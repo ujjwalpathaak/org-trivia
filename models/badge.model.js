@@ -1,8 +1,19 @@
 import mongoose from "mongoose";
 
 const badgeSchema = new mongoose.Schema({
-    // need to add fields
-}, { timestamps: true });
+    shieldUrl: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    description: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+  },
+  { timestamps: true }
+);
 
 const Badge = mongoose.model("Badge", badgeSchema);
 
