@@ -1,14 +1,4 @@
-To securely manage passwords in a **MERN** stack with **MongoDB** and **JWT**, follow these best practices:  
 
----
-
-### **1. Hash Passwords Before Storing**
-Never store raw passwords. Use **bcrypt** to hash passwords before saving them to the database.
-
-#### **Install bcrypt**:
-```sh
-npm install bcrypt
-```
 
 #### **Modify Admin Schema (Hash Password Before Saving)**:
 ```javascript
