@@ -1,33 +1,26 @@
-import mongoose from "mongoose";
+import Employee from "../models/employee.model.js";
 
-const employeeSchema = new mongoose.Schema({
-    id: {
-        type: UUID,
-        required: true
-    },
-    name: {
-        type: String,
-        required: true,
-        trim: true
-    },
-    current_streak: {
-        type: Number, // no. of days
-        default: 0
-    },
-    current_points: {
-        type: Number,
-        default: 0
-    },
-    badges: {
-        type: [Object],
-        default: []
-    },
-    submitted_question: {
-        type: Number,
-        default: 0
+export const getAllEmployees = async (request, response) => {
+    try {
+        const employees = await Employee.find({});
+
+        response.status(200).json({ employees });
+    } catch (error) {
+        response.status(500).json({ message: "Server error", error: error.message });
     }
-}, { timestamps: true });
+}
 
-const Employee = mongoose.model("Employee", employeeSchema);
-
-export default Employee;
+export const getEmployeeByEmail = async (request, response) => {
+    try {
+        const { email } = request.body;
+    
+        const employee = await Employee.findOne({ email });
+        if(!employee){
+            return response.status(404).json({ message: "No Employee found" });
+        }
+    
+        response.status(200).json({ employee });
+    } catch (error) {
+        response.status(500).json({ message: "Server error", error: error.message });
+    }
+}

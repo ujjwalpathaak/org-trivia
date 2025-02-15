@@ -1,9 +1,9 @@
-import mongoose from "mongoose";
+import express from "express";
+import { getAdminByEmail, getAllAdmins } from "../controllers/admin.controller.js";
 
-const adminSchema = new mongoose.Schema({
-    // need to add fields
-}, { timestamps: true });
+const adminRouter = express.Router();
 
-const Admin = mongoose.model("Admin", adminSchema);
+adminRouter.get("/", getAllAdmins);
+adminRouter.get("/:email", getAdminByEmail);
 
-export default Admin;
+export default adminRouter;

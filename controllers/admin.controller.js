@@ -1,9 +1,26 @@
-import mongoose from "mongoose";
+import Admin from "../models/admin.model.js";
 
-const adminSchema = new mongoose.Schema({
-    // need to add fields
-}, { timestamps: true });
+export const getAllAdmins = async (request, response) => {
+    try {
+        const admins = await Admin.find({});
 
-const Admin = mongoose.model("Admin", adminSchema);
+        response.status(200).json({ admins });
+    } catch (error) {
+        response.status(500).json({ message: "Server error", error: error.message });
+    }
+}
 
-export default Admin;
+export const getAdminByEmail = async (request, response) => {
+    try {
+        const { email } = request.body;
+    
+        const admin = await Admin.findOne({ email });
+        if(!admin){
+            return response.status(404).json({ message: "No Admin found" });
+        }
+    
+        response.status(200).json({ admin });
+    } catch (error) {
+        response.status(500).json({ message: "Server error", error: error.message });
+    }
+}
