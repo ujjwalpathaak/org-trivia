@@ -5,8 +5,8 @@ import dotenv from "dotenv";
 import express from "express";
 import router from "./routes/router.js";
 
-import { isProduction } from "./utils.js";
-import { connectDatabase } from "./connectDatabase.js";
+import { isProduction, logService } from "./utils.js";
+import { connectDatabase } from "./Database.js";
 
 const app = express();
 
@@ -16,6 +16,7 @@ const ALLOWED_ORIGINS = isProduction() ? process.env.CORS_ORIGIN?.split(",") : "
 app.use(cors({ origin: ALLOWED_ORIGINS }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(logService);
 
 connectDatabase();
 
