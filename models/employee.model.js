@@ -24,6 +24,12 @@ const employeeSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    role: {
+      type: String,
+      default: "Employee",
+      enum: ["Employee"],
+      immutable: true
+    },
     badges: {
       type: [Object],
       default: [],
