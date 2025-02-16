@@ -6,7 +6,6 @@ const LoginForm = () => {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
-    isAdmin: false,
     rememberMe: false,
   });
 
@@ -29,7 +28,7 @@ const LoginForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!validateForm(formData, setErrors)) return;
+    if (!validateForm(formData, setErrors, true)) return;
 
     try {
       const response = await loginRequest(formData);
@@ -49,40 +48,6 @@ const LoginForm = () => {
   return (
     <form className="max-w-sm mx-auto" onSubmit={handleSubmit}>
       <h1 className="text-lg font-bold mb-4">Welcome Back!</h1>
-
-      {/* Role Selection */}
-      <div className="mb-5">
-        <label className="block mb-2 text-sm font-medium text-gray-900">
-          I am an
-        </label>
-        <div className="flex gap-4">
-          <label className="flex items-center">
-            <input
-              type="radio"
-              name="isAdmin"
-              value="false"
-              checked={!formData.isAdmin}
-              onChange={handleChange}
-              className="mr-2"
-            />
-            Employee
-          </label>
-          <label className="flex items-center">
-            <input
-              type="radio"
-              name="isAdmin"
-              value="true"
-              checked={formData.isAdmin}
-              onChange={handleChange}
-              className="mr-2"
-            />
-            Admin
-          </label>
-        </div>
-        {errors.isAdmin && (
-          <p className="text-red-500 text-xs mt-1">{errors.isAdmin}</p>
-        )}
-      </div>
 
       <div className="mb-5">
         <label
