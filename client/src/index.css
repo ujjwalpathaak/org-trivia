@@ -10,8 +10,10 @@
 }
 
 .floating-div{
-    padding: 10px;
-    /* border: black 1px solid; */
     border-radius: 15px;
     box-shadow: 0 1px 10px rgb(0,0,0,0.1);
+}
+
+.parent-page-div{
+    height: calc(100vh - 4rem);
 }

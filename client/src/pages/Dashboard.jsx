@@ -1,6 +1,11 @@
+import React from "react";
+
 const Dashboard = () => {
-    return <h1>Welcome to the Dashboard (Protected)</h1>;
-  };
-  
-  export default Dashboard;
-  
+  return (
+    <div className="parent-page-div font-black flex justify-center items-center">
+      Dashboard
+    </div>
+  );
+};
+
+export default Dashboard;

@@ -7,7 +7,6 @@ const JWT_SECRET = process.env.JWT_SECRET;
 
 export const checkRole = (...allowedRoles) => {
     return (req, res, next) => {
-        console.log(allowedRoles)
         if (allowedRoles.includes(req.user.role)) next();
         return res.status(403).json({ message: "Access Denied: Insufficient permissions" });
     };

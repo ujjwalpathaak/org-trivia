@@ -7,7 +7,7 @@ const getUserModel = (isAdmin) => (isAdmin ? [Admin, "Admin"] : [Employee, "Empl
 
 const generateToken = (user, isAdmin) => {
     return jwt.sign(
-        { id: user._id, role: isAdmin ? "Admin" : "Employee" },
+        { id: user._id, user: user, role: isAdmin ? "Admin" : "Employee" },
         process.env.JWT_SECRET,
         { expiresIn: "7d" }
     );
@@ -40,9 +40,7 @@ export const register = async (req, res) => {
 
 export const login = async (req, res) => {
     try {
-        console.log(process.env.JWT_SECRET)
         const { isAdmin, email, password } = req.body;
-        
         const [UserModel, userType] = getUserModel(isAdmin);
         const user = await UserModel.findOne({ email });
         if (!user) return res.status(404).json({ message: "User not found!" });
