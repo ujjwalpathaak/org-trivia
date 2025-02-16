@@ -5,6 +5,6 @@ import { checkRole, protectRoute } from "../middleware/auth.middleware.js";
 const employeeRouter = express.Router();
 
 employeeRouter.get("/", protectRoute, checkRole("Admin"), getAllEmployees);
-employeeRouter.get("/:email", getEmployeeByEmail);
+employeeRouter.get("/:email", protectRoute, checkRole("Admin"), getEmployeeByEmail);
 
 export default employeeRouter;

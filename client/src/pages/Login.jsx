@@ -1,22 +1,19 @@
-import { useContext } from "react";
-// import { AuthContext } from "../App";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from 'react'
+import EmployeeLoginForm from '../components/EmployeeLoginForm';
+import AdminLoginForm from '../components/AdminLoginForm';
 
 const Login = () => {
-//   const { setIsAuthenticated } = useContext(AuthContext);
-  const navigate = useNavigate();
-
-  const handleLogin = () => {
-    setIsAuthenticated(true);
-    navigate("/dashboard");
-  };
-
+  const [employeeLogin, setEmployeeLogin] = useState(true);
   return (
     <div>
-      <h1>Login Page</h1>
-      <button onClick={handleLogin}>Login</button>
+      {
+        employeeLogin ? <EmployeeLoginForm /> : <AdminLoginForm />
+      }
+      {
+        employeeLogin ? <button onClick={() => setEmployeeLogin(false)}>Admin?</button> : <button onClick={() => setEmployeeLogin(true)}>Employee?</button>
+      }
     </div>
-  );
-};
+  )
+}
 
-export default Login;
+export default Login
