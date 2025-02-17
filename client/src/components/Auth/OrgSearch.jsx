@@ -7,12 +7,28 @@ const OrgSearch = ({ setFormData }) => {
   const [orgList, setOrgList] = useState([]);
 
   useEffect(() => {
+    let cachedData = localStorage.getItem("cachedData");
+    cachedData = cachedData ? JSON.parse(cachedData) : {};
+
     const fetchAllOrgs = async () => {
-      const promise = await getAllOrgs();
-      const data = await promise.json();
-      setOrgList(data.orgs);
+      try {
+        const response = await getAllOrgs();
+        const data = await response.json();
+
+        const newCache = { ...cachedData, orgs: data.orgs };
+        localStorage.setItem("cachedData", JSON.stringify(newCache));
+
+        setOrgList(data.orgs);
+      } catch (error) {
+        console.error("Error fetching organizations:", error);
+      }
     };
-    fetchAllOrgs();
+
+    if (cachedData.orgs) {
+      setOrgList(cachedData.orgs);
+    } else {
+      fetchAllOrgs();
+    }
   }, []);
 
   const handleSearch = (e) => {
@@ -34,6 +50,7 @@ const OrgSearch = ({ setFormData }) => {
     setSearchTerm(org.name);
     setFilteredOrgs([]);
   };
+
   return (
     <div className="mb-5 relative">
       <label className="block mb-2 text-sm font-medium text-gray-900">
