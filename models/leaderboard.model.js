@@ -3,16 +3,12 @@ import mongoose from "mongoose";
 const rankingSchema = new mongoose.Schema({
     employeeId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
+        ref: "Employee",
         required: true
     },
     score: {
         type: Number,
         required: true
-    },
-    date: {
-        type: Date,
-        default: Date.now
     }
 });
 
@@ -26,7 +22,6 @@ const leaderboardSchema = new mongoose.Schema({
         default: Date.now
     }
 }, { timestamps: true });
-
 
 const Leaderboard = mongoose.model("Leaderboard", leaderboardSchema);
 

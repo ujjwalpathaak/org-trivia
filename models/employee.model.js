@@ -1,5 +1,16 @@
 import mongoose from "mongoose";
 
+const earnedBadgeSchema = new mongoose.Schema(
+  {
+    badge: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Badge",
+      required: true,
+    },
+  },
+  { timestamps: true }
+);
+
 const employeeSchema = new mongoose.Schema(
   {
     name: {
@@ -10,11 +21,12 @@ const employeeSchema = new mongoose.Schema(
     email: {
       type: String,
       required: true,
-      trim: true
+      trim: true,
+      unique: true,
     },
     password: {
       type: String,
-      required: true
+      required: true,
     },
     currentStreak: {
       type: Number, // no. of days
@@ -28,14 +40,15 @@ const employeeSchema = new mongoose.Schema(
       type: String,
       default: "Employee",
       enum: ["Employee"],
-      immutable: true
+      immutable: true,
     },
     badges: {
-      type: [Object],
+      type: [earnedBadgeSchema],
       default: [],
     },
     submittedQuestion: {
-      type: [Object],
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: "Question",
       default: [],
     },
   },
