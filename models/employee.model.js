@@ -51,6 +51,12 @@ const employeeSchema = new mongoose.Schema(
       ref: "Question",
       default: [],
     },
+    Org: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Org",
+      immutable: true,
+      required: true,
+    },
   },
   { timestamps: true }
 );

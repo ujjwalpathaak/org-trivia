@@ -24,6 +24,12 @@ const adminSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    Org: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Org",
+      immutable: true,
+      required: true,
+    },
   },
   { timestamps: true }
 );

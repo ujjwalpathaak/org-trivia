@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import { SchedulerSystem } from "pixi.js";
 
 const weeklyQuestionSchema = new mongoose.Schema({
   scheduledDate: {
@@ -11,7 +10,13 @@ const weeklyQuestionSchema = new mongoose.Schema({
       type: mongoose.Schema.Types.ObjectId,
       ref: "Question",
       required: true,
-    },
+  },
+  Org: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Org",
+    immutable: true,
+    required: true,
+  },
 });
 
 const WeeklyQuestion = mongoose.model("WeeklyQuestion", weeklyQuestionSchema);

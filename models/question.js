@@ -63,6 +63,12 @@ const questionSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  Org: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Org",
+    immutable: true,
+    required: true,
+  },
 }, { timestamps: true });
 
 const Question = mongoose.model("Question", questionSchema);

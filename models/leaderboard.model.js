@@ -20,7 +20,13 @@ const leaderboardSchema = new mongoose.Schema({
     date: {
         type: Date,
         default: Date.now
-    }
+    },
+    Org: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Org",
+        immutable: true,
+        required: true,
+    },
 }, { timestamps: true });
 
 const Leaderboard = mongoose.model("Leaderboard", leaderboardSchema);
