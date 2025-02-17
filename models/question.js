@@ -63,7 +63,7 @@ const questionSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
-  Org: {
+  org: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Org",
     immutable: true,

@@ -32,21 +32,25 @@ const generateToken = (user, isAdmin) => {
 export const register = async (req, res) => {
     try {
 
-        const { isAdmin, email, password, name } = req.body;
+        const { isAdmin, email, password, name, org } = req.body;
 
         const [UserModel, userType] = getUserModel(isAdmin);
-        
+
         const data = await checkUserExists(email);
 
         const user = data?.user;
 
         if (user) {
             return res.status(400).json({ message: `This email already exists` });
+        }   
+        
+        if(Object.keys(org).length === 0){
+            return res.status(400).json({ message: `No such organisation exists` });
         }
         
         const hashedPassword = await bcrypt.hash(password, 10);
         
-        const newUser = new UserModel({ email, password: hashedPassword, name });
+        const newUser = new UserModel({ email, password: hashedPassword, name, org });
         await newUser.save();
 
         res.status(201).json({ 

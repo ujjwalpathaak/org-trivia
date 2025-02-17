@@ -11,7 +11,7 @@ const weeklyQuestionSchema = new mongoose.Schema({
       ref: "Question",
       required: true,
   },
-  Org: {
+  org: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Org",
     immutable: true,

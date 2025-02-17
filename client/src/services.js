@@ -18,3 +18,11 @@ export const registerRequest = async (formData) => {
 
     return response;
 }
+export const getAllOrgs = async () => {
+    const response = await fetch(BACKEND_URL + "/org", {
+        method: "GET",
+        headers: { "Content-Type": "application/json" }
+      });
+
+    return response;
+}

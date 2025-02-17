@@ -1,21 +1,22 @@
 import React, { useState } from "react";
 import { validateForm } from "../../utils";
 import { registerRequest } from "../../services";
+import OrgSearch from "./OrgSearch";
 
 const RegistrationForm = () => {
   const [formData, setFormData] = useState({
     email: "",
     name: "",
     password: "",
-    isAdmin: "Employee",
+    isAdmin: false,
     rememberMe: false,
+    org: {},
   });
 
   const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-
     setFormData((prev) => ({
       ...prev,
       [name]:
@@ -37,6 +38,11 @@ const RegistrationForm = () => {
       const data = await response.json();
 
       if (response.ok) {
+        alert(
+          `Successfully registered you as an ${
+            formData.isAdmin ? "Admin" : "Employee"
+          }. Login again to get access to the dashboard!`
+        );
         window.location.href = "/";
       } else {
         setErrors({ ...errors, serverError: data.message });
@@ -81,6 +87,7 @@ const RegistrationForm = () => {
           <p className="text-red-500 text-xs mt-1">{errors.isAdmin}</p>
         )}
       </div>
+      <OrgSearch setFormData={setFormData} />
       <div className="mb-5">
         <label
           htmlFor="name"
