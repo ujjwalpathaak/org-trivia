@@ -21,8 +21,6 @@ export const protectRoute = async (req, res, next) => {
         }
 
         const token = bearerToken.split(' ')[1];
-
-        console.log(token)
         const decoded = jwt.verify(token, JWT_SECRET);
         req.user = decoded;
         next();

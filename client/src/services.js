@@ -9,6 +9,7 @@ export const loginRequest = async (formData) => {
 
     return response;
 }
+
 export const registerRequest = async (formData) => {
     const response = await fetch(BACKEND_URL + "/auth/register", {
         method: "POST",
@@ -18,10 +19,22 @@ export const registerRequest = async (formData) => {
 
     return response;
 }
+
 export const getAllOrgs = async () => {
     const response = await fetch(BACKEND_URL + "/org", {
         method: "GET",
         headers: { "Content-Type": "application/json" }
+      });
+
+    return response;
+}
+
+export const getEmployeesByOrg = async (token, orgId) => {
+    const response = await fetch(BACKEND_URL + `/employee/org/${orgId}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}` }
       });
 
     return response;

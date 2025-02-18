@@ -4,6 +4,8 @@ import { AuthProvider, ProtectedRoute } from "./context/auth.context.jsx";
 import Auth from "./pages/Auth.jsx";
 import Dashboard from "./pages/Dashboard";
 import Navbar from "./components/Navbar.jsx";
+import QuestionMaker from "./pages/QuestionMaker.jsx";
+import NotFound from "./pages/NotFound.jsx";
 
 function App() {
   return (
@@ -11,15 +13,26 @@ function App() {
       <Router>
         <Navbar />
         <Routes>
+          <Route path="*" element={<NotFound />} />
           <Route path="/" element={<Auth />} />
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            }
-          />
+          <Route path="/dashboard">
+            <Route
+              index
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="question-maker"
+              element={
+                <ProtectedRoute>
+                  <QuestionMaker />
+                </ProtectedRoute>
+              }
+            />
+          </Route>
         </Routes>
       </Router>
     </AuthProvider>
