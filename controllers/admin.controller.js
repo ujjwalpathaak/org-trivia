@@ -12,7 +12,7 @@ export const getAllAdmins = async (request, response) => {
 
 export const getAdminByEmail = async (request, response) => {
     try {
-        const { email } = request.body;
+        const { email } = request.params;
     
         const admin = await Admin.findOne({ email });
         if(!admin){
@@ -20,6 +20,21 @@ export const getAdminByEmail = async (request, response) => {
         }
     
         response.status(200).json({ admin });
+    } catch (error) {
+        response.status(500).json({ message: "Server error", error: error.message });
+    }
+}
+
+export const getAllAdminsByOrg = async (request, response) => {
+    try {
+        const { orgId } = request.params;
+    
+        const admins = await Admin.find({ org: orgId });
+        if(!admins){
+            return response.status(404).json({ message: "No Admins found" });
+        }
+    
+        response.status(200).json({ admins });
     } catch (error) {
         response.status(500).json({ message: "Server error", error: error.message });
     }

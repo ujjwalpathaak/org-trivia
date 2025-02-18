@@ -8,7 +8,7 @@ const JWT_SECRET = process.env.JWT_SECRET;
 export const checkRole = (...allowedRoles) => {
     return (req, res, next) => {
         if (allowedRoles.includes(req.user.role)) next();
-        return res.status(403).json({ message: "Access Denied: Insufficient permissions" });
+        else return res.status(403).json({ message: "Access Denied: Insufficient permissions" });
     };
 };
 
@@ -22,6 +22,7 @@ export const protectRoute = async (req, res, next) => {
 
         const token = bearerToken.split(' ')[1];
 
+        console.log(token)
         const decoded = jwt.verify(token, JWT_SECRET);
         req.user = decoded;
         next();
