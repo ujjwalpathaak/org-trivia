@@ -11,6 +11,8 @@ node_modules
 dist
 dist-ssr
 *.local
+HR_Docs
+sample.pdf
 .env
 
 # Editor directories and files
