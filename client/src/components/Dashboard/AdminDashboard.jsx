@@ -6,6 +6,7 @@ const AdminDashboard = () => {
   const { data } = useAuth();
   const [employees, setEmployees] = useState([]);
 
+  // add promise.all here as more APIs come
   useEffect(() => {
     const fetchAllEmployees = async () => {
       try {
