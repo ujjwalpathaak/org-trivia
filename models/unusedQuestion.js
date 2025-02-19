@@ -13,12 +13,19 @@ const optionsSchema = new mongoose.Schema({
   },
 }, { timestamps: true });
 
-const questionSchema = new mongoose.Schema({
+const unusedQuestionSchema = new mongoose.Schema({
   source: {
     type: String,
     enum: ["AI", "Employee", "Admin"],
     immutable: true,
+    required: true,
     default: "AI",
+  },
+  category: {
+    type: String,
+    enum: ["CC&H", "IT&&FF", "CA", "HRD", "RP&A"],
+    immutable: true,
+    required: true
   },
   image: {
     type: String,
@@ -51,10 +58,6 @@ const questionSchema = new mongoose.Schema({
     required: true,
     default: "extra"
   },
-  scheduledDate: {
-    type: Date,
-    default: null, // will only be used when question is live
-  },
   lastModifiedBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Admin",
@@ -71,6 +74,6 @@ const questionSchema = new mongoose.Schema({
   },
 }, { timestamps: true });
 
-const Question = mongoose.model("Question", questionSchema);
+const unusedQuestion = mongoose.model("unusedQuestion", unusedQuestionSchema);
 
-export default Question;
+export default unusedQuestion;

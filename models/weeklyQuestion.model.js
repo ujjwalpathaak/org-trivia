@@ -8,7 +8,7 @@ const weeklyQuestionSchema = new mongoose.Schema({
   },
   question: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Question",
+      ref: "unusedQuestion",
       required: true,
   },
   org: {

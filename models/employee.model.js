@@ -48,7 +48,7 @@ const employeeSchema = new mongoose.Schema(
     },
     submittedQuestion: {
       type: [mongoose.Schema.Types.ObjectId],
-      ref: "Question",
+      ref: "usedQuestion",
       default: [],
     },
     org: {
