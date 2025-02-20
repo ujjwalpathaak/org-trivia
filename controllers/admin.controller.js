@@ -24,7 +24,7 @@ export const getAdminByEmail = async (request, response) => {
     try {
         const { email } = request.params;
 
-        const user = authService.getUser(email);
+        const user = authService.getUserByEmail(email);
 
         if(!user){
             return response.status(404).json({ message: "No such user found" });

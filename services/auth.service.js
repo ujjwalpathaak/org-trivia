@@ -6,7 +6,7 @@ class AuthService {
         this.authRepository = authRepository;
     }
 
-    async getUser(email) {
+    async getUserByEmail(email) {
         return await this.authRepository.getUserByEmail(email);
     }
 

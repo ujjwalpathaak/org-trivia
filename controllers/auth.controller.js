@@ -13,7 +13,7 @@ export const register = async (req, res) => {
 
         const [UserModel, userType] = isAdmin ? [Admin, "Admin"] : [Employee, "Employee"];
         
-        const user = await authService.getUser(email);
+        const user = await authService.getUserByEmail(email);
 
         if (user) {
             return res.status(400).json({ message: `This email already exists` });
@@ -38,7 +38,7 @@ export const login = async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        const user = await authService.getUser(email);
+        const user = await authService.getUserByEmail(email);
 
         if (!user) {
             return res.status(404).json({ message: "User not found!" });

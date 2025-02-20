@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 import express from "express";
 import router from "./routes/router.js";
 
-import { isProduction, logService } from "./utils.js";
+import { isProduction, logService } from "./middleware/utils.js";
 import { connectDatabase } from "./Database.js";
 
 const app = express();

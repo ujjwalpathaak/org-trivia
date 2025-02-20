@@ -20,7 +20,7 @@ export const getEmployeeByEmail = async (request, response) => {
     try {
         const { email } = request.params;
     
-        const user = await authService.getUser(email);
+        const user = await authService.getUserByEmail(email);
         if(!user){
             return response.status(404).json({ message: "No Employee found" });
         }

@@ -23,7 +23,7 @@ const unusedQuestionSchema = new mongoose.Schema({
   },
   category: {
     type: String,
-    enum: ["CCnHnFF", "CAnIT", "HRD", "RPnA"],
+    enum: ["CCnHnFF", "CAnIT", "HRD", "PnA"],
     immutable: true,
     required: true
   },
