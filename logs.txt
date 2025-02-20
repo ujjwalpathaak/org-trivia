@@ -131,3 +131,15 @@ GET req on /testGemini at 1739866404522
 GET req on /testGemini at 1739866444918
 GET req on /testGemini at 1739868107065
 HEAD req on / at 1739868289488
+GET req on /admins at 1740038979817
+GET req on /admins at 1740038996330
+GET req on /admins at 1740039019211
+GET req on /admins at 1740039027026
+GET req on /admin at 1740039053140
+POST req on /auth/login at 1740040627996
+POST req on /auth/login at 1740040748503
+POST req on /auth/login at 1740040758790
+POST req on /auth/login at 1740040766279
+POST req on /auth/login at 1740040858291
+POST req on /auth/login at 1740040917239
+POST req on /auth/login at 1740040920779

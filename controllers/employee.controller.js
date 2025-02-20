@@ -1,8 +1,14 @@
-import Employee from "../models/employee.model.js";
+import EmployeeService from "../services/employee.service.js";
+import EmployeeRepository from "../repositories/employee.repository.js";
+import AuthService from "../services/auth.service.js";
+import AuthRepository from "../repositories/auth.repository.js";
+
+const authService = new AuthService(new AuthRepository());
+const employeeService = new EmployeeService(new EmployeeRepository());
 
 export const getAllEmployees = async (request, response) => {
     try {
-        const employees = await Employee.find({});
+        const employees = await employeeService.getAllEmployees();
 
         response.status(200).json({ employees });
     } catch (error) {
@@ -10,13 +16,12 @@ export const getAllEmployees = async (request, response) => {
     }
 }
 
-// test
 export const getEmployeeByEmail = async (request, response) => {
     try {
         const { email } = request.params;
     
-        const employee = await Employee.findOne({ email });
-        if(!employee){
+        const user = await authService.getUser(email);
+        if(!user){
             return response.status(404).json({ message: "No Employee found" });
         }
     
@@ -26,12 +31,11 @@ export const getEmployeeByEmail = async (request, response) => {
     }
 }
 
-// test
 export const getAllEmployeesByOrg = async (request, response) => {
     try {
         const { orgId } = request.params;
     
-        const employees = await Employee.find({ org: orgId });
+        const employees = await employeeService.getAllOrgEmployees(orgId);
         if(!employees){
             return response.status(404).json({ message: "No Employees found" });
         }

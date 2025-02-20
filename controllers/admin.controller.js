@@ -1,8 +1,18 @@
-import Admin from "../models/admin.model.js";
+import AdminService from "../services/admin.service.js";
+import AdminRepository from "../repositories/admin.repository.js";
+import AuthService from "../services/auth.service.js";
+import AuthRepository from "../repositories/auth.repository.js";
+
+const adminRepository = new AdminRepository();
+const adminService = new AdminService(adminRepository);
+
+const authRepository = new AuthRepository();
+const authService = new AuthService(authRepository);
+
 
 export const getAllAdmins = async (request, response) => {
     try {
-        const admins = await Admin.find({});
+        const admins = await adminService.getAllAdmins();
 
         response.status(200).json({ admins });
     } catch (error) {
@@ -13,10 +23,11 @@ export const getAllAdmins = async (request, response) => {
 export const getAdminByEmail = async (request, response) => {
     try {
         const { email } = request.params;
-    
-        const admin = await Admin.findOne({ email });
-        if(!admin){
-            return response.status(404).json({ message: "No Admin found" });
+
+        const user = authService.getUser(email);
+
+        if(!user){
+            return response.status(404).json({ message: "No such user found" });
         }
     
         response.status(200).json({ admin });
@@ -29,7 +40,8 @@ export const getAllAdminsByOrg = async (request, response) => {
     try {
         const { orgId } = request.params;
     
-        const admins = await Admin.find({ org: orgId });
+        const admins = adminService.getAllOrgAdmins(orgId);
+
         if(!admins){
             return response.status(404).json({ message: "No Admins found" });
         }
