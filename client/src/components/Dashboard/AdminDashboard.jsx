@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { getEmployeesByOrg } from "../../services";
 import { useOrgId } from "../../context/auth.context";
+import { useNavigate } from "react-router-dom";
 
 const AdminDashboard = () => {
   const orgId = useOrgId();
+  const navigate = useNavigate();
   const [employees, setEmployees] = useState([]);
 
   useEffect(() => {
@@ -58,30 +60,11 @@ const AdminDashboard = () => {
         <div className="bg-white p-4 rounded-2xl shadow-lg">
           <h2 className="text-lg font-semibold mb-2">Approve Questions</h2>
           <p className="text-gray-600">Review and approve pending questions.</p>
-          <button className="mt-3 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+          <button
+            onClick={() => navigate("approve-questions")}
+            className="mt-3 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          >
             View Pending Questions
-          </button>
-        </div>
-
-        <div className="bg-white p-4 rounded-2xl shadow-lg">
-          <h2 className="text-lg font-semibold mb-2">AI & Unused Questions</h2>
-          <p className="text-gray-600">
-            Manage AI-generated and unused questions.
-          </p>
-          <button className="mt-3 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
-            View AI Questions
-          </button>
-        </div>
-
-        <div className="bg-white p-4 rounded-2xl shadow-lg">
-          <h2 className="text-lg font-semibold mb-2">
-            Employee Submitted Questions
-          </h2>
-          <p className="text-gray-600">
-            Review questions submitted by employees.
-          </p>
-          <button className="mt-3 px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700">
-            View Submissions
           </button>
         </div>
 

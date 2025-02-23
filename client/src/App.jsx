@@ -8,6 +8,7 @@ import QuestionMaker from "./pages/QuestionMaker.jsx";
 import NotFound from "./pages/NotFound.jsx";
 import Quiz from "./pages/Quiz.jsx";
 import { ToastContainer } from "react-toastify";
+import ApproveQuestions from "./pages/ApproveQuestions.jsx";
 
 function App() {
   return (
@@ -37,8 +38,16 @@ function App() {
             <Route
               path="quiz"
               element={
-                <ProtectedRoute quiz="quiz">
+                <ProtectedRoute route="quiz">
                   <Quiz />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="approve-questions"
+              element={
+                <ProtectedRoute route="approve-questions">
+                  <ApproveQuestions />
                 </ProtectedRoute>
               }
             />

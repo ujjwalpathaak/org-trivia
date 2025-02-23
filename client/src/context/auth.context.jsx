@@ -68,14 +68,20 @@ export const useOrgId = () => {
   return data?.user?.org || "";
 };
 
-export const ProtectedRoute = ({ children, ...props }) => {
-  const { isAuthenticated, loading } = useAuth();
+export const ProtectedRoute = ({ children, route }) => {
+  const { isAuthenticated, data, loading } = useAuth();
   const isQuizLive = false;
 
-  if (props.quiz && !isQuizLive) {
+  if (loading) return <p>Loading...</p>;
+
+  if (route === "quiz" && !isQuizLive) {
     return <Navigate to="/" replace />;
   }
-  if (loading) return <p>Loading...</p>;
+
+  if (route === "approve-questions" && data?.user?.role !== "Admin") {
+    return <Navigate to="/" replace />;
+  }
+
   return isAuthenticated ? children : <Navigate to="/" replace />;
 };
 
