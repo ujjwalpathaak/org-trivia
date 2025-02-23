@@ -1,19 +1,6 @@
 import mongoose from "mongoose";
 
-const optionsSchema = new mongoose.Schema({
-  description: {
-    type: String,
-    required: true,
-    minlength: 5,
-    maxlength: 200,
-  },
-  isAnswer: {
-    type: Boolean,
-    required: true,
-  },
-}, { timestamps: true });
-
-const usedQuestionSchema = new mongoose.Schema({
+const questionSchema = new mongoose.Schema({
   source: {
     type: String,
     enum: ["AI", "Employee", "Admin"],
@@ -29,7 +16,7 @@ const usedQuestionSchema = new mongoose.Schema({
   },
   image: {
     type: String,
-    default: NULL,
+    default: "",
   },
   description: {
     type: String,
@@ -43,7 +30,7 @@ const usedQuestionSchema = new mongoose.Schema({
     immutable: true,
   },
   options: {
-    type: [optionsSchema],
+    type: [String],
     required: true,
     validate: {
       validator: function (v) {
@@ -77,6 +64,6 @@ const usedQuestionSchema = new mongoose.Schema({
   },
 }, { timestamps: true });
 
-const usedQuestion = mongoose.model("usedQuestion", usedQuestionSchema);
+const Question = mongoose.model("Question", questionSchema);
 
-export default usedQuestion;
+export default Question;

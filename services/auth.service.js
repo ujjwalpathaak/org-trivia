@@ -31,7 +31,7 @@ class AuthService {
     }
 
     async createUser(UserModel, email, password, name, org) {
-        const hashedPassword = await this.authService.createHash(password, 10);
+        const hashedPassword = await this.createHash(password, 10);
 
         const newUser = new UserModel({ email, password: hashedPassword, name, org });
         await this.authRepository.saveUser(newUser);

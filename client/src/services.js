@@ -1,4 +1,5 @@
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL
+const token = localStorage.getItem("token");
 
 export const loginRequest = async (formData) => {
     const response = await fetch(BACKEND_URL + "/auth/login", {
@@ -29,7 +30,7 @@ export const getAllOrgs = async () => {
     return response;
 }
 
-export const getEmployeesByOrg = async (token, orgId) => {
+export const getEmployeesByOrg = async (orgId) => {
     const response = await fetch(BACKEND_URL + `/employee/org/${orgId}`, {
         method: "GET",
         headers: {
@@ -39,3 +40,25 @@ export const getEmployeesByOrg = async (token, orgId) => {
 
     return response;
 }
+
+export const createNewQuestion = async (formData, token) => {
+  try {
+    const response = await fetch(`${BACKEND_URL}/question`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+      body: JSON.stringify(formData),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Failed to create question");
+    }
+
+    return await response.json();
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+};

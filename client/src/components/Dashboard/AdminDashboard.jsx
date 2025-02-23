@@ -6,14 +6,12 @@ const AdminDashboard = () => {
   const { data } = useAuth();
   const [employees, setEmployees] = useState([]);
 
-  // add promise.all here as more APIs come
   useEffect(() => {
     const fetchAllEmployees = async () => {
       try {
-        const token = localStorage.getItem("token");
         const orgId = data.user.org;
 
-        const response = await getEmployeesByOrg(token, orgId);
+        const response = await getEmployeesByOrg(orgId);
         const responseJSON = await response.json();
         const employeesList = responseJSON.employees;
 

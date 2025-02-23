@@ -1,34 +1,56 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { createNewQuestion } from "../services";
+import { getOrgId } from "../context/auth.context";
 
 const QuestionMaker = () => {
-  const [question, setQuestion] = useState("");
-  const [options, setOptions] = useState(["", "", "", ""]);
-  const [answer, setAnswer] = useState("");
-  const [image, setImage] = useState(null);
   const navigate = useNavigate();
 
+  const [orgId, setOrgId] = useState(null);
+
+  useEffect(() => {
+    setOrgId(getOrgId()); // Fetch orgId only once
+  }, []);
+
+  const [question, setQuestion] = useState({
+    description: "",
+    answer: null,
+    options: ["", "", "", ""],
+    image: null,
+    source: "Employee",
+    org: orgId,
+    category: "",
+  });
+
+  useEffect(() => {
+    setQuestion((prev) => ({ ...prev, org: orgId }));
+  }, [orgId]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setQuestion((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
   const handleOptionChange = (index, value) => {
-    const updatedOptions = [...options];
-    updatedOptions[index] = value;
-    setOptions(updatedOptions);
+    setQuestion((prev) => {
+      const updatedOptions = [...prev.options];
+      updatedOptions[index] = value;
+      return { ...prev, options: updatedOptions };
+    });
   };
 
   const handleImageChange = (event) => {
-    setImage(event.target.files[0]);
+    setQuestion((prev) => ({
+      ...prev,
+      image: event.target.files[0],
+    }));
   };
 
   const handleSubmit = () => {
-    const formData = new FormData();
-    formData.append("question", question);
-    formData.append("answer", answer);
-    formData.append("image", image);
-
-    options.forEach((option, index) => {
-      formData.append(`option${index + 1}`, option);
-    });
-
-    console.log("Form Data to Submit:", formData);
+    createNewQuestion(question);
   };
 
   return (
@@ -44,11 +66,32 @@ const QuestionMaker = () => {
             Question
           </label>
           <textarea
-            value={question}
-            onChange={(e) => setQuestion(e.target.value)}
+            name="description"
+            value={question.description}
+            onChange={handleChange}
             className="mt-2 max-h-30 overflow-y-auto block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Enter the question here"
           />
+        </div>
+
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700">
+            Category
+          </label>
+          <select
+            name="category"
+            value={question.category}
+            onChange={handleChange}
+            className="mt-2 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">Select Category</option>
+            <option value="CCnHnFF">Company Culture, History & Facts</option>
+            <option value="CAnIT">
+              Company Achievements and Industry Trends
+            </option>
+            <option value="HRD">HR Docs</option>
+            <option value="PnA">Puzzles and Aptitude</option>
+          </select>
         </div>
 
         <div className="mb-4">
@@ -66,7 +109,7 @@ const QuestionMaker = () => {
           <label className="block text-sm font-medium text-gray-700">
             Options
           </label>
-          {options.map((option, index) => (
+          {question.options.map((option, index) => (
             <div key={index} className="mb-2">
               <input
                 type="text"
@@ -84,13 +127,14 @@ const QuestionMaker = () => {
             Correct Answer
           </label>
           <select
-            value={answer}
-            onChange={(e) => setAnswer(e.target.value)}
+            name="answer"
+            value={question.answer}
+            onChange={handleChange}
             className="mt-2 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="">Select Correct Answer</option>
-            {options.map((option, index) => (
-              <option key={index} value={option}>
+            {question.options.map((option, index) => (
+              <option key={index} value={index}>
                 Option {index + 1}:{" "}
                 {option.length > 15 ? option.substring(0, 15) + "..." : option}
               </option>

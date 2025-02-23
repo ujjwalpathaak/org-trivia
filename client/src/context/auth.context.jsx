@@ -63,6 +63,11 @@ export const AuthProvider = ({ children }) => {
 
 export const useAuth = () => useContext(AuthContext);
 
+export const getOrgId = () => {
+  const { data } = useAuth();
+  return data?.user?.org || null;
+};
+
 export const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
 
