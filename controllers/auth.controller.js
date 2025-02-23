@@ -44,18 +44,15 @@ export const login = async (req, res) => {
             return res.status(404).json({ message: "User not found!" });
         }
 
-        const isAdmin = user.isAdmin;
-        const userType = isAdmin ? "Admin" : "Employee";
-
         const isMatch = await authService.passwordsMatch(password, user.password);
         if (!isMatch) {
             return res.status(401).json({ message: "Invalid password" });
         }
 
-        const token = authService.generateToken(user, isAdmin);
+        const token = authService.generateToken(user);
 
         res.status(200).json({ 
-            message: `${userType} logged in successfully`,
+            message: `user logged in successfully`,
             token
         });
     } catch (error) {

@@ -12,7 +12,7 @@ class AuthService {
 
     generateToken(user, isAdmin) {
         return jwt.sign(
-            { id: user._id, user: user, role: isAdmin ? "Admin" : "Employee" },
+            { id: user._id, user: user},
             process.env.JWT_SECRET,
             { expiresIn: "7d" }
         );

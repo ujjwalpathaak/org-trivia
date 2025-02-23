@@ -63,12 +63,23 @@ export const AuthProvider = ({ children }) => {
 
 export const useAuth = () => useContext(AuthContext);
 
-export const getOrgId = () => {
+export const useOrgId = () => {
   const { data } = useAuth();
-  return data?.user?.org || null;
+  return data?.user?.org || "";
 };
 
-export const ProtectedRoute = ({ children }) => {
+export const ProtectedRoute = ({ children, ...props }) => {
+  const { isAuthenticated, loading } = useAuth();
+  const isQuizLive = false;
+
+  if (props.quiz && !isQuizLive) {
+    return <Navigate to="/" replace />;
+  }
+  if (loading) return <p>Loading...</p>;
+  return isAuthenticated ? children : <Navigate to="/" replace />;
+};
+
+export const QuizRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
 
   if (loading) return <p>Loading...</p>;

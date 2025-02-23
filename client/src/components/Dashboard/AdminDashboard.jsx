@@ -1,16 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { getEmployeesByOrg } from "../../services";
-import { useAuth } from "../../context/auth.context";
+import { useOrgId } from "../../context/auth.context";
 
 const AdminDashboard = () => {
-  const { data } = useAuth();
+  const orgId = useOrgId();
   const [employees, setEmployees] = useState([]);
 
   useEffect(() => {
     const fetchAllEmployees = async () => {
       try {
-        const orgId = data.user.org;
-
         const response = await getEmployeesByOrg(orgId);
         const responseJSON = await response.json();
         const employeesList = responseJSON.employees;

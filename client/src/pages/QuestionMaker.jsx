@@ -1,20 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createNewQuestion } from "../services";
-import { getOrgId } from "../context/auth.context";
+import { useOrgId } from "../context/auth.context";
+
+import { toast } from "react-toastify";
 
 const QuestionMaker = () => {
   const navigate = useNavigate();
-
-  const [orgId, setOrgId] = useState(null);
-
-  useEffect(() => {
-    setOrgId(getOrgId()); // Fetch orgId only once
-  }, []);
+  const orgId = useOrgId();
 
   const [question, setQuestion] = useState({
     description: "",
-    answer: null,
+    answer: "",
     options: ["", "", "", ""],
     image: null,
     source: "Employee",
@@ -22,9 +19,7 @@ const QuestionMaker = () => {
     category: "",
   });
 
-  useEffect(() => {
-    setQuestion((prev) => ({ ...prev, org: orgId }));
-  }, [orgId]);
+  const notifyQuestionSubmitted = () => toast("New question submitted!");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -50,6 +45,7 @@ const QuestionMaker = () => {
   };
 
   const handleSubmit = () => {
+    notifyQuestionSubmitted();
     createNewQuestion(question);
   };
 

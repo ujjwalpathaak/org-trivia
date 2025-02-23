@@ -6,6 +6,8 @@ import Dashboard from "./pages/Dashboard";
 import Navbar from "./components/Navbar.jsx";
 import QuestionMaker from "./pages/QuestionMaker.jsx";
 import NotFound from "./pages/NotFound.jsx";
+import Quiz from "./pages/Quiz.jsx";
+import { ToastContainer } from "react-toastify";
 
 function App() {
   return (
@@ -32,8 +34,28 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="quiz"
+              element={
+                <ProtectedRoute quiz="quiz">
+                  <Quiz />
+                </ProtectedRoute>
+              }
+            />
           </Route>
         </Routes>
+        <ToastContainer
+          position="top-center"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick={false}
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+        />
       </Router>
     </AuthProvider>
   );

@@ -1,8 +1,17 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const EmployeeDashboard = () => {
   const navigate = useNavigate();
+  const [isQuizLive, setIsQuizLive] = useState(false);
+
+  useEffect(() => {
+    const getQuizLiveStatus = () => {
+      let response = false;
+      setIsQuizLive(response);
+    };
+    getQuizLiveStatus();
+  }, [isQuizLive]);
 
   return (
     <div className="bg-gray-100 p-6">
@@ -22,13 +31,27 @@ const EmployeeDashboard = () => {
         </div>
 
         <div className="bg-white p-4 rounded-2xl floating-div">
-          <h2 className="text-lg font-semibold mb-2">Upcoming Quiz</h2>
-          <p className="text-gray-600">
-            Next Quiz: <strong>March 15, 2025</strong>
-          </p>
-          <button className="mt-3 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-            View Details
-          </button>
+          {isQuizLive ? (
+            <>
+              <h2 className="text-lg font-semibold mb-2">Upcoming Quiz</h2>
+              <p className="text-gray-600">
+                Next Quiz: <strong>March 15, 2025</strong>
+              </p>
+              <button className="mt-3 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                View Details
+              </button>
+            </>
+          ) : (
+            <>
+              <h2 className="text-lg font-semibold mb-2">Quiz is live!</h2>
+              <button
+                onClick={() => navigate("/dashboard/quiz")}
+                className="mt-3 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              >
+                Go to quiz
+              </button>
+            </>
+          )}
         </div>
 
         <div className="bg-white p-4 rounded-2xl floating-div">
