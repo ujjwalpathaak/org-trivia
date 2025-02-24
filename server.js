@@ -5,8 +5,9 @@ import dotenv from "dotenv";
 import express from "express";
 import router from "./routes/router.js";
 
-import { isProduction, logService } from "./middleware/utils.js";
 import { connectDatabase } from "./Database.js";
+import { isProduction, logService } from "./middleware/utils.js";
+import { startJobs } from "./jobs/index.js";
 
 const app = express();
 
@@ -19,6 +20,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(logService);
 
 connectDatabase();
+// startJobs();
 
 app.use("/", router);
 

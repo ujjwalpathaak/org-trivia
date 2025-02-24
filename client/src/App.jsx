@@ -9,6 +9,7 @@ import NotFound from "./pages/NotFound.jsx";
 import Quiz from "./pages/Quiz.jsx";
 import { ToastContainer } from "react-toastify";
 import ApproveQuestions from "./pages/ApproveQuestions.jsx";
+import Settings from "./pages/Settings.jsx";
 
 function App() {
   return (
@@ -48,6 +49,14 @@ function App() {
               element={
                 <ProtectedRoute route="approve-questions">
                   <ApproveQuestions />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="settings"
+              element={
+                <ProtectedRoute route="settings">
+                  <Settings />
                 </ProtectedRoute>
               }
             />

@@ -20,7 +20,7 @@ const orgSchema = new mongoose.Schema({
     type: [mongoose.Schema.Types.ObjectId],
     ref: "Employees",
     default: []
-  },
+  }
 });
 
 const Org = mongoose.model("Org", orgSchema);

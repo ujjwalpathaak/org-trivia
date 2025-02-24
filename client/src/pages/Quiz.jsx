@@ -43,7 +43,6 @@ const Quiz = () => {
 
   const handleAnswer = (selected) => {
     if (selected === questions[currentQuestion].answer) {
-      console.log("Correct Answer");
       setScore(showScore + 1);
     }
 
