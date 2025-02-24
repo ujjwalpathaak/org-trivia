@@ -29,7 +29,7 @@ const employeeSchema = new mongoose.Schema(
       required: true,
     },
     currentStreak: {
-      type: Number, // no. of days
+      type: Number,
       default: 0,
     },
     currentPoints: {

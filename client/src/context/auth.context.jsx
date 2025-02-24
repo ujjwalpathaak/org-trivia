@@ -70,7 +70,7 @@ export const useOrgId = () => {
 
 export const ProtectedRoute = ({ children, route }) => {
   const { isAuthenticated, data, loading } = useAuth();
-  const isQuizLive = false;
+  const isQuizLive = true;
 
   if (loading) return <p>Loading...</p>;
 

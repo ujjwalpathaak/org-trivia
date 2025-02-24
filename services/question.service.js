@@ -1,4 +1,10 @@
+import OrgRepository from "../repositories/org.repository.js";
+import OrgService from "./org.service.js";
+
 const API_GATEWAY_URL = "https://w6d724kzj1.execute-api.eu-north-1.amazonaws.com"
+
+const orgRepository = new OrgRepository();
+const orgService = new OrgService(orgRepository);
 
 class QuestionService {
     constructor(questionService) {
@@ -10,16 +16,52 @@ class QuestionService {
     }
 
     async scheduleQuestionsForNextWeek(){
-        // logic for scheduling quesitons
-        // see what all orgs have it enabled.
-        // see which week it is.
-        // start that workflow.
+        const triviaEnabledOrgs = await orgService.getTriviaEnabledOrgs();
+        triviaEnabledOrgs.forEach(element => {
+            const genre = element.settings.selectedGenre[element.settings.currentGenre];
+            switch (genre) {
+                case "PnA":
+                    this.startPnAWorkflow(element.name);
+                    break;
+                    
+                case "HRD":
+                    this.startHRDWorkflow();
+                    break;
+                    
+                case "CAnIT":
+                    this.startCAnITWorkflow(element.name);
+                    break;
+            
+                default:
+                    break;
+            }
+        });
     }
 
-    async selectPnAQuestions(){
+    async startPnAWorkflow(companyName){
+        const tempPnAQuestions = await this.selectTempPnAQuestions();
+        const finalPnAQuestions = await this.makeFinalPnAQuestions(companyName, tempPnAQuestions);
+
+        console.log(finalPnAQuestions)
+
+        // send questions for approval.
+    }
+
+    async startCAnITWorkflow(){
+        const finalCAnITQuestions = await this.makeCAnITQuestions();
+
+        console.log(finalCAnITQuestions)
+        // send questions for approval.
+    }
+
+    async startHRDWorkflow(){
+        // startHRDWorkflow
+    }
+
+    async selectTempPnAQuestions(){
         // logic for selectPnAQuestions
         // currently hardcode it.
-        const PnAQuestions = [
+        const tempPnAQuestions = [
             {
               "question": "Golu starts from his house and walks 8 km north. Then, he turns left and walks 6 km. What is the shortest distance from his house?",
               "img": null,
@@ -50,10 +92,10 @@ class QuestionService {
             }
         ];
 
-        this.fetchPnAQuestions(PnAQuestions)
+        return tempPnAQuestions;
     }
     
-    async fetchPnAQuestions(companyName, PnAQuestions) {    
+    async makeFinalPnAQuestions(companyName, PnAQuestions) {    
         try {
             const response = await fetch(API_GATEWAY_URL + "/generatePnA_Questions", {
                 method: "POST",
@@ -71,16 +113,38 @@ class QuestionService {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
     
-            const data = await response.json();
-            console.log(data);
+            const finalPnAQuestions = await response.json();
+            return finalPnAQuestions;
         } catch (error) {
             throw new Error("Error fetching PnA Questions:", error);
         }
     }
+
+    async makeCAnITQuestions(companyName, PnAQuestions) {    
+        try {
+            const response = await fetch(API_GATEWAY_URL + "/generateCAnIT_Questions", {
+                method: "POST",
+                headers: {
+                    'x-api-key': 'your-api-key',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    companyName: companyName,
+                    companyIndustry: companyIndustry
+                })
+            });
     
-    async fetchCAnITQuestions(){
-        // logic for fetchCAnITQuestions 
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+    
+            const finalCAnITQuestions = await response.json();
+            return finalCAnITQuestions;
+        } catch (error) {
+            throw new Error("Error fetching PnA Questions:", error);
+        }
     }
+
     async fetchHRDQuestions(){
         // logic for fetchHRDQuestions
     }

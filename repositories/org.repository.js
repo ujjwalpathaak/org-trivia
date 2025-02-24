@@ -8,6 +8,10 @@ class OrgRepository {
     async getOrgById(orgId) {
         return await Org.find({ _id: orgId });
     }
+
+    async getTriviaEnabledOrgs() {
+        return await Org.find({ "settings.isTriviaEnabled": true }).select("_id settings.currentGenre settings.selectedGenre");          
+    }
 }
 
 export default OrgRepository;

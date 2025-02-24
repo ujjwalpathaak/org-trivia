@@ -1,5 +1,11 @@
 import mongoose from "mongoose";
 
+const settingsSchema = new mongoose.Schema({
+  isTriviaEnabled: { type: Boolean, default: false },
+  currentGenre: { type: Number, default: 0, min: 0, max: 3 },
+  selectedGenre: { type: [String], default: ["PnA", "HRD", "CAnIT"] }
+});
+
 const orgSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -7,19 +13,23 @@ const orgSchema = new mongoose.Schema({
     unique: true
   },
   questions: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "usedQuestion",
-      default: []
+    type: [mongoose.Schema.Types.ObjectId],
+    ref: "Questions",
+    default: []
   },
   admins: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Admins",
-      default: []
+    type: [mongoose.Schema.Types.ObjectId],
+    ref: "Admins",
+    default: []
   },
   employees: {
     type: [mongoose.Schema.Types.ObjectId],
     ref: "Employees",
     default: []
+  },
+  settings: {
+    type: settingsSchema,
+    default: () => ({})
   }
 });
 

@@ -1,14 +1,18 @@
 class OrgService {
-    constructor(orgService) {
-        this.orgService = orgService;
+    constructor(orgRepository) {
+        this.orgRepository = orgRepository;
     }
 
     async getAllOrgs(){
-        return await this.orgService.getAllOrgs();
+        return await this.orgRepository.getAllOrgs();
     }
 
     async getOrgById(orgId){
-        return await this.orgService.getOrgById(orgId);
+        return await this.orgRepository.getOrgById(orgId);
+    }
+
+    async getTriviaEnabledOrgs(){
+        return await this.orgRepository.getTriviaEnabledOrgs();
     }
 
 }
