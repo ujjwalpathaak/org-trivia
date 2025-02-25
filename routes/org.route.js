@@ -4,8 +4,5 @@ import { getAllOrgs, getOrgById, getOrgQuestions, getOrgQuestionsByGenre } from 
 const orgRouter = express.Router();
 
 orgRouter.get("/", getAllOrgs);
-orgRouter.get("/:orgId", getOrgById);
-orgRouter.get("/:orgId/questions", getOrgQuestions);
-orgRouter.get("/:orgId/questions/genre/:genreName", getOrgQuestionsByGenre);
 
 export default orgRouter;

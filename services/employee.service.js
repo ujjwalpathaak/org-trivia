@@ -3,12 +3,8 @@ class EmployeeService {
         this.employeeRepository = employeeRepository;
     }
 
-    async getAllEmployees () {
-        this.employeeRepository.getAllEmployees();
-    }
-
-    async getAllOrgEmployees (orgId) {
-        return await this.employeeRepository.getAllOrgEmployees(orgId);
+    async getAllEmployeesByOrg (orgId) {
+        return await this.employeeRepository.getAllEmployeesByOrg(orgId);
     }
 
 

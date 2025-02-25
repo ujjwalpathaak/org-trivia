@@ -1,10 +1,6 @@
 import Admin from "../models/admin.model.js";
 
 class AdminRepository {
-    async getAllAdmins() {
-        return await Admin.find({});
-    }
-
     async getAdminByEmail(email) {
         return await Admin.findOne({ email });
     }

@@ -14,10 +14,6 @@ class QuestionRepository {
             console.log(err)
         }
     }
-    
-    async getCompanyName(orgId) {
-        return await WeeklyQuestion.insertMany(newQuestions);
-    }
 
     async getWeeklyUnapprovedQuestions(orgId) {
         return await WeeklyQuestion.find({
