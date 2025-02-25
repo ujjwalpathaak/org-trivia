@@ -1,64 +1,39 @@
-import Admin from '../models/admin.model.js';
-import Employee from '../models/employee.model.js';
-
 import AuthService from '../services/auth.service.js';
 import AuthRepository from '../repositories/auth.repository.js';
 
 const authRepository = new AuthRepository();
 const authService = new AuthService(authRepository);
 
-export const register = async (request, response) => {
-  try {
-    const { isAdmin, email, password, name, org } = request.body;
+class AuthController {
+  async register(req, res, next) {
+    try {
+      const { isAdmin, email, password, name, org } = req.body;
 
-    const [UserModel, userType] = isAdmin
-      ? [Admin, 'Admin']
-      : [Employee, 'Employee'];
+      const response = await authService.registerUser(
+        isAdmin,
+        email,
+        password,
+        name,
+        org,
+      );
 
-    const user = await authService.getUserByEmail(email);
-
-    if (user) {
-      return response.status(400).json({ message: `This email already exists` });
+      res.status(response.status).json(response.data);
+    } catch (error) {
+      next(error);
     }
-
-    if (!org || Object.keys(org).length === 0) {
-      return response.status(400).json({ message: `No such organisation exists` });
-    }
-
-    await authService.createUser(UserModel, email, password, name, org);
-
-    response.status(201).json({
-      message: `New ${userType} registered successfully`,
-    });
-  } catch (error) {
-    console.error(error.message);
-    response.status(500).json({ message: 'Server Error', error: error.message });
   }
-};
 
-export const login = async (request, response) => {
-  try {
-    const { email, password } = request.body;
+  async login(req, res, next) {
+    try {
+      const { email, password } = req.body;
 
-    const user = await authService.getUserByEmail(email);
+      const response = await authService.loginUser(email, password);
 
-    if (!user) {
-      return response.status(404).json({ message: 'User not found!' });
+      res.status(response.status).json(response.data);
+    } catch (error) {
+      next(error);
     }
-
-    const isMatch = await authService.passwordsMatch(password, user.password);
-    if (!isMatch) {
-      return response.status(401).json({ message: 'Invalid password' });
-    }
-
-    const token = authService.generateToken(user);
-
-    response.status(200).json({
-      message: `user logged in successfully`,
-      token,
-    });
-  } catch (error) {
-    console.error(error.message);
-    response.status(500).json({ message: 'Server Error', error: error.message });
   }
-};
+}
+
+export default AuthController;

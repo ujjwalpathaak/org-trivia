@@ -3,8 +3,14 @@ class EmployeeService {
     this.employeeRepository = employeeRepository;
   }
 
-  async getAllEmployeesByOrg(orgId) {
-    return await this.employeeRepository.getAllEmployeesByOrg(orgId);
+  async getAllOrgEmployeesByOrgId(orgId) {
+    const employees =
+      await this.employeeRepository.getAllOrgEmployeesByOrgId(orgId);
+    if (!employees) {
+      return { status: 404, data: { message: 'No Employees found' } };
+    }
+
+    return { status: 200, data: employees };
   }
 }
 

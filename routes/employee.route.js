@@ -1,10 +1,9 @@
 import express from 'express';
-import {
-  getAllEmployeesByOrg,
-} from '../controllers/employee.controller.js';
+import EmployeeController from '../controllers/employee.controller.js';
 
+const employeeController = new EmployeeController();
 const employeeRouter = express.Router();
 
-employeeRouter.get('/org/:orgId', getAllEmployeesByOrg);
+employeeRouter.get('/org/:orgId', employeeController.getAllOrgEmployeesByOrgId);
 
 export default employeeRouter;

@@ -18,9 +18,9 @@ router.use('/question', questionRouter);
 router.use('/cron', protectRoute, checkRole('Admin'), cronTestRouter);
 
 router.use('*', (request, response, next) => {
-    const error = new Error(`Cannot reach ${request.originalUrl} on server!`)
-    error.status = 404;
-    next(error)
+  const error = new Error(`Cannot reach ${request.originalUrl} on server!`);
+  error.status = 404;
+  next(error);
 });
 
 export default router;

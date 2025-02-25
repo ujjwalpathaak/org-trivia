@@ -1,15 +1,24 @@
 import OrgRepository from '../repositories/org.repository.js';
-import QuestionRepository from '../repositories/question.repository.js';
 import OrgService from '../services/org.service.js';
+import QuestionRepository from '../repositories/question.repository.js';
 import QuestionService from '../services/question.service.js';
 
-const quesitonService = new QuestionService(new QuestionRepository());
-const orgService = new OrgService(new OrgRepository());
+const questionRepository = new QuestionRepository();
+const quesitonService = new QuestionService(questionRepository);
 
-export const startPnAWorkflow = async (request, response) => {
-  const { orgId } = request.params;
-  console.log('startPnAWorkflow - orgId', orgId);
-  const org = await orgService.getOrgById(orgId);
-  console.log('startPnAWorkflow - name', org.name);
-  quesitonService.startPnAWorkflow(org.name, orgId);
-};
+const orgRepository = new OrgRepository();
+const orgService = new OrgService(orgRepository);
+
+class CronTestController {
+  async startPnAWorkflow(req, res, next) {
+    try {
+      const { orgId } = req.params;
+      const org = await orgService.getOrgById(orgId);
+      quesitonService.startPnAWorkflow(org.name, orgId);
+    } catch (error) {
+      next(error);
+    }
+  }
+}
+
+export default CronTestController;

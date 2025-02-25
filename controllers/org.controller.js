@@ -10,6 +10,8 @@ export const getAllOrgs = async (request, response) => {
     response.status(200).json({ orgs });
   } catch (error) {
     console.error(error.message);
-    response.status(500).json({ message: 'Server Error', error: error.message });
+    response
+      .status(500)
+      .json({ message: 'Server Error', error: error.message });
   }
 };

@@ -1,7 +1,7 @@
 import Employee from '../models/employee.model.js';
 
 class EmployeeRepository {
-  async getAllEmployeesByOrg(orgId) {
+  async getAllOrgEmployeesByOrgId(orgId) {
     return await Employee.find({ org: orgId });
   }
 }

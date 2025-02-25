@@ -14,8 +14,8 @@ const isProductionServer = isProduction();
 
 const PORT = process.env.PORT || 8080;
 const ALLOWED_ORIGINS = isProductionServer
-? process.env.CORS_ORIGIN?.split(',')
-: '*';
+  ? process.env.CORS_ORIGIN?.split(',')
+  : '*';
 
 app.use(cors({ origin: ALLOWED_ORIGINS }));
 app.use(express.json());
@@ -27,15 +27,16 @@ isProductionServer && startJobs();
 app.use('/', router);
 
 app.use(logService);
+
 app.use((error, request, response, next) => {
-  error.status = error.status || 500
-  error.message = error.message || "Server Error"
+  error.status = error.status || 500;
+  error.message = error.message || 'Server Error';
 
   response.status(error.status).json({
     status: error.status,
-    message: error.message
-  })
-})
+    message: error.message,
+  });
+});
 
 app.listen(PORT, () => {
   console.log(`Server running on ${PORT}`);

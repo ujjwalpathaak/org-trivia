@@ -1,21 +1,21 @@
 import EmployeeService from '../services/employee.service.js';
 import EmployeeRepository from '../repositories/employee.repository.js';
 
-const employeeService = new EmployeeService(new EmployeeRepository());
+const employeeRepository = new EmployeeRepository();
+const employeeService = new EmployeeService(employeeRepository);
 
-export const getAllEmployeesByOrg = async (request, response) => {
-  try {
-    const { orgId } = request.params;
+class EmployeeController {
+  async getAllOrgEmployeesByOrgId(req, res, next) {
+    try {
+      const { orgId } = req.params;
 
-    const employees = await employeeService.getAllOrgEmployees(orgId);
-    if (!employees) {
-      return response.status(404).json({ message: 'No Employees found' });
+      const response = await employeeService.getAllOrgEmployeesByOrgId(orgId);
+
+      res.status(response.status).json(response.data);
+    } catch (error) {
+      next(error);
     }
-
-    response.status(200).json({ employees });
-  } catch (error) {
-    response
-      .status(500)
-      .json({ message: 'Server error', error: error.message });
   }
-};
+}
+
+export default EmployeeController;

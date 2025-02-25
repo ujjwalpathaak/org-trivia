@@ -10,19 +10,21 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     const fetchAllEmployees = async () => {
+      if (!orgId) return;
+
       try {
         const response = await getEmployeesByOrg(orgId);
-        const responseJSON = await response.json();
-        const employeesList = responseJSON.employees;
+        const employees = await response.json();
 
-        setEmployees(Array.isArray(employeesList) ? employeesList : []);
+        setEmployees(Array.isArray(employees) ? employees : []);
       } catch (error) {
         console.error('Error fetching employees:', error);
         setEmployees([]);
       }
     };
+
     fetchAllEmployees();
-  }, []);
+  }, [orgId]);
 
   function ListEmployees() {
     if (!Array.isArray(employees)) {
