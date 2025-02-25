@@ -68,6 +68,11 @@ const questionSchema = new mongoose.Schema(
 
 const weeklyQuestionSchema = new mongoose.Schema(
   {
+    isApproved: {
+      type: Boolean,
+      required: true,
+      default: false
+    },
     scheduledDate: {
       type: Date,
       required: true,

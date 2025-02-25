@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { getQuestionsToApprove } from "../services.js";
+import { useOrgId } from "../context/auth.context.jsx";
 
 export default function ScheduleQuestions() {
-  const [selectedWeek, setSelectedWeek] = useState(null);
   const [aiQuestions, setAiQuestions] = useState([
     {
       question: "AI Question 1",
@@ -22,9 +23,22 @@ export default function ScheduleQuestions() {
     },
   ]);
   const [customQuestions, setCustomQuestions] = useState([]);
-  const [selectedQuestions, setSelectedQuestions] = useState([]);
   const [newQuestion, setNewQuestion] = useState("");
   const [uploadedFile, setUploadedFile] = useState(null);
+
+  // ----------------------------------------------------------
+  const [selectedWeek, setSelectedWeek] = useState(null);
+  const [questions, setQuestions] = useState([]);
+  const orgId = useOrgId();
+
+  useEffect(() => {
+    const getQuestionsToApproveFunc = async () => {
+      const response = await getQuestionsToApprove(orgId);
+      setQuestions(response.questions);
+    };
+
+    getQuestionsToApproveFunc();
+  }, []);
 
   const addCustomQuestion = () => {
     if (newQuestion.trim()) {
@@ -49,27 +63,27 @@ export default function ScheduleQuestions() {
   };
 
   const selectQuestion = (question) => {
-    if (selectedQuestions.length < 5 && !selectedQuestions.includes(question)) {
-      setSelectedQuestions([...selectedQuestions, question]);
+    if (questions.length < 5 && !questions.includes(question)) {
+      setQuestions([...questions, question]);
     }
   };
 
   const handleQuestionChange = (idx, newQuestion) => {
-    const updatedQuestions = [...selectedQuestions];
+    const updatedQuestions = [...questions];
     updatedQuestions[idx].question = newQuestion;
-    setSelectedQuestions(updatedQuestions);
+    setQuestions(updatedQuestions);
   };
 
   const handleOptionChange = (qIdx, optionIdx, newOption) => {
-    const updatedQuestions = [...selectedQuestions];
+    const updatedQuestions = [...questions];
     updatedQuestions[qIdx].options[optionIdx] = newOption;
-    setSelectedQuestions(updatedQuestions);
+    setQuestions(updatedQuestions);
   };
 
   const handleCorrectAnswerChange = (idx, correctOption) => {
-    const updatedQuestions = [...selectedQuestions];
+    const updatedQuestions = [...questions];
     updatedQuestions[idx].correctAnswer = correctOption;
-    setSelectedQuestions(updatedQuestions);
+    setQuestions(updatedQuestions);
   };
 
   return (
@@ -130,19 +144,19 @@ export default function ScheduleQuestions() {
 
         <div className="mt-4 p-4 border rounded-md">
           <h3 className="font-semibold">Selected Questions (Max 5)</h3>
-          {selectedQuestions.map((q, idx) => (
+          {questions.map((q, idx) => (
             <div key={idx} className="mt-2 p-2 border rounded-md">
               {/* Editable Question */}
               <input
                 type="text"
-                value={q.question}
+                value={q.question.question}
                 onChange={(e) => handleQuestionChange(idx, e.target.value)}
                 className="w-full p-2 border rounded-md"
               />
 
               {/* Editable Options */}
               <div className="mt-2">
-                {q.options.map((option, i) => (
+                {q.question.options.map((option, i) => (
                   <input
                     key={i}
                     type="text"
@@ -160,7 +174,7 @@ export default function ScheduleQuestions() {
                 className="mt-2 p-2 border rounded-md w-full"
               >
                 <option value="">Select Correct Answer</option>
-                {q.options.map((option, i) => (
+                {q.question.options.map((option, i) => (
                   <option key={i} value={option}>
                     {option}
                   </option>

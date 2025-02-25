@@ -180,6 +180,10 @@ class QuestionService {
     async fetchHRDQuestions(){
         // logic for fetchHRDQuestions
     }
+
+    async getWeeklyUnapprovedQuestions (orgId) {
+        return this.questionRepository.getWeeklyUnapprovedQuestions(orgId); 
+    }
 }
 
 export default QuestionService;

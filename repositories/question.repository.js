@@ -1,5 +1,6 @@
 import Question from '../models/question.model.js';
 import WeeklyQuestion from '../models/weeklyQuestion.model.js';
+import { ObjectId } from 'mongodb';
 
 class QuestionRepository {
     async saveQuestion(newQuestion) {
@@ -16,6 +17,13 @@ class QuestionRepository {
     
     async getCompanyName(orgId) {
         return await WeeklyQuestion.insertMany(newQuestions);
+    }
+
+    async getWeeklyUnapprovedQuestions(orgId) {
+        return await WeeklyQuestion.find({
+          org: new ObjectId(orgId),
+          isApproved: false
+        });        
     }
     
 }
