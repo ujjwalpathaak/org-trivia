@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { response } from 'express';
 
 import authRouter from './auth.route.js';
 import employeeRouter from './employee.route.js';
@@ -9,12 +9,18 @@ import cronTestRouter from './cron.test.route.js';
 
 const router = express.Router();
 
-router.get('/', (req, res) => res.send('API Working'));
+router.get('/', (request, response) => response.send('API Working'));
 
 router.use('/auth', authRouter);
 router.use('/employee', protectRoute, checkRole('Admin'), employeeRouter);
 router.use('/org', orgRouter);
 router.use('/question', questionRouter);
 router.use('/cron', protectRoute, checkRole('Admin'), cronTestRouter);
+
+router.use('*', (request, response, next) => {
+    const error = new Error(`Cannot reach ${request.originalUrl} on server!`)
+    error.status = 404;
+    next(error)
+});
 
 export default router;

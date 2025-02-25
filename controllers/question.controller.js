@@ -3,35 +3,35 @@ import QuestionService from '../services/question.service.js';
 
 const questionService = new QuestionService(new QuestionRepository());
 
-export const addQuestions = async (req, res) => {
+export const addQuestions = async (request, response) => {
   try {
-    const question = req.body;
+    const question = request.body;
     const newQues = await questionService.saveQuestion(question);
-    res.status(200).json({ newQues });
+    response.status(200).json({ newQues });
   } catch (err) {
-    res.status(500).json({ message: 'server error', error: err });
+    response.status(500).json({ message: 'server error', error: err });
   }
 };
 
-export const handleLambdaCallback = async (req, res) => {
+export const handleLambdaCallback = async (request, response) => {
   try {
-    const data = req.body;
+    const data = request.body;
     const { weeklyQuestions, orgId } =
       await questionService.formatWeeklyQuestions(data);
     await questionService.saveWeeklyQuestions(weeklyQuestions);
 
-    res.status(200).json({ message: 'Scheduled new questions' });
+    response.status(200).json({ message: 'Scheduled new questions' });
   } catch (err) {
-    res.status(500).json({ message: 'server error', error: err });
+    response.status(500).json({ message: 'server error', error: err });
   }
 };
-export const getWeeklyUnapprovedQuestions = async (req, res) => {
+export const getWeeklyUnapprovedQuestions = async (request, response) => {
   try {
-    const { orgId } = req.params;
+    const { orgId } = request.params;
     const questions = await questionService.getWeeklyUnapprovedQuestions(orgId);
 
-    res.status(200).json({ questions: questions });
+    response.status(200).json({ questions: questions });
   } catch (err) {
-    res.status(500).json({ message: 'server error', error: err });
+    response.status(500).json({ message: 'server error', error: err });
   }
 };
