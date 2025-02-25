@@ -6,7 +6,7 @@ class OrgRepository {
     }
 
     async getOrgById(orgId) {
-        return await Org.find({ _id: orgId });
+        return await Org.findOne({ _id: orgId });
     }
 
     async getTriviaEnabledOrgs() {

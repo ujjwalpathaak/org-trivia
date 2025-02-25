@@ -1,5 +1,6 @@
 import OrgRepository from "../repositories/org.repository.js";
 import OrgService from "./org.service.js";
+import { getNextFriday } from "../middleware/utils.js";
 
 const API_GATEWAY_URL = "https://w6d724kzj1.execute-api.eu-north-1.amazonaws.com"
 
@@ -7,19 +8,47 @@ const orgRepository = new OrgRepository();
 const orgService = new OrgService(orgRepository);
 
 class QuestionService {
-    constructor(questionService) {
-        this.questionService = questionService;
+    constructor(questionRepository) {
+        this.questionRepository = questionRepository;
     }
 
     async saveQuestion(newQuestion){
-        return this.questionService.saveQuestion(newQuestion);
+        return this.questionRepository.saveQuestion(newQuestion);
     }
+
+    async saveWeeklyQuestions(newQuestions){
+        return this.questionRepository.saveWeeklyQuestions(newQuestions);
+    }
+
+    async formatWeeklyQuestions(data) {
+        const JSONdata = data;
+
+        let questions = JSONdata.quesitons;
+        const orgId = JSONdata.orgId;
+        const category = JSONdata.category;
+        const nextFriday = getNextFriday();
+    
+        const weeklyQuestions = questions.map((curr) => ({
+            scheduledDate: nextFriday,
+            question: {
+              ...curr,
+              source: 'AI',
+              category: category,
+              status: "live",
+              org: orgId
+            },
+            org: orgId,
+        }));
+    
+        return { weeklyQuestions, orgId };
+    }    
 
     async scheduleQuestionsForNextWeek(){
         const triviaEnabledOrgs = await orgService.getTriviaEnabledOrgs();
         triviaEnabledOrgs.forEach(element => {
             const genre = element.settings.selectedGenre[element.settings.currentGenre];
             switch (genre) {
+                //  add orgIds
                 case "PnA":
                     this.startPnAWorkflow(element.name);
                     break;
@@ -38,11 +67,12 @@ class QuestionService {
         });
     }
 
-    async startPnAWorkflow(companyName){
+    async startPnAWorkflow(companyName, orgId){
+        console.log("startPnAWorkflow - startPnAWorkflow", companyName, orgId)
         const tempPnAQuestions = await this.selectTempPnAQuestions();
-        const finalPnAQuestions = await this.makeFinalPnAQuestions(companyName, tempPnAQuestions);
-
-        console.log(finalPnAQuestions)
+        console.log("startPnAWorkflow - tempPnAQuestions", tempPnAQuestions)
+        const finalPnAQuestions = await this.makeFinalPnAQuestions(companyName, tempPnAQuestions, orgId);
+        console.log("startPnAWorkflow - finalPnAQuestions", finalPnAQuestions)
 
         // send questions for approval.
     }
@@ -95,7 +125,8 @@ class QuestionService {
         return tempPnAQuestions;
     }
     
-    async makeFinalPnAQuestions(companyName, PnAQuestions) {    
+    async makeFinalPnAQuestions(companyName, PnAQuestions, orgId) {
+        console.log("makeFinalPnAQuestions - makeFinalPnAQuestions", companyName, PnAQuestions, orgId)
         try {
             const response = await fetch(API_GATEWAY_URL + "/generatePnA_Questions", {
                 method: "POST",
@@ -105,7 +136,8 @@ class QuestionService {
                 },
                 body: JSON.stringify({
                     companyName: companyName,
-                    PnAQuestions: PnAQuestions
+                    PnAQuestions: PnAQuestions,
+                    orgId: orgId
                 })
             });
     
@@ -147,9 +179,6 @@ class QuestionService {
 
     async fetchHRDQuestions(){
         // logic for fetchHRDQuestions
-    }
-    async scheduleQuestionsForNextWeek(){
-        // logic for scheduling quesitons
     }
 }
 

@@ -18,7 +18,7 @@ const questionSchema = new mongoose.Schema({
     type: String,
     default: "",
   },
-  description: {
+  question: {
     type: String,
     trim: true,
     unique: true,

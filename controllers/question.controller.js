@@ -39,3 +39,15 @@ export const getQuestionByGenreName = () => {
   }
 };
 
+export const handleLambdaCallback = async (req, res) => {
+  try {
+    const data = req.body;
+    const { weeklyQuestions, orgId } = await questionService.formatWeeklyQuestions(data);
+    await questionService.saveWeeklyQuestions(weeklyQuestions);
+
+    res.status(200).json({ message: "Scheduled new questions"});
+  } catch (err) {
+    res.status(500).json({ message: "server error", error: err });
+  }
+}
+

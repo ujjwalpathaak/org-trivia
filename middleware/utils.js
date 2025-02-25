@@ -10,3 +10,12 @@ export const logService = (req, res, next) => {
         next();
     });
 }
+
+export const getNextFriday = () => {
+    const today = new Date();
+    const dayOfWeek = today.getDay(); // 0 (Sunday) to 6 (Saturday)
+    const daysUntilFriday = (5 - dayOfWeek + 7) % 7 || 7; // Calculate days until next Friday
+    const nextFriday = new Date();
+    nextFriday.setDate(today.getDate() + daysUntilFriday);
+    return nextFriday;
+  }
