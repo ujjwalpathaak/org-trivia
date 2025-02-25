@@ -1,9 +1,9 @@
-import Employee from "../models/employee.model.js";
+import Employee from '../models/employee.model.js';
 
 class EmployeeRepository {
-    async getAllEmployeesByOrg(orgId) {
-        return await Employee.find({ org: orgId });
-    }
+  async getAllEmployeesByOrg(orgId) {
+    return await Employee.find({ org: orgId });
+  }
 }
 
 export default EmployeeRepository;

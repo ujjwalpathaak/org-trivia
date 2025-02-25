@@ -1,15 +1,15 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const answerSchema = new mongoose.Schema(
   {
     employeeId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Employee",
+      ref: 'Employee',
       required: true,
     },
     questionId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "usedQuestion",
+      ref: 'usedQuestion',
       required: true,
     },
     answer: {
@@ -17,9 +17,9 @@ const answerSchema = new mongoose.Schema(
       required: true,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
-const Answer = mongoose.model("Answer", answerSchema);
+const Answer = mongoose.model('Answer', answerSchema);
 
 export default Answer;

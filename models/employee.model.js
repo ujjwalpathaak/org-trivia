@@ -1,14 +1,14 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const earnedBadgeSchema = new mongoose.Schema(
   {
     badge: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Badge",
+      ref: 'Badge',
       required: true,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 const employeeSchema = new mongoose.Schema(
@@ -38,8 +38,8 @@ const employeeSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      default: "Employee",
-      enum: ["Employee"],
+      default: 'Employee',
+      enum: ['Employee'],
       immutable: true,
     },
     badges: {
@@ -48,19 +48,19 @@ const employeeSchema = new mongoose.Schema(
     },
     submittedQuestion: {
       type: [mongoose.Schema.Types.ObjectId],
-      ref: "usedQuestion",
+      ref: 'usedQuestion',
       default: [],
     },
     org: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Org",
+      ref: 'Org',
       immutable: true,
       required: true,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
-const Employee = mongoose.model("Employee", employeeSchema);
+const Employee = mongoose.model('Employee', employeeSchema);
 
 export default Employee;

@@ -1,11 +1,11 @@
-import React, { useState } from "react";
-import { validateForm } from "../../utils";
-import { loginRequest } from "../../services";
+import React, { useState } from 'react';
+import { validateForm } from '../../utils';
+import { loginRequest } from '../../services';
 
 const LoginForm = () => {
   const [formData, setFormData] = useState({
-    email: "",
-    password: "",
+    email: '',
+    password: '',
     rememberMe: false,
   });
 
@@ -17,11 +17,11 @@ const LoginForm = () => {
     setFormData((prev) => ({
       ...prev,
       [name]:
-        type === "checkbox"
+        type === 'checkbox'
           ? checked
-          : type === "radio"
-          ? value === "true"
-          : value,
+          : type === 'radio'
+            ? value === 'true'
+            : value,
     }));
   };
 
@@ -35,13 +35,13 @@ const LoginForm = () => {
       const data = await response.json();
 
       if (response.ok) {
-        localStorage.setItem("token", data.token);
-        window.location.href = "/dashboard";
+        localStorage.setItem('token', data.token);
+        window.location.href = '/dashboard';
       } else {
         setErrors({ ...errors, serverError: data.message });
       }
     } catch (error) {
-      console.error("Error:", error);
+      console.error('Error:', error);
     }
   };
 
@@ -62,7 +62,7 @@ const LoginForm = () => {
           value={formData.email}
           onChange={handleChange}
           className={`bg-gray-50 border ${
-            errors.email ? "border-red-500" : "border-gray-300"
+            errors.email ? 'border-red-500' : 'border-gray-300'
           } text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5`}
           placeholder="name@example.com"
           required
@@ -84,7 +84,7 @@ const LoginForm = () => {
           value={formData.password}
           onChange={handleChange}
           className={`bg-gray-50 border ${
-            errors.password ? "border-red-500" : "border-gray-300"
+            errors.password ? 'border-red-500' : 'border-gray-300'
           } text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5`}
           placeholder="********"
           required

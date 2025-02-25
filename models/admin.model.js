@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const adminSchema = new mongoose.Schema(
   {
@@ -16,9 +16,9 @@ const adminSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      default: "Admin",
-      enum: ["Admin"],
-      immutable: true
+      default: 'Admin',
+      enum: ['Admin'],
+      immutable: true,
     },
     password: {
       type: String,
@@ -26,14 +26,14 @@ const adminSchema = new mongoose.Schema(
     },
     org: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Org",
+      ref: 'Org',
       immutable: true,
       required: true,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
-const Admin = mongoose.model("Admin", adminSchema);
+const Admin = mongoose.model('Admin', adminSchema);
 
 export default Admin;

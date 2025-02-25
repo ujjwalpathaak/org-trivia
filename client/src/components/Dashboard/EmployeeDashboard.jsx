@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const EmployeeDashboard = () => {
   const navigate = useNavigate();
@@ -45,7 +45,7 @@ const EmployeeDashboard = () => {
             <>
               <h2 className="text-lg font-semibold mb-2">Quiz is live!</h2>
               <button
-                onClick={() => navigate("/dashboard/quiz")}
+                onClick={() => navigate('/dashboard/quiz')}
                 className="mt-3 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
               >
                 Go to quiz
@@ -70,7 +70,7 @@ const EmployeeDashboard = () => {
             <li>Submissions Accepted: 10</li>
           </ul>
           <button
-            onClick={() => navigate("/dashboard/question-maker")}
+            onClick={() => navigate('/dashboard/question-maker')}
             className="mt-3 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
           >
             Write Question

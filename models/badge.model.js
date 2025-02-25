@@ -1,6 +1,7 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
-const badgeSchema = new mongoose.Schema({
+const badgeSchema = new mongoose.Schema(
+  {
     shieldUrl: {
       type: String,
       required: true,
@@ -12,9 +13,9 @@ const badgeSchema = new mongoose.Schema({
       trim: true,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
-const Badge = mongoose.model("Badge", badgeSchema);
+const Badge = mongoose.model('Badge', badgeSchema);
 
 export default Badge;

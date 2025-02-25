@@ -1,10 +1,10 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React from 'react';
+import { Link } from 'react-router-dom';
 
-import ProfilePhoto from "../assets/profile_photo.avif";
+import ProfilePhoto from '../assets/profile_photo.avif';
 
-import DarwinboxLogo from "../assets/darwinboxlogo.png";
-import { useAuth } from "../context/auth.context";
+import DarwinboxLogo from '../assets/darwinboxlogo.png';
+import { useAuth } from '../context/auth.context';
 
 const Navbar = () => {
   const { isAuthenticated, data, logout } = useAuth();

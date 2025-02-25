@@ -1,38 +1,38 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const settingsSchema = new mongoose.Schema({
   isTriviaEnabled: { type: Boolean, default: false },
   currentGenre: { type: Number, default: 0, min: 0, max: 3 },
-  selectedGenre: { type: [String], default: ["PnA", "HRD", "CAnIT"] }
+  selectedGenre: { type: [String], default: ['PnA', 'HRD', 'CAnIT'] },
 });
 
 const orgSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
-    unique: true
+    unique: true,
   },
   questions: {
     type: [mongoose.Schema.Types.ObjectId],
-    ref: "Questions",
-    default: []
+    ref: 'Questions',
+    default: [],
   },
   admins: {
     type: [mongoose.Schema.Types.ObjectId],
-    ref: "Admins",
-    default: []
+    ref: 'Admins',
+    default: [],
   },
   employees: {
     type: [mongoose.Schema.Types.ObjectId],
-    ref: "Employees",
-    default: []
+    ref: 'Employees',
+    default: [],
   },
   settings: {
     type: settingsSchema,
-    default: () => ({})
-  }
+    default: () => ({}),
+  },
 });
 
-const Org = mongoose.model("Org", orgSchema);
+const Org = mongoose.model('Org', orgSchema);
 
 export default Org;

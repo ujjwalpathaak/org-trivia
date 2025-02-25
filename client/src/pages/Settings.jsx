@@ -1,15 +1,15 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 
 const Settings = () => {
   const [darkMode, setDarkMode] = useState(false);
   const [notifications, setNotifications] = useState(true);
   const [genres, setGenres] = useState([]);
-  const [newGenre, setNewGenre] = useState("");
+  const [newGenre, setNewGenre] = useState('');
 
   const addGenre = () => {
     if (newGenre.trim()) {
       setGenres([...genres, newGenre.trim()]);
-      setNewGenre("");
+      setNewGenre('');
     }
   };
 
@@ -27,12 +27,12 @@ const Settings = () => {
             <button
               onClick={() => setDarkMode(!darkMode)}
               className={`relative w-12 h-6 flex items-center bg-gray-300 rounded-full transition-all duration-300 ${
-                darkMode ? "bg-green-500" : ""
+                darkMode ? 'bg-green-500' : ''
               }`}
             >
               <div
                 className={`absolute w-5 h-5 bg-white rounded-full shadow-md transform transition-all duration-300 ${
-                  darkMode ? "translate-x-6" : "translate-x-1"
+                  darkMode ? 'translate-x-6' : 'translate-x-1'
                 }`}
               ></div>
             </button>

@@ -1,1 +1,1 @@
-export const scheduleQuestions = () => "0 0 * * *";
+export const scheduleQuestions = () => '0 0 * * *';

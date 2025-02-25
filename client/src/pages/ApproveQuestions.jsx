@@ -1,29 +1,29 @@
-import { useEffect, useState } from "react";
-import { getQuestionsToApprove } from "../services.js";
-import { useOrgId } from "../context/auth.context.jsx";
+import { useEffect, useState } from 'react';
+import { getQuestionsToApprove } from '../services.js';
+import { useOrgId } from '../context/auth.context.jsx';
 
 export default function ScheduleQuestions() {
   const [aiQuestions, setAiQuestions] = useState([
     {
-      question: "AI Question 1",
-      options: ["Option 1", "Option 2"],
-      correctAnswer: "Option 1",
+      question: 'AI Question 1',
+      options: ['Option 1', 'Option 2'],
+      correctAnswer: 'Option 1',
     },
     {
-      question: "AI Question 2",
-      options: ["Option A", "Option B"],
-      correctAnswer: "Option B",
+      question: 'AI Question 2',
+      options: ['Option A', 'Option B'],
+      correctAnswer: 'Option B',
     },
   ]);
   const [empQuestions, setEmpQuestions] = useState([
     {
-      question: "Emp Question 1",
-      options: ["Yes", "No"],
-      correctAnswer: "Yes",
+      question: 'Emp Question 1',
+      options: ['Yes', 'No'],
+      correctAnswer: 'Yes',
     },
   ]);
   const [customQuestions, setCustomQuestions] = useState([]);
-  const [newQuestion, setNewQuestion] = useState("");
+  const [newQuestion, setNewQuestion] = useState('');
   const [uploadedFile, setUploadedFile] = useState(null);
 
   // ----------------------------------------------------------
@@ -44,9 +44,9 @@ export default function ScheduleQuestions() {
     if (newQuestion.trim()) {
       setCustomQuestions([
         ...customQuestions,
-        { question: newQuestion, options: [], correctAnswer: "" },
+        { question: newQuestion, options: [], correctAnswer: '' },
       ]);
-      setNewQuestion("");
+      setNewQuestion('');
     }
   };
 
@@ -55,10 +55,10 @@ export default function ScheduleQuestions() {
   };
 
   const generateAIQuestion = () => {
-    const aiGeneratedQuestion = "Generated AI Question";
+    const aiGeneratedQuestion = 'Generated AI Question';
     setCustomQuestions([
       ...customQuestions,
-      { question: aiGeneratedQuestion, options: [], correctAnswer: "" },
+      { question: aiGeneratedQuestion, options: [], correctAnswer: '' },
     ]);
   };
 
@@ -169,7 +169,7 @@ export default function ScheduleQuestions() {
 
               {/* Correct Answer Dropdown */}
               <select
-                value={q.correctAnswer || ""}
+                value={q.correctAnswer || ''}
                 onChange={(e) => handleCorrectAnswerChange(idx, e.target.value)}
                 className="mt-2 p-2 border rounded-md w-full"
               >

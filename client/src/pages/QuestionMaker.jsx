@@ -1,25 +1,25 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { createNewQuestion } from "../services";
-import { useOrgId } from "../context/auth.context";
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { createNewQuestion } from '../services';
+import { useOrgId } from '../context/auth.context';
 
-import { toast } from "react-toastify";
+import { toast } from 'react-toastify';
 
 const QuestionMaker = () => {
   const navigate = useNavigate();
   const orgId = useOrgId();
 
   const [question, setQuestion] = useState({
-    description: "",
-    answer: "",
-    options: ["", "", "", ""],
+    description: '',
+    answer: '',
+    options: ['', '', '', ''],
     image: null,
-    source: "Employee",
+    source: 'Employee',
     org: orgId,
-    category: "",
+    category: '',
   });
 
-  const notifyQuestionSubmitted = () => toast("New question submitted!");
+  const notifyQuestionSubmitted = () => toast('New question submitted!');
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -131,8 +131,8 @@ const QuestionMaker = () => {
             <option value="">Select Correct Answer</option>
             {question.options.map((option, index) => (
               <option key={index} value={index}>
-                Option {index + 1}:{" "}
-                {option.length > 15 ? option.substring(0, 15) + "..." : option}
+                Option {index + 1}:{' '}
+                {option.length > 15 ? option.substring(0, 15) + '...' : option}
               </option>
             ))}
           </select>

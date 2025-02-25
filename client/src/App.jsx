@@ -1,15 +1,15 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { AuthProvider, ProtectedRoute } from "./context/auth.context.jsx";
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { AuthProvider, ProtectedRoute } from './context/auth.context.jsx';
 
-import Auth from "./pages/Auth.jsx";
-import Dashboard from "./pages/Dashboard";
-import Navbar from "./components/Navbar.jsx";
-import QuestionMaker from "./pages/QuestionMaker.jsx";
-import NotFound from "./pages/NotFound.jsx";
-import Quiz from "./pages/Quiz.jsx";
-import { ToastContainer } from "react-toastify";
-import ApproveQuestions from "./pages/ApproveQuestions.jsx";
-import Settings from "./pages/Settings.jsx";
+import Auth from './pages/Auth.jsx';
+import Dashboard from './pages/Dashboard';
+import Navbar from './components/Navbar.jsx';
+import QuestionMaker from './pages/QuestionMaker.jsx';
+import NotFound from './pages/NotFound.jsx';
+import Quiz from './pages/Quiz.jsx';
+import { ToastContainer } from 'react-toastify';
+import ApproveQuestions from './pages/ApproveQuestions.jsx';
+import Settings from './pages/Settings.jsx';
 
 function App() {
   return (

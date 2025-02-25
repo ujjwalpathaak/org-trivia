@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from "react";
-import { getAllOrgs } from "../../services";
+import React, { useEffect, useState } from 'react';
+import { getAllOrgs } from '../../services';
 
 const OrgSearch = ({ setFormData }) => {
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
   const [filteredOrgs, setFilteredOrgs] = useState([]);
   const [orgList, setOrgList] = useState([]);
 
   useEffect(() => {
-    let cachedData = localStorage.getItem("cachedData");
+    let cachedData = localStorage.getItem('cachedData');
     cachedData = cachedData ? JSON.parse(cachedData) : {};
 
     const fetchAllOrgs = async () => {
@@ -16,11 +16,11 @@ const OrgSearch = ({ setFormData }) => {
         const data = await response.json();
 
         const newCache = { ...cachedData, orgs: data.orgs };
-        localStorage.setItem("cachedData", JSON.stringify(newCache));
+        localStorage.setItem('cachedData', JSON.stringify(newCache));
 
         setOrgList(data.orgs);
       } catch (error) {
-        console.error("Error fetching organizations:", error);
+        console.error('Error fetching organizations:', error);
       }
     };
 
@@ -37,8 +37,8 @@ const OrgSearch = ({ setFormData }) => {
     if (value) {
       setFilteredOrgs(
         orgList.filter((org) =>
-          org.name.toLowerCase().includes(value.toLowerCase())
-        )
+          org.name.toLowerCase().includes(value.toLowerCase()),
+        ),
       );
     } else {
       setFilteredOrgs([]);

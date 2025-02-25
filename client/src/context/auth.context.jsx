@@ -1,6 +1,6 @@
-import { useState, createContext, useContext, useEffect } from "react";
-import { jwtDecode } from "jwt-decode";
-import { Navigate } from "react-router-dom";
+import { useState, createContext, useContext, useEffect } from 'react';
+import { jwtDecode } from 'jwt-decode';
+import { Navigate } from 'react-router-dom';
 
 const AuthContext = createContext({
   isAuthenticated: false,
@@ -15,7 +15,7 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem('token');
     if (token) {
       try {
         const decodedToken = jwtDecode(token);
@@ -28,7 +28,7 @@ export const AuthProvider = ({ children }) => {
           logout();
         }
       } catch (error) {
-        console.error("Invalid token:", error);
+        console.error('Invalid token:', error);
         logout();
       }
     }
@@ -37,17 +37,17 @@ export const AuthProvider = ({ children }) => {
 
   const login = (token) => {
     try {
-      localStorage.setItem("token", token);
+      localStorage.setItem('token', token);
       const decodedToken = jwtDecode(token);
       setIsAuthenticated(true);
       setData(decodedToken);
     } catch (error) {
-      console.error("Login failed:", error);
+      console.error('Login failed:', error);
     }
   };
 
   const logout = () => {
-    localStorage.removeItem("token");
+    localStorage.removeItem('token');
     setIsAuthenticated(false);
     setData(null);
   };
@@ -65,7 +65,7 @@ export const useAuth = () => useContext(AuthContext);
 
 export const useOrgId = () => {
   const { data } = useAuth();
-  return data?.user?.org || "";
+  return data?.user?.org || '';
 };
 
 export const ProtectedRoute = ({ children, route }) => {
@@ -74,11 +74,11 @@ export const ProtectedRoute = ({ children, route }) => {
 
   if (loading) return <p>Loading...</p>;
 
-  if (route === "quiz" && !isQuizLive) {
+  if (route === 'quiz' && !isQuizLive) {
     return <Navigate to="/" replace />;
   }
 
-  if (route === "approve-questions" && data?.user?.role !== "Admin") {
+  if (route === 'approve-questions' && data?.user?.role !== 'Admin') {
     return <Navigate to="/" replace />;
   }
 

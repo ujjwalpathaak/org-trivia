@@ -3,17 +3,17 @@
 @tailwind utilities;
 
 #root {
-    box-sizing: border-box;
-    width: 100vw;
-    height: 100vh;
-    background-color: #f4f4f4;
+  box-sizing: border-box;
+  width: 100vw;
+  height: 100vh;
+  background-color: #f4f4f4;
 }
 
-.floating-div{
-    border-radius: 15px;
-    box-shadow: 0 1px 10px rgb(0,0,0,0.1);
+.floating-div {
+  border-radius: 15px;
+  box-shadow: 0 1px 10px rgb(0, 0, 0, 0.1);
 }
 
-.parent-page-div{
-    height: calc(100vh - 4rem);
+.parent-page-div {
+  height: calc(100vh - 4rem);
 }

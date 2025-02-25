@@ -1,23 +1,23 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const questionSchema = new mongoose.Schema(
   {
     source: {
       type: String,
-      enum: ["AI", "Employee", "Admin"],
+      enum: ['AI', 'Employee', 'Admin'],
       immutable: true,
       required: true,
-      default: "AI",
+      default: 'AI',
     },
     category: {
       type: String,
-      enum: ["CCnHnFF", "CAnIT", "HRD", "PnA"],
+      enum: ['CCnHnFF', 'CAnIT', 'HRD', 'PnA'],
       immutable: true,
       required: true,
     },
     image: {
       type: String,
-      default: "",
+      default: '',
     },
     question: {
       type: String,
@@ -36,21 +36,21 @@ const questionSchema = new mongoose.Schema(
         validator: function (v) {
           return v.length === 4;
         },
-        message: "Options array must have exactly 4 items.",
+        message: 'Options array must have exactly 4 items.',
       },
     },
     status: {
       type: String,
-      enum: ["done", "extra", "live"],
+      enum: ['done', 'extra', 'live'],
       required: true,
-      default: "live",
+      default: 'live',
     },
     date: {
       type: Date,
     },
     lastModifiedBy: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Admin",
+      ref: 'Admin',
     },
     lastModifiedAt: {
       type: Date,
@@ -58,12 +58,12 @@ const questionSchema = new mongoose.Schema(
     },
     org: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Org",
+      ref: 'Org',
       immutable: true,
       required: true,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 const weeklyQuestionSchema = new mongoose.Schema(
@@ -71,7 +71,7 @@ const weeklyQuestionSchema = new mongoose.Schema(
     isApproved: {
       type: Boolean,
       required: true,
-      default: false
+      default: false,
     },
     scheduledDate: {
       type: Date,
@@ -80,14 +80,14 @@ const weeklyQuestionSchema = new mongoose.Schema(
     question: questionSchema,
     org: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Org",
+      ref: 'Org',
       immutable: true,
       required: true,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
-const WeeklyQuestion = mongoose.model("WeeklyQuestion", weeklyQuestionSchema);
+const WeeklyQuestion = mongoose.model('WeeklyQuestion', weeklyQuestionSchema);
 
 export default WeeklyQuestion;

@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
-import { getEmployeesByOrg } from "../../services";
-import { useOrgId } from "../../context/auth.context";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from 'react';
+import { getEmployeesByOrg } from '../../services';
+import { useOrgId } from '../../context/auth.context';
+import { useNavigate } from 'react-router-dom';
 
 const AdminDashboard = () => {
   const orgId = useOrgId();
@@ -17,7 +17,7 @@ const AdminDashboard = () => {
 
         setEmployees(Array.isArray(employeesList) ? employeesList : []);
       } catch (error) {
-        console.error("Error fetching employees:", error);
+        console.error('Error fetching employees:', error);
         setEmployees([]);
       }
     };
@@ -61,7 +61,7 @@ const AdminDashboard = () => {
           <h2 className="text-lg font-semibold mb-2">Approve Questions</h2>
           <p className="text-gray-600">Review and approve pending questions.</p>
           <button
-            onClick={() => navigate("approve-questions")}
+            onClick={() => navigate('approve-questions')}
             className="mt-3 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
           >
             View Pending Questions
@@ -74,7 +74,7 @@ const AdminDashboard = () => {
             Manage admin settings and configurations.
           </p>
           <button
-            onClick={() => navigate("settings")}
+            onClick={() => navigate('settings')}
             className="mt-3 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
           >
             Open Settings

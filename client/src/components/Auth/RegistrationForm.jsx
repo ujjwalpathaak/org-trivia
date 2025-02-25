@@ -1,13 +1,13 @@
-import React, { useState } from "react";
-import { validateForm } from "../../utils";
-import { registerRequest } from "../../services";
-import OrgSearch from "./OrgSearch";
+import React, { useState } from 'react';
+import { validateForm } from '../../utils';
+import { registerRequest } from '../../services';
+import OrgSearch from './OrgSearch';
 
 const RegistrationForm = () => {
   const [formData, setFormData] = useState({
-    email: "",
-    name: "",
-    password: "",
+    email: '',
+    name: '',
+    password: '',
     isAdmin: false,
     rememberMe: false,
     org: {},
@@ -20,11 +20,11 @@ const RegistrationForm = () => {
     setFormData((prev) => ({
       ...prev,
       [name]:
-        type === "checkbox"
+        type === 'checkbox'
           ? checked
-          : type === "radio"
-          ? value === "true"
-          : value,
+          : type === 'radio'
+            ? value === 'true'
+            : value,
     }));
   };
 
@@ -40,15 +40,15 @@ const RegistrationForm = () => {
       if (response.ok) {
         alert(
           `Successfully registered you as an ${
-            formData.isAdmin ? "Admin" : "Employee"
-          }. Login again to get access to the dashboard!`
+            formData.isAdmin ? 'Admin' : 'Employee'
+          }. Login again to get access to the dashboard!`,
         );
-        window.location.href = "/";
+        window.location.href = '/';
       } else {
         setErrors({ ...errors, serverError: data.message });
       }
     } catch (error) {
-      console.error("Error:", error);
+      console.error('Error:', error);
     }
   };
 
@@ -101,7 +101,7 @@ const RegistrationForm = () => {
           value={formData.name}
           onChange={handleChange}
           className={`bg-gray-50 border ${
-            errors.name ? "border-red-500" : "border-gray-300"
+            errors.name ? 'border-red-500' : 'border-gray-300'
           } text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5`}
           placeholder="John Doe"
           required
@@ -123,7 +123,7 @@ const RegistrationForm = () => {
           value={formData.email}
           onChange={handleChange}
           className={`bg-gray-50 border ${
-            errors.email ? "border-red-500" : "border-gray-300"
+            errors.email ? 'border-red-500' : 'border-gray-300'
           } text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5`}
           placeholder="name@example.com"
           required
@@ -145,7 +145,7 @@ const RegistrationForm = () => {
           value={formData.password}
           onChange={handleChange}
           className={`bg-gray-50 border ${
-            errors.password ? "border-red-500" : "border-gray-300"
+            errors.password ? 'border-red-500' : 'border-gray-300'
           } text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5`}
           placeholder="********"
           required

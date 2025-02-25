@@ -1,41 +1,44 @@
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
 class AuthService {
-    constructor(authRepository) {
-        this.authRepository = authRepository;
-    }
+  constructor(authRepository) {
+    this.authRepository = authRepository;
+  }
 
-    async getUserByEmail(email) {
-        return await this.authRepository.getUserByEmail(email);
-    }
+  async getUserByEmail(email) {
+    return await this.authRepository.getUserByEmail(email);
+  }
 
-    generateToken(user, isAdmin) {
-        return jwt.sign(
-            { id: user._id, user: user},
-            process.env.JWT_SECRET,
-            { expiresIn: "7d" }
-        );
-    }
+  generateToken(user, isAdmin) {
+    return jwt.sign({ id: user._id, user: user }, process.env.JWT_SECRET, {
+      expiresIn: '7d',
+    });
+  }
 
-    async createHash(password, strength) {
-        return await bcrypt.hash(password, strength);
-    }
+  async createHash(password, strength) {
+    return await bcrypt.hash(password, strength);
+  }
 
-    async passwordsMatch(password, userPassword) {
-        return await bcrypt.compare(password, userPassword);
-    }
+  async passwordsMatch(password, userPassword) {
+    return await bcrypt.compare(password, userPassword);
+  }
 
-    async registerUser(user) {
-        return await this.authRepository.saveUser(user);
-    }
+  async registerUser(user) {
+    return await this.authRepository.saveUser(user);
+  }
 
-    async createUser(UserModel, email, password, name, org) {
-        const hashedPassword = await this.createHash(password, 10);
+  async createUser(UserModel, email, password, name, org) {
+    const hashedPassword = await this.createHash(password, 10);
 
-        const newUser = new UserModel({ email, password: hashedPassword, name, org });
-        await this.authRepository.saveUser(newUser);
-    }
+    const newUser = new UserModel({
+      email,
+      password: hashedPassword,
+      name,
+      org,
+    });
+    await this.authRepository.saveUser(newUser);
+  }
 }
 
 export default AuthService;

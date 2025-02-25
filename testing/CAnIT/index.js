@@ -1,26 +1,26 @@
-import path from "path";
-import { fileURLToPath } from "url";
-import dotenv from "dotenv";
-import Praser from 'rss-parser'
+import path from 'path';
+import { fileURLToPath } from 'url';
+import dotenv from 'dotenv';
+import Praser from 'rss-parser';
 const parser = new Praser();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-dotenv.config({ path: path.resolve(__dirname, "../.env") });
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenerativeAI } from '@google/generative-ai';
 const apiKey = process.env.GEMINI_API_KEY;
 const genAI = new GoogleGenerativeAI(apiKey);
 const model = genAI.getGenerativeModel({
-  model: "gemini-2.0-flash",
+  model: 'gemini-2.0-flash',
 });
 
 const days = 30;
 
 async function fetchNews(query) {
   try {
-    const rssUrl = "https://news.google.com/rss/search?q=" + query;
+    const rssUrl = 'https://news.google.com/rss/search?q=' + query;
     const feed = await parser.parseURL(rssUrl);
 
     const oneMonthAgo = new Date();
@@ -43,7 +43,7 @@ async function fetchNews(query) {
     }
 
     if (uniqueNews.length === 0) {
-      console.log("No unique news found in the last 1 month.");
+      console.log('No unique news found in the last 1 month.');
       return;
     }
 
@@ -51,7 +51,7 @@ async function fetchNews(query) {
       return `${curr.title}`;
     });
   } catch (error) {
-    console.error("Error fetching RSS feed:", error);
+    console.error('Error fetching RSS feed:', error);
   }
 }
 
@@ -61,7 +61,7 @@ const generateMCQQuizFromNews = async (pdfText) => {
     topP: 0.9,
     topK: 50,
     maxOutputTokens: 1024,
-    responseMimeType: "application/json",
+    responseMimeType: 'application/json',
   };
 
   const prompt = `
@@ -94,16 +94,18 @@ const generateMCQQuizFromNews = async (pdfText) => {
 
   const result = await model.generateContent(prompt, generationConfig);
   let responseText = result.response.text();
-  if (responseText.startsWith("```json") && responseText.endsWith("```")) {
+  if (responseText.startsWith('```json') && responseText.endsWith('```')) {
     responseText = responseText.slice(7, -3).trim();
   }
 
   return [...JSON.parse(responseText)];
 };
 
-const latestNewsOrg = await fetchNews("Darwinbox");
-console.log("latestNewsOrg: ", latestNewsOrg);
+const latestNewsOrg = await fetchNews('Darwinbox');
+console.log('latestNewsOrg: ', latestNewsOrg);
 generateMCQQuizFromNews(JSON.stringify(latestNewsOrg));
-const latestNewsIndustry = await fetchNews("HRTech: Human Resources Technology");
-console.log("latestNewsIndustry: ", latestNewsIndustry);
+const latestNewsIndustry = await fetchNews(
+  'HRTech: Human Resources Technology',
+);
+console.log('latestNewsIndustry: ', latestNewsIndustry);
 generateMCQQuizFromNews(JSON.stringify(latestNewsIndustry));
