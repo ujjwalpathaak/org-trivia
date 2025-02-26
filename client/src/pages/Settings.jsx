@@ -18,8 +18,8 @@ const Settings = () => {
   };
 
   return (
-    <div className="parent-page-div flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="max-w-2xl floating-div p-6 shadow-lg rounded-lg bg-white">
+    <div className="parent-page-div flex items-center justify-center bg-gray-100">
+      <div className="mt-[6rem] max-w-2xl floating-div p-6 shadow-lg rounded-lg bg-white">
         <h2 className="text-xl font-bold text-gray-900">Admin Settings</h2>
         <div className="mt-4 space-y-4">
           <div className="flex items-center justify-between">

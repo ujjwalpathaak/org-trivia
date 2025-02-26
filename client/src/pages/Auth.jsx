@@ -17,7 +17,7 @@ const Auth = () => {
 
   return (
     <div className="parent-page-div flex-grow flex justify-center items-center flex-col">
-      <div className="floating-div w-[23rem] flex flex-col justify-center items-center py-8">
+      <div className="floating-div min-w-[23rem] flex flex-col justify-center items-center py-8">
         {isLogin ? <LoginForm /> : <RegistrationFormForm />}
         <button className="underline mt-8" onClick={() => setIsLogin(!isLogin)}>
           {isLogin ? "I don't have an account" : 'I already have an account'}
