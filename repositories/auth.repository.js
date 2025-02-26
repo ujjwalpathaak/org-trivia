@@ -29,13 +29,9 @@ class AuthRepository {
 
   generateToken(user) {
     // id: user._id, user: user
-    return jwt.sign(
-      { id: user._id, user: user },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: '7d',
-      },
-    );
+    return jwt.sign({ id: user._id, user: user }, process.env.JWT_SECRET, {
+      expiresIn: '7d',
+    });
   }
 
   async getAdminModel() {

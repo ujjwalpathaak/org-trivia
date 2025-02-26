@@ -1,9 +1,10 @@
 import OrgRepository from '../repositories/org.repository.js';
 import OrgService from './org.service.js';
 import { getNextFriday } from '../middleware/utils.js';
-
-const API_GATEWAY_URL =
-  'https://w6d724kzj1.execute-api.eu-north-1.amazonaws.com';
+import {
+  fetchNewCAnITQuestions,
+  fetchNewPnAQuestions,
+} from '../api/lambda.api.js';
 
 const orgRepository = new OrgRepository();
 const orgService = new OrgService(orgRepository);
@@ -13,12 +14,14 @@ class QuestionService {
     this.questionRepository = questionRepository;
   }
 
-  async saveQuestion(newQuestion) {
-    return this.questionRepository.saveQuestion(newQuestion);
+  async saveQuestion(newQuestionData) {
+    const newQue = await this.questionRepository.saveQuestion(newQuestionData);
+
+    return { status: 201, data: newQue };
   }
 
   async saveWeeklyQuestions(newQuestions) {
-    return this.questionRepository.saveWeeklyQuestions(newQuestions);
+    await this.questionRepository.saveWeeklyQuestions(newQuestions);
   }
 
   async formatWeeklyQuestions(data) {
@@ -41,11 +44,12 @@ class QuestionService {
       org: orgId,
     }));
 
-    return { weeklyQuestions, orgId };
+    return weeklyQuestions;
   }
 
   async scheduleQuestionsForNextWeek() {
-    const triviaEnabledOrgs = await orgService.getTriviaEnabledOrgs();
+    const response = await orgService.getTriviaEnabledOrgs();
+    const triviaEnabledOrgs = response.data;
     triviaEnabledOrgs.forEach((element) => {
       const genre =
         element.settings.selectedGenre[element.settings.currentGenre];
@@ -70,9 +74,7 @@ class QuestionService {
   }
 
   async startPnAWorkflow(companyName, orgId) {
-    console.log('startPnAWorkflow - startPnAWorkflow', companyName, orgId);
     const tempPnAQuestions = await this.selectTempPnAQuestions();
-    console.log('startPnAWorkflow - tempPnAQuestions', tempPnAQuestions);
     const finalPnAQuestions = await this.makeFinalPnAQuestions(
       companyName,
       tempPnAQuestions,
@@ -136,63 +138,22 @@ class QuestionService {
   }
 
   async makeFinalPnAQuestions(companyName, PnAQuestions, orgId) {
-    console.log(
-      'makeFinalPnAQuestions - makeFinalPnAQuestions',
+    const finalPnAQuestions = await fetchNewPnAQuestions(
       companyName,
       PnAQuestions,
       orgId,
     );
-    try {
-      const response = await fetch(API_GATEWAY_URL + '/generatePnA_Questions', {
-        method: 'POST',
-        headers: {
-          'x-api-key': 'your-api-key',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          companyName: companyName,
-          PnAQuestions: PnAQuestions,
-          orgId: orgId,
-        }),
-      });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-
-      const finalPnAQuestions = await response.json();
-      return finalPnAQuestions;
-    } catch (error) {
-      throw new Error('Error fetching PnA Questions:', error);
-    }
+    return finalPnAQuestions;
   }
 
-  async makeCAnITQuestions(companyName, PnAQuestions) {
-    try {
-      const response = await fetch(
-        API_GATEWAY_URL + '/generateCAnIT_Questions',
-        {
-          method: 'POST',
-          headers: {
-            'x-api-key': 'your-api-key',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            companyName: companyName,
-            companyIndustry: companyIndustry,
-          }),
-        },
-      );
+  async makeCAnITQuestions(companyName, companyIndustry) {
+    const finalCAnITQuestions = await fetchNewCAnITQuestions(
+      companyName,
+      companyIndustry,
+    );
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-
-      const finalCAnITQuestions = await response.json();
-      return finalCAnITQuestions;
-    } catch (error) {
-      throw new Error('Error fetching PnA Questions:', error);
-    }
+    return finalCAnITQuestions;
   }
 
   async fetchHRDQuestions() {
@@ -200,7 +161,9 @@ class QuestionService {
   }
 
   async getWeeklyUnapprovedQuestions(orgId) {
-    return this.questionRepository.getWeeklyUnapprovedQuestions(orgId);
+    const weeklyUnapprovedQuestions =
+      await this.questionRepository.getWeeklyUnapprovedQuestions(orgId);
+    return { status: 200, data: weeklyUnapprovedQuestions };
   }
 }
 

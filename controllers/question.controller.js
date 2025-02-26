@@ -1,37 +1,49 @@
+import { response } from 'express';
 import QuestionRepository from '../repositories/question.repository.js';
 import QuestionService from '../services/question.service.js';
 
-const questionService = new QuestionService(new QuestionRepository());
+const questionRepository = new QuestionRepository();
+const questionService = new QuestionService(questionRepository);
 
-export const addQuestions = async (request, response) => {
-  try {
-    const question = request.body;
-    const newQues = await questionService.saveQuestion(question);
-    response.status(200).json({ newQues });
-  } catch (err) {
-    response.status(500).json({ message: 'server error', error: err });
+class QuestionController {
+  async addQuestions(req, res, next) {
+    try {
+      const question = req.body;
+
+      const response = await questionService.saveQuestion(question);
+
+      res.status(response.status).json(response.data);
+    } catch (error) {
+      next(error);
+    }
   }
-};
 
-export const handleLambdaCallback = async (request, response) => {
-  try {
-    const data = request.body;
-    const { weeklyQuestions, orgId } =
-      await questionService.formatWeeklyQuestions(data);
-    await questionService.saveWeeklyQuestions(weeklyQuestions);
+  async handleLambdaCallback(req, res, next) {
+    try {
+      const data = req.body;
 
-    response.status(200).json({ message: 'Scheduled new questions' });
-  } catch (err) {
-    response.status(500).json({ message: 'server error', error: err });
+      const weeklyQuestions = await questionService.formatWeeklyQuestions(data);
+
+      await questionService.saveWeeklyQuestions(weeklyQuestions);
+
+      res.status(200).json({ message: 'Scheduled new questions' });
+    } catch (error) {
+      next(error);
+    }
   }
-};
-export const getWeeklyUnapprovedQuestions = async (request, response) => {
-  try {
-    const { orgId } = request.params;
-    const questions = await questionService.getWeeklyUnapprovedQuestions(orgId);
 
-    response.status(200).json({ questions: questions });
-  } catch (err) {
-    response.status(500).json({ message: 'server error', error: err });
+  async getWeeklyUnapprovedQuestions(req, res, next) {
+    try {
+      const { orgId } = req.params;
+
+      const response =
+        await questionService.getWeeklyUnapprovedQuestions(orgId);
+
+      res.status(response.status).json(response.data);
+    } catch (error) {
+      next(error);
+    }
   }
-};
+}
+
+export default QuestionController;

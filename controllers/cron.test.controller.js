@@ -13,7 +13,9 @@ class CronTestController {
   async startPnAWorkflow(req, res, next) {
     try {
       const { orgId } = req.params;
-      const org = await orgService.getOrgById(orgId);
+      const response = await orgService.getOrgById(orgId);
+      const org = response.data;
+
       quesitonService.startPnAWorkflow(org.name, orgId);
     } catch (error) {
       next(error);

@@ -3,16 +3,22 @@ class OrgService {
     this.orgRepository = orgRepository;
   }
 
-  async getAllOrgs() {
-    return await this.orgRepository.getAllOrgs();
+  async getAllOrgNames() {
+    const orgNames = await this.orgRepository.getAllOrgNames();
+
+    return { status: 200, data: orgNames };
   }
 
   async getOrgById(orgId) {
-    return await this.orgRepository.getOrgById(orgId);
+    const org = await this.orgRepository.getOrgById(orgId);
+
+    return { status: 200, data: org };
   }
 
   async getTriviaEnabledOrgs() {
-    return await this.orgRepository.getTriviaEnabledOrgs();
+    const orgs = await this.orgRepository.getTriviaEnabledOrgs();
+
+    return { status: 200, data: orgs };
   }
 }
 

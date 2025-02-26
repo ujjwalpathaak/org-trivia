@@ -3,15 +3,16 @@ import OrgRepository from '../repositories/org.repository.js';
 
 const orgService = new OrgService(new OrgRepository());
 
-export const getAllOrgs = async (request, response) => {
-  try {
-    const orgs = await orgService.getAllOrgs.select('id name');
+class OrgController {
+  async getAllOrgNames(req, res, next) {
+    try {
+      const response = await orgService.getAllOrgNames();
 
-    response.status(200).json({ orgs });
-  } catch (error) {
-    console.error(error.message);
-    response
-      .status(500)
-      .json({ message: 'Server Error', error: error.message });
+      res.status(response.status).json(response.data);
+    } catch (error) {
+      next(error);
+    }
   }
-};
+}
+
+export default OrgController;

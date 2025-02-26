@@ -1,8 +1,8 @@
 import Org from '../models/org.model.js';
 
 class OrgRepository {
-  async getAllOrgs() {
-    return await Org.find({});
+  async getAllOrgNames() {
+    return await Org.find({}).select('id name');
   }
 
   async getOrgById(orgId) {

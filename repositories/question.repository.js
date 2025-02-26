@@ -8,11 +8,7 @@ class QuestionRepository {
   }
 
   async saveWeeklyQuestions(newQuestions) {
-    try {
-      return await WeeklyQuestion.insertMany(newQuestions);
-    } catch (err) {
-      console.log(err);
-    }
+    return await WeeklyQuestion.insertMany(newQuestions);
   }
 
   async getWeeklyUnapprovedQuestions(orgId) {
