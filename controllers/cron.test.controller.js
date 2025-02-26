@@ -21,6 +21,17 @@ class CronTestController {
       next(error);
     }
   }
+  async startCAnITWorkflow(req, res, next) {
+    try {
+      const { orgId } = req.params;
+      const response = await orgService.getOrgById(orgId);
+      const org = response.data;
+
+      quesitonService.startCAnITWorkflow(org.name, org.industry, orgId);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export default CronTestController;

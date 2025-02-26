@@ -1,10 +1,10 @@
 import express from 'express';
 import OrgController from '../controllers/org.controller.js';
 
-const OrgController = new OrgController();
+const orgController = new OrgController();
 
 const orgRouter = express.Router();
 
-orgRouter.get('/', OrgController.getAllOrgNames);
+orgRouter.get('/', orgController.getAllOrgNames);
 
 export default orgRouter;

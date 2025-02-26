@@ -33,14 +33,6 @@ class AuthRepository {
       expiresIn: '7d',
     });
   }
-
-  async getAdminModel() {
-    return Admin;
-  }
-
-  async getEmployeeModel() {
-    return Employee;
-  }
 }
 
 export default AuthRepository;

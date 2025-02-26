@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { createNewQuestion } from '../services';
+import { createNewQuestion } from '../api';
 import { useOrgId } from '../context/auth.context';
 
 import { toast } from 'react-toastify';

@@ -1,8 +1,8 @@
 const API_GATEWAY_URL =
   'https://w6d724kzj1.execute-api.eu-north-1.amazonaws.com';
 
-export const fetchNewPnAQuestions = async (
-  companyName,
+export const refactorPnAQuestions = async (
+  orgName,
   PnAQuestions,
   orgId,
 ) => {
@@ -13,7 +13,7 @@ export const fetchNewPnAQuestions = async (
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      companyName: companyName,
+      orgName: orgName,
       PnAQuestions: PnAQuestions,
       orgId: orgId,
     }),
@@ -27,7 +27,7 @@ export const fetchNewPnAQuestions = async (
 
   return finalPnAQuestions;
 };
-export const fetchNewCAnITQuestions = async (companyName, companyIndustry) => {
+export const fetchNewCAnITQuestions = async (orgName, orgIndustry, orgId) => {
   const response = await fetch(API_GATEWAY_URL + '/generateCAnIT_Questions', {
     method: 'POST',
     headers: {
@@ -35,8 +35,9 @@ export const fetchNewCAnITQuestions = async (companyName, companyIndustry) => {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      companyName: companyName,
-      companyIndustry: companyIndustry,
+      orgName: orgName,
+      orgIndustry: orgIndustry,
+      orgId: orgId,
     }),
   });
 

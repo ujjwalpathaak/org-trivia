@@ -1,3 +1,6 @@
+import Admin from "../models/admin.model.js";
+import Employee from "../models/employee.model.js";
+
 class AuthService {
   constructor(authRepository) {
     this.authRepository = authRepository;
@@ -5,8 +8,8 @@ class AuthService {
 
   async registerUser(isAdmin, email, password, name, org) {
     const [UserModel, userType] = isAdmin
-      ? [this.authRepository.getAdminModel(), 'Admin']
-      : [this.authRepository.getEmployeeModel(), 'Employee'];
+      ? [Admin, 'Admin']
+      : [Employee, 'Employee'];
 
     const user = await this.authRepository.getUserByEmail(email);
     if (user) {

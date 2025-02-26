@@ -3,7 +3,7 @@ import OrgService from './org.service.js';
 import { getNextFriday } from '../middleware/utils.js';
 import {
   fetchNewCAnITQuestions,
-  fetchNewPnAQuestions,
+  refactorPnAQuestions,
 } from '../api/lambda.api.js';
 
 const orgRepository = new OrgRepository();
@@ -25,11 +25,7 @@ class QuestionService {
   }
 
   async formatWeeklyQuestions(data) {
-    const JSONdata = data;
-
-    let questions = JSONdata.quesitons;
-    const orgId = JSONdata.orgId;
-    const category = JSONdata.category;
+    let {questions, orgId, category} = data;
     const nextFriday = getNextFriday();
 
     const weeklyQuestions = questions.map((curr) => ({
@@ -50,11 +46,11 @@ class QuestionService {
   async scheduleQuestionsForNextWeek() {
     const response = await orgService.getTriviaEnabledOrgs();
     const triviaEnabledOrgs = response.data;
+
     triviaEnabledOrgs.forEach((element) => {
       const genre =
         element.settings.selectedGenre[element.settings.currentGenre];
       switch (genre) {
-        //  add orgIds
         case 'PnA':
           this.startPnAWorkflow(element.name);
           break;
@@ -74,31 +70,6 @@ class QuestionService {
   }
 
   async startPnAWorkflow(companyName, orgId) {
-    const tempPnAQuestions = await this.selectTempPnAQuestions();
-    const finalPnAQuestions = await this.makeFinalPnAQuestions(
-      companyName,
-      tempPnAQuestions,
-      orgId,
-    );
-    console.log('startPnAWorkflow - finalPnAQuestions', finalPnAQuestions);
-
-    // send questions for approval.
-  }
-
-  async startCAnITWorkflow() {
-    const finalCAnITQuestions = await this.makeCAnITQuestions();
-
-    console.log(finalCAnITQuestions);
-    // send questions for approval.
-  }
-
-  async startHRDWorkflow() {
-    // startHRDWorkflow
-  }
-
-  async selectTempPnAQuestions() {
-    // logic for selectPnAQuestions
-    // currently hardcode it.
     const tempPnAQuestions = [
       {
         question:
@@ -133,27 +104,25 @@ class QuestionService {
         refactor: false,
       },
     ];
-
-    return tempPnAQuestions;
-  }
-
-  async makeFinalPnAQuestions(companyName, PnAQuestions, orgId) {
-    const finalPnAQuestions = await fetchNewPnAQuestions(
+    const finalPnAQuestions = await refactorPnAQuestions(
       companyName,
-      PnAQuestions,
+      tempPnAQuestions,
       orgId,
     );
 
     return finalPnAQuestions;
   }
 
-  async makeCAnITQuestions(companyName, companyIndustry) {
+  async startCAnITWorkflow(orgName, orgIndustry, orgId) {
     const finalCAnITQuestions = await fetchNewCAnITQuestions(
-      companyName,
-      companyIndustry,
+      orgName, orgIndustry, orgId
     );
 
     return finalCAnITQuestions;
+  }
+
+  async startHRDWorkflow() {
+    // startHRDWorkflow
   }
 
   async fetchHRDQuestions() {

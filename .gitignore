@@ -13,6 +13,7 @@ dist-ssr
 *.local
 HR_Docs
 sample.pdf
+testing
 .env
 
 # Editor directories and files

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { validateForm } from '../../utils';
-import { loginRequest } from '../../services';
+import { loginRequest } from '../../api';
 
 const LoginForm = () => {
   const [formData, setFormData] = useState({

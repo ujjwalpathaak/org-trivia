@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getEmployeesByOrg } from '../../services';
+import { getEmployeesByOrg } from '../../api';
 import { useOrgId } from '../../context/auth.context';
 import { useNavigate } from 'react-router-dom';
 

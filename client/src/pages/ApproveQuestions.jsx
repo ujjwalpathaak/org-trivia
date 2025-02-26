@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { getQuestionsToApprove } from '../services.js';
+import { getQuestionsToApprove } from '../api.js';
 import { useOrgId } from '../context/auth.context.jsx';
 
 export default function ScheduleQuestions() {
@@ -34,7 +34,7 @@ export default function ScheduleQuestions() {
   useEffect(() => {
     const getQuestionsToApproveFunc = async () => {
       const response = await getQuestionsToApprove(orgId);
-      setQuestions(response.questions);
+      setQuestions(response);
     };
 
     getQuestionsToApproveFunc();

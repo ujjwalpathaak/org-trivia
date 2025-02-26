@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getAllOrgs } from '../../services';
+import { getAllOrgs } from '../../api';
 
 const OrgSearch = ({ setFormData }) => {
   const [searchTerm, setSearchTerm] = useState('');

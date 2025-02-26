@@ -9,4 +9,9 @@ cronTestRouter.post(
   cronTestController.startPnAWorkflow,
 );
 
+cronTestRouter.post(
+  '/startCAnITWorkflow/:orgId',
+  cronTestController.startCAnITWorkflow,
+);
+
 export default cronTestRouter;

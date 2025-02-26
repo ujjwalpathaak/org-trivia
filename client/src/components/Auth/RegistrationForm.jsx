@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { validateForm } from '../../utils';
-import { registerRequest } from '../../services';
+import { registerRequest } from '../../api';
 import OrgSearch from './OrgSearch';
 
 const RegistrationForm = () => {
