@@ -1,4 +1,5 @@
 import Employee from '../models/employee.model.js';
+import { ObjectId } from 'mongodb';
 
 class EmployeeRepository {
   async getAllOrgEmployeesByOrgId(orgId) {
@@ -7,8 +8,8 @@ class EmployeeRepository {
 
   async updateWeeklyQuizScore(employeeId, newScore) {
     return await Employee.updateOne(
-      { employeeId: employeeId },
-      { $inc: { score: newScore } },
+      { _id: new ObjectId(employeeId) },
+      { $inc: { currentPoints: newScore } },
     );
   }
 }

@@ -7,10 +7,11 @@ const employeeSerivce = new EmployeeService(employeeRepository);
 class AnswerRepository {
   async calculateScore(userAnswers, correctAnswers) {
     let score = 0;
-
     userAnswers.forEach(({ questionId, answer }) => {
       const correctAnswer = correctAnswers.find(
-        (q) => q.questionId === questionId,
+        (q) =>{
+          return q._id.toString() === questionId
+        },
       );
       if (correctAnswer && answer === correctAnswer.answer) {
         score += 10;
@@ -24,10 +25,9 @@ class AnswerRepository {
     userAnswers,
     correctAnswers,
     employeeId,
-    orgId,
   ) {
     userAnswers = JSON.parse(userAnswers);
-    const score = calculateScore(userAnswers, correctAnswers);
+    const score = await this.calculateScore(userAnswers, correctAnswers);
     await employeeSerivce.updateWeeklyQuizScore(employeeId, score);
 
     return { status: 200, data: 'Answers submitted successfully' };
