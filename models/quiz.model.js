@@ -9,7 +9,7 @@ const quizSchema = new mongoose.Schema(
     },
     questions: {
       type: [mongoose.Schema.Types.ObjectId],
-      ref: 'Questions',
+      ref: 'WeeklyQuestion',
       required: true,
     },
     scheduledDate: {

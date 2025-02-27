@@ -7,7 +7,7 @@ class QuestionRepository {
     return await new Question(newQuestion).save();
   }
 
-  async saveWeeklyQuestions(newQuestions) {
+  async saveWeeklyQuizQuestions(newQuestions) {
     return await WeeklyQuestion.insertMany(newQuestions);
   }
 

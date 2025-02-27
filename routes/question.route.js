@@ -5,7 +5,7 @@ import QuestionController from '../controllers/question.controller.js';
 const questionController = new QuestionController();
 const questionRouter = express.Router();
 
-questionRouter.post('/', protectRoute, questionController.addQuestions);
+questionRouter.post('/', protectRoute, questionController.addQuestion);
 
 questionRouter.get(
   '/weekly/unapproved/:orgId',
@@ -18,11 +18,6 @@ questionRouter.get(
   protectRoute,
   checkRole('Employee'),
   questionController.getWeeklyQuizQuestions,
-);
-// how to limit this API call to only lambda funcitions - will see later
-questionRouter.post(
-  '/weekly/lambda/callback',
-  questionController.handleLambdaCallback,
 );
 
 export default questionRouter;

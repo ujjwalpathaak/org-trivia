@@ -20,8 +20,8 @@ class QuestionService {
     return { status: 201, data: newQue };
   }
 
-  async saveWeeklyQuestions(newQuestions) {
-    await this.questionRepository.saveWeeklyQuestions(newQuestions);
+  async saveWeeklyQuizQuestions(newQuestions) {
+    await this.questionRepository.saveWeeklyQuizQuestions(newQuestions);
   }
 
   async formatWeeklyQuestions(data) {

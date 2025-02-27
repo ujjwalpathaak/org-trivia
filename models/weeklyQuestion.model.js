@@ -73,10 +73,6 @@ const weeklyQuestionSchema = new mongoose.Schema(
       required: true,
       default: false,
     },
-    scheduledDate: {
-      type: Date,
-      required: true,
-    },
     question: questionSchema,
     org: {
       type: mongoose.Schema.Types.ObjectId,

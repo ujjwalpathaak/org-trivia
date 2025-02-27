@@ -20,7 +20,7 @@ class AuthService {
       return { status: 400, data: { message: `No such organisation exists` } };
     }
 
-    await this.authRepository.createUser(UserModel, email, password, name, org);
+    await this.authRepository.createUser(UserModel, email, password, name, org, isAdmin);
 
     return {
       status: 201,

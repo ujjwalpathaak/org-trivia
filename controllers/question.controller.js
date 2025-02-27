@@ -5,27 +5,15 @@ const questionRepository = new QuestionRepository();
 const questionService = new QuestionService(questionRepository);
 
 class QuestionController {
-  async addQuestions(req, res, next) {
+  async addQuestion(req, res, next) {
     try {
       const question = req.body;
 
-      const response = await questionService.saveQuestion(question);
+      console.log(question)
+
+      // const response = await questionService.saveQuestion(question);
 
       res.status(response.status).json(response.data);
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  async handleLambdaCallback(req, res, next) {
-    try {
-      const data = req.body;
-
-      const weeklyQuestions = await questionService.formatWeeklyQuestions(data);
-
-      await questionService.saveWeeklyQuestions(weeklyQuestions);
-
-      res.status(200).json({ message: 'Scheduled new questions' });
     } catch (error) {
       next(error);
     }

@@ -7,6 +7,7 @@ import orgRouter from './org.route.js';
 import questionRouter from './question.route.js';
 import cronTestRouter from './cron.test.route.js';
 import answerRouter from './answer.route.js';
+import quizRouter from './quiz.route.js';
 
 const router = express.Router();
 
@@ -18,6 +19,7 @@ router.use('/org', orgRouter);
 router.use('/question', questionRouter);
 router.use('/cron', protectRoute, checkRole('Admin'), cronTestRouter);
 router.use('/answers', protectRoute, checkRole('Employee'), answerRouter);
+router.use('/quiz', quizRouter);
 
 router.use('*', (request, response, next) => {
   const error = new Error(`Cannot reach ${request.originalUrl} on server!`);
