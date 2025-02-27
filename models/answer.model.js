@@ -7,13 +7,23 @@ const answerSchema = new mongoose.Schema(
       ref: 'Employee',
       required: true,
     },
-    questionId: {
+    quizId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'usedQuestion',
+      ref: 'Questions',
       required: true,
     },
-    answer: {
+    score: {
       type: Number,
+      required: true,
+    },
+    answers: {
+      type: [
+        {
+          questionId: mongoose.Schema.Types.ObjectId,
+          ref: 'Questions',
+          answer: Number,
+        },
+      ],
       required: true,
     },
   },

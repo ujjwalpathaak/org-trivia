@@ -15,10 +15,10 @@ const OrgSearch = ({ setFormData }) => {
         const response = await getAllOrgs();
         const data = await response.json();
 
-        const newCache = { ...cachedData, orgs: data.orgs };
+        const newCache = { ...cachedData, orgs: data };
         localStorage.setItem('cachedData', JSON.stringify(newCache));
 
-        setOrgList(data.orgs);
+        setOrgList(data);
       } catch (error) {
         console.error('Error fetching organizations:', error);
       }

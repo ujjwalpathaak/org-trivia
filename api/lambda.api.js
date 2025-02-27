@@ -1,11 +1,7 @@
 const API_GATEWAY_URL =
   'https://w6d724kzj1.execute-api.eu-north-1.amazonaws.com';
 
-export const refactorPnAQuestions = async (
-  orgName,
-  PnAQuestions,
-  orgId,
-) => {
+export const refactorPnAQuestions = async (orgName, PnAQuestions, orgId) => {
   const response = await fetch(API_GATEWAY_URL + '/generatePnA_Questions', {
     method: 'POST',
     headers: {

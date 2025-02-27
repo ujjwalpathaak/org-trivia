@@ -68,6 +68,11 @@ export const useOrgId = () => {
   return data?.user?.org || '';
 };
 
+export const useUserId = () => {
+  const { data } = useAuth();
+  return data?.user?._id || '';
+};
+
 export const ProtectedRoute = ({ children, route }) => {
   const { isAuthenticated, data, loading } = useAuth();
   const isQuizLive = true;

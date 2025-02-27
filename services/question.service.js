@@ -25,7 +25,7 @@ class QuestionService {
   }
 
   async formatWeeklyQuestions(data) {
-    let {questions, orgId, category} = data;
+    let { questions, orgId, category } = data;
     const nextFriday = getNextFriday();
 
     const weeklyQuestions = questions.map((curr) => ({
@@ -115,7 +115,9 @@ class QuestionService {
 
   async startCAnITWorkflow(orgName, orgIndustry, orgId) {
     const finalCAnITQuestions = await fetchNewCAnITQuestions(
-      orgName, orgIndustry, orgId
+      orgName,
+      orgIndustry,
+      orgId,
     );
 
     return finalCAnITQuestions;
@@ -133,6 +135,18 @@ class QuestionService {
     const weeklyUnapprovedQuestions =
       await this.questionRepository.getWeeklyUnapprovedQuestions(orgId);
     return { status: 200, data: weeklyUnapprovedQuestions };
+  }
+
+  async getWeeklyQuizQuestions(orgId) {
+    const weeklyQuizQuestions =
+      await this.questionRepository.weeklyQuizQuestions(orgId);
+    return { status: 200, data: weeklyQuizQuestions };
+  }
+
+  async getWeeklyQuizAnswers(orgId) {
+    const weeklyQuizAnswers =
+      await this.questionRepository.weeklyQuizAnswers(orgId);
+    return weeklyQuizAnswers;
   }
 }
 

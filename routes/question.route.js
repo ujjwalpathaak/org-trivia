@@ -13,6 +13,12 @@ questionRouter.get(
   checkRole('Admin'),
   questionController.getWeeklyUnapprovedQuestions,
 );
+questionRouter.get(
+  '/quiz/:orgId',
+  protectRoute,
+  checkRole('Employee'),
+  questionController.getWeeklyQuizQuestions,
+);
 // how to limit this API call to only lambda funcitions - will see later
 questionRouter.post(
   '/weekly/lambda/callback',

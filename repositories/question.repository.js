@@ -15,6 +15,25 @@ class QuestionRepository {
     return await WeeklyQuestion.find({
       org: new ObjectId(orgId),
       isApproved: false,
+      status: 'live',
+    });
+  }
+
+  async weeklyQuizQuestions(orgId) {
+    const questions = await WeeklyQuestion.find({ org: new ObjectId(orgId) })
+      .select({ 'question.answer': 0 })
+      .lean();
+    return questions.map((curr) => {
+      return curr.question;
+    });
+  }
+
+  async weeklyQuizAnswers(orgId) {
+    const questions = await WeeklyQuestion.find({ org: new ObjectId(orgId) })
+      .select('question._id question.answer')
+      .lean();
+    return questions.map((curr) => {
+      return curr.question;
     });
   }
 }

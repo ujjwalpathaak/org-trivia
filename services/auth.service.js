@@ -1,5 +1,5 @@
-import Admin from "../models/admin.model.js";
-import Employee from "../models/employee.model.js";
+import Admin from '../models/admin.model.js';
+import Employee from '../models/employee.model.js';
 
 class AuthService {
   constructor(authRepository) {

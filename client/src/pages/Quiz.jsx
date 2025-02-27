@@ -1,92 +1,126 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { getWeeklyQuizQuestions, submitWeeklyQuizAnswers } from '../api';
+import { useOrgId, useUserId } from '../context/auth.context';
 
-const questions = [
-  {
-    _id: '67b8d31a8f6aae97d0bb14a5',
-    source: 'AI',
-    category: 'PnA',
-    image: null,
-    description:
-      'Golu starts from his house and walks 8 km north. Then, he turns left and walks 6 km. What is the shortest distance from his house?',
-    answer: 0,
-    options: ['10 km', '16 km', '14 km', '2 km'],
-    status: 'extra',
-    org: '67b2fa464f423c3b4c544ca8',
-    lastModifiedAt: '2025-02-21T19:25:14.041Z',
-    createdAt: '2025-02-21T19:25:14.043Z',
-    updatedAt: '2025-02-21T19:25:14.043Z',
-    __v: 0,
-  },
-  {
-    _id: '67b9b43814cd6eb39da6ccfe',
-    source: 'Employee',
-    category: 'CAnIT',
-    image: null,
-    description: 'sampl question',
-    answer: 1,
-    options: ['ddd', 'dd', 'd', 'd'],
-    status: 'extra',
-    org: '67b2fa464f423c3b4c544ca9',
-    lastModifiedAt: '2025-02-22T11:25:44.646Z',
-    createdAt: '2025-02-22T11:25:44.647Z',
-    updatedAt: '2025-02-22T11:25:44.647Z',
-    __v: 0,
-  },
-];
+import { toast } from 'react-toastify';
 
 const Quiz = () => {
   const navigate = useNavigate();
+  const orgId = useOrgId();
+  const userId = useUserId();
+
+  const [answers, setAnswers] = useState([]);
+  const [questions, setQuestions] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [showScore, setShowScore] = useState(false);
-  const [score, setScore] = useState(0);
+  const [isQuizFinished, setIsQuizFinished] = useState(false);
+  const [timeLeftCurrentQuestion, setTimeLeftCurrentQuestion] = useState(5);
 
-  const handleAnswer = (selected) => {
-    if (selected === questions[currentQuestion].answer) {
-      setScore(showScore + 1);
+  useEffect(() => {
+    const fetchWeeklyQuizQuestions = async () => {
+      if (!orgId || !userId) return;
+      let response = await getWeeklyQuizQuestions(orgId);
+      setQuestions(response);
+    };
+
+    fetchWeeklyQuizQuestions();
+  }, [orgId, userId]);
+
+  useEffect(() => {
+    if (isQuizFinished || questions.length === 0) return;
+    setTimeLeftCurrentQuestion(5);
+
+    const timer = setInterval(() => {
+      setTimeLeftCurrentQuestion((prev) => {
+        if (prev === 1) {
+          handleNextQuestion();
+          return 5;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [currentQuestion, isQuizFinished, questions.length]);
+
+  const notifyAnswersSubmitted = () => toast('Answers Submitted!');
+
+  const handleAnswer = (option) => {
+    const newAnswer = {
+      questionId: questions[currentQuestion]._id,
+      answer: option,
+    };
+
+    let storedAnswers = JSON.parse(localStorage.getItem('answers')) || [];
+
+    const updatedAnswers = [...storedAnswers, newAnswer];
+
+    setAnswers(updatedAnswers);
+    localStorage.setItem('answers', JSON.stringify(updatedAnswers));
+    const check = localStorage.getItem('answers');
+
+    console.log(check); // Fixed incorrect variable name
+
+    handleNextQuestion();
+  };
+
+  const handleSubmitAnswers = async () => {
+    if (currentQuestion === questions.length - 1) {
+      const optionsSelected = localStorage.getItem('answers');
+      if (optionsSelected) {
+        await submitWeeklyQuizAnswers(optionsSelected, orgId, userId);
+        localStorage.removeItem('answers');
+      }
+      notifyAnswersSubmitted();
+      navigate('/dashboard');
     }
+  };
 
+  const handleNextQuestion = () => {
     const nextQuestion = currentQuestion + 1;
     if (nextQuestion < questions.length) {
       setCurrentQuestion(nextQuestion);
     } else {
-      setShowScore(true);
+      setIsQuizFinished(true);
     }
   };
 
   return (
     <div className="parent-page-div flex justify-center items-center">
       <div className="max-w-2xl mx-auto p-6 bg-white floating-div rounded-xl">
-        {showScore ? (
-          <>
-            <div>
-              <h2 className="text-2xl font-bold">
-                Your Score: {score}/{questions.length}
-              </h2>
-              <button
-                onClick={() => navigate('/dashboard')}
-                className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-              >
-                Go to dashboard
-              </button>
-            </div>
-          </>
-        ) : (
+        {isQuizFinished ? (
+          <div>
+            <button
+              onClick={handleSubmitAnswers}
+              className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+            >
+              Are you sure you want to submit your quiz?
+            </button>
+          </div>
+        ) : questions.length > 0 ? (
           <>
             <div className="border-2 p-2 rounded-lg mb-6">
-              {questions[currentQuestion].description}
+              <h3 className="text-lg font-semibold">
+                {questions[currentQuestion]?.question}
+              </h3>
+              <p className="mt-2 text-red-500">
+                Time Left: {timeLeftCurrentQuestion} sec
+              </p>
             </div>
             <div className="grid grid-cols-2 gap-4">
-              {questions[currentQuestion].options.map((option, optionIndex) => (
+              {questions[currentQuestion]?.options?.map((option, index) => (
                 <div
-                  className="border-2 p-2 rounded-lg"
-                  onClick={() => handleAnswer(optionIndex)}
+                  key={index}
+                  className="border-2 p-2 rounded-lg cursor-pointer hover:bg-gray-200"
+                  onClick={() => handleAnswer(index)}
                 >
-                  {`(${String.fromCharCode(65 + optionIndex)}) ${option}`}
+                  {`(${String.fromCharCode(65 + index)}) ${option}`}
                 </div>
               ))}
             </div>
           </>
+        ) : (
+          <p>Loading questions...</p>
         )}
       </div>
     </div>

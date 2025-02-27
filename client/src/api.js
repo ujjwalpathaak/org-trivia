@@ -87,3 +87,58 @@ export const getQuestionsToApprove = async (orgId) => {
     return { success: false, error: error.message };
   }
 };
+
+export const getWeeklyQuizQuestions = async (orgId) => {
+  try {
+    const response = await fetch(`${BACKEND_URL}/question/quiz/${orgId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to create question');
+    }
+
+    return await response.json();
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+};
+
+export const submitWeeklyQuizAnswers = async (
+  weeklyQuizAnswers,
+  orgId,
+  employeeId,
+) => {
+  try {
+    const data = {
+      answers: weeklyQuizAnswers,
+      orgId: orgId,
+      employeeId: employeeId,
+    };
+    const response = await fetch(
+      `${BACKEND_URL}/answers/submitWeeklyQuizAnswers`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(data),
+      },
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to create question');
+    }
+
+    return await response.json();
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+};
