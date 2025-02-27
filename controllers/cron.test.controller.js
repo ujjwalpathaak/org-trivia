@@ -4,7 +4,7 @@ import QuestionRepository from '../repositories/question.repository.js';
 import QuestionService from '../services/question.service.js';
 
 const questionRepository = new QuestionRepository();
-const quesitonService = new QuestionService(questionRepository);
+const questionservice = new QuestionService(questionRepository);
 
 const orgRepository = new OrgRepository();
 const orgService = new OrgService(orgRepository);
@@ -16,7 +16,7 @@ class CronTestController {
       const response = await orgService.getOrgById(orgId);
       const org = response.data;
 
-      quesitonService.startPnAWorkflow(org.name, orgId);
+      questionservice.startPnAWorkflow(org.name, orgId);
     } catch (error) {
       next(error);
     }
@@ -27,7 +27,7 @@ class CronTestController {
       const response = await orgService.getOrgById(orgId);
       const org = response.data;
 
-      quesitonService.startCAnITWorkflow(org.name, org.industry, orgId);
+      questionservice.startCAnITWorkflow(org.name, org.industry, orgId);
     } catch (error) {
       next(error);
     }

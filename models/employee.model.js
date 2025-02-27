@@ -1,16 +1,5 @@
 import mongoose from 'mongoose';
 
-const earnedBadgeSchema = new mongoose.Schema(
-  {
-    badge: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Badge',
-      required: true,
-    },
-  },
-  { timestamps: true },
-);
-
 const employeeSchema = new mongoose.Schema(
   {
     name: {
@@ -43,7 +32,17 @@ const employeeSchema = new mongoose.Schema(
       immutable: true,
     },
     badges: {
-      type: [earnedBadgeSchema],
+      type: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Badge',
+        required: true,
+        unique: true,
+        earnedAt: {
+          type: Date,
+          default: Date.now,
+          required: true,
+        }
+      }],
       default: [],
     },
     submittedQuestion: {
