@@ -10,7 +10,7 @@ const QuestionMaker = () => {
   const orgId = useOrgId();
 
   const [question, setQuestion] = useState({
-    description: '',
+    question: '',
     answer: '',
     options: ['', '', '', ''],
     image: null,
@@ -62,8 +62,8 @@ const QuestionMaker = () => {
             Question
           </label>
           <textarea
-            name="description"
-            value={question.description}
+            name="question"
+            value={question.question}
             onChange={handleChange}
             className="mt-2 max-h-30 overflow-y-auto block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Enter the question here"

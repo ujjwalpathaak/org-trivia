@@ -14,6 +14,13 @@ class OrgRepository {
       '_id settings.currentGenre settings.selectedGenre',
     );
   }
+
+  async addQuestionToOrg(orgId, questionId){
+    return await Org.updateOne(
+      { _id: orgId },
+      { $push: { questions: questionId } },
+    );
+  }
 }
 
 export default OrgRepository;

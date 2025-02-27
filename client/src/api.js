@@ -42,7 +42,7 @@ export const getEmployeesByOrg = async (orgId) => {
   return response;
 };
 
-export const createNewQuestion = async (formData, token) => {
+export const createNewQuestion = async (formData) => {
   try {
     const response = await fetch(`${BACKEND_URL}/question`, {
       method: 'POST',

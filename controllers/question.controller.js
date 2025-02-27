@@ -9,9 +9,7 @@ class QuestionController {
     try {
       const question = req.body;
 
-      console.log(question)
-
-      // const response = await questionService.saveQuestion(question);
+      const response = await questionService.saveQuestion(question);
 
       res.status(response.status).json(response.data);
     } catch (error) {

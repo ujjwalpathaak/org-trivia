@@ -1,10 +1,16 @@
 import Question from '../models/question.model.js';
 import WeeklyQuestion from '../models/weeklyQuestion.model.js';
 import { ObjectId } from 'mongodb';
+import OrgRepository from './org.repository.js';
+
+const orgRepository = new OrgRepository();
 
 class QuestionRepository {
   async saveQuestion(newQuestion) {
-    return await new Question(newQuestion).save();
+      const question = new Question(newQuestion);
+      await question.save();
+      await orgRepository.addQuestionToOrg(question.org, question._id);
+      return question;
   }
 
   async saveWeeklyQuizQuestions(newQuestions) {
