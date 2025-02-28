@@ -14,9 +14,15 @@ class QuizRepository {
       }
 
       async scheduleNewQuiz(orgId, date) {
+        const existingQuiz = await Quiz.findOne({ orgId, scheduledDate });
+
+        if (existingQuiz) {
+          return { status: 500, data: "Cannot schedule new quiz" };
+        }
+
         return await Quiz.insertOne({
-            orgId: orgId,
-            scheduledDate: date
+          orgId: orgId,
+          scheduledDate: date
         })
       }
 }

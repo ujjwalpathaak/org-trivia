@@ -2,14 +2,9 @@
 
 ## ⏳ Cron Jobs
 
-| Task                          | Frequency                   | Purpose                                         |
-| ----------------------------- | --------------------------- | ----------------------------------------------- |
-| **Daily Question Assignment** | Every day at 05:30 am       | Assigns scheduled questions                     |
-| **Leaderboard Update**        | Every day at 11:00 pm       | Updates points & streak multipliers             |
-| **Streak Reset**              | Every day at 11:30 pm       | Resets streaks for inactive users               |
-| **AI Question Generation**    | Every Friday 06:00 am       | Generates AI-based questions if needed          |
-| **HR Review Reminder**        | Every Friday 12:00 pm       | Reminds HR to review pending questions          |
-| **Monthly Leaderboard Reset** | 1st of every month 12:30 am | Clears monthly scores but keeps all-time scores |
+| Task                                             | Frequency                      | Name                               |
+| ------------------------------------------       | ---------------------------    | -----------------------------------|
+| **Approve Next Week Questions Request to Admin** | Every friday at 12:01am        | scheduleNextWeekQuestionsApproval  |
 
 ## 🔌 API Endpoints
 

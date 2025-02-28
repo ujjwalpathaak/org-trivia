@@ -43,6 +43,16 @@ class QuestionController {
     }
   }
 
+  async testScheduleNextWeekQuestionsApproval(req, res, next) {
+    try {
+      await questionService.scheduleNextWeekQuestionsApproval();
+
+      res.json("Job running");
+    } catch (error) {
+      next(error);
+    }
+  }
+
 }
 
 export default QuestionController;

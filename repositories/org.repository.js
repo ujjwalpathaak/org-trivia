@@ -35,6 +35,20 @@ class OrgRepository {
   async getSettings(orgId) {
     return await Org.findById(orgId).select('settings');
   }
+
+  async setNextQuestionGenre(orgId, currentGenre) {
+    const org = await Org.findOne({ _id: orgId }).select('settings');
+    const totalSelectedGenre = org.settings.selectedGenre.length;
+    
+    const nextIndex = (currentGenre + 1) % totalSelectedGenre;
+    await Org.updateOne(
+      { _id: orgId },
+      { $set: { 'settings.currentGenre': nextIndex } }
+    );
+  
+    return nextIndex;
+  }
+  
   
 }
 

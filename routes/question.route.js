@@ -19,4 +19,9 @@ questionRouter.post(
   questionController.saveHRdocQuestions
 );
 
+questionRouter.get(
+  '/test/scheduleNextWeekQuestionsApproval',
+  questionController.testScheduleNextWeekQuestionsApproval
+);
+
 export default questionRouter;

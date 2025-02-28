@@ -5,9 +5,13 @@ import {
   fetchNewCAnITQuestions,
   refactorPnAQuestions,
 } from '../api/lambda.api.js';
+import QuizService from './quiz.service.js';
+import QuizRepository from '../repositories/quiz.repository.js';
 
 const orgRepository = new OrgRepository();
 const orgService = new OrgService(orgRepository);
+
+const quizService = new QuizService(new QuizRepository());
 
 class QuestionService {
   constructor(questionRepository) {
@@ -43,28 +47,38 @@ class QuestionService {
     return weeklyQuestions;
   }
 
-  async scheduleQuestionsForNextWeek() {
+  async scheduleNextWeekQuestionsApproval() {
     const response = await orgService.getTriviaEnabledOrgs();
     const triviaEnabledOrgs = response.data;
 
-    triviaEnabledOrgs.forEach((element) => {
+    triviaEnabledOrgs.forEach(async (element) => {
       const genre =
         element.settings.selectedGenre[element.settings.currentGenre];
-      switch (genre) {
-        case 'PnA':
-          this.startPnAWorkflow(element.name);
-          break;
 
-        case 'HRD':
-          this.startHRDWorkflow();
-          break;
+      await orgRepository.setNextQuestionGenre(element._id, element.settings.currentGenre);
 
-        case 'CAnIT':
-          this.startCAnITWorkflow(element.name);
-          break;
-
-        default:
-          break;
+      // schedule new quiz
+      const response = quizService.scheduleNewQuiz(element._id);
+      if(response.status === 201){
+        switch (genre) {
+            case 'PnA':
+              console.log("starting PnA")
+              // this.startPnAWorkflow(element.name);
+              break;
+          
+            case 'HRD':
+              console.log("starting HRD")
+              // this.startHRDWorkflow();
+              break;
+          
+            case 'CAnIT':
+              console.log("starting CAnIT");
+              // this.startCAnITWorkflow(element.name);
+              break;
+          
+            default:
+              break;
+        }
       }
     });
   }

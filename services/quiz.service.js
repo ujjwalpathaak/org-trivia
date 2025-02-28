@@ -14,8 +14,12 @@ class QuizService {
   async scheduleNewQuiz(orgId){
     const nextFriday = getNextFriday();
     const newQuiz = await this.quizRepository.scheduleNewQuiz(orgId, nextFriday);
+    
+    if (!newQuiz) {
+      return { status: 409, error: "Quiz already scheduled for this date." };
+    }
 
-    return {status: 201, data: newQuiz}
+    return {status: 500, data : "Cannot"}
   }
 
     async formatWeeklyQuestions(data) {
