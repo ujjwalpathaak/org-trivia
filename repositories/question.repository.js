@@ -32,6 +32,11 @@ class QuestionRepository {
       return curr.question;
     });
   }
+
+  async saveHRdocQuestions(orgId, questions) {
+    return Question.insertMany(questions)
+
+  }
 }
 
 export default QuestionRepository;

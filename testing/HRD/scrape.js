@@ -21,4 +21,3 @@ const readTextFromHRDoc = (filePath, newFilePath) => {
   });
 };
 
-readTextFromHRDoc('./HR_Docs/Code_of_Conduct.pdf', './sample.pdf');

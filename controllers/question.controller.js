@@ -28,6 +28,21 @@ class QuestionController {
       next(error);
     }
   }
+
+  async saveHRdocQuestions(req, res, next) {
+    try {
+      const { orgId, questions } = req.body;
+      const response = await questionService.saveHRdocQuestions(
+        orgId,
+        questions
+      );
+
+      res.status(response.status).json(response.data);
+    } catch (error) {
+      next(error);
+    }
+  }
+
 }
 
 export default QuestionController;

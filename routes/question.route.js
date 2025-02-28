@@ -14,4 +14,9 @@ questionRouter.get(
   questionController.getWeeklyUnapprovedQuestions,
 );
 
+questionRouter.post(
+  '/new/HRdocs',
+  questionController.saveHRdocQuestions
+);
+
 export default questionRouter;

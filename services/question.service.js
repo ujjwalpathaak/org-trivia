@@ -143,6 +143,24 @@ class QuestionService {
       await this.questionRepository.weeklyQuizAnswers(orgId);
     return weeklyQuizAnswers;
   }
+
+  formatHRDQuestions(orgId, questions) {
+    return questions.map((curr) => ({
+      ...curr,
+      source: 'AI',
+      category: 'HRD',
+      status: 'extra',
+      org: orgId,
+    }));
+  }
+
+  async saveHRdocQuestions(orgId, questions) {
+    const formatedQuestions = await this.formatHRDQuestions(orgId, questions);
+    await this.questionRepository.saveHRdocQuestions(orgId, formatedQuestions);
+
+    return { status: 200, message: 'Content saved successfully' };
+  }
+
 }
 
 export default QuestionService;

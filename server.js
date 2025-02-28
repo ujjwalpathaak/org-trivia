@@ -17,9 +17,11 @@ const ALLOWED_ORIGINS = isProductionServer
   ? process.env.CORS_ORIGIN?.split(',')
   : '*';
 
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 app.use(cors({ origin: ALLOWED_ORIGINS }));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// app.use(express.json());
+// app.use(express.urlencoded({ extended: true }));
 
 connectDatabase();
 isProductionServer && startJobs();
