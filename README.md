@@ -39,7 +39,7 @@
 | Method | Endpoint                           | Description                                                                | Protected | Allowed Roles   |
 | ------ | ---------------------------------- | -------------------------------------------------------------------------- | --------- | --------------- |
 | POST   | /question/                         | Submit a new question                                                      | Yes       | Admin, Employee |
-| POST    | /question/new/HRdocs              | Saves New HR Docs Questions                                                | Yes       | Admin           |
+| POST   | /question/new/HRdocs              | Saves New HR Docs Questions                                                | Yes       | Admin           |
 | GET    | /question/weekly/unapproved/:orgId | Fetch weekly questions for quiz                                            | Yes       | Employee        |
 
 ### Answer
