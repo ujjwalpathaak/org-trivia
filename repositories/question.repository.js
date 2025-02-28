@@ -20,17 +20,7 @@ class QuestionRepository {
   async getWeeklyUnapprovedQuestions(orgId) {
     return await WeeklyQuestion.find({
       org: new ObjectId(orgId),
-      isApproved: false,
-      status: 'live',
-    });
-  }
-
-  async weeklyQuizQuestions(orgId) {
-    const questions = await WeeklyQuestion.find({ org: new ObjectId(orgId) })
-      .select({ 'question.answer': 0 })
-      .lean();
-    return questions.map((curr) => {
-      return curr.question;
+      isApproved: false
     });
   }
 

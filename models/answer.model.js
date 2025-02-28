@@ -9,7 +9,7 @@ const answerSchema = new mongoose.Schema(
     },
     quizId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Questions',
+      ref: 'Quiz',
       required: true,
     },
     score: {
@@ -19,13 +19,14 @@ const answerSchema = new mongoose.Schema(
     answers: {
       type: [
         {
-          questionId: mongoose.Schema.Types.ObjectId,
-          ref: 'Questions',
+          questionId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Question', // Ensure 'Question' is the correct model name
+          },
           answer: Number,
-        },
-      ],
-      required: true,
-    },
+        }
+      ]
+    }    
   },
   { timestamps: true },
 );

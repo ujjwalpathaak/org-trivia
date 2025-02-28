@@ -73,6 +73,11 @@ const weeklyQuestionSchema = new mongoose.Schema(
       required: true,
       default: false,
     },
+    quizId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Quiz',
+      required: true,
+    },
     question: questionSchema,
     org: {
       type: mongoose.Schema.Types.ObjectId,

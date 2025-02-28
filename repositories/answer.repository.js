@@ -1,3 +1,4 @@
+import Answer from '../models/answer.model.js';
 import EmployeeRepository from '../repositories/employee.repository.js';
 import EmployeeService from '../services/employee.service.js';
 
@@ -25,9 +26,18 @@ class AnswerRepository {
     userAnswers,
     correctAnswers,
     employeeId,
+    quizId
   ) {
     userAnswers = JSON.parse(userAnswers);
     const score = await this.calculateScore(userAnswers, correctAnswers);
+
+    await Answer.insert({
+      answers: userAnswers,
+      score: score,
+      employeeId: employeeId,
+      quizId: quizId
+    });
+
     await employeeSerivce.updateWeeklyQuizScore(employeeId, score);
 
     return { status: 200, data: 'Answers submitted successfully' };

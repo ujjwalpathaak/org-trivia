@@ -14,7 +14,7 @@ const orgSchema = new mongoose.Schema({
   },
   questions: {
     type: [mongoose.Schema.Types.ObjectId],
-    ref: 'Questions',
+    ref: 'Question',
     default: [],
   },
   admins: {

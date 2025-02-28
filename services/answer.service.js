@@ -9,13 +9,14 @@ class AnswerService {
     this.answerRepository = answerRepository;
   }
 
-  async submitWeeklyQuizAnswers(userAnswers, employeeId, orgId) {
+  async submitWeeklyQuizAnswers(userAnswers, employeeId, orgId, quizId) {
     const correctAnswers = await questionService.getWeeklyQuizAnswers(orgId);
     const response = await this.answerRepository.submitWeeklyQuizAnswers(
       userAnswers,
       correctAnswers,
       employeeId,
       orgId,
+      quizId
     );
 
     return response;

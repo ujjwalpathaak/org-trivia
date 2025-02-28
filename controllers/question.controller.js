@@ -20,21 +20,8 @@ class QuestionController {
   async getWeeklyUnapprovedQuestions(req, res, next) {
     try {
       const { orgId } = req.params;
-
       const response =
         await questionService.getWeeklyUnapprovedQuestions(orgId);
-
-      res.status(response.status).json(response.data);
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  async getWeeklyQuizQuestions(req, res, next) {
-    try {
-      const { orgId } = req.params;
-
-      const response = await questionService.getWeeklyQuizQuestions(orgId);
 
       res.status(response.status).json(response.data);
     } catch (error) {

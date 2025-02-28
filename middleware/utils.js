@@ -15,7 +15,10 @@ export const getNextFriday = () => {
   const today = new Date();
   const dayOfWeek = today.getDay(); // 0 (Sunday) to 6 (Saturday)
   const daysUntilFriday = (5 - dayOfWeek + 7) % 7 || 7; // Calculate days until next Friday
+
   const nextFriday = new Date();
   nextFriday.setDate(today.getDate() + daysUntilFriday);
-  return nextFriday;
+  nextFriday.setHours(0, 0, 0, 0); // Remove time part
+
+  return nextFriday.toISOString().split('T')[0]; // Return only YYYY-MM-DD
 };

@@ -7,18 +7,15 @@ const quizSchema = new mongoose.Schema(
       ref: 'Org',
       required: true,
     },
-    questions: {
-      type: [mongoose.Schema.Types.ObjectId],
-      ref: 'WeeklyQuestion',
-      required: true,
-    },
     scheduledDate: {
       type: Date,
       required: true,
     },
   },
-  { timestamps: true },
+  { timestamps: true }
 );
+
+quizSchema.index({ orgId: 1, scheduledDate: 1 }, { unique: true });
 
 const Quiz = mongoose.model('Quiz', quizSchema);
 

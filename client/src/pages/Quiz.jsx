@@ -20,6 +20,7 @@ const Quiz = () => {
     const fetchWeeklyQuizQuestions = async () => {
       if (!orgId || !userId) return;
       let response = await getWeeklyQuizQuestions(orgId);
+      console.log(response);
       setQuestions(response);
     };
 
@@ -57,9 +58,6 @@ const Quiz = () => {
 
     setAnswers(updatedAnswers);
     localStorage.setItem('answers', JSON.stringify(updatedAnswers));
-    const check = localStorage.getItem('answers');
-
-    console.log(check); // Fixed incorrect variable name
 
     handleNextQuestion();
   };
@@ -68,7 +66,7 @@ const Quiz = () => {
     if (currentQuestion === questions.length - 1) {
       const optionsSelected = localStorage.getItem('answers');
       if (optionsSelected) {
-        await submitWeeklyQuizAnswers(optionsSelected, orgId, userId);
+        await submitWeeklyQuizAnswers(optionsSelected, orgId, userId, quizId);
         localStorage.removeItem('answers');
       }
       notifyAnswersSubmitted();

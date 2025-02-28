@@ -13,11 +13,5 @@ questionRouter.get(
   checkRole('Admin'),
   questionController.getWeeklyUnapprovedQuestions,
 );
-questionRouter.get(
-  '/quiz/:orgId',
-  protectRoute,
-  checkRole('Employee'),
-  questionController.getWeeklyQuizQuestions,
-);
 
 export default questionRouter;

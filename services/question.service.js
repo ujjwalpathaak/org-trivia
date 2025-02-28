@@ -134,13 +134,8 @@ class QuestionService {
   async getWeeklyUnapprovedQuestions(orgId) {
     const weeklyUnapprovedQuestions =
       await this.questionRepository.getWeeklyUnapprovedQuestions(orgId);
+      console.log('weeklyUnapprovedQuestions', weeklyUnapprovedQuestions)
     return { status: 200, data: weeklyUnapprovedQuestions };
-  }
-
-  async getWeeklyQuizQuestions(orgId) {
-    const weeklyQuizQuestions =
-      await this.questionRepository.weeklyQuizQuestions(orgId);
-    return { status: 200, data: weeklyQuizQuestions };
   }
 
   async getWeeklyQuizAnswers(orgId) {

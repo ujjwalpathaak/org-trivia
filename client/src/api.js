@@ -90,7 +90,7 @@ export const getQuestionsToApprove = async (orgId) => {
 
 export const getWeeklyQuizQuestions = async (orgId) => {
   try {
-    const response = await fetch(`${BACKEND_URL}/question/quiz/${orgId}`, {
+    const response = await fetch(`${BACKEND_URL}/quiz/questions/${orgId}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -113,12 +113,14 @@ export const submitWeeklyQuizAnswers = async (
   weeklyQuizAnswers,
   orgId,
   employeeId,
+  quizId
 ) => {
   try {
     const data = {
       answers: weeklyQuizAnswers,
       orgId: orgId,
       employeeId: employeeId,
+      quizId: quizId
     };
     const response = await fetch(
       `${BACKEND_URL}/answers/submitWeeklyQuizAnswers`,
