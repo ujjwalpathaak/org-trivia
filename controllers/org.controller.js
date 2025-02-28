@@ -13,6 +13,30 @@ class OrgController {
       next(error);
     }
   }
+
+  async toggleTrivia(req, res, next) {
+    try {
+      const { orgId } = req.params;
+      const response = await orgService.toggleTrivia(orgId);
+
+      console.log(response.data)
+
+      res.status(response.status).json(response.data);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getSettings(req, res, next) {
+    try {
+      const { orgId } = req.params;
+      const response = await orgService.getSettings(orgId);
+
+      res.status(response.status).json(response.data);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export default OrgController;

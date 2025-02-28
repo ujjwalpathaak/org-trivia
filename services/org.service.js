@@ -20,6 +20,17 @@ class OrgService {
 
     return { status: 200, data: orgs };
   }
+
+  async toggleTrivia(orgId) {
+    await this.orgRepository.toggleTrivia(orgId);
+
+    return { status: 200, data: `Trivia toggled` };
+  }
+  async getSettings(orgId) {
+    const org = await this.orgRepository.getSettings(orgId);
+
+    return { status: 200, data: org.settings };
+  }
 }
 
 export default OrgService;

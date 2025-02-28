@@ -21,6 +21,21 @@ class OrgRepository {
       { $push: { questions: questionId } },
     );
   }
+
+  async toggleTrivia(orgId) {
+    const org = await Org.findById(orgId).select('settings.isTriviaEnabled');
+    if (!org) throw new Error('Organization not found');
+  
+    return await Org.updateOne(
+      { _id: orgId },
+      { $set: { 'settings.isTriviaEnabled': !org.settings.isTriviaEnabled } }
+    );
+  }
+  
+  async getSettings(orgId) {
+    return await Org.findById(orgId).select('settings');
+  }
+  
 }
 
 export default OrgRepository;

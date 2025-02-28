@@ -1,20 +1,37 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useOrgId } from '../context/auth.context';
+import { getSettings, toggleTrivia } from '../api';
 
 const Settings = () => {
-  const [darkMode, setDarkMode] = useState(false);
-  const [notifications, setNotifications] = useState(true);
-  const [genres, setGenres] = useState([]);
-  const [newGenre, setNewGenre] = useState('');
+  const [isTriviaEnabled, setIsTriviaEnabled] = useState(false);
+  const [selectedGenre, setSelectedGenre] = useState(['loading']);
+  const [currentGenre, setCurrentGenre] = useState(0);
 
-  const addGenre = () => {
-    if (newGenre.trim()) {
-      setGenres([...genres, newGenre.trim()]);
-      setNewGenre('');
-    }
-  };
+  const orgId = useOrgId();
 
-  const removeGenre = (index) => {
-    setGenres(genres.filter((_, i) => i !== index));
+  useEffect(() => {
+    const fetchSettings = async () => {
+      if (!orgId) return;
+
+      try {
+        const response = await getSettings(orgId);
+
+        console.log(response);
+
+        setIsTriviaEnabled(response.isTriviaEnabled);
+        setCurrentGenre(response.currentGenre);
+        setSelectedGenre(response.selectedGenre);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchSettings();
+  }, [orgId]);
+
+  const toggleIsTriviaEnabled = () => {
+    setIsTriviaEnabled(!isTriviaEnabled);
+    toggleTrivia(orgId);
   };
 
   return (
@@ -25,19 +42,19 @@ const Settings = () => {
           <div className="flex items-center justify-between">
             <label className="font-medium text-gray-700">Weekly Trivia</label>
             <button
-              onClick={() => setDarkMode(!darkMode)}
+              onClick={toggleIsTriviaEnabled}
               className={`relative w-12 h-6 flex items-center bg-gray-300 rounded-full transition-all duration-300 ${
-                darkMode ? 'bg-green-500' : ''
+                isTriviaEnabled ? 'bg-green-500' : ''
               }`}
             >
               <div
                 className={`absolute w-5 h-5 bg-white rounded-full shadow-md transform transition-all duration-300 ${
-                  darkMode ? 'translate-x-6' : 'translate-x-1'
+                  isTriviaEnabled ? 'translate-x-6' : 'translate-x-1'
                 }`}
               ></div>
             </button>
           </div>
-          <div className="mt-4">
+          {/* <div className="mt-4">
             <h3 className="text-lg font-bold text-gray-900 dark:text-white">
               Genres
             </h3>
@@ -72,7 +89,7 @@ const Settings = () => {
                 </li>
               ))}
             </ul>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

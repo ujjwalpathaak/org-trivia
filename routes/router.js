@@ -1,4 +1,4 @@
-import express, { response } from 'express';
+import express from 'express';
 
 import authRouter from './auth.route.js';
 import employeeRouter from './employee.route.js';
@@ -18,7 +18,7 @@ router.use('/employee', protectRoute, checkRole('Admin'), employeeRouter);
 router.use('/org', orgRouter);
 router.use('/question', questionRouter);
 router.use('/cron', protectRoute, checkRole('Admin'), cronTestRouter);
-router.use('/answers', protectRoute, checkRole('Employee'), answerRouter);
+router.use('/answer', protectRoute, checkRole('Employee'), answerRouter);
 router.use('/quiz', quizRouter);
 
 router.use('*', (request, response, next) => {

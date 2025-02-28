@@ -109,6 +109,48 @@ export const getWeeklyQuizQuestions = async (orgId) => {
   }
 };
 
+export const getSettings = async (orgId) => {
+  try {
+    const response = await fetch(`${BACKEND_URL}/org/settings/${orgId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to create question');
+    }
+
+    return await response.json();
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+};
+
+export const toggleTrivia = async (orgId) => {
+  try {
+    const response = await fetch(`${BACKEND_URL}/org/settings/toggleTrivia/${orgId}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to create question');
+    }
+
+    return await response.json();
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+};
+
 export const submitWeeklyQuizAnswers = async (
   weeklyQuizAnswers,
   orgId,
@@ -123,7 +165,7 @@ export const submitWeeklyQuizAnswers = async (
       quizId: quizId
     };
     const response = await fetch(
-      `${BACKEND_URL}/answers/submitWeeklyQuizAnswers`,
+      `${BACKEND_URL}/answer/submitWeeklyQuizAnswers`,
       {
         method: 'POST',
         headers: {

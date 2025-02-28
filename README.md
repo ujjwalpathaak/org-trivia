@@ -28,18 +28,19 @@
 
 ### Organization
 
-| Method | Endpoint | Description             | Protected | Allowed Roles |
-| ------ | -------- | ----------------------- | --------- | ------------- |
-| GET    | /org     | Fetch all organizations | Yes       | Public        |
+| Method | Endpoint                          | Description             | Protected | Allowed Roles |
+| ------ | --------------------------------- | ----------------------- | --------- | ------------- |
+| GET    | /org                              | Fetch all organizations | Yes       | Public        |
+| GET    | /settings/toggleTrivia/:orgId     | Toggle trivia settin    | Yes       | Admin         |
+| GET    | /settings/:orgId                  | Fetch all settings      | Yes       | Admin         |
 
 ### Question
 
 | Method | Endpoint                           | Description                                                                | Protected | Allowed Roles   |
 | ------ | ---------------------------------- | -------------------------------------------------------------------------- | --------- | --------------- |
 | POST   | /question/                         | Submit a new question                                                      | Yes       | Admin, Employee |
-| GET    | /question/weekly/unapproved/:orgId | Fetch all unapproved questions for next week for a particular organization | Yes       | Admin           |
+| POST    | /question/new/HRdocs              | Saves New HR Docs Questions                                                | Yes       | Admin           |
 | GET    | /question/weekly/unapproved/:orgId | Fetch weekly questions for quiz                                            | Yes       | Employee        |
-| POST   | /question/weekly/lambda/callback   | Callback to add questions from AWS Lambda                                  | Yes       | AWS Lambda      |
 
 ### Answer
 
@@ -49,6 +50,15 @@
 
 ### Cron Jobs
 
-| Method | Endpoint                      | Description                                              | Protected | Allowed Roles |
-| ------ | ----------------------------- | -------------------------------------------------------- | --------- | ------------- |
-| post   | /cron/startPnAWorkflow/:orgId | Start the startPnAWorkflow for a particular organization | Yes       | Admin         |
+| Method | Endpoint                        | Description                                                | Protected | Allowed Roles |
+| ------ | -----------------------------   | --------------------------------------------------------   | --------- | ------------- |
+| post   | /cron/startPnAWorkflow/:orgId   | Start the startPnAWorkflow for a particular organization   | Yes       | Admin         |
+| post   | /cron/startCAnITWorkflow/:orgId | Start the startCAnITWorkflow for a particular organization | Yes       | Admin         |
+
+### Cron Jobs
+
+| Method | Endpoint                      | Description                                                 | Protected | Allowed Roles |
+| ------ | ----------------------------- | ----------------------------------------------------------  | --------- | ------------- |
+| post   | /quiz/weekly/lambda/callback  | Callback function for Lmabda to add questions               | Yes       | Admin         |
+| post   | /quiz/new/:orgId              | Make a new quiz entry                                       | Yes       | Admin         |
+| post   | /quiz/questions/:orgId        | Get all questions for the next quiz for that particular org | Yes       | Admin         |
