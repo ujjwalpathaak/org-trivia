@@ -11,7 +11,7 @@ import quizRouter from './quiz.route.js';
 
 const router = express.Router();
 
-router.get('/', (request, response) => response.send('API Working'));
+router.get('/', (req, res) => res.send('API Working'));
 
 router.use('/auth', authRouter);
 router.use('/employee', protectRoute, checkRole('Admin'), employeeRouter);
@@ -21,8 +21,8 @@ router.use('/cron', protectRoute, checkRole('Admin'), cronTestRouter);
 router.use('/answer', protectRoute, checkRole('Employee'), answerRouter);
 router.use('/quiz', quizRouter);
 
-router.use('*', (request, response, next) => {
-  const error = new Error(`Cannot reach ${request.originalUrl} on server!`);
+router.use('*', (req, res, next) => {
+  const error = new Error(`Cannot reach ${req.originalUrl} on server!`);
   error.status = 404;
   next(error);
 });

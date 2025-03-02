@@ -30,11 +30,11 @@ app.use('/', router);
 
 app.use(logService);
 
-app.use((error, request, response, next) => {
+app.use((error, req, res, next) => {
   error.status = error.status || 500;
   error.message = error.message || 'Server Error';
 
-  response.status(error.status).json({
+  res.status(error.status).json({
     status: error.status,
     message: error.message,
   });

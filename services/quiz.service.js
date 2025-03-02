@@ -13,11 +13,11 @@ class QuizService {
   }
 
   async scheduleNewQuiz(orgId) {
-    const nextFriday = getNextFriday();
+    const dateNextFriday = getNextFriday();
 
     const newQuiz = await this.quizRepository.scheduleNewQuiz(
       orgId,
-      nextFriday,
+      dateNextFriday,
     );
     if (!newQuiz) {
       return { status: 409, error: 'Quiz already scheduled for this date.' };

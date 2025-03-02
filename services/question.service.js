@@ -52,18 +52,18 @@ class QuestionService {
     const triviaEnabledOrgs = response.data;
 
     triviaEnabledOrgs.forEach(async (element) => {
-      const genre =
-        element.settings.selectedGenre[element.settings.currentGenre];
+      const orgId = element._id;
+      const currentGenreIndex = element.settings.currentGenre;
+      const selectedGenresList = element.settings.selectedGenre;
+      const genreToScheduleNext = selectedGenresList[currentGenreIndex];
 
-      await orgRepository.setNextQuestionGenre(
-        element._id,
-        element.settings.currentGenre,
-      );
+      await orgRepository.setNextQuestionGenre(orgId, currentGenreIndex);
 
-      // schedule new quiz
       const response = quizService.scheduleNewQuiz(element._id);
+
+      // 201 means new quiz was made
       if (response.status === 201) {
-        switch (genre) {
+        switch (genreToScheduleNext) {
           case 'PnA':
             console.log('starting PnA');
             // this.startPnAWorkflow(element.name);

@@ -10,6 +10,9 @@ class AuthController {
       if (!isAdmin || !email || !password || !name || !org) {
         return res.status(400).json({ message: 'Missing required fields' });
       }
+      if (!org || Object.keys(org).length === 0) {
+        return res.status(400).json({ message: 'No such organisation exists' });
+      }
 
       const response = await authService.registerUser(
         isAdmin,
@@ -30,9 +33,6 @@ class AuthController {
       const { email, password } = req.body;
       if (!email || !password) {
         return res.status(400).json({ message: 'Missing required fields' });
-      }
-      if (!org || Object.keys(org).length === 0) {
-        return res.status(400).json({ message: 'No such organisation exists' });
       }
 
       const response = await authService.loginUser(email, password);

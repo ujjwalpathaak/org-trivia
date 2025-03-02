@@ -16,9 +16,9 @@ class OrgService {
   }
 
   async getTriviaEnabledOrgs() {
-    const orgs = await this.orgRepository.getTriviaEnabledOrgs();
+    const triviaEnabledOrgs = await this.orgRepository.getTriviaEnabledOrgs();
 
-    return { status: 200, data: orgs };
+    return { status: 200, data: triviaEnabledOrgs };
   }
 
   async toggleTrivia(orgId) {

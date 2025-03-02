@@ -16,7 +16,7 @@ class OrgRepository {
   async getTriviaEnabledOrgs() {
     const triviaEnabledOrgs = await Org.find({
       'settings.isTriviaEnabled': true,
-    }).select('_id settings.currentGenre settings.selectedGenre');
+    }).select('_id settings.currentGenreIndex settings.selectedGenre');
 
     return triviaEnabledOrgs;
   }
@@ -51,14 +51,14 @@ class OrgRepository {
     return Org.findById(orgId).select('settings');
   }
 
-  async setNextQuestionGenre(orgId, currentGenre) {
+  async setNextQuestionGenre(orgId, currentGenreIndex) {
     const org = await Org.findById(orgId).select('settings.selectedGenre');
     if (!org) throw new Error('Organization not found');
 
     const totalGenres = org.settings.selectedGenre.length;
     if (totalGenres === 0) throw new Error('No genres available');
 
-    const nextIndex = (currentGenre + 1) % totalGenres;
+    const nextIndex = (currentGenreIndex + 1) % totalGenres;
     await Org.updateOne(
       { _id: orgId },
       { $set: { 'settings.currentGenre': nextIndex } },
