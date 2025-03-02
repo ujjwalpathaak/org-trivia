@@ -4,7 +4,7 @@ import Admin from '../models/admin.model.js';
 import Employee from '../models/employee.model.js';
 import Org from '../models/org.model.js';
 
-import {ObjectId} from "mongodb"
+import { ObjectId } from 'mongodb';
 
 class AuthRepository {
   async getUserByEmail(email) {
@@ -12,34 +12,34 @@ class AuthRepository {
       Admin.findOne({ email }),
       Employee.findOne({ email }),
     ]);
+
     return admin || employee || null;
   }
 
   async createUser(UserModel, email, password, name, org, isAdmin) {
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = new UserModel({
+    const newUser = await new UserModel({
       email,
       password: hashedPassword,
       name,
       org,
-    });
-    isAdmin ? (    await Org.updateOne(
-      { _id: new ObjectId(org) }, 
-      { $push: { admins: newUser._id } }
-    )) : (    await Org.updateOne(
-      { _id: new ObjectId(org) }, 
-      { $push: { employees: newUser._id } }
-    ))
+    }).save();
 
-    return newUser.save();
+    await Org.updateOne(
+      { _id: new ObjectId(org) },
+      { $push: { [isAdmin ? 'admins' : 'employees']: newUser._id } },
+    );
+
+    return newUser;
   }
 
   async passwordsMatch(password, hashedPassword) {
-    return bcrypt.compare(password, hashedPassword);
+    const isMatch = await bcrypt.hash(password, hashedPassword);
+
+    return isMatch ? true : false;
   }
 
   generateToken(user) {
-    // id: user._id, user: user
     return jwt.sign({ id: user._id, user: user }, process.env.JWT_SECRET, {
       expiresIn: '7d',
     });

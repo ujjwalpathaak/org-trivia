@@ -16,11 +16,14 @@ class AuthService {
       return { status: 400, data: { message: `This email already exists` } };
     }
 
-    if (!org || Object.keys(org).length === 0) {
-      return { status: 400, data: { message: `No such organisation exists` } };
-    }
-
-    await this.authRepository.createUser(UserModel, email, password, name, org, isAdmin);
+    await this.authRepository.createUser(
+      UserModel,
+      email,
+      password,
+      name,
+      org,
+      isAdmin,
+    );
 
     return {
       status: 201,

@@ -6,22 +6,16 @@ import QuizController from '../controllers/quiz.controller.js';
 const quizController = new QuizController();
 const quizRouter = express.Router();
 
-quizRouter.post(
-    '/weekly/lambda/callback',
-    quizController.handleLambdaCallback,
-  );
+quizRouter.post('/weekly/lambda/callback', quizController.handleLambdaCallback);
 
-quizRouter.post(
-    '/new/:orgId',
-    quizController.scheduleNewQuiz,
-  );
+quizRouter.post('/new/:orgId', quizController.scheduleNewQuiz);
 
-  quizRouter.get(
-    '/questions/:orgId',
-    protectRoute,
-    checkRole('Employee'),
+quizRouter.get(
+  '/questions/:orgId',
+  protectRoute,
+  checkRole('Employee'),
 
-    quizController.getWeeklyQuizQuestions,
-  );
+  quizController.getWeeklyQuizQuestions,
+);
 
 export default quizRouter;

@@ -32,16 +32,18 @@ const employeeSchema = new mongoose.Schema(
       immutable: true,
     },
     badges: {
-      type: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Badge',
-        required: true,
-        earnedAt: {
-          type: Date,
-          default: Date.now,
+      type: [
+        {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'Badge',
           required: true,
-        }
-      }],
+          earnedAt: {
+            type: Date,
+            default: Date.now,
+            required: true,
+          },
+        },
+      ],
       default: [],
     },
     submittedQuestion: {

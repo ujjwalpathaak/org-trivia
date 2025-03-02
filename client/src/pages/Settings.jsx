@@ -16,8 +16,6 @@ const Settings = () => {
       try {
         const response = await getSettings(orgId);
 
-        console.log(response);
-
         setIsTriviaEnabled(response.isTriviaEnabled);
         setCurrentGenre(response.currentGenre);
         setSelectedGenre(response.selectedGenre);

@@ -1,13 +1,15 @@
 import AuthService from '../services/auth.service.js';
 import AuthRepository from '../repositories/auth.repository.js';
 
-const authRepository = new AuthRepository();
-const authService = new AuthService(authRepository);
+const authService = new AuthService(new AuthRepository());
 
 class AuthController {
   async register(req, res, next) {
     try {
       const { isAdmin, email, password, name, org } = req.body;
+      if (!isAdmin || !email || !password || !name || !org) {
+        return res.status(400).json({ message: 'Missing required fields' });
+      }
 
       const response = await authService.registerUser(
         isAdmin,
@@ -26,6 +28,12 @@ class AuthController {
   async login(req, res, next) {
     try {
       const { email, password } = req.body;
+      if (!email || !password) {
+        return res.status(400).json({ message: 'Missing required fields' });
+      }
+      if (!org || Object.keys(org).length === 0) {
+        return res.status(400).json({ message: 'No such organisation exists' });
+      }
 
       const response = await authService.loginUser(email, password);
 

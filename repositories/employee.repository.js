@@ -1,16 +1,21 @@
 import Employee from '../models/employee.model.js';
+
 import { ObjectId } from 'mongodb';
 
 class EmployeeRepository {
   async getAllOrgEmployeesByOrgId(orgId) {
-    return await Employee.find({ org: orgId });
+    const employee = await Employee.find({ org: orgId });
+
+    return employee;
   }
 
   async updateWeeklyQuizScore(employeeId, newScore) {
-    return await Employee.updateOne(
+    const employee = await Employee.updateOne(
       { _id: new ObjectId(employeeId) },
       { $inc: { currentPoints: newScore } },
     );
+
+    return employee;
   }
 }
 

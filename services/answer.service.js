@@ -1,8 +1,7 @@
 import QuestionRepository from '../repositories/question.repository.js';
 import QuestionService from './question.service.js';
 
-const questionRepository = new QuestionRepository();
-const questionService = new QuestionService(questionRepository);
+const questionService = new QuestionService(new QuestionRepository());
 
 class AnswerService {
   constructor(answerRepository) {
@@ -11,15 +10,16 @@ class AnswerService {
 
   async submitWeeklyQuizAnswers(userAnswers, employeeId, orgId, quizId) {
     const correctAnswers = await questionService.getWeeklyQuizAnswers(orgId);
+
     const response = await this.answerRepository.submitWeeklyQuizAnswers(
       userAnswers,
       correctAnswers,
       employeeId,
       orgId,
-      quizId
+      quizId,
     );
 
-    return response;
+    return { status: 200, data: response };
   }
 }
 

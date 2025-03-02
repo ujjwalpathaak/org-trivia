@@ -3,17 +3,19 @@ import mongoose from 'mongoose';
 const leaderboardSchema = new mongoose.Schema(
   {
     rankings: {
-      type: [{
-        employeeId: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: 'Employee',
-          required: true,
+      type: [
+        {
+          employeeId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Employee',
+            required: true,
+          },
+          score: {
+            type: Number,
+            required: true,
+          },
         },
-        score: {
-          type: Number,
-          required: true,
-        },
-      }],
+      ],
       default: [],
     },
     date: {

@@ -55,29 +55,32 @@ class QuestionService {
       const genre =
         element.settings.selectedGenre[element.settings.currentGenre];
 
-      await orgRepository.setNextQuestionGenre(element._id, element.settings.currentGenre);
+      await orgRepository.setNextQuestionGenre(
+        element._id,
+        element.settings.currentGenre,
+      );
 
       // schedule new quiz
       const response = quizService.scheduleNewQuiz(element._id);
-      if(response.status === 201){
+      if (response.status === 201) {
         switch (genre) {
-            case 'PnA':
-              console.log("starting PnA")
-              // this.startPnAWorkflow(element.name);
-              break;
-          
-            case 'HRD':
-              console.log("starting HRD")
-              // this.startHRDWorkflow();
-              break;
-          
-            case 'CAnIT':
-              console.log("starting CAnIT");
-              // this.startCAnITWorkflow(element.name);
-              break;
-          
-            default:
-              break;
+          case 'PnA':
+            console.log('starting PnA');
+            // this.startPnAWorkflow(element.name);
+            break;
+
+          case 'HRD':
+            console.log('starting HRD');
+            // this.startHRDWorkflow();
+            break;
+
+          case 'CAnIT':
+            console.log('starting CAnIT');
+            // this.startCAnITWorkflow(element.name);
+            break;
+
+          default:
+            break;
         }
       }
     });
@@ -148,7 +151,7 @@ class QuestionService {
   async getWeeklyUnapprovedQuestions(orgId) {
     const weeklyUnapprovedQuestions =
       await this.questionRepository.getWeeklyUnapprovedQuestions(orgId);
-      console.log('weeklyUnapprovedQuestions', weeklyUnapprovedQuestions)
+
     return { status: 200, data: weeklyUnapprovedQuestions };
   }
 
@@ -174,7 +177,6 @@ class QuestionService {
 
     return { status: 200, message: 'Content saved successfully' };
   }
-
 }
 
 export default QuestionService;

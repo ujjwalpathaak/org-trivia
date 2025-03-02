@@ -132,13 +132,16 @@ export const getSettings = async (orgId) => {
 
 export const toggleTrivia = async (orgId) => {
   try {
-    const response = await fetch(`${BACKEND_URL}/org/settings/toggleTrivia/${orgId}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
+    const response = await fetch(
+      `${BACKEND_URL}/org/settings/toggleTrivia/${orgId}`,
+      {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
       },
-    });
+    );
 
     if (!response.ok) {
       const errorData = await response.json();
@@ -155,14 +158,14 @@ export const submitWeeklyQuizAnswers = async (
   weeklyQuizAnswers,
   orgId,
   employeeId,
-  quizId
+  quizId,
 ) => {
   try {
     const data = {
       answers: weeklyQuizAnswers,
       orgId: orgId,
       employeeId: employeeId,
-      quizId: quizId
+      quizId: quizId,
     };
     const response = await fetch(
       `${BACKEND_URL}/answer/submitWeeklyQuizAnswers`,

@@ -2,18 +2,17 @@ import Answer from '../models/answer.model.js';
 import EmployeeRepository from '../repositories/employee.repository.js';
 import EmployeeService from '../services/employee.service.js';
 
-const employeeRepository = new EmployeeRepository();
-const employeeSerivce = new EmployeeService(employeeRepository);
+const employeeSerivce = new EmployeeService(new EmployeeRepository());
 
 class AnswerRepository {
   async calculateScore(userAnswers, correctAnswers) {
     let score = 0;
+
     userAnswers.forEach(({ questionId, answer }) => {
       const correctAnswer = correctAnswers.find(
-        (q) =>{
-          return q._id.toString() === questionId
-        },
+        (correctAnswer) => correctAnswer._id.toString() === questionId,
       );
+
       if (correctAnswer && answer === correctAnswer.answer) {
         score += 10;
       }
@@ -26,16 +25,16 @@ class AnswerRepository {
     userAnswers,
     correctAnswers,
     employeeId,
-    quizId
+    quizId,
   ) {
-    userAnswers = JSON.parse(userAnswers);
-    const score = await this.calculateScore(userAnswers, correctAnswers);
+    const userAnswersJSON = JSON.parse(userAnswers);
+    const score = await this.calculateScore(userAnswersJSON, correctAnswers);
 
     await Answer.insert({
-      answers: userAnswers,
+      answers: userAnswersJSON,
       score: score,
       employeeId: employeeId,
-      quizId: quizId
+      quizId: quizId,
     });
 
     await employeeSerivce.updateWeeklyQuizScore(employeeId, score);

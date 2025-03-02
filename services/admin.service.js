@@ -4,7 +4,9 @@ class AdminService {
   }
 
   async getAllOrgAdmins(orgId) {
-    return await this.adminRepository.getAllOrgAdmins(orgId);
+    const admins = await this.adminRepository.getAllOrgAdmins(orgId);
+
+    return { status: 200, data: admins };
   }
 }
 

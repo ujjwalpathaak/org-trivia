@@ -13,12 +13,12 @@ export const logService = (request, response, next) => {
 
 export const getNextFriday = () => {
   const today = new Date();
-  const dayOfWeek = today.getDay(); // 0 (Sunday) to 6 (Saturday)
-  const daysUntilFriday = (5 - dayOfWeek + 7) % 7 || 7; // Calculate days until next Friday
+  const dayOfWeek = today.getDay();
+  const daysUntilFriday = (5 - dayOfWeek + 7) % 7 || 7;
 
   const nextFriday = new Date();
   nextFriday.setDate(today.getDate() + daysUntilFriday);
-  nextFriday.setHours(0, 0, 0, 0); // Remove time part
+  nextFriday.setHours(0, 0, 0, 0);
 
-  return nextFriday.toISOString().split('T')[0]; // Return only YYYY-MM-DD
+  return nextFriday.toISOString().split('T')[0];
 };

@@ -9,7 +9,17 @@ const orgRouter = express.Router();
 
 orgRouter.get('/', orgController.getAllOrgNames);
 
-orgRouter.patch('/settings/toggleTrivia/:orgId', protectRoute, checkRole("Admin"), orgController.toggleTrivia);
-orgRouter.get('/settings/:orgId', protectRoute, checkRole("Admin"), orgController.getSettings);
+orgRouter.patch(
+  '/settings/toggleTrivia/:orgId',
+  protectRoute,
+  checkRole('Admin'),
+  orgController.toggleTrivia,
+);
+orgRouter.get(
+  '/settings/:orgId',
+  protectRoute,
+  checkRole('Admin'),
+  orgController.getSettings,
+);
 
 export default orgRouter;

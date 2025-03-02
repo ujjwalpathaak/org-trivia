@@ -14,14 +14,11 @@ questionRouter.get(
   questionController.getWeeklyUnapprovedQuestions,
 );
 
-questionRouter.post(
-  '/new/HRdocs',
-  questionController.saveHRdocQuestions
-);
+questionRouter.post('/new/HRdocs', questionController.saveHRdocQuestions);
 
 questionRouter.get(
   '/test/scheduleNextWeekQuestionsApproval',
-  questionController.testScheduleNextWeekQuestionsApproval
+  questionController.testScheduleNextWeekQuestionsApproval,
 );
 
 export default questionRouter;

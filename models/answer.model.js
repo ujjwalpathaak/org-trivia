@@ -24,9 +24,9 @@ const answerSchema = new mongoose.Schema(
             ref: 'Question', // Ensure 'Question' is the correct model name
           },
           answer: Number,
-        }
-      ]
-    }    
+        },
+      ],
+    },
   },
   { timestamps: true },
 );

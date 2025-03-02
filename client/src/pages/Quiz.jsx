@@ -20,7 +20,6 @@ const Quiz = () => {
     const fetchWeeklyQuizQuestions = async () => {
       if (!orgId || !userId) return;
       let response = await getWeeklyQuizQuestions(orgId);
-      console.log(response);
       setQuestions(response);
     };
 

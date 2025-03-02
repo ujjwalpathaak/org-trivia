@@ -17,9 +17,11 @@ class OrgController {
   async toggleTrivia(req, res, next) {
     try {
       const { orgId } = req.params;
-      const response = await orgService.toggleTrivia(orgId);
+      if (!orgId) {
+        return res.status(400).json({ message: 'Missing required fields' });
+      }
 
-      console.log(response.data)
+      const response = await orgService.toggleTrivia(orgId);
 
       res.status(response.status).json(response.data);
     } catch (error) {
@@ -30,6 +32,10 @@ class OrgController {
   async getSettings(req, res, next) {
     try {
       const { orgId } = req.params;
+      if (!orgId) {
+        return res.status(400).json({ message: 'Missing required fields' });
+      }
+
       const response = await orgService.getSettings(orgId);
 
       res.status(response.status).json(response.data);

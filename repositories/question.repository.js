@@ -7,10 +7,10 @@ const orgRepository = new OrgRepository();
 
 class QuestionRepository {
   async saveQuestion(newQuestion) {
-      const question = new Question(newQuestion);
-      await question.save();
-      await orgRepository.addQuestionToOrg(question.org, question._id);
-      return question;
+    const question = await new Question(newQuestion).save();
+    await orgRepository.addQuestionToOrg(question.org, question._id);
+
+    return question;
   }
 
   async saveWeeklyQuizQuestions(newQuestions) {
@@ -20,7 +20,7 @@ class QuestionRepository {
   async getWeeklyUnapprovedQuestions(orgId) {
     return await WeeklyQuestion.find({
       org: new ObjectId(orgId),
-      isApproved: false
+      isApproved: false,
     });
   }
 
@@ -34,8 +34,7 @@ class QuestionRepository {
   }
 
   async saveHRdocQuestions(orgId, questions) {
-    return Question.insertMany(questions)
-
+    return Question.insertMany(questions);
   }
 }
 
