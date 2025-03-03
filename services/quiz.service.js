@@ -25,11 +25,12 @@ class QuizService {
     return response;
   }
 
-  async formatWeeklyQuestions(questions, orgId, category) {
+  async formatWeeklyQuestions(questions, orgId, category, quizId) {
     const nextFriday = getNextFriday();
 
     const weeklyQuestions = questions.map((curr) => ({
       scheduledDate: nextFriday,
+      quizId: quizId,
       question: {
         ...curr,
         source: 'AI',

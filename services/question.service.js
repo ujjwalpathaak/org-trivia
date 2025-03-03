@@ -54,19 +54,20 @@ class QuestionService {
     triviaEnabledOrgs.forEach(async (element) => {
       const genre =
         element.settings.selectedGenre[element.settings.currentGenre];
+
       
       const response = await quizService.scheduleNewQuiz(element._id, genre);
+      const quizId = response.data._id;
 
       if (response.status === 201) {
         await orgRepository.setNextQuestionGenre(
           element._id,
           element.settings.currentGenre,
         );
-
-        switch (genre) {
+        switch ("PnA") {
           case 'PnA':
-            // console.log('starting PnA');
-            this.startPnAWorkflow(element.name, element._id);
+            console.log('starting PnA');
+            this.startPnAWorkflow(element.name, element._id, quizId);
             break;
 
           case 'HRD':
@@ -90,21 +91,22 @@ class QuestionService {
     return await this.questionRepository.fetchPnAQuestions();
   }
 
-  async startPnAWorkflow(companyName, orgId) {
+  async startPnAWorkflow(companyName, orgId, quizId) {
     const tempPnAQuestions = await this.fetchPnAQuestions();
-    const finalPnAQuestions = await refactorPnAQuestions(
+
+    const { questions } = await refactorPnAQuestions(
       companyName,
       tempPnAQuestions,
       orgId,
     );
 
-    const response = await this.pushQuestionsForApproval(finalPnAQuestions, "PnA", orgId)
+    const response = await this.pushQuestionsForApproval(questions, "PnA", orgId, quizId)
 
     return response;
   }
 
-  async pushQuestionsForApproval(questions, category, orgId){
-    const response = await this.questionRepository.pushQuestionsForApproval(questions, category, orgId);
+  async pushQuestionsForApproval(questions, category, orgId, quizId){
+    const response = await this.questionRepository.pushQuestionsForApproval(questions, category, orgId, quizId);
 
     if(response?.status === 500) return { status: 500, message: "Couldn't push questions for approval" };
 

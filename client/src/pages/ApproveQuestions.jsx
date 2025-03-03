@@ -226,6 +226,9 @@ export default function ScheduleQuestions() {
                 onChange={(e) => handleQuestionChange(idx, e.target.value)}
                 className="w-full p-2 border mt-2 rounded-md resize-none overflow-hidden h-[150px] transition-all duration-200"
               />
+              {q.question.image && (
+                <img className="w-1/2" src={q.question.image} />
+              )}
               {/* Editable Options */}
               <div className="mt-2">
                 {q.question.options.map((option, i) => (

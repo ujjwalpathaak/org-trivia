@@ -4,6 +4,7 @@ import { ObjectId } from 'mongodb';
 import OrgRepository from './org.repository.js';
 import QuizRepository from './quiz.repository.js';
 import QuizService from '../services/quiz.service.js';
+import Quiz from '../models/quiz.model.js';
 
 const orgRepository = new OrgRepository();
 const quizService = new QuizService(new QuizRepository());
@@ -20,11 +21,14 @@ class QuestionRepository {
     return await WeeklyQuestion.insertMany(newQuestions);
   }
 
+  // get quizID & then get questions for that qioz od
   async getWeeklyUnapprovedQuestions(orgId) {
-    return await WeeklyQuestion.find({
-      org: new ObjectId(orgId),
-      isApproved: false,
-    });
+    const quiz = await Quiz.findOne({ orgId: new ObjectId(orgId) });
+    const quizId = quiz._id;
+
+    const weeklyQuizQuestions = await WeeklyQuestion.find({ quizId: quizId });
+
+    return weeklyQuizQuestions;
   }
 
   async weeklyQuizAnswers(orgId) {
@@ -40,11 +44,12 @@ class QuestionRepository {
     return Question.insertMany(questions);
   }
 
-  async pushQuestionsForApproval(questions, category, orgId){
+  async pushQuestionsForApproval(questions, category, orgId, quizId){
       const weeklyQuestions = await quizService.formatWeeklyQuestions(
           questions,
           orgId,
           category,
+          quizId
         );
       const response = await this.saveWeeklyQuizQuestions(weeklyQuestions);
       return response;
