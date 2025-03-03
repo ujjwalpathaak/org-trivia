@@ -55,16 +55,14 @@ class QuestionService {
       const genre =
         element.settings.selectedGenre[element.settings.currentGenre];
 
-      
       const response = await quizService.scheduleNewQuiz(element._id, genre);
-      const quizId = response.data._id;
-
       if (response.status === 201) {
+        const quizId = response.data._id;
         await orgRepository.setNextQuestionGenre(
           element._id,
           element.settings.currentGenre,
         );
-        switch ("PnA") {
+        switch ('CAnIT') {
           case 'PnA':
             console.log('starting PnA');
             this.startPnAWorkflow(element.name, element._id, quizId);
@@ -77,12 +75,17 @@ class QuestionService {
 
           case 'CAnIT':
             console.log('starting CAnIT');
-            // this.startCAnITWorkflow(element.name);
+            // fetchNewCAnITQuestions('Microsoft', 'IT Services', orgId, quizId);
             break;
 
           default:
             break;
         }
+      } else {
+        console.error(
+          `Error scheduling quiz for org ${element._id}:`,
+          response,
+        );
       }
     });
   }
@@ -90,6 +93,17 @@ class QuestionService {
   async fetchPnAQuestions() {
     return await this.questionRepository.fetchPnAQuestions();
   }
+
+  async pushQuestionsForApproval(questions, category, orgId, quizId){
+    const response = await this.questionRepository.pushQuestionsForApproval(questions, category, orgId, quizId);
+
+    console.log(response)
+
+    if(response?.status === 500) return { status: 500, message: "Couldn't push questions for approval" };
+
+    return { status: 200, message: 'Questions pushed for approval' };
+  }
+
 
   async startPnAWorkflow(companyName, orgId, quizId) {
     const tempPnAQuestions = await this.fetchPnAQuestions();
@@ -100,25 +114,14 @@ class QuestionService {
       orgId,
     );
 
-    const response = await this.pushQuestionsForApproval(questions, "PnA", orgId, quizId)
+    const response = await this.pushQuestionsForApproval(
+      questions,
+      'PnA',
+      orgId,
+      quizId,
+    );
 
     return response;
-  }
-
-  async pushQuestionsForApproval(questions, category, orgId, quizId){
-    const response = await this.questionRepository.pushQuestionsForApproval(questions, category, orgId, quizId);
-
-    if(response?.status === 500) return { status: 500, message: "Couldn't push questions for approval" };
-
-    return { status: 200, message: 'Questions pushed for approval' };
-  }
-
-  async startCAnITWorkflow(orgName, orgIndustry, orgId) {
-    const finalCAnITQuestions = await fetchNewCAnITQuestions(
-      orgName,
-      orgIndustry,
-      orgId,
-    );
   }
 
   async startHRDWorkflow() {

@@ -9,19 +9,13 @@ const questionService = new QuestionService(new QuestionRepository());
 class QuizController {
   async handleLambdaCallback(req, res, next) {
     try {
-      const { questions, orgId, category } = req.body;
-      if (!questions || !orgId || !category) {
+      const { questions, orgId, category, quizId } = req.body;
+      if (!questions || !orgId || !category || !quizId) {
         next(new Error('Invalid request body'));
         return;
       }
 
-      const weeklyQuestions = await quizService.formatWeeklyQuestions(
-        questions,
-        orgId,
-        category,
-      );
-
-      await questionService.saveWeeklyQuizQuestions(weeklyQuestions);
+      await questionService.pushQuestionsForApproval(questions, category, orgId, quizId);
 
       res.status(200).json({ message: 'Scheduled new questions' });
     } catch (error) {

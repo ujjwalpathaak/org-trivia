@@ -14,7 +14,6 @@ quizRouter.get(
   '/questions/:orgId',
   protectRoute,
   checkRole('Employee'),
-
   quizController.getWeeklyQuizQuestions,
 );
 

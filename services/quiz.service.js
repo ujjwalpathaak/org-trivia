@@ -18,9 +18,8 @@ class QuizService {
     const response = await this.quizRepository.scheduleNewQuiz(
       orgId,
       dateNextFriday,
-      genre
+      genre,
     );
-    if (response.status === 500) return response.status
 
     return response;
   }

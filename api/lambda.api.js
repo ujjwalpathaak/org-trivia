@@ -23,8 +23,8 @@ export const refactorPnAQuestions = async (orgName, PnAQuestions, orgId) => {
 
   return finalPnAQuestions;
 };
-export const fetchNewCAnITQuestions = async (orgName, orgIndustry, orgId) => {
-  const response = await fetch(API_GATEWAY_URL + '/generateCAnIT_Questions', {
+export const fetchNewCAnITQuestions = async (orgName, orgIndustry, orgId, quizId) => {
+  const response = fetch(API_GATEWAY_URL + '/generateCAnIT_Questions', {
     method: 'POST',
     headers: {
       'x-api-key': 'your-api-key',
@@ -34,6 +34,7 @@ export const fetchNewCAnITQuestions = async (orgName, orgIndustry, orgId) => {
       orgName: orgName,
       orgIndustry: orgIndustry,
       orgId: orgId,
+      quizId: quizId,
     }),
   });
 

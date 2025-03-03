@@ -44,30 +44,36 @@ class QuestionRepository {
     return Question.insertMany(questions);
   }
 
-  async pushQuestionsForApproval(questions, category, orgId, quizId){
-      const weeklyQuestions = await quizService.formatWeeklyQuestions(
-          questions,
-          orgId,
-          category,
-          quizId
-        );
-      const response = await this.saveWeeklyQuizQuestions(weeklyQuestions);
-      return response;
+  async pushQuestionsForApproval(questions, category, orgId, quizId) {
+    const weeklyQuestions = await quizService.formatWeeklyQuestions(
+      questions,
+      orgId,
+      category,
+      quizId,
+    );
+    const response = await this.saveWeeklyQuizQuestions(weeklyQuestions);
+    return response;
   }
 
-  async fetchPnAQuestions(){
+  async fetchPnAQuestions() {
     const questions = await Question.aggregate([
-      { $match: {
-        category: 'PnA',
-        status: 'extra',
-      }},
-      { $group: { 
-        _id: "$config.puzzleType",
-        question: { $first: "$$ROOT" }
-      }},
-      { $replaceRoot: {
-        newRoot: "$question"
-      }}
+      {
+        $match: {
+          category: 'PnA',
+          status: 'extra',
+        },
+      },
+      {
+        $group: {
+          _id: '$config.puzzleType',
+          question: { $first: '$$ROOT' },
+        },
+      },
+      {
+        $replaceRoot: {
+          newRoot: '$question',
+        },
+      },
     ]);
 
     return questions;
