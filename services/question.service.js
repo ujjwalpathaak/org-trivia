@@ -52,21 +52,21 @@ class QuestionService {
     const triviaEnabledOrgs = response.data;
 
     triviaEnabledOrgs.forEach(async (element) => {
-      const orgId = element._id;
-      const currentGenreIndex = element.settings.currentGenre;
-      const selectedGenresList = element.settings.selectedGenre;
-      const genreToScheduleNext = selectedGenresList[currentGenreIndex];
+      const genre =
+        element.settings.selectedGenre[element.settings.currentGenre];
+      
+      const response = await quizService.scheduleNewQuiz(element._id, genre);
 
-      await orgRepository.setNextQuestionGenre(orgId, currentGenreIndex);
-
-      const response = quizService.scheduleNewQuiz(element._id);
-
-      // 201 means new quiz was made
       if (response.status === 201) {
-        switch (genreToScheduleNext) {
+        await orgRepository.setNextQuestionGenre(
+          element._id,
+          element.settings.currentGenre,
+        );
+
+        switch (genre) {
           case 'PnA':
-            console.log('starting PnA');
-            // this.startPnAWorkflow(element.name);
+            // console.log('starting PnA');
+            this.startPnAWorkflow(element.name, element._id);
             break;
 
           case 'HRD':
@@ -86,48 +86,29 @@ class QuestionService {
     });
   }
 
+  async fetchPnAQuestions() {
+    return await this.questionRepository.fetchPnAQuestions();
+  }
+
   async startPnAWorkflow(companyName, orgId) {
-    const tempPnAQuestions = [
-      {
-        question:
-          'Golu starts from his house and walks 8 km north. Then, he turns left and walks 6 km. What is the shortest distance from his house?',
-        img: null,
-        options: ['10 km', '16 km', '14 km', '2 km'],
-        answer: 0,
-        refactor: false,
-      },
-      {
-        question:
-          'P starts walking 25 m west from his house, then turns right and walks 10 m. He turns right again and walks 15 m. After this, he turns right at an angle of 135° and walks 30 m. In which direction is he now heading?',
-        img: null,
-        options: ['West', 'South', 'South-West', 'South-East'],
-        answer: 2,
-        refactor: true,
-      },
-      {
-        question:
-          'X starts walking straight south for 5 m, then turns left and walks 3 m. After that, he turns right and walks another 5 m. In which direction is X facing now?',
-        img: null,
-        options: ['North-East', 'South', 'North', 'South-West'],
-        answer: 1,
-        refactor: true,
-      },
-      {
-        question:
-          'Hemant leaves his house, which is in the east, and reaches a crossing. The road to his left leads to a theatre, while the road straight ahead leads to a hospital. In which direction is the university?',
-        img: null,
-        options: ['North', 'South', 'East', 'West'],
-        answer: 0,
-        refactor: false,
-      },
-    ];
+    const tempPnAQuestions = await this.fetchPnAQuestions();
     const finalPnAQuestions = await refactorPnAQuestions(
       companyName,
       tempPnAQuestions,
       orgId,
     );
 
-    return finalPnAQuestions;
+    const response = await this.pushQuestionsForApproval(finalPnAQuestions, "PnA", orgId)
+
+    return response;
+  }
+
+  async pushQuestionsForApproval(questions, category, orgId){
+    const response = await this.questionRepository.pushQuestionsForApproval(questions, category);
+
+    if(response?.status === 500) return { status: 500, message: "Couldn't push questions for approval" };
+
+    return { status: 200, message: 'Questions pushed for approval' };
   }
 
   async startCAnITWorkflow(orgName, orgIndustry, orgId) {
@@ -136,8 +117,6 @@ class QuestionService {
       orgIndustry,
       orgId,
     );
-
-    return finalCAnITQuestions;
   }
 
   async startHRDWorkflow() {

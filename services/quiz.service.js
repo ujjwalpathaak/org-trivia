@@ -12,18 +12,17 @@ class QuizService {
     return { status: 200, data: weeklyQuizQuestions };
   }
 
-  async scheduleNewQuiz(orgId) {
+  async scheduleNewQuiz(orgId, genre) {
     const dateNextFriday = getNextFriday();
 
-    const newQuiz = await this.quizRepository.scheduleNewQuiz(
+    const response = await this.quizRepository.scheduleNewQuiz(
       orgId,
       dateNextFriday,
+      genre
     );
-    if (!newQuiz) {
-      return { status: 409, error: 'Quiz already scheduled for this date.' };
-    }
+    if (response.status === 500) return response.status
 
-    return { status: 500, data: 'Cannot schedule new quiz' };
+    return response;
   }
 
   async formatWeeklyQuestions(questions, orgId, category) {

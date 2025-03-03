@@ -16,8 +16,7 @@ class OrgRepository {
   async getTriviaEnabledOrgs() {
     const triviaEnabledOrgs = await Org.find({
       'settings.isTriviaEnabled': true,
-    }).select('_id settings.currentGenreIndex settings.selectedGenre');
-
+    });
     return triviaEnabledOrgs;
   }
 

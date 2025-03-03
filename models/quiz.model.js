@@ -11,11 +11,13 @@ const quizSchema = new mongoose.Schema(
       type: Date,
       required: true,
     },
+    genre: {
+      type: String,
+      required: true,
+    },
   },
   { timestamps: true },
 );
-
-quizSchema.index({ orgId: 1, scheduledDate: 1 }, { unique: true });
 
 const Quiz = mongoose.model('Quiz', quizSchema);
 
