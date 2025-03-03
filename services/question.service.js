@@ -104,7 +104,7 @@ class QuestionService {
   }
 
   async pushQuestionsForApproval(questions, category, orgId){
-    const response = await this.questionRepository.pushQuestionsForApproval(questions, category);
+    const response = await this.questionRepository.pushQuestionsForApproval(questions, category, orgId);
 
     if(response?.status === 500) return { status: 500, message: "Couldn't push questions for approval" };
 
