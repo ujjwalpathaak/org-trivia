@@ -17,11 +17,13 @@ class QuestionService {
   }
 
   async saveQuestion(newQuestionData) {
-    const newQue = await this.questionRepository.saveQuestion(newQuestionData);
+    console.log(newQuestionData)
+    const newQuestion = await this.questionRepository.saveQuestion(newQuestionData);
+    if(!newQuestion) return false;
 
-    return { status: 201, data: newQue };
+    return true;
   }
-
+// ----------------------------------------------------------------
   async saveWeeklyQuizQuestions(newQuestions) {
     await this.questionRepository.saveWeeklyQuizQuestions(newQuestions);
   }

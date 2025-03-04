@@ -7,16 +7,16 @@ const OrgSearch = ({ setFormData }) => {
   const [orgList, setOrgList] = useState([]);
 
   useEffect(() => {
-    let cachedData = localStorage.getItem('cachedData');
-    cachedData = cachedData ? JSON.parse(cachedData) : {};
+    // let cachedData = localStorage.getItem('cachedData');
+    // cachedData = cachedData ? JSON.parse(cachedData) : {};
 
     const fetchAllOrgs = async () => {
       try {
         const response = await getAllOrgs();
         const data = await response.json();
 
-        const newCache = { ...cachedData, orgs: data };
-        localStorage.setItem('cachedData', JSON.stringify(newCache));
+        // const newCache = { ...cachedData, orgs: data };
+        // localStorage.setItem('cachedData', JSON.stringify(newCache));
 
         setOrgList(data);
       } catch (error) {
@@ -24,11 +24,11 @@ const OrgSearch = ({ setFormData }) => {
       }
     };
 
-    if (cachedData.orgs) {
-      setOrgList(cachedData.orgs);
-    } else {
-      fetchAllOrgs();
-    }
+    // if (cachedData.orgs) {
+    //   setOrgList(cachedData.orgs);
+    // } else {
+    fetchAllOrgs();
+    // }
   }, []);
 
   const handleSearch = (e) => {

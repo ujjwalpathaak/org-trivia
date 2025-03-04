@@ -16,7 +16,9 @@ const QuestionMaker = () => {
     image: null,
     source: 'Employee',
     org: orgId,
+    config: {},
     category: '',
+    config: { isUsed: false, puzzleType: '', refactor: false },
   });
 
   const notifyQuestionSubmitted = () => toast('New question submitted!');
@@ -35,6 +37,19 @@ const QuestionMaker = () => {
       updatedOptions[index] = value;
       return { ...prev, options: updatedOptions };
     });
+  };
+
+  const handleChangePuzzleType = (event) => {
+    const newPuzzleType = event.target.value;
+    setQuestion((prev) => ({
+      ...prev,
+      config: {
+        ...prev.config,
+        puzzleType: newPuzzleType,
+        refactor:
+          newPuzzleType === 'BloodRelation' || newPuzzleType === 'Direction',
+      },
+    }));
   };
 
   const handleImageChange = (event) => {
@@ -81,7 +96,7 @@ const QuestionMaker = () => {
             className="mt-2 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="">Select Category</option>
-            <option value="CCnHnFF">Company Culture, History & Facts</option>
+            {/* <option value="CCnHnFF">Company Culture, History & Facts</option> */}
             <option value="CAnIT">
               Company Achievements and Industry Trends
             </option>
@@ -89,7 +104,28 @@ const QuestionMaker = () => {
             <option value="PnA">Puzzles and Aptitude</option>
           </select>
         </div>
-
+        {
+          // conditionally render options based on selected category
+          question.category === 'PnA' && (
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700">
+                Puzzle Type
+              </label>
+              <select
+                name="category"
+                value={question?.config?.puzzleType || ''}
+                onChange={handleChangePuzzleType}
+                className="mt-2 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">Select PuzzleType</option>
+                <option value="BloodRelation">Blood Relations</option>
+                <option value="Analytical">Analytical</option>
+                <option value="Arithmetic">Arithmetic</option>
+                <option value="Direction">Direction</option>
+              </select>
+            </div>
+          )
+        }
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700">
             Upload Image (Optional)

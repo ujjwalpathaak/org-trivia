@@ -12,10 +12,13 @@ const quizService = new QuizService(new QuizRepository());
 class QuestionRepository {
   async saveQuestion(newQuestion) {
     const question = await new Question(newQuestion).save();
-    await orgRepository.addQuestionToOrg(question.org, question._id);
+    const addedToList = await orgRepository.addQuestionToOrg(question.org, question._id);
+    if(!question || !addedToList) return false;
 
-    return question;
+    return true;
   }
+
+  // ----------------------------------------------------------------
 
   async saveWeeklyQuizQuestions(newQuestions) {
     return await WeeklyQuestion.insertMany(newQuestions);

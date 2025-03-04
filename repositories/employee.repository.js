@@ -4,10 +4,11 @@ import { ObjectId } from 'mongodb';
 
 class EmployeeRepository {
   async getAllOrgEmployeesByOrgId(orgId) {
-    const employees = await Employee.find({ org: orgId });
+    const orgEmployees = await Employee.find({ orgId: new ObjectId(orgId) });
 
-    return employees;
+    return orgEmployees;
   }
+  // ----------------------------------------------------------------
 
   async updateWeeklyQuizScore(employeeId, updatedWeeklyQuizScore) {
     await Employee.updateOne(

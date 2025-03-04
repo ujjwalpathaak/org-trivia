@@ -65,7 +65,7 @@ export const useAuth = () => useContext(AuthContext);
 
 export const useOrgId = () => {
   const { data } = useAuth();
-  return data?.user?.org || '';
+  return data?.user?.orgId || '';
 };
 
 export const useUserId = () => {

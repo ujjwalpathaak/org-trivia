@@ -16,17 +16,17 @@ class AuthRepository {
     return admin || employee || null;
   }
 
-  async createUser(UserModel, email, password, name, org, isAdmin) {
+  async createUser(UserModel, email, password, name, orgId, isAdmin) {
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = await new UserModel({
       email,
       password: hashedPassword,
       name,
-      org,
+      orgId,
     }).save();
 
     await Org.updateOne(
-      { _id: new ObjectId(org) },
+      { _id: new ObjectId(orgId) },
       { $push: { [isAdmin ? 'admins' : 'employees']: newUser._id } },
     );
 

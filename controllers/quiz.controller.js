@@ -7,6 +7,21 @@ const quizService = new QuizService(new QuizRepository());
 const questionService = new QuestionService(new QuestionRepository());
 
 class QuizController {
+  async getNextWeeklyQuizDate(req, res, next){
+    try{
+      const { orgId } = req.params;
+      if(!orgId) return res.status(404).json({ message: 'Missing organizationId' });
+
+      const nextWeeklyQuizDate = await quizService.getNextWeeklyQuizDate(orgId);
+      if(!nextWeeklyQuizDate) res.status(404).json({ message: 'No quiz scheduled for next week' });
+
+      res.status(200).json(nextWeeklyQuizDate);
+    }
+    catch(error){
+      next(error);
+    }
+  }
+  //  ----------------------------------------------------------------
   async handleLambdaCallback(req, res, next) {
     try {
       const { questions, orgId, category, quizId } = req.body;

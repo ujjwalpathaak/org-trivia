@@ -6,6 +6,8 @@ import QuizController from '../controllers/quiz.controller.js';
 const quizController = new QuizController();
 const quizRouter = express.Router();
 
+quizRouter.get('/next/date/:orgId', quizController.getNextWeeklyQuizDate);
+
 quizRouter.post('/weekly/lambda/callback', quizController.handleLambdaCallback);
 
 quizRouter.post('/new/:orgId', quizController.scheduleNewQuiz);

@@ -11,6 +11,12 @@ const quizSchema = new mongoose.Schema(
       type: Date,
       required: true,
     },
+    status: {
+      type: String,
+      enum: ['upcoming', 'expired'],
+      required: true,
+      default: 'upcoming'
+    },
     genre: {
       type: String,
       required: true,

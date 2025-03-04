@@ -7,7 +7,7 @@ class AuthController {
   async register(req, res, next) {
     try {
       const { isAdmin, email, password, name, org } = req.body;
-      if (!isAdmin || !email || !password || !name || !org) {
+      if (!email || !password || !name || !org) {
         return res.status(400).json({ message: 'Missing required fields' });
       }
       if (!org || Object.keys(org).length === 0) {
@@ -42,6 +42,7 @@ class AuthController {
       next(error);
     }
   }
+  // ----------------------------------------------------------------
 }
 
 export default AuthController;

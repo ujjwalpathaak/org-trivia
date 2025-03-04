@@ -7,17 +7,20 @@ class QuestionController {
   async addQuestion(req, res, next) {
     try {
       const question = req.body;
-      if (!question.question || !question.type || !question.options) {
+      if (!question) {
         return res.status(400).json({ message: 'All fields are required' });
       }
 
-      const response = await questionService.saveQuestion(question);
+      const isQuestionAdded = await questionService.saveQuestion(question);
+      if(!isQuestionAdded) res.status(404).json({ message: 'Not able to save question' });
 
-      res.status(response.status).json(response.data);
+      res.status(200).json({message: 'New question saved successfully'});
     } catch (error) {
       next(error);
     }
   }
+
+  // ----------------------------------------------------------------
 
   async getWeeklyUnapprovedQuestions(req, res, next) {
     try {

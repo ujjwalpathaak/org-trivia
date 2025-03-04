@@ -61,6 +61,7 @@
 
 | Method | Endpoint                     | Description                                                 | Protected | Allowed Roles |
 | ------ | ---------------------------- | ----------------------------------------------------------- | --------- | ------------- |
+| post   | /quiz/next/date/:orgId       | Get next weekly quiz date                                   | Yes       | Admin         |
 | post   | /quiz/weekly/lambda/callback | Callback function for Lmabda to add questions               | Yes       | Admin         |
 | post   | /quiz/new/:orgId             | Make a new quiz entry                                       | Yes       | Admin         |
 | post   | /quiz/questions/:orgId       | Get all questions for the next quiz for that particular org | Yes       | Admin         |

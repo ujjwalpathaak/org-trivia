@@ -1,6 +1,22 @@
 import Org from '../models/org.model.js';
 
+import { ObjectId } from 'mongodb'
+
 class OrgRepository {
+  async addQuestionToOrg(orgId, questionId) {
+    const result = await Org.updateOne(
+      { _id: new ObjectId(orgId) },
+      { $push: { questions: questionId } },
+    );
+
+    if (result.matchedCount === 0) {
+      throw new Error('Organization not found');
+    }
+
+    return true;
+  }
+
+  // ----------------------------------------------------------------
   async getAllOrgNames() {
     const orgs = await Org.find({}).select('id name');
 
@@ -18,19 +34,6 @@ class OrgRepository {
       'settings.isTriviaEnabled': true,
     });
     return triviaEnabledOrgs;
-  }
-
-  async addQuestionToOrg(orgId, questionId) {
-    const result = await Org.updateOne(
-      { _id: new ObjectId(orgId) },
-      { $push: { questions: questionId } },
-    );
-
-    if (result.matchedCount === 0) {
-      throw new Error('Organization not found');
-    }
-
-    return result;
   }
 
   async toggleTrivia(orgId) {

@@ -13,8 +13,7 @@ const AdminDashboard = () => {
       if (!orgId) return;
 
       try {
-        const response = await getEmployeesByOrg(orgId);
-        const employees = await response.json();
+        const employees = await getEmployeesByOrg(orgId);
 
         setEmployees(Array.isArray(employees) ? employees : []);
       } catch (error) {

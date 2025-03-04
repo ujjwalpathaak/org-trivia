@@ -6,7 +6,7 @@ class AuthService {
     this.authRepository = authRepository;
   }
 
-  async registerUser(isAdmin, email, password, name, org) {
+  async registerUser(isAdmin, email, password, name, orgId) {
     const [UserModel, userType] = isAdmin
       ? [Admin, 'Admin']
       : [Employee, 'Employee'];
@@ -21,7 +21,7 @@ class AuthService {
       email,
       password,
       name,
-      org,
+      orgId,
       isAdmin,
     );
 

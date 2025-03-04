@@ -5,6 +5,18 @@ import WeeklyQuestion from '../models/weeklyQuestion.model.js';
 import { ObjectId } from 'mongodb';
 
 class QuizRepository {
+  async fetchNextWeeklyQuizDate(orgId) {
+    const nextWeeklyQuiz = await Quiz.findOne({
+      orgId: new ObjectId(orgId),
+      status: 'upcoming'
+    });
+
+    const scheduledQuizDate = nextWeeklyQuiz.scheduledDate || null;
+
+    return scheduledQuizDate;
+  }
+
+// ----------------------------------------------------------------
   async getWeeklyQuizQuestions(orgId) {
     const questions = await WeeklyQuestion.find({
       orgId: new ObjectId(orgId),
@@ -53,6 +65,7 @@ class QuizRepository {
 
     const newQuiz = await Quiz.create({
       orgId,
+      status: 'upcoming',
       scheduledDate: startOfDay,
       genre,
     });

@@ -5,6 +5,16 @@ class QuizService {
     this.quizRepository = quizRepository;
   }
 
+  async getNextWeeklyQuizDate(orgId){
+    const nextWeeklyQuizDate = this.quizRepository.fetchNextWeeklyQuizDate(orgId)
+
+    if (!nextWeeklyQuizDate) {
+      return false;
+    }
+
+    return nextWeeklyQuizDate;
+  }
+// ----------------------------------------------------------------
   async getWeeklyQuizQuestions(orgId) {
     const weeklyQuizQuestions =
       await this.quizRepository.getWeeklyQuizQuestions(orgId);

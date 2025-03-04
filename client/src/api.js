@@ -38,8 +38,8 @@ export const getEmployeesByOrg = async (orgId) => {
       Authorization: `Bearer ${token}`,
     },
   });
-
-  return response;
+  const responseJSON = await response.json()
+  return responseJSON;
 };
 
 export const createNewQuestion = async (formData) => {
@@ -211,3 +211,34 @@ export const submitWeeklyQuizAnswers = async (
     return { success: false, error: error.message };
   }
 };
+
+// const getWeeklyQuizStatus = async (orgId) => {
+//   try {
+//     // const response = await fetch(`${BACKEND_URL}/quiz/next/date/${orgId}`, {
+//     //   method: 'GET',
+//     //   headers: {
+//     //     'Content-Type': 'application/json',
+//     //     Authorization: `Bearer ${token}`,
+//     //   },
+//     // });
+
+//     // if (!response.ok) {
+//     //   const errorData = await response.json();
+//     //   throw new Error(errorData.message || 'Failed to create question');
+//     // }
+
+//     // const nextWeeklyQuizDate = await response.json();
+
+//     // console.log(nextWeeklyQuizDate)
+
+//     // return {
+//     //   isQuizAccessible,
+//     //   nextWeeklyQuizDate,
+//     // };
+
+//     return true;
+
+//   } catch (error) {
+//     return { success: false, error: error.message };
+//   }
+// }
