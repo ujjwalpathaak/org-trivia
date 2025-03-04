@@ -154,6 +154,28 @@ export const toggleTrivia = async (orgId) => {
   }
 };
 
+export const handleScheduleWeeklyQuiz = async (questions, orgId) => {
+  try {
+    const response = await fetch(`${BACKEND_URL}/quiz/schedule/${orgId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(questions),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to create question');
+    }
+
+    return await response.json();
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+};
+
 export const submitWeeklyQuizAnswers = async (
   weeklyQuizAnswers,
   orgId,

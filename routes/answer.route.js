@@ -7,7 +7,7 @@ const answerRouter = express.Router();
 
 answerRouter.post(
   '/submitWeeklyQuizAnswers',
-  answerController.handleSubmitWeeklyQuizAnswers,
+  answerController.submitWeeklyQuizAnswers,
 );
 
 export default answerRouter;

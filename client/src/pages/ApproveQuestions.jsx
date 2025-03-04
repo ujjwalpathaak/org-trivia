@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { getQuestionsToApprove } from '../api.js';
+import { getQuestionsToApprove, handleScheduleWeeklyQuiz } from '../api.js';
 import { useOrgId } from '../context/auth.context.jsx';
 
 export default function ScheduleQuestions() {
@@ -28,14 +28,14 @@ export default function ScheduleQuestions() {
 
   const getNextWeek = () => {
     const today = new Date();
-    today.setDate(today.getDate() + 7); // Move to next week
+    today.setDate(today.getDate() + 7);
     const year = today.getFullYear();
     const week = Math.ceil(
       ((today - new Date(year, 0, 1)) / 86400000 +
         new Date(year, 0, 1).getDay() +
         1) /
         7,
-    ); // Calculate ISO week number
+    );
     return `${year}-W${week.toString().padStart(2, '0')}`;
   };
 
@@ -52,6 +52,11 @@ export default function ScheduleQuestions() {
 
     getQuestionsToApproveFunc();
   }, []);
+
+  const handleScheduleQuiz = async () => {
+    // Schedule the quiz here
+    await handleScheduleWeeklyQuiz(questions, orgId);
+  };
 
   const addCustomQuestion = () => {
     if (newQuestion.trim()) {
@@ -207,7 +212,10 @@ export default function ScheduleQuestions() {
               onChange={(e) => setSelectedWeek(e.target.value)}
             />
           </div>
-          <button className="bg-green-500 p-2 rounded-md ml-6">
+          <button
+            onClick={handleScheduleQuiz}
+            className="bg-green-500 p-2 rounded-md ml-6"
+          >
             Schedule Quiz
           </button>
         </h2>

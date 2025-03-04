@@ -15,7 +15,12 @@ class QuizController {
         return;
       }
 
-      await questionService.pushQuestionsForApproval(questions, category, orgId, quizId);
+      await questionService.pushQuestionsForApproval(
+        questions,
+        category,
+        orgId,
+        quizId,
+      );
 
       res.status(200).json({ message: 'Scheduled new questions' });
     } catch (error) {
@@ -33,6 +38,25 @@ class QuizController {
       const response = await quizService.scheduleNewQuiz(orgId);
 
       res.status(response.status).json(response.data);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async approveWeeklyQuizQuestions(req, res, next) {
+    try {
+      const { orgId } = req.params;
+      const questions = req.body;
+      if (!orgId || !questions) {
+        return res.status(400).json({ message: 'Missing required fields' });
+      }
+
+      const response = await quizService.approveWeeklyQuizQuestions(
+        questions,
+        orgId,
+      );
+
+      res.status(200).json({ message: 'Questions marked as approved' });
     } catch (error) {
       next(error);
     }

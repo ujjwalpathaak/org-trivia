@@ -3,14 +3,12 @@ import OrgService from './org.service.js';
 import { getNextFriday } from '../middleware/utils.js';
 import {
   fetchNewCAnITQuestions,
-  refactorPnAQuestions,
+  refactorPnAQuestionsToOrgContext,
 } from '../api/lambda.api.js';
 import QuizService from './quiz.service.js';
 import QuizRepository from '../repositories/quiz.repository.js';
 
-const orgRepository = new OrgRepository();
-const orgService = new OrgService(orgRepository);
-
+const orgService = new OrgService(new OrgRepository());
 const quizService = new QuizService(new QuizRepository());
 
 class QuestionService {
@@ -94,21 +92,26 @@ class QuestionService {
     return await this.questionRepository.fetchPnAQuestions();
   }
 
-  async pushQuestionsForApproval(questions, category, orgId, quizId){
-    const response = await this.questionRepository.pushQuestionsForApproval(questions, category, orgId, quizId);
+  async pushQuestionsForApproval(questions, category, orgId, quizId) {
+    const response = await this.questionRepository.pushQuestionsForApproval(
+      questions,
+      category,
+      orgId,
+      quizId,
+    );
 
-    console.log(response)
+    console.log(response);
 
-    if(response?.status === 500) return { status: 500, message: "Couldn't push questions for approval" };
+    if (response?.status === 500)
+      return { status: 500, message: "Couldn't push questions for approval" };
 
     return { status: 200, message: 'Questions pushed for approval' };
   }
 
-
   async startPnAWorkflow(companyName, orgId, quizId) {
     const tempPnAQuestions = await this.fetchPnAQuestions();
 
-    const { questions } = await refactorPnAQuestions(
+    const { questions } = await refactorPnAQuestionsToOrgContext(
       companyName,
       tempPnAQuestions,
       orgId,
@@ -139,10 +142,12 @@ class QuestionService {
     return { status: 200, data: weeklyUnapprovedQuestions };
   }
 
-  async getWeeklyQuizAnswers(orgId) {
-    const weeklyQuizAnswers =
-      await this.questionRepository.weeklyQuizAnswers(orgId);
-    return weeklyQuizAnswers;
+  async getWeeklyQuizCorrectAnswers(orgId) {
+    console.log('getWeeklyQuizCorrectAnswers', orgId);
+    const weeklyQuizCorrectAnswers =
+      await this.questionRepository.getWeeklyQuizCorrectAnswers(orgId);
+
+    return weeklyQuizCorrectAnswers;
   }
 
   formatHRDQuestions(orgId, questions) {

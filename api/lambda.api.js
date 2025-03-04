@@ -1,11 +1,16 @@
-const API_GATEWAY_URL =
-  'https://w6d724kzj1.execute-api.eu-north-1.amazonaws.com';
+dotenv.config();
+import dotenv from 'dotenv';
 
-export const refactorPnAQuestions = async (orgName, PnAQuestions, orgId) => {
+const API_GATEWAY_URL = process.env.API_GATEWAY_URL;
+
+export const refactorPnAQuestionsToOrgContext = async (
+  orgName,
+  PnAQuestions,
+  orgId,
+) => {
   const response = await fetch(API_GATEWAY_URL + '/generatePnA_Questions', {
     method: 'POST',
     headers: {
-      'x-api-key': 'your-api-key',
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
@@ -16,18 +21,25 @@ export const refactorPnAQuestions = async (orgName, PnAQuestions, orgId) => {
   });
 
   if (!response.ok) {
-    throw new Error(`HTTP error! Status: ${response.status}`);
+    throw new Error(
+      `HTTP error! Status: ${response.status}; Message: ${response.message}`,
+    );
   }
 
   const finalPnAQuestions = await response.json();
 
   return finalPnAQuestions;
 };
-export const fetchNewCAnITQuestions = async (orgName, orgIndustry, orgId, quizId) => {
+
+export const fetchNewCAnITQuestions = async (
+  orgName,
+  orgIndustry,
+  orgId,
+  quizId,
+) => {
   const response = fetch(API_GATEWAY_URL + '/generateCAnIT_Questions', {
     method: 'POST',
     headers: {
-      'x-api-key': 'your-api-key',
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
@@ -39,7 +51,9 @@ export const fetchNewCAnITQuestions = async (orgName, orgIndustry, orgId, quizId
   });
 
   if (!response.ok) {
-    throw new Error(`HTTP error! Status: ${response.status}`);
+    throw new Error(
+      `HTTP error! Status: ${response.status}; Message: ${response.message}`,
+    );
   }
 
   const finalCAnITQuestions = await response.json();

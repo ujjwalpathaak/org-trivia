@@ -9,9 +9,12 @@ class AnswerService {
   }
 
   async submitWeeklyQuizAnswers(userAnswers, employeeId, orgId, quizId) {
-    const correctAnswers = await questionService.getWeeklyQuizAnswers(orgId);
+    const correctAnswers = await questionService.getWeeklyQuizCorrectAnswers(
+      orgId,
+      quizId,
+    );
 
-    const response = await this.answerRepository.submitWeeklyQuizAnswers(
+    await this.answerRepository.submitWeeklyQuizAnswers(
       userAnswers,
       correctAnswers,
       employeeId,
@@ -19,7 +22,7 @@ class AnswerService {
       quizId,
     );
 
-    return { status: 200, data: response };
+    return;
   }
 }
 

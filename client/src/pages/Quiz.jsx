@@ -13,6 +13,7 @@ const Quiz = () => {
   const [answers, setAnswers] = useState([]);
   const [questions, setQuestions] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [quizId, setQuizId] = useState(null);
   const [isQuizFinished, setIsQuizFinished] = useState(false);
   const [timeLeftCurrentQuestion, setTimeLeftCurrentQuestion] = useState(5);
 
@@ -20,7 +21,8 @@ const Quiz = () => {
     const fetchWeeklyQuizQuestions = async () => {
       if (!orgId || !userId) return;
       let response = await getWeeklyQuizQuestions(orgId);
-      setQuestions(response);
+      setQuizId(response.quizId);
+      setQuestions(response.weeklyQuizQuestions);
     };
 
     fetchWeeklyQuizQuestions();

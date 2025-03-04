@@ -1,27 +1,44 @@
+import Question from '../models/question.model.js';
 import Quiz from '../models/quiz.model.js';
 import WeeklyQuestion from '../models/weeklyQuestion.model.js';
 
-import ObjectId from 'mongodb';
+import { ObjectId } from 'mongodb';
 
 class QuizRepository {
-  async weeklyQuizQuestions(orgId) {
-    const questions = await WeeklyQuestion.find({ org: orgId })
+  async getWeeklyQuizQuestions(orgId) {
+    const questions = await WeeklyQuestion.find({
+      orgId: new ObjectId(orgId),
+      isApproved: true,
+    })
       .select({ 'question.answer': 0 })
       .lean();
-    return questions.map((curr) => {
+    const weeklyQuizQuestions = questions.map((curr) => {
       return curr.question;
     });
+    return {
+      weeklyQuizQuestions: weeklyQuizQuestions,
+      quizId: questions[0].quizId,
+    };
   }
+
+  async approveQuizQuestions(questions, orgId) {
+    const idsOfQuestionsToApprove = questions.map(
+      (question) => new ObjectId(question._id),
+    );
+
+    await WeeklyQuestion.updateMany(
+      { _id: { $in: idsOfQuestionsToApprove } },
+      { $set: { isApproved: true } },
+    );
+  }
+
   async scheduleNewQuiz(orgId, date, genre) {
-    // Convert the input date to a Date object (Start of the Day)
     const startOfDay = new Date(date);
     startOfDay.setUTCHours(0, 0, 0, 0);
 
-    // Get the end of the day
     const endOfDay = new Date(date);
     endOfDay.setUTCHours(23, 59, 59, 999);
 
-    // Find any quiz scheduled within the same day
     const existingQuiz = await Quiz.findOne({
       orgId,
       scheduledDate: { $gte: startOfDay, $lt: endOfDay },
@@ -41,6 +58,25 @@ class QuizRepository {
     });
 
     return { status: 201, data: newQuiz };
+  }
+
+  async cleanWeeklyQuizQuestions() {
+    const questionsToClean = await WeeklyQuestion.find({})
+      .select('question._id')
+      .lean();
+
+    const idsOfQuestionsToClean = questionsToClean.map(
+      (currentQuestion) => currentQuestion._id,
+    );
+
+    console.log(idsOfQuestionsToClean);
+
+    await Question.updateMany(
+      { _id: { $in: idsOfQuestionsToClean } },
+      { $set: { 'question.status': 'done' } },
+    );
+
+    await WeeklyQuestion.deleteMany({});
   }
 }
 

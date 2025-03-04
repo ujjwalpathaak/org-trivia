@@ -43,14 +43,21 @@
 | ------ | ------------------------------- | --------------------- | --------- | ------------- |
 | POST   | /answer/submitWeeklyQuizAnswers | Mark answers for quiz | Yes       | Employee      |
 
-### Cron Jobs
+### Cron
 
 | Method | Endpoint                        | Description                                                | Protected | Allowed Roles |
 | ------ | ------------------------------- | ---------------------------------------------------------- | --------- | ------------- |
 | post   | /cron/startPnAWorkflow/:orgId   | Start the startPnAWorkflow for a particular organization   | Yes       | Admin         |
 | post   | /cron/startCAnITWorkflow/:orgId | Start the startCAnITWorkflow for a particular organization | Yes       | Admin         |
 
-### Cron Jobs
+### Org
+
+| Method | Endpoint                      | Description                       | Protected | Allowed Roles |
+| ------ | ----------------------------- | --------------------------------- | --------- | ------------- |
+| post   | /settings/toggleTrivia/:orgId | Toggle trivia on & off for an org | Yes       | Admin         |
+| post   | /settings/:orgId              | Get settings for an org           | Yes       | Admin         |
+
+### Quiz
 
 | Method | Endpoint                     | Description                                                 | Protected | Allowed Roles |
 | ------ | ---------------------------- | ----------------------------------------------------------- | --------- | ------------- |

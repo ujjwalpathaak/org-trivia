@@ -34,6 +34,8 @@ app.use((error, req, res, next) => {
   error.status = error.status || 500;
   error.message = error.message || 'Server Error';
 
+  console.error(error);
+
   res.status(error.status).json({
     status: error.status,
     message: error.message,

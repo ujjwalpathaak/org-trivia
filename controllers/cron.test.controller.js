@@ -2,9 +2,12 @@ import OrgRepository from '../repositories/org.repository.js';
 import OrgService from '../services/org.service.js';
 import QuestionRepository from '../repositories/question.repository.js';
 import QuestionService from '../services/question.service.js';
+import QuizService from '../services/quiz.service.js';
+import QuizRepository from '../repositories/quiz.repository.js';
 
 const questionservice = new QuestionService(new QuestionRepository());
 const orgService = new OrgService(new OrgRepository());
+const quizService = new QuizService(new QuizRepository());
 
 class CronTestController {
   async startPnAWorkflow(req, res, next) {
@@ -40,6 +43,16 @@ class CronTestController {
       );
 
       res.status(200).json({ message: 'CAnIT workflow started successfully' });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async cleanWeeklyQuiz(req, res, next) {
+    try {
+      const response = await quizService.cleanWeeklyQuizQuestions();
+
+      res.status(response.status).json(response.data);
     } catch (error) {
       next(error);
     }

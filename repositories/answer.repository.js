@@ -5,8 +5,8 @@ import EmployeeService from '../services/employee.service.js';
 const employeeSerivce = new EmployeeService(new EmployeeRepository());
 
 class AnswerRepository {
-  async calculateScore(userAnswers, correctAnswers) {
-    let score = 0;
+  async calculateWeeklyQuizScore(userAnswers, correctAnswers) {
+    let weeklyQuizScore = 0;
 
     userAnswers.forEach(({ questionId, answer }) => {
       const correctAnswer = correctAnswers.find(
@@ -14,11 +14,11 @@ class AnswerRepository {
       );
 
       if (correctAnswer && answer === correctAnswer.answer) {
-        score += 10;
+        weeklyQuizScore += 10;
       }
     });
 
-    return score;
+    return weeklyQuizScore;
   }
 
   async submitWeeklyQuizAnswers(
@@ -28,18 +28,22 @@ class AnswerRepository {
     quizId,
   ) {
     const userAnswersJSON = JSON.parse(userAnswers);
-    const score = await this.calculateScore(userAnswersJSON, correctAnswers);
+    const weeklyQuizScore = await this.calculateWeeklyQuizScore(
+      userAnswersJSON,
+      correctAnswers,
+    );
+    console.log(weeklyQuizScore);
 
-    await Answer.insert({
-      answers: userAnswersJSON,
-      score: score,
-      employeeId: employeeId,
-      quizId: quizId,
-    });
+    // await Answer.insert({
+    //   answers: userAnswersJSON,
+    //   currentPoints: weeklyQuizScore,
+    //   employeeId: employeeId,
+    //   quizId: quizId,
+    // });
 
-    await employeeSerivce.updateWeeklyQuizScore(employeeId, score);
+    await employeeSerivce.updateWeeklyQuizScore(employeeId, weeklyQuizScore);
 
-    return { status: 200, data: 'Answers submitted successfully' };
+    return;
   }
 }
 

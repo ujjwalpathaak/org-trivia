@@ -7,7 +7,7 @@ class QuizService {
 
   async getWeeklyQuizQuestions(orgId) {
     const weeklyQuizQuestions =
-      await this.quizRepository.weeklyQuizQuestions(orgId);
+      await this.quizRepository.getWeeklyQuizQuestions(orgId);
 
     return { status: 200, data: weeklyQuizQuestions };
   }
@@ -22,6 +22,10 @@ class QuizService {
     );
 
     return response;
+  }
+
+  async approveWeeklyQuizQuestions(questions, orgId) {
+    await this.quizRepository.approveQuizQuestions(questions, orgId);
   }
 
   async formatWeeklyQuestions(questions, orgId, category, quizId) {
@@ -41,6 +45,24 @@ class QuizService {
     }));
 
     return weeklyQuestions;
+  }
+
+  async formatQuestions(questions, orgId, category) {
+    const weeklyQuestions = questions.map((curr) => ({
+      ...curr,
+      source: 'AI',
+      category: category,
+      status: 'live',
+      org: orgId,
+    }));
+
+    return weeklyQuestions;
+  }
+
+  async cleanWeeklyQuizQuestions(questions, orgId) {
+    await this.quizRepository.cleanWeeklyQuizQuestions(questions, orgId);
+
+    return { status: 200, message: 'Questions cleaned successfully' };
   }
 }
 

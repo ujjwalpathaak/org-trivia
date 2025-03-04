@@ -51,7 +51,7 @@ const employeeSchema = new mongoose.Schema(
       ref: 'usedQuestion',
       default: [],
     },
-    org: {
+    orgId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Org',
       immutable: true,

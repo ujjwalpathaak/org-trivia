@@ -4,18 +4,18 @@ import { ObjectId } from 'mongodb';
 
 class EmployeeRepository {
   async getAllOrgEmployeesByOrgId(orgId) {
-    const employee = await Employee.find({ org: orgId });
+    const employees = await Employee.find({ org: orgId });
 
-    return employee;
+    return employees;
   }
 
-  async updateWeeklyQuizScore(employeeId, newScore) {
-    const employee = await Employee.updateOne(
+  async updateWeeklyQuizScore(employeeId, updatedWeeklyQuizScore) {
+    await Employee.updateOne(
       { _id: new ObjectId(employeeId) },
-      { $inc: { currentPoints: newScore } },
+      { $inc: { currentPoints: updatedWeeklyQuizScore } },
     );
 
-    return employee;
+    return;
   }
 }
 

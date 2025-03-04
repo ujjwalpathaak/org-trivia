@@ -21,7 +21,7 @@ class QuestionRepository {
     return await WeeklyQuestion.insertMany(newQuestions);
   }
 
-  // get quizID & then get questions for that qioz od
+  // get quizID & then get questions for that qioz odf
   async getWeeklyUnapprovedQuestions(orgId) {
     const quiz = await Quiz.findOne({ orgId: new ObjectId(orgId) });
     const quizId = quiz._id;
@@ -31,13 +31,19 @@ class QuestionRepository {
     return weeklyQuizQuestions;
   }
 
-  async weeklyQuizAnswers(orgId) {
-    const questions = await WeeklyQuestion.find({ org: new ObjectId(orgId) })
+  async getWeeklyQuizCorrectAnswers(orgId) {
+    const weeklyQuizCorrectAnswers = await WeeklyQuestion.find({
+      orgId: new ObjectId(orgId),
+    })
       .select('question._id question.answer')
       .lean();
-    return questions.map((curr) => {
-      return curr.question;
-    });
+
+    const formatedWeeklyQuizCorrectAnswers = weeklyQuizCorrectAnswers.map(
+      (curr) => curr.question,
+    );
+    console.log(formatedWeeklyQuizCorrectAnswers);
+
+    return formatedWeeklyQuizCorrectAnswers;
   }
 
   async saveHRdocQuestions(orgId, questions) {
@@ -51,7 +57,14 @@ class QuestionRepository {
       category,
       quizId,
     );
+    const formatedQuestions = await quizService.formatQuestions(
+      questions,
+      orgId,
+      category,
+    );
     const response = await this.saveWeeklyQuizQuestions(weeklyQuestions);
+    await this.questions(formatedQuestions);
+
     return response;
   }
 
