@@ -48,6 +48,16 @@ class CronTestController {
     }
   }
 
+  async makeQuizLiveTest(req, res, next) {
+    try {
+      await quizService.makeQuizLiveTest();
+
+      res.status(200).json({});
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async cleanWeeklyQuiz(req, res, next) {
     try {
       const response = await quizService.cleanWeeklyQuizQuestions();

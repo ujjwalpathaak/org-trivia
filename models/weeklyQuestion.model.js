@@ -56,12 +56,6 @@ const questionSchema = new mongoose.Schema(
       type: Date,
       default: Date.now,
     },
-    orgId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Org',
-      immutable: true,
-      required: true,
-    },
   },
   { timestamps: true },
 );
@@ -79,7 +73,7 @@ const weeklyQuestionSchema = new mongoose.Schema(
       required: true,
     },
     question: questionSchema,
-    org: {
+    orgId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Org',
       immutable: true,

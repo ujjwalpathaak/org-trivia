@@ -12,16 +12,14 @@ class QuestionController {
       }
 
       const isQuestionAdded = await questionService.saveQuestion(question);
-      if(!isQuestionAdded) res.status(404).json({ message: 'Not able to save question' });
+      if (!isQuestionAdded)
+        res.status(404).json({ message: 'Not able to save question' });
 
-      res.status(200).json({message: 'New question saved successfully'});
+      res.status(200).json({ message: 'New question saved successfully' });
     } catch (error) {
       next(error);
     }
   }
-
-  // ----------------------------------------------------------------
-
   async getWeeklyUnapprovedQuestions(req, res, next) {
     try {
       const { orgId } = req.params;
@@ -29,14 +27,21 @@ class QuestionController {
         return res.status(400).json({ message: 'Missing required fields' });
       }
 
-      const response =
+      const weeklyUnapprovedQuestions =
         await questionService.getWeeklyUnapprovedQuestions(orgId);
 
-      res.status(response.status).json(response.data);
+      if (!weeklyUnapprovedQuestions)
+        return res
+          .status(404)
+          .json({ message: 'No questions scheduled till now' });
+
+      res.status(200).json(weeklyUnapprovedQuestions);
     } catch (error) {
       next(error);
     }
   }
+
+  // ----------------------------------------------------------------
 
   async saveHRdocQuestions(req, res, next) {
     try {

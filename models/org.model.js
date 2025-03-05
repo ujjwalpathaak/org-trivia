@@ -6,19 +6,72 @@ const orgSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
-  questions: {
-    type: [mongoose.Schema.Types.ObjectId],
-    ref: 'Question',
+  questionsPnA: {
+    type: [
+      {
+        questionId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'Question',
+        },
+        isUsed: {
+          type: Boolean,
+          default: false,
+        },
+        category: {
+          type: String,
+          enum: ['BloodRelation', 'Direction', 'Analytical', 'Arithmetic'],
+          required: true,
+          default: 'PnA',
+        },
+      },
+    ],
+    default: [],
+  },
+  questionsHRD: {
+    type: [
+      {
+        questionId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'Question',
+        },
+        isUsed: {
+          type: Boolean,
+          default: false,
+        },
+        category: {
+          type: String,
+          required: true,
+        },
+      },
+    ],
+    default: [],
+  },
+  questionsCAnIT: {
+    type: [
+      {
+        questionId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'Question',
+        },
+        isUsed: {
+          type: Boolean,
+          default: false,
+        },
+        category: {
+          type: String,
+          enum: ['CompanyNews', 'IndustryNews'],
+          required: true,
+        },
+      },
+    ],
     default: [],
   },
   admins: {
-    type: [mongoose.Schema.Types.ObjectId],
-    ref: 'Admins',
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Admins' }],
     default: [],
   },
   employees: {
-    type: [mongoose.Schema.Types.ObjectId],
-    ref: 'Employees',
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Employees' }],
     default: [],
   },
   settings: {

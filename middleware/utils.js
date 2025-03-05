@@ -11,7 +11,7 @@ export const logService = (request, response, next) => {
   });
 };
 
-export const getNextFriday = () => {
+export const getNextFridayDate = () => {
   const today = new Date();
   const dayOfWeek = today.getDay();
   const daysUntilFriday = (5 - dayOfWeek + 7) % 7 || 7;

@@ -57,6 +57,10 @@ const employeeSchema = new mongoose.Schema(
       immutable: true,
       required: true,
     },
+    isQuizGiven: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true },
 );

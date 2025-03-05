@@ -13,7 +13,10 @@ class EmployeeRepository {
   async updateWeeklyQuizScore(employeeId, updatedWeeklyQuizScore) {
     await Employee.updateOne(
       { _id: new ObjectId(employeeId) },
-      { $inc: { currentPoints: updatedWeeklyQuizScore } },
+      {
+        $inc: { currentPoints: updatedWeeklyQuizScore },
+        $set: { isQuizGiven: true },
+      },
     );
 
     return;

@@ -2,9 +2,10 @@
 
 ## ⏳ Cron Jobs
 
-| Task                                             | Frequency               | Name                              |
-| ------------------------------------------------ | ----------------------- | --------------------------------- |
-| **Approve Next Week Questions Request to Admin** | Every friday at 12:01am | scheduleNextWeekQuestionsApproval |
+| Task                                             | Frequency                 | Name                              |
+| ------------------------------------------------ | ------------------------- | --------------------------------- |
+| **Approve Next Week Questions Request to Admin** | Every saturday at 12:01am | scheduleNextWeekQuestionsApproval |
+| **Approve Next Week Questions Request to Admin** | Every friday at 12:01am   | scheduleNextWeekQuestionsApproval |
 
 ## 🔌 API Endpoints
 

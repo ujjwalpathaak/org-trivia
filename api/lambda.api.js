@@ -26,9 +26,9 @@ export const refactorPnAQuestionsToOrgContext = async (
     );
   }
 
-  const finalPnAQuestions = await response.json();
+  const refactoredPnAQuestions = await response.json();
 
-  return finalPnAQuestions;
+  return refactoredPnAQuestions;
 };
 
 export const fetchNewCAnITQuestions = async (

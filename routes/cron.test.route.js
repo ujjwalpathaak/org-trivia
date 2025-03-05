@@ -16,4 +16,6 @@ cronTestRouter.post(
 
 cronTestRouter.post('/cleanWeeklyQuiz', cronTestController.cleanWeeklyQuiz);
 
+cronTestRouter.post('/makeQuizLiveTest', cronTestController.makeQuizLiveTest);
+
 export default cronTestRouter;

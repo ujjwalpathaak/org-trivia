@@ -1,4 +1,5 @@
 import Answer from '../models/answer.model.js';
+import Employee from '../models/employee.model.js';
 import EmployeeRepository from '../repositories/employee.repository.js';
 import EmployeeService from '../services/employee.service.js';
 
@@ -32,14 +33,13 @@ class AnswerRepository {
       userAnswersJSON,
       correctAnswers,
     );
-    console.log(weeklyQuizScore);
 
-    // await Answer.insert({
-    //   answers: userAnswersJSON,
-    //   currentPoints: weeklyQuizScore,
-    //   employeeId: employeeId,
-    //   quizId: quizId,
-    // });
+    await Answer.insert({
+      answers: userAnswersJSON,
+      currentPoints: weeklyQuizScore,
+      employeeId: employeeId,
+      quizId: quizId,
+    });
 
     await employeeSerivce.updateWeeklyQuizScore(employeeId, weeklyQuizScore);
 

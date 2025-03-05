@@ -8,7 +8,7 @@ const quizService = new QuizService(new QuizRepository());
 const questionService = new QuestionService(new QuestionRepository());
 
 export const scheduleNextWeekQuestionsApproval = cron.schedule(
-  '1 0 * * 5',
+  '5 0 * * 6',
   async () => {
     console.log('Running Scheduled Task: Next Week Questions Approval...');
 
@@ -19,12 +19,24 @@ export const scheduleNextWeekQuestionsApproval = cron.schedule(
   { scheduled: true, timezone: 'UTC' },
 );
 
-export const cleanWeeklyQuiz = cron.schedule(
-  '1 0 * * 7',
+export const cleanUpWeeklyQuiz = cron.schedule(
+  '1 0 * * 5',
   async () => {
-    console.log('Running Scheduled Task: Clean Week Quiz...');
+    console.log('Running Scheduled Task: Clean Up Weekly Quiz...');
 
-    await quizService.cleanWeeklyQuizQuestions();
+    await quizService.cleanUpWeeklyQuiz();
+    // .then(() => console.log('Successfully scheduled new questions for all organizations.'))
+    // .catch((error) => console.error('Error scheduling questions:', error));
+  },
+  { scheduled: true, timezone: 'UTC' },
+);
+
+export const makeWeeklyQuizLive = cron.schedule(
+  '1 0 * * 5',
+  async () => {
+    console.log('Running Scheduled Task: Make Weekly Quiz Live...');
+
+    await quizService.makeWeeklyQuizLive();
     // .then(() => console.log('Successfully scheduled new questions for all organizations.'))
     // .catch((error) => console.error('Error scheduling questions:', error));
   },

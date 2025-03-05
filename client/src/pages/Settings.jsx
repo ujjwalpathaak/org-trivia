@@ -1,21 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import { useOrgId } from '../context/auth.context';
 import { getSettings, toggleTrivia } from '../api';
+import ListManager from '../components/ListManager';
 
 const Settings = () => {
   const [isTriviaEnabled, setIsTriviaEnabled] = useState(false);
-  const [selectedGenre, setSelectedGenre] = useState(['loading']);
+  const [selectedGenre, setSelectedGenre] = useState([]);
   const [currentGenre, setCurrentGenre] = useState(0);
+  const [settings, setSettings] = useState(null);
 
   const orgId = useOrgId();
 
   useEffect(() => {
     const fetchSettings = async () => {
       if (!orgId) return;
-
       try {
         const response = await getSettings(orgId);
+        console.log('Fetched Settings:', response);
 
+        setSettings(response);
         setIsTriviaEnabled(response.isTriviaEnabled);
         setCurrentGenre(response.currentGenre);
         setSelectedGenre(response.selectedGenre);
@@ -27,9 +30,8 @@ const Settings = () => {
     fetchSettings();
   }, [orgId]);
 
-  const toggleIsTriviaEnabled = () => {
-    setIsTriviaEnabled(!isTriviaEnabled);
-    toggleTrivia(orgId);
+  const toggleIsTriviaEnabled = async () => {
+    await toggleTrivia(orgId);
   };
 
   return (
@@ -52,42 +54,11 @@ const Settings = () => {
               ></div>
             </button>
           </div>
-          {/* <div className="mt-4">
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white">
-              Genres
-            </h3>
-            <div className="flex gap-2 mt-2">
-              <input
-                type="text"
-                value={newGenre}
-                onChange={(e) => setNewGenre(e.target.value)}
-                className="p-2 border rounded-lg w-full"
-                placeholder="Add a genre"
-              />
-              <button
-                onClick={addGenre}
-                className="p-2 bg-blue-500 text-white rounded-lg"
-              >
-                Add
-              </button>
-            </div>
-            <ul className="mt-2 space-y-2">
-              {genres.map((genre, index) => (
-                <li
-                  key={index}
-                  className="flex justify-between p-2 bg-gray-200 rounded-lg"
-                >
-                  {genre}
-                  <button
-                    onClick={() => removeGenre(index)}
-                    className="text-red-500"
-                  >
-                    Remove
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div> */}
+          <hr></hr>
+          <h3 className="mb-2">Genres</h3>
+          {settings && (
+            <ListManager orgId={orgId} selectedGenre={settings.selectedGenre} />
+          )}
         </div>
       </div>
     </div>

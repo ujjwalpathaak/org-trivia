@@ -46,13 +46,6 @@ const questionSchema = new mongoose.Schema(
       required: true,
       default: 'extra',
     },
-    /*
-    PnA - 
-    {
-      refactor: true | false,
-      puzzleCategory: Direction | Number | Time | Arithmetic | Blood
-    }
-    */
     config: {
       type: Object,
       default: {},
@@ -67,12 +60,6 @@ const questionSchema = new mongoose.Schema(
     lastModifiedAt: {
       type: Date,
       default: Date.now,
-    },
-    org: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Org',
-      immutable: true,
-      default: null,
     },
   },
   { timestamps: true },

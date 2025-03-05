@@ -21,5 +21,11 @@ orgRouter.get(
   checkRole('Admin'),
   orgController.getSettings,
 );
+orgRouter.post(
+  '/settings/genre/:orgId',
+  // protectRoute,
+  // checkRole('Admin'),
+  orgController.changeGenreSettings,
+);
 
 export default orgRouter;

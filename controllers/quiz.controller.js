@@ -7,17 +7,51 @@ const quizService = new QuizService(new QuizRepository());
 const questionService = new QuestionService(new QuestionRepository());
 
 class QuizController {
-  async getNextWeeklyQuizDate(req, res, next){
-    try{
-      const { orgId } = req.params;
-      if(!orgId) return res.status(404).json({ message: 'Missing organizationId' });
+  async isWeeklyQuizLive(req, res, next) {
+    try {
+      const { orgId, employeeId } = req.params;
+      if (!orgId || !employeeId)
+        return res.status(404).json({ message: 'Missing organizationId' });
 
-      const nextWeeklyQuizDate = await quizService.getNextWeeklyQuizDate(orgId);
-      if(!nextWeeklyQuizDate) res.status(404).json({ message: 'No quiz scheduled for next week' });
+      const isWeeklyQuizLive = await quizService.isWeeklyQuizLive(
+        orgId,
+        employeeId,
+      );
 
-      res.status(200).json(nextWeeklyQuizDate);
+      res.status(200).json(isWeeklyQuizLive);
+    } catch (error) {
+      next(error);
     }
-    catch(error){
+  }
+
+  async getWeeklyQuizQuestions(req, res, next) {
+    try {
+      const { orgId } = req.params;
+      if (!orgId) {
+        return res.status(400).json({ message: 'Missing required fields' });
+      }
+
+      const weeklyQuizQuestions =
+        await quizService.getWeeklyQuizQuestions(orgId);
+
+      res.status(200).json(weeklyQuizQuestions);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async approveWeeklyQuizQuestions(req, res, next) {
+    try {
+      const { orgId } = req.params;
+      const questions = req.body;
+      if (!orgId || !questions) {
+        return res.status(400).json({ message: 'Missing required fields' });
+      }
+
+      await quizService.approveWeeklyQuizQuestions(questions, orgId);
+
+      res.status(200).json({ message: 'Questions marked as approved' });
+    } catch (error) {
       next(error);
     }
   }
@@ -51,40 +85,6 @@ class QuizController {
       }
 
       const response = await quizService.scheduleNewQuiz(orgId);
-
-      res.status(response.status).json(response.data);
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  async approveWeeklyQuizQuestions(req, res, next) {
-    try {
-      const { orgId } = req.params;
-      const questions = req.body;
-      if (!orgId || !questions) {
-        return res.status(400).json({ message: 'Missing required fields' });
-      }
-
-      const response = await quizService.approveWeeklyQuizQuestions(
-        questions,
-        orgId,
-      );
-
-      res.status(200).json({ message: 'Questions marked as approved' });
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  async getWeeklyQuizQuestions(req, res, next) {
-    try {
-      const { orgId } = req.params;
-      if (!orgId) {
-        return res.status(400).json({ message: 'Missing required fields' });
-      }
-
-      const response = await quizService.getWeeklyQuizQuestions(orgId);
 
       res.status(response.status).json(response.data);
     } catch (error) {

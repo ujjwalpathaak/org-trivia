@@ -1,6 +1,9 @@
-import { useEffect, useState } from 'react';
-import { getQuestionsToApprove, handleScheduleWeeklyQuiz } from '../api.js';
+import { useEffect, useRef, useState } from 'react';
+import { getQuestionsToApprove, handleApproveWeeklyQuiz } from '../api.js';
 import { useOrgId } from '../context/auth.context.jsx';
+import { useNavigate } from 'react-router-dom';
+
+import { toast } from 'react-toastify';
 
 export default function ScheduleQuestions() {
   const [aiQuestions, setAiQuestions] = useState([
@@ -24,6 +27,7 @@ export default function ScheduleQuestions() {
   ]);
   const [customQuestions, setCustomQuestions] = useState([]);
   const [newQuestion, setNewQuestion] = useState('');
+  const navigate = useNavigate();
   const [uploadedFile, setUploadedFile] = useState(null);
 
   const getNextWeek = () => {
@@ -44,18 +48,29 @@ export default function ScheduleQuestions() {
   const [questions, setQuestions] = useState([]);
   const orgId = useOrgId();
 
+  const noQuestionFound = () => toast('No questions found to approve');
+  const toastShownRef = useRef(false);
+
   useEffect(() => {
     const getQuestionsToApproveFunc = async () => {
       const response = await getQuestionsToApprove(orgId);
-      setQuestions(response);
+      if (response.status === 404) {
+        if (!toastShownRef.current) {
+          noQuestionFound();
+          toastShownRef.current = true;
+        }
+        navigate('/dashboard');
+        return;
+      }
+      setQuestions(response.data);
     };
 
     getQuestionsToApproveFunc();
   }, []);
 
-  const handleScheduleQuiz = async () => {
+  const handleApproveQuiz = async () => {
     // Schedule the quiz here
-    await handleScheduleWeeklyQuiz(questions, orgId);
+    await handleApproveWeeklyQuiz(questions, orgId);
   };
 
   const addCustomQuestion = () => {
@@ -213,7 +228,7 @@ export default function ScheduleQuestions() {
             />
           </div>
           <button
-            onClick={handleScheduleQuiz}
+            onClick={handleApproveQuiz}
             className="bg-green-500 p-2 rounded-md ml-6"
           >
             Schedule Quiz

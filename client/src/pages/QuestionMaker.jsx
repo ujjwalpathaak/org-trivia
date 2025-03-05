@@ -15,10 +15,9 @@ const QuestionMaker = () => {
     options: ['', '', '', ''],
     image: null,
     source: 'Employee',
-    org: orgId,
-    config: {},
+    orgId: orgId,
     category: '',
-    config: { isUsed: false, puzzleType: '', refactor: false },
+    config: { puzzleType: '', refactor: false },
   });
 
   const notifyQuestionSubmitted = () => toast('New question submitted!');

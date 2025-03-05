@@ -4,8 +4,11 @@
     "img": "https://www.indiabix.com/_files/images/non-verbal-reasoning/analytical-reasoning/16.png",
     "options": ["6", "9", "12", "15"],
     "answer": 2,
+"source": "Employee",
+"category": "PnA",
+"status": "extra",
     "config": {
-      "isUsed": false,
+      
       "puzzleType": "Analytical",
       "refactor": false
     }
@@ -16,7 +19,7 @@
     "options": ["15", "17", "18", "20"],
     "answer": 1,
     "config": {
-      "isUsed": false,
+      
       "puzzleType": "Analytical",
       "refactor": false
     }
@@ -26,8 +29,11 @@
     "img": "https://www.indiabix.com/_files/images/non-verbal-reasoning/analytical-reasoning/17.png",
     "options": ["21", "24", "27", "30"],
     "answer": 2,
+"source": "Employee",
+"category": "PnA",
+"status": "extra",
     "config": {
-      "isUsed": false,
+      
       "puzzleType": "Analytical",
       "refactor": false
     }
@@ -38,7 +44,7 @@
     "options": ["28", "30", "31", "33"],
     "answer": 1,
     "config": {
-      "isUsed": false,
+      
       "puzzleType": "Analytical",
       "refactor": false
     }
@@ -49,7 +55,7 @@
     "options": ["10", "18", "22", "25"],
     "answer": 1,
     "config": {
-      "isUsed": false,
+      
       "puzzleType": "Analytical",
       "refactor": false
     }
@@ -59,8 +65,11 @@
     "img": "https://www.indiabix.com/_files/images/non-verbal-reasoning/analytical-reasoning/23.png",
     "options": ["16", "20", "23", "26"],
     "answer": 2,
+"source": "Employee",
+"category": "PnA",
+"status": "extra",
     "config": {
-      "isUsed": false,
+      
       "puzzleType": "Analytical",
       "refactor": false
     }
@@ -70,8 +79,11 @@
     "img": "https://www.indiabix.com/_files/images/non-verbal-reasoning/analytical-reasoning/29.png",
     "options": ["30", "32", "35", "38"],
     "answer": 2,
+"source": "Employee",
+"category": "PnA",
+"status": "extra",
     "config": {
-      "isUsed": false,
+      
       "puzzleType": "Analytical",
       "refactor": false
     }
@@ -82,7 +94,7 @@
     "options": ["2", "4", "5", "6"],
     "answer": 1,
     "config": {
-      "isUsed": false,
+      
       "puzzleType": "Analytical",
       "refactor": false
     }
@@ -93,7 +105,7 @@
     "options": ["3", "5", "7", "8"],
     "answer": 1,
     "config": {
-      "isUsed": false,
+      
       "puzzleType": "Analytical",
       "refactor": false
     }
@@ -103,8 +115,11 @@
     "img": "https://www.indiabix.com/_files/images/non-verbal-reasoning/analytical-reasoning/25.png",
     "options": ["14", "17", "19", "22"],
     "answer": 2,
+"source": "Employee",
+"category": "PnA",
+"status": "extra",
     "config": {
-      "isUsed": false,
+      
       "puzzleType": "Analytical",
       "refactor": false
     }
@@ -115,7 +130,7 @@
     "options": ["14", "16", "18", "20"],
     "answer": 1,
     "config": {
-      "isUsed": false,
+      
       "puzzleType": "Analytical",
       "refactor": false
     }
@@ -125,8 +140,11 @@
     "img": "https://www.indiabix.com/_files/images/non-verbal-reasoning/analytical-reasoning/22.png",
     "options": ["17", "21", "28", "32"],
     "answer": 2,
+"source": "Employee",
+"category": "PnA",
+"status": "extra",
     "config": {
-      "isUsed": false,
+      
       "puzzleType": "Analytical",
       "refactor": false
     }
@@ -136,8 +154,11 @@
     "img": "https://www.indiabix.com/_files/images/non-verbal-reasoning/analytical-reasoning/27.png",
     "options": ["22", "25", "28", "31"],
     "answer": 2,
+"source": "Employee",
+"category": "PnA",
+"status": "extra",
     "config": {
-      "isUsed": false,
+      
       "puzzleType": "Analytical",
       "refactor": false
     }
@@ -148,7 +169,7 @@
     "options": ["12", "14", "16", "18"],
     "answer": 1,
     "config": {
-      "isUsed": false,
+      
       "puzzleType": "Analytical",
       "refactor": false
     }
@@ -159,7 +180,7 @@
     "options": ["Son", "Brother", "Cousin", "Brother-in-law"],
     "answer": 1,
     "config": {
-      "isUsed": false,
+      
       "puzzleType": "BloodRelations",
       "refactor": false
     }
@@ -170,7 +191,7 @@
     "options": ["Daughter", "Son", "Nephew", "Cannot be decided"],
     "answer": 1,
     "config": {
-      "isUsed": false,
+      
       "puzzleType": "BloodRelations",
       "refactor": false
     }
@@ -181,7 +202,7 @@
     "options": ["Mother-in-law", "Aunt", "Wife", "None of these"],
     "answer": 3,
     "config": {
-      "isUsed": false,
+      
       "puzzleType": "BloodRelations",
       "refactor": false
     }
@@ -197,7 +218,7 @@
     ],
     "answer": 1,
     "config": {
-      "isUsed": false,
+      
       "puzzleType": "BloodRelations",
       "refactor": false
     }
@@ -208,7 +229,7 @@
     "options": ["Sister", "Grandmother", "Mother-in-law", "Mother"],
     "answer": 3,
     "config": {
-      "isUsed": false,
+      
       "puzzleType": "BloodRelations",
       "refactor": false
     }
@@ -219,7 +240,7 @@
     "options": ["Brother", "Uncle", "Cousin", "Father"],
     "answer": 3,
     "config": {
-      "isUsed": false,
+      
       "puzzleType": "BloodRelations",
       "refactor": false
     }
@@ -234,8 +255,11 @@
       "Q - S % P"
     ],
     "answer": 2,
+"source": "Employee",
+"category": "PnA",
+"status": "extra",
     "config": {
-      "isUsed": false,
+      
       "puzzleType": "BloodRelations",
       "refactor": false
     }
@@ -246,7 +270,7 @@
     "options": ["Brother", "Sister", "Nephew", "Cannot be determined"],
     "answer": 3,
     "config": {
-      "isUsed": false,
+      
       "puzzleType": "BloodRelations",
       "refactor": false
     }
@@ -262,7 +286,7 @@
     ],
     "answer": 3,
     "config": {
-      "isUsed": false,
+      
       "puzzleType": "BloodRelations",
       "refactor": false
     }
@@ -273,7 +297,7 @@
     "options": ["Brother", "Nephew", "Uncle", "Son-in-law"],
     "answer": 0,
     "config": {
-      "isUsed": false,
+      
       "puzzleType": "BloodRelations",
       "refactor": false
     }
@@ -284,7 +308,7 @@
     "options": ["45", "60", "75", "90"],
     "answer": 3,
     "config": {
-      "isUsed": false,
+      
       "puzzleType": "Arithmetic",
       "refactor": true
     }
@@ -294,8 +318,11 @@
     "img": null,
     "options": ["20", "80", "100", "200"],
     "answer": 2,
+"source": "Employee",
+"category": "PnA",
+"status": "extra",
     "config": {
-      "isUsed": false,
+      
       "puzzleType": "Arithmetic",
       "refactor": true
     }
@@ -306,7 +333,7 @@
     "options": ["₹3500", "₹3750", "₹3840", "₹3900"],
     "answer": 3,
     "config": {
-      "isUsed": false,
+      
       "puzzleType": "Arithmetic",
       "refactor": true
     }
@@ -317,7 +344,7 @@
     "options": ["10", "12", "15", "18"],
     "answer": 0,
     "config": {
-      "isUsed": false,
+      
       "puzzleType": "Arithmetic",
       "refactor": false
     }
@@ -328,7 +355,7 @@
     "options": ["₹1200", "₹2400", "₹4800", "Cannot be determined"],
     "answer": 1,
     "config": {
-      "isUsed": false,
+      
       "puzzleType": "Arithmetic",
       "refactor": true
     }
@@ -339,7 +366,7 @@
     "options": ["160", "175", "180", "195"],
     "answer": 1,
     "config": {
-      "isUsed": false,
+      
       "puzzleType": "Arithmetic",
       "refactor": true
     }
@@ -349,8 +376,11 @@
     "img": null,
     "options": ["256", "432", "512", "640", "None of these"],
     "answer": 2,
+"source": "Employee",
+"category": "PnA",
+"status": "extra",
     "config": {
-      "isUsed": false,
+      
       "puzzleType": "Arithmetic",
       "refactor": false
     }
@@ -361,7 +391,7 @@
     "options": ["22", "23", "24", "26"],
     "answer": 3,
     "config": {
-      "isUsed": false,
+      
       "puzzleType": "Arithmetic",
       "refactor": true
     }
@@ -371,8 +401,11 @@
     "img": null,
     "options": ["19", "28", "30", "37"],
     "answer": 2,
+"source": "Employee",
+"category": "PnA",
+"status": "extra",
     "config": {
-      "isUsed": false,
+      
       "puzzleType": "Arithmetic",
       "refactor": true
     }
@@ -383,7 +416,7 @@
     "options": ["35", "36", "45", "54"],
     "answer": 3,
     "config": {
-      "isUsed": false,
+      
       "puzzleType": "Arithmetic",
       "refactor": false
     }
@@ -394,7 +427,7 @@
     "options": ["9", "11", "13", "15"],
     "answer": 3,
     "config": {
-      "isUsed": false,
+      
       "puzzleType": "Arithmetic",
       "refactor": false
     }
@@ -405,7 +438,7 @@
     "options": ["3", "4", "9", "Cannot be determined", "None of these"],
     "answer": 1,
     "config": {
-      "isUsed": false,
+      
       "puzzleType": "Arithmetic",
       "refactor": false
     }
@@ -416,7 +449,7 @@
     "options": ["4", "8", "16", "None of these"],
     "answer": 1,
     "config": {
-      "isUsed": false,
+      
       "puzzleType": "Arithmetic",
       "refactor": false
     }
@@ -427,7 +460,7 @@
     "options": ["18", "24", "42", "81"],
     "answer": 1,
     "config": {
-      "isUsed": false,
+      
       "puzzleType": "Arithmetic",
       "refactor": false
     }
@@ -438,7 +471,7 @@
     "options": ["69", "78", "96", "Cannot be determined", "None of these"],
     "answer": 3,
     "config": {
-      "isUsed": false,
+      
       "puzzleType": "Arithmetic",
       "refactor": false
     }
@@ -449,7 +482,7 @@
     "options": ["20", "30", "40", "None of these"],
     "answer": 0,
     "config": {
-      "isUsed": false,
+      
       "puzzleType": "Arithmetic",
       "refactor": false
     }
@@ -460,7 +493,7 @@
     "options": ["3", "5", "9", "11"],
     "answer": 3,
     "config": {
-      "isUsed": false,
+      
       "puzzleType": "Arithmetic",
       "refactor": false
     }
@@ -471,7 +504,7 @@
     "options": ["24", "26", "42", "46"],
     "answer": 0,
     "config": {
-      "isUsed": false,
+      
       "puzzleType": "Arithmetic",
       "refactor": false
     }
@@ -482,7 +515,7 @@
     "options": ["3", "10", "17", "20"],
     "answer": 0,
     "config": {
-      "isUsed": false,
+      
       "puzzleType": "Arithmetic",
       "refactor": false
     }
@@ -492,8 +525,11 @@
     "img": null,
     "options": ["East", "West", "North", "South"],
     "answer": 2,
+"source": "Employee",
+"category": "PnA",
+"status": "extra",
     "config": {
-      "isUsed": false,
+      
       "puzzleType": "Direction",
       "refactor": false
     }
@@ -504,7 +540,7 @@
     "options": ["North", "South", "South-East", "None of these"],
     "answer": 3,
     "config": {
-      "isUsed": false,
+      
       "puzzleType": "Direction",
       "refactor": false
     }
@@ -515,7 +551,7 @@
     "options": ["North-East", "North-West", "South-East", "South-West"],
     "answer": 1,
     "config": {
-      "isUsed": false,
+      
       "puzzleType": "Direction",
       "refactor": false
     }
@@ -525,8 +561,11 @@
     "img": null,
     "options": ["West", "South", "North-East", "South-West"],
     "answer": 2,
+"source": "Employee",
+"category": "PnA",
+"status": "extra",
     "config": {
-      "isUsed": false,
+      
       "puzzleType": "Direction",
       "refactor": true
     }
@@ -537,7 +576,7 @@
     "options": ["South-East", "South", "North", "West"],
     "answer": 3,
     "config": {
-      "isUsed": false,
+      
       "puzzleType": "Direction",
       "refactor": true
     }
@@ -548,7 +587,7 @@
     "options": ["East", "West", "South", "Data inadequate"],
     "answer": 1,
     "config": {
-      "isUsed": false,
+      
       "puzzleType": "Direction",
       "refactor": false
     }
@@ -559,7 +598,7 @@
     "options": ["10 km", "16 km", "14 km", "2 km"],
     "answer": 0,
     "config": {
-      "isUsed": false,
+      
       "puzzleType": "Direction",
       "refactor": false
     }
@@ -569,8 +608,11 @@
     "img": null,
     "options": ["West", "South", "South-West", "South-East"],
     "answer": 2,
+"source": "Employee",
+"category": "PnA",
+"status": "extra",
     "config": {
-      "isUsed": false,
+      
       "puzzleType": "Direction",
       "refactor": true
     }
@@ -581,7 +623,7 @@
     "options": ["North-East", "South", "North", "South-West"],
     "answer": 1,
     "config": {
-      "isUsed": false,
+      
       "puzzleType": "Direction",
       "refactor": true
     }
@@ -592,7 +634,7 @@
     "options": ["North", "South", "East", "West"],
     "answer": 0,
     "config": {
-      "isUsed": false,
+      
       "puzzleType": "Direction",
       "refactor": false
     }

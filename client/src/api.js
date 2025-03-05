@@ -38,7 +38,7 @@ export const getEmployeesByOrg = async (orgId) => {
       Authorization: `Bearer ${token}`,
     },
   });
-  const responseJSON = await response.json()
+  const responseJSON = await response.json();
   return responseJSON;
 };
 
@@ -64,6 +64,28 @@ export const createNewQuestion = async (formData) => {
   }
 };
 
+export const saveGenreSettings = async (newGenres, orgId) => {
+  try {
+    const response = await fetch(`${BACKEND_URL}/org/settings/genre/${orgId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(newGenres),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to save genre settings');
+    }
+
+    return await response.json();
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+};
+
 export const getQuestionsToApprove = async (orgId) => {
   try {
     const response = await fetch(
@@ -77,12 +99,7 @@ export const getQuestionsToApprove = async (orgId) => {
       },
     );
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Failed to create question');
-    }
-
-    return await response.json();
+    return { status: response.status, data: await response.json() };
   } catch (error) {
     return { success: false, error: error.message };
   }
@@ -154,9 +171,9 @@ export const toggleTrivia = async (orgId) => {
   }
 };
 
-export const handleScheduleWeeklyQuiz = async (questions, orgId) => {
+export const handleApproveWeeklyQuiz = async (questions, orgId) => {
   try {
-    const response = await fetch(`${BACKEND_URL}/quiz/schedule/${orgId}`, {
+    const response = await fetch(`${BACKEND_URL}/quiz/approve/${orgId}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -212,33 +229,26 @@ export const submitWeeklyQuizAnswers = async (
   }
 };
 
-// const getWeeklyQuizStatus = async (orgId) => {
-//   try {
-//     // const response = await fetch(`${BACKEND_URL}/quiz/next/date/${orgId}`, {
-//     //   method: 'GET',
-//     //   headers: {
-//     //     'Content-Type': 'application/json',
-//     //     Authorization: `Bearer ${token}`,
-//     //   },
-//     // });
+export const isWeeklyQuizLive = async (orgId, employeeId) => {
+  try {
+    const response = await fetch(
+      `${BACKEND_URL}/quiz/status/${orgId}/${employeeId}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
 
-//     // if (!response.ok) {
-//     //   const errorData = await response.json();
-//     //   throw new Error(errorData.message || 'Failed to create question');
-//     // }
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to create question');
+    }
 
-//     // const nextWeeklyQuizDate = await response.json();
-
-//     // console.log(nextWeeklyQuizDate)
-
-//     // return {
-//     //   isQuizAccessible,
-//     //   nextWeeklyQuizDate,
-//     // };
-
-//     return true;
-
-//   } catch (error) {
-//     return { success: false, error: error.message };
-//   }
-// }
+    return await response.json();
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+};

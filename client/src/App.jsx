@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { AuthProvider, ProtectedRoute } from './context/auth.context.jsx';
+import { AuthProvider } from './context/auth.context.jsx';
 
 import Auth from './pages/Auth.jsx';
 import Dashboard from './pages/Dashboard';
@@ -10,6 +10,7 @@ import Quiz from './pages/Quiz.jsx';
 import { ToastContainer } from 'react-toastify';
 import ApproveQuestions from './pages/ApproveQuestions.jsx';
 import Settings from './pages/Settings.jsx';
+import { ProtectedRoute } from './components/ProtectedRoute.jsx';
 
 function App() {
   return (

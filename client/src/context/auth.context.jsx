@@ -1,6 +1,7 @@
 import { useState, createContext, useContext, useEffect } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import { Navigate } from 'react-router-dom';
+import { isWeeklyQuizLive } from '../api.js';
 
 const AuthContext = createContext({
   isAuthenticated: false,
@@ -71,28 +72,4 @@ export const useOrgId = () => {
 export const useUserId = () => {
   const { data } = useAuth();
   return data?.user?._id || '';
-};
-
-export const ProtectedRoute = ({ children, route }) => {
-  const { isAuthenticated, data, loading } = useAuth();
-  const isQuizLive = true;
-
-  if (loading) return <p>Loading...</p>;
-
-  if (route === 'quiz' && !isQuizLive) {
-    return <Navigate to="/" replace />;
-  }
-
-  if (route === 'approve-questions' && data?.user?.role !== 'Admin') {
-    return <Navigate to="/" replace />;
-  }
-
-  return isAuthenticated ? children : <Navigate to="/" replace />;
-};
-
-export const QuizRoute = ({ children }) => {
-  const { isAuthenticated, loading } = useAuth();
-
-  if (loading) return <p>Loading...</p>;
-  return isAuthenticated ? children : <Navigate to="/" replace />;
 };

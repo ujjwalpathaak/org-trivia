@@ -11,7 +11,8 @@ class EmployeeController {
         return res.status(400).json({ message: 'Missing required fields' });
       }
 
-      const orgEmployees = await employeeService.getAllOrgEmployeesByOrgId(orgId);
+      const orgEmployees =
+        await employeeService.getAllOrgEmployeesByOrgId(orgId);
 
       res.status(200).json(orgEmployees);
     } catch (error) {

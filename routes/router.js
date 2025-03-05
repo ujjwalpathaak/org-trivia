@@ -17,7 +17,7 @@ router.use('/auth', authRouter);
 router.use('/employee', protectRoute, checkRole('Admin'), employeeRouter);
 router.use('/org', orgRouter);
 router.use('/question', questionRouter);
-router.use('/cron', protectRoute, checkRole('Admin'), cronTestRouter);
+router.use('/cron', cronTestRouter);
 router.use('/answer', protectRoute, checkRole('Employee'), answerRouter);
 router.use('/quiz', quizRouter);
 

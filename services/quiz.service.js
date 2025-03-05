@@ -1,60 +1,43 @@
-import { getNextFriday } from '../middleware/utils.js';
+import { getNextFridayDate } from '../middleware/utils.js';
 
 class QuizService {
   constructor(quizRepository) {
     this.quizRepository = quizRepository;
   }
 
-  async getNextWeeklyQuizDate(orgId){
-    const nextWeeklyQuizDate = this.quizRepository.fetchNextWeeklyQuizDate(orgId)
+  async isWeeklyQuizLive(orgId, employeeId) {
+    const isWeeklyQuizLive = this.quizRepository.isWeeklyQuizLive(
+      orgId,
+      employeeId,
+    );
 
-    if (!nextWeeklyQuizDate) {
-      return false;
-    }
-
-    return nextWeeklyQuizDate;
-  }
-// ----------------------------------------------------------------
-  async getWeeklyQuizQuestions(orgId) {
-    const weeklyQuizQuestions =
-      await this.quizRepository.getWeeklyQuizQuestions(orgId);
-
-    return { status: 200, data: weeklyQuizQuestions };
+    return isWeeklyQuizLive;
   }
 
   async scheduleNewQuiz(orgId, genre) {
-    const dateNextFriday = getNextFriday();
+    const dateNextFriday = getNextFridayDate();
 
-    const response = await this.quizRepository.scheduleNewQuiz(
+    const newWeeklyQuiz = await this.quizRepository.scheduleNewQuiz(
       orgId,
       dateNextFriday,
       genre,
     );
+    if (!newWeeklyQuiz) return false;
 
-    return response;
+    return newWeeklyQuiz;
   }
 
-  async approveWeeklyQuizQuestions(questions, orgId) {
-    await this.quizRepository.approveQuizQuestions(questions, orgId);
-  }
+  async formatQuestionsWeeklyFormat(questions, orgId, quizId) {
+    const dateNextFriday = getNextFridayDate();
 
-  async formatWeeklyQuestions(questions, orgId, category, quizId) {
-    const nextFriday = getNextFriday();
-
-    const weeklyQuestions = questions.map((curr) => ({
-      scheduledDate: nextFriday,
+    const formatedWeeklyQuestions = questions.map((curr) => ({
+      scheduledDate: dateNextFriday,
       quizId: quizId,
-      question: {
-        ...curr,
-        source: 'AI',
-        category: category,
-        status: 'live',
-        org: orgId,
-      },
-      org: orgId,
+      question: curr,
+      orgId: orgId,
     }));
 
-    return weeklyQuestions;
+    return formatedWeeklyQuestions;
   }
 
   async formatQuestions(questions, orgId, category) {
@@ -68,6 +51,30 @@ class QuizService {
 
     return weeklyQuestions;
   }
+
+  async makeWeeklyQuizLive() {
+    this.quizRepository.makeWeeklyQuizLive();
+  }
+  async makeQuizLiveTest() {
+    this.quizRepository.makeQuizLiveTest();
+  }
+  async getWeeklyQuizQuestions(orgId) {
+    const weeklyQuizQuestions =
+      await this.quizRepository.getWeeklyQuizQuestions(orgId);
+
+    return weeklyQuizQuestions;
+  }
+
+  async approveWeeklyQuizQuestions(questions, orgId) {
+    await this.quizRepository.approveWeeklyQuizQuestions(questions, orgId);
+  }
+
+  async cleanUpWeeklyQuiz() {
+    this.quizRepository.cleanUpWeeklyQuiz();
+
+    return;
+  }
+  // ----------------------------------------------------------------
 
   async cleanWeeklyQuizQuestions(questions, orgId) {
     await this.quizRepository.cleanWeeklyQuizQuestions(questions, orgId);

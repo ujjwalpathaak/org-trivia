@@ -1,17 +1,26 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { isWeeklyQuizLive } from '../../api';
+import { useOrgId, useUserId } from '../../context/auth.context';
 
 const EmployeeDashboard = () => {
   const navigate = useNavigate();
+  const orgId = useOrgId();
+  const employeeId = useUserId();
   const [isQuizLive, setIsQuizLive] = useState(false);
 
   useEffect(() => {
-    const getQuizLiveStatus = () => {
-      let response = false;
-      setIsQuizLive(response);
+    const fetchIsWeeklyQuizLive = async () => {
+      try {
+        const live = await isWeeklyQuizLive(orgId, employeeId);
+        setIsQuizLive(live);
+      } catch (error) {
+        console.error('Error checking quiz status:', error);
+        setIsQuizLive(false);
+      }
     };
-    getQuizLiveStatus();
-  }, [isQuizLive]);
+    fetchIsWeeklyQuizLive();
+  }, [orgId, employeeId]);
 
   return (
     <div className="bg-gray-100 p-6">
@@ -33,17 +42,9 @@ const EmployeeDashboard = () => {
         <div className="bg-white p-4 rounded-2xl floating-div">
           {isQuizLive ? (
             <>
-              <h2 className="text-lg font-semibold mb-2">Upcoming Quiz</h2>
-              <p className="text-gray-600">
-                Next Quiz: <strong>March 15, 2025</strong>
-              </p>
-              <button className="mt-3 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                View Details
-              </button>
-            </>
-          ) : (
-            <>
-              <h2 className="text-lg font-semibold mb-2">Quiz is live!</h2>
+              <h2 className="text-lg font-semibold mb-2">
+                Weekly Quiz is live!
+              </h2>
               <button
                 onClick={() => navigate('/dashboard/quiz')}
                 className="mt-3 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
@@ -51,9 +52,10 @@ const EmployeeDashboard = () => {
                 Go to quiz
               </button>
             </>
+          ) : (
+            <span className="">Quiz has Ended</span>
           )}
         </div>
-
         <div className="bg-white p-4 rounded-2xl floating-div">
           <h2 className="text-lg font-semibold mb-2">Leaderboard</h2>
           <ul className="text-gray-700">
