@@ -31,32 +31,23 @@ export const refactorPnAQuestionsToOrgContext = async (
   return refactoredPnAQuestions;
 };
 
-export const fetchNewCAnITQuestions = async (
+export const fetchNewCAnITQuestions = (
   orgName,
   orgIndustry,
   orgId,
-  quizId,
+  quizId
 ) => {
-  const response = fetch(API_GATEWAY_URL + '/generateCAnIT_Questions', {
-    method: 'POST',
+  fetch(API_GATEWAY_URL + "/generateCAnIT_Questions", {
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      orgName: orgName,
-      orgIndustry: orgIndustry,
-      orgId: orgId,
-      quizId: quizId,
+      orgName,
+      callbackUrl: "https://392b-183-82-55-162.ngrok-free.app",
+      orgIndustry,
+      orgId,
+      quizId,
     }),
-  });
-
-  if (!response.ok) {
-    throw new Error(
-      `HTTP error! Status: ${response.status}; Message: ${response.message}`,
-    );
-  }
-
-  const finalCAnITQuestions = await response.json();
-
-  return finalCAnITQuestions;
+  }).catch((error) => console.error("Error triggering Lambda:", error));
 };
