@@ -19,22 +19,14 @@ class QuizRepository {
     return false;
   }
 
-  async getStartAndEndDates(date) {
-    const startOfDay = new Date(date);
-    startOfDay.setUTCHours(0, 0, 0, 0);
-
-    const endOfDay = new Date(date);
-    endOfDay.setUTCHours(23, 59, 59, 999);
-
-    return { startOfDay, endOfDay };
-  }
-
   async scheduleNewQuiz(orgId, date, genre) {
-    const { startOfDay, endOfDay } = await this.getStartAndEndDates(date);
+    const newDate = new Date(date);
+    newDate.setUTCHours(0, 0, 0, 0);
 
     const existingWeeklyQuiz = await Quiz.findOne({
       orgId,
-      scheduledDate: { $gte: startOfDay, $lt: endOfDay },
+      scheduledDate: newDate,
+      status: { $ne: 'expired' },
     });
 
     if (existingWeeklyQuiz) {
@@ -44,7 +36,7 @@ class QuizRepository {
     const newWeeklyQuiz = await Quiz.create({
       orgId,
       status: 'upcoming',
-      scheduledDate: startOfDay,
+      scheduledDate: newDate,
       genre,
     });
 
@@ -70,7 +62,7 @@ class QuizRepository {
     })
       .select({ 'question.answer': 0 })
       .lean();
-    console.log(questions);
+
     const weeklyQuizQuestions = questions.map((curr) => {
       return curr.question;
     });
@@ -81,8 +73,9 @@ class QuizRepository {
   }
 
   async approveWeeklyQuizQuestions(questions, orgId) {
+
     const idsOfQuestionsToApprove = questions.map(
-      (question) => new ObjectId(question._id),
+      (question) => new ObjectId(question.question._id),
     );
     const category = questions[0].question.category;
     const quizId = questions[0].quizId;
@@ -96,8 +89,8 @@ class QuizRepository {
         {
           arrayFilters: [
             {
-              'elem._id': {
-                $in: idsOfQuestionsToApprove.map((id) => new ObjectId(id)),
+              'elem.questionId': {
+                $in: idsOfQuestionsToApprove,
               },
             },
           ],
@@ -138,10 +131,15 @@ class QuizRepository {
       (currentQuestion) => currentQuestion._id,
     );
 
-    await Question.updateMany(
-      { _id: { $in: idsOfQuestionsToClean } },
-      { $set: { 'question.status': 'done' } },
-    );
+    await Quiz.updateMany({
+    }, {
+      $set: { status: 'expired' },
+    });
+
+    // await Question.updateMany(
+    //   { _id: { $in: idsOfQuestionsToClean } },
+    //   { $set: { 'question.status': 'done' } },
+    // );
 
     await WeeklyQuestion.deleteMany({});
   }

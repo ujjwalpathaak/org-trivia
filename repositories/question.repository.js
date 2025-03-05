@@ -24,32 +24,32 @@ class QuestionRepository {
     const simplePnAQuestions = await Org.aggregate([
       {
         $match: {
-          _id: orgId, // Match by the given orgId
+          _id: orgId,
         },
       },
       {
-        $unwind: '$questionsPnA', // Flatten the questionsPnA array
+        $unwind: '$questionsPnA',
       },
       {
         $group: {
-          _id: '$questionsPnA.puzzleType', // Group by puzzleType
-          question: { $first: '$questionsPnA' }, // Pick the first question per puzzleType
+          _id: '$questionsPnA.puzzleType',
+          question: { $first: '$questionsPnA' },
         },
       },
       {
         $lookup: {
-          from: 'questions', // Collection to join with
-          localField: 'question.questionId', // Use questionId from questionsPnA
-          foreignField: '_id', // Matching ID in questions collection
-          as: 'questionDetails', // Returns an array of matched documents
+          from: 'questions',
+          localField: 'question.questionId',
+          foreignField: '_id',
+          as: 'questionDetails',
         },
       },
       {
-        $unwind: '$questionDetails', // Flatten questionDetails to get individual question objects
+        $unwind: '$questionDetails',
       },
       {
         $replaceRoot: {
-          newRoot: '$questionDetails', // Replace the root document with questionDetails
+          newRoot: '$questionDetails',
         },
       },
     ]);
@@ -73,20 +73,16 @@ class QuestionRepository {
     return await WeeklyQuestion.insertMany(newQuestions);
   }
 
-  // ----------------------------------------------------------------
-
-  // get quizID & then get questions for that qioz odf
   async getWeeklyUnapprovedQuestions(orgId) {
     const quiz = await Quiz.findOne({
       orgId: new ObjectId(orgId),
-      status: 'unapproved',
+      status: 'upcoming',
     });
     if (!quiz) return false;
 
     const quizId = quiz._id;
 
     const weeklyQuizQuestions = await WeeklyQuestion.find({ quizId: quizId });
-    console.log(weeklyQuizQuestions);
     return weeklyQuizQuestions || [];
   }
 
@@ -100,7 +96,6 @@ class QuestionRepository {
     const formatedWeeklyQuizCorrectAnswers = weeklyQuizCorrectAnswers.map(
       (curr) => curr.question,
     );
-    console.log(formatedWeeklyQuizCorrectAnswers);
 
     return formatedWeeklyQuizCorrectAnswers;
   }

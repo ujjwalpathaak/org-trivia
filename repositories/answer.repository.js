@@ -34,12 +34,12 @@ class AnswerRepository {
       correctAnswers,
     );
 
-    await Answer.insert({
-      answers: userAnswersJSON,
-      currentPoints: weeklyQuizScore,
-      employeeId: employeeId,
-      quizId: quizId,
-    });
+    // await Answer.insert({
+    //   answers: userAnswersJSON,
+    //   currentPoints: weeklyQuizScore,
+    //   employeeId: employeeId,
+    //   quizId: quizId,
+    // });
 
     await employeeSerivce.updateWeeklyQuizScore(employeeId, weeklyQuizScore);
 

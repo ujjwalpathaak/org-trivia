@@ -130,7 +130,6 @@ class QuestionService {
   }
 
   async getWeeklyQuizCorrectAnswers(orgId) {
-    console.log('getWeeklyQuizCorrectAnswers', orgId);
     const weeklyQuizCorrectAnswers =
       await this.questionRepository.getWeeklyQuizCorrectAnswers(orgId);
 

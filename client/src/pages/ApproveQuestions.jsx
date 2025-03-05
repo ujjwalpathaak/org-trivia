@@ -71,6 +71,8 @@ export default function ScheduleQuestions() {
   const handleApproveQuiz = async () => {
     // Schedule the quiz here
     await handleApproveWeeklyQuiz(questions, orgId);
+    toast.success('Quiz approved successfully');
+    navigate('/dashboard');
   };
 
   const addCustomQuestion = () => {
