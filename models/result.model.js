@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const answerSchema = new mongoose.Schema(
+const resultSchema = new mongoose.Schema(
   {
     employeeId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -16,12 +16,12 @@ const answerSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    answers: {
+    results: {
       type: [
         {
           questionId: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'Question', // Ensure 'Question' is the correct model name
+            ref: 'Question',
           },
           answer: Number,
         },
@@ -31,6 +31,6 @@ const answerSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-const Answer = mongoose.model('Answer', answerSchema);
+const Result = mongoose.model('Result', resultSchema);
 
-export default Answer;
+export default Result;

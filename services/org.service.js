@@ -3,22 +3,8 @@ class OrgService {
     this.orgRepository = orgRepository;
   }
 
-  async getTriviaEnabledOrgs() {
-    const triviaEnabledOrgs = await this.orgRepository.getTriviaEnabledOrgs();
-
-    return triviaEnabledOrgs;
-  }
-
-  async setNextQuestionGenre(orgId, currentGenreIndex) {
-    return await this.orgRepository.setNextQuestionGenre(
-      orgId,
-      currentGenreIndex,
-    );
-  }
-
   async changeGenreSettings(genre, orgId) {
-    await this.orgRepository.changeGenreSettings(genre, orgId);
-    return;
+    return await this.orgRepository.changeGenreSettings(genre, orgId);
   }
 
   async getSettings(orgId) {
@@ -27,24 +13,22 @@ class OrgService {
     return org.settings;
   }
 
-  // -------------------------------------------------------------
-
   async getAllOrgNames() {
-    const orgNames = await this.orgRepository.getAllOrgNames();
-
-    return { status: 200, data: orgNames };
+    return await this.orgRepository.getAllOrgNames();
   }
 
   async getOrgById(orgId) {
-    const org = await this.orgRepository.getOrgById(orgId);
-
-    return { status: 200, data: org };
+    return await this.orgRepository.getOrgById(orgId);
   }
 
   async toggleTrivia(orgId) {
-    await this.orgRepository.toggleTrivia(orgId);
+    const org = await this.orgRepository.isTriviaEnabled(orgId);
 
-    return { status: 200, data: `Trivia toggled` };
+    if (!org) return false;
+
+    const newStatus = !org.settings.isTriviaEnabled;
+
+    return await this.orgRepository.updateTriviaSettings(orgId, newStatus);
   }
 }
 

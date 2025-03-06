@@ -1,34 +1,63 @@
-import OrgRepository from '../repositories/org.repository.js';
-import OrgService from './org.service.js';
-import { getNextFridayDate } from '../middleware/utils.js';
 import {
   fetchNewCAnITQuestions,
   refactorPnAQuestionsToOrgContext,
 } from '../api/lambda.api.js';
 import QuizService from './quiz.service.js';
 import QuizRepository from '../repositories/quiz.repository.js';
-import Org from '../models/org.model.js';
 
-import { ObjectId} from 'mongodb'
+import { ObjectId } from 'mongodb';
 
-const orgService = new OrgService(new OrgRepository());
 const quizService = new QuizService(new QuizRepository());
 
 class QuestionService {
-  constructor(questionRepository) {
+  constructor(questionRepository, orgRepository) {
     this.questionRepository = questionRepository;
+    this.orgRepository = orgRepository;
   }
 
   async saveQuestion(newQuestionData) {
+    const orgId = newQuestion.orgId;
     const newQuestion =
       await this.questionRepository.saveQuestion(newQuestionData);
-    if (!newQuestion) return false;
+    const addedToList = await this.orgRepository.addQuestionToOrg(
+      newQuestion,
+      orgId,
+    );
+    if (!newQuestion || !addedToList) return false;
 
     return true;
   }
 
+  async scheduleNextWeekQuestionsApproval() {
+    const triviaEnabledOrgs = await this.orgRepository.getTriviaEnabledOrgs();
+
+    triviaEnabledOrgs.forEach(async (element) => {
+      const genre =
+        element.settings.selectedGenre[element.settings.currentGenre];
+
+      const newWeeklyQuiz = await quizService.scheduleNewWeeklyQuiz(
+        element._id,
+        genre,
+      );
+
+      if (newWeeklyQuiz) {
+        const quizId = newWeeklyQuiz._id;
+
+        await this.orgRepository.setNextQuestionGenre(
+          element._id,
+          element.settings.currentGenre,
+        );
+
+        this.startQuestionGenerationWorkflow(genre, element, quizId);
+      } else {
+        console.error(`Error scheduling quiz for org ${element._id}:`);
+      }
+    });
+  }
+
   async startQuestionGenerationWorkflow(genre, element, quizId) {
-    switch ('HRD') {
+    // switch (genre) {
+    switch ('CAnIT') {
       case 'PnA':
         console.log('starting PnA');
         this.startPnAWorkflow(element.name, element._id, quizId);
@@ -54,139 +83,167 @@ class QuestionService {
     }
   }
 
-  async scheduleNextWeekQuestionsApproval() {
-    const triviaEnabledOrgs = await orgService.getTriviaEnabledOrgs();
+  async formatQuestionsWeeklyFormat(questions, orgId, quizId) {
+    return questions.map((curr) => ({
+      isApproved: false,
+      quizId: quizId,
+      question: curr,
+      orgId: orgId,
+    }));
+  }
 
-    triviaEnabledOrgs.forEach(async (element) => {
-      const genre =
-        element.settings.selectedGenre[element.settings.currentGenre];
-
-      const newWeeklyQuiz = await quizService.scheduleNewWeeklyQuiz(
-        element._id,
-        genre,
-      );
-
-      if (newWeeklyQuiz) {
-        const quizId = newWeeklyQuiz._id;
-        await orgService.setNextQuestionGenre(
-          element._id,
-          element.settings.currentGenre,
-        );
-
-        this.startQuestionGenerationWorkflow(genre, element, quizId);
-      } else {
-        console.error(`Error scheduling quiz for org ${element._id}:`);
-      }
+  async formatQuestionsForOrgs(questions) {
+    return questions.map((question) => {
+      return {
+        questionId: new ObjectId(question._id),
+        isUsed: false,
+      };
     });
   }
 
-  async startPnAWorkflow(companyName, orgId, quizId) {
-    const simplePnAQuestions =
-      await this.questionRepository.fetchPnAQuestions(orgId);
-
-    const refactoredPnAQuestions = await refactorPnAQuestionsToOrgContext(
-      companyName,
-      simplePnAQuestions,
-      orgId,
-    );
-
-    await this.pushQuestionsForApproval(refactoredPnAQuestions, orgId, quizId);
+  async formatQuestionsForDatabase(questions, category) {
+    return questions.map((question) => {
+      return {
+        question: question.question,
+        answer: question.answer,
+        options: question.options,
+        category: category,
+        source: 'AI',
+        status: 'extra',
+        image: null,
+        config: {},
+      };
+    });
   }
 
-  async pushQuestionsForApproval(questions, orgId, quizId) {
-    await this.questionRepository.pushQuestionsForApproval(
+  async pushQuestionsForApprovals(questions, orgId, quizId) {
+    const refactoredQuestions = await this.formatQuestionsWeeklyFormat(
       questions,
       orgId,
       quizId,
     );
+    return await this.questionRepository.saveWeeklyQuizQuestions(
+      refactoredQuestions,
+    );
   }
 
-  async addLambdaCallbackQuestions(questions, category, orgId, quizId){
-    await this.questionRepository.addLambdaCallbackQuestions(questions, category, orgId, quizId);
+  async pushQuestionsInOrg(questions, orgId) {
+    const refactoredQuestions = await this.formatQuestionsForOrgs(questions);
+
+    return await this.questionRepository.pushQuestionsInOrg(
+      refactoredQuestions,
+      orgId,
+    );
+  }
+
+  async pushQuestionsToDatabase(questions, category) {
+    const refactoredQuestions = await this.formatQuestionsForDatabase(
+      questions,
+      category,
+    );
+    const response =
+      await this.questionRepository.addQuestions(refactoredQuestions);
+
+    return response;
+  }
+
+  async questionsPipeline(refactoredPnAQuestions, orgId, quizId) {
+    await this.pushQuestionsForApprovals(refactoredPnAQuestions, orgId, quizId);
+    await this.pushQuestionsInOrg(refactoredPnAQuestions, orgId, quizId);
+  }
+
+  async startPnAWorkflow(companyName, orgId, quizId) {
+    const pnAQuestions = await this.questionRepository.fetchPnAQuestions(orgId);
+
+    const refactoredPnAQuestions = await refactorPnAQuestionsToOrgContext(
+      companyName,
+      pnAQuestions,
+      orgId,
+    );
+
+    await this.questionsPipeline(refactoredPnAQuestions, orgId, quizId);
+  }
+
+  async addLambdaCallbackQuestions(newQuestions, category, orgId, quizId) {
+    const questions = await this.pushQuestionsToDatabase(
+      newQuestions,
+      category,
+    );
+
+    await this.questionsPipeline(questions, orgId, quizId);
   }
 
   async getWeeklyUnapprovedQuestions(orgId) {
+    const upcomingQuiz =
+      await this.questionRepository.getUpcomingWeeklyQuiz(orgId);
+    if (!upcomingQuiz) return false;
+
+    const quizId = upcomingQuiz._id;
+
     const weeklyUnapprovedQuestions =
-      await this.questionRepository.getWeeklyUnapprovedQuestions(orgId);
+      await this.questionRepository.getWeeklyUnapprovedQuestions(quizId);
 
-    return weeklyUnapprovedQuestions;
-  }
-
-  // ----------------------------------------------------------------
-  async saveWeeklyQuizQuestions(newQuestions) {
-    await this.questionRepository.saveWeeklyQuizQuestions(newQuestions);
-  }
-
-  async formatQuestionsWeeklyFormat(data) {
-    let { questions, orgId, category } = data;
-    const nextFriday = getNextFridayDate();
-
-    const weeklyQuestions = questions.map((curr) => ({
-      scheduledDate: nextFriday,
-      question: {
-        ...curr,
-        source: 'AI',
-        category: category,
-        status: 'live',
-        org: orgId,
-      },
-      org: orgId,
-    }));
-
-    return weeklyQuestions;
-  }
-
-  async startHRDWorkflow(orgId, quizId) {
-    const questionToPushToWeeklyQuiz = await this.questionRepository.fetchHRDQuestions(orgId);
-    await this.questionRepository.pushQuestionsForApprovalHRD(questionToPushToWeeklyQuiz, orgId, quizId);
+    return weeklyUnapprovedQuestions || [];
   }
 
   async getWeeklyQuizCorrectAnswers(orgId) {
-    const weeklyQuizCorrectAnswers =
-      await this.questionRepository.getWeeklyQuizCorrectAnswers(orgId);
+    const correctWeeklyQuizAnswers =
+      await this.questionRepository.getCorrectWeeklyQuizAnswers(orgId);
 
-    return weeklyQuizCorrectAnswers;
+    return correctWeeklyQuizAnswers.map((curr) => curr.question);
   }
 
-  formatHRDQuestions(orgId, questions) {
-    return questions.map((curr) => ({
-      ...curr,
-      source: 'AI',
-      category: 'HRD',
-      status: 'extra',
-      org: orgId,
-    }));
+  async startHRDWorkflow(orgId, quizId) {
+    const hrdQuestions = await this.questionRepository.fetchHRDQuestions(orgId);
+
+    await this.questionsPipeline(hrdQuestions, orgId, quizId);
   }
 
-  async saveHRdocQuestions(orgId, questions) {
-    const formatedQuestions = await this.formatHRDQuestions(orgId, questions);
-    const newQuestions = await this.questionRepository.saveHRdocQuestions(orgId, formatedQuestions);
+  // formatHRDQuestions(orgId, questions) {
+  //   return questions.map((curr) => ({
+  //     ...curr,
+  //     source: 'AI',
+  //     category: 'HRD',
+  //     status: 'extra',
+  //     org: orgId,
+  //   }));
+  // }
 
-    console.log('newQuestions', newQuestions)
-    
-    const temp = newQuestions.map(question => {
-      return {
-        questionId: question._id,
-        isUsed: false,
-      }
-    })
+  // async saveHRdocQuestions(orgId, questions) {
+  //   const formatedQuestions = await this.formatHRDQuestions(orgId, questions);
+  //   const newQuestions = await this.questionRepository.saveHRdocQuestions(
+  //     orgId,
+  //     formatedQuestions,
+  //   );
 
-    console.log('temp', temp)
+  //   console.log('newQuestions', newQuestions);
 
-    const update = await Org.updateMany({
-      _id: new ObjectId(orgId),
-    }, {
-      $push: {
-        questionsHRD: {
-          $each: temp,
-        },
-      },
-    })
+  //   const temp = newQuestions.map((question) => {
+  //     return {
+  //       questionId: question._id,
+  //       isUsed: false,
+  //     };
+  //   });
 
-    console.log('update', update)
+  //   console.log('temp', temp);
 
-    return { status: 200, message: 'Content saved successfully' };
-  }
+  //   const update = await Org.updateMany(
+  //     {
+  //       _id: new ObjectId(orgId),
+  //     },
+  //     {
+  //       $push: {
+  //         questionsHRD: {
+  //           $each: temp,
+  //         },
+  //       },
+  //     },
+  //   );
+
+  //   console.log('update', update);
+
+  //   return { status: 200, message: 'Content saved successfully' };
+  // }
 }
 
 export default QuestionService;

@@ -3,39 +3,33 @@ import Employee from '../models/employee.model.js';
 import { ObjectId } from 'mongodb';
 
 class EmployeeRepository {
-  async findEmployeeById(employeeId){
+  async findEmployeeById(employeeId) {
     return Employee.findOne({ _id: new ObjectId(employeeId) });
   }
 
   async didEmployeeGaveWeeklyQuiz(employeeId) {
     return Employee.findOne(
       { _id: new ObjectId(employeeId) },
-      { isQuizGiven: 1 }
+      { isQuizGiven: 1 },
     );
   }
 
-  async markAllEmployeesAsQuizNotGiven(){
+  async markAllEmployeesAsQuizNotGiven() {
     return Employee.updateMany({}, { $set: { isQuizGiven: false } });
   }
 
-  // ----------------------------------------------------------------
-
   async getAllOrgEmployeesByOrgId(orgId) {
-    const orgEmployees = await Employee.find({ orgId: new ObjectId(orgId) });
-
-    return orgEmployees;
+    return Employee.find({ orgId: new ObjectId(orgId) });
   }
 
   async updateWeeklyQuizScore(employeeId, updatedWeeklyQuizScore) {
-    await Employee.updateOne(
+    return Employee.updateOne(
       { _id: new ObjectId(employeeId) },
       {
         $inc: { currentPoints: updatedWeeklyQuizScore },
         $set: { isQuizGiven: true },
       },
     );
-
-    return;
   }
 }
 

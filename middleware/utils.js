@@ -14,11 +14,11 @@ export const logService = (request, response, next) => {
 export const getNextFridayDate = () => {
   const today = new Date();
   const dayOfWeek = today.getDay();
-  const daysUntilFriday = (5 - dayOfWeek + 7) % 7 || 7; // Ensures Friday is always next week
+  const daysUntilFriday = (5 - dayOfWeek + 7) % 7 || 7;
 
   const nextFriday = new Date(today);
   nextFriday.setDate(today.getDate() + daysUntilFriday);
-  nextFriday.setHours(0, 0, 0, 0); // Normalize time to midnight
+  nextFriday.setHours(0, 0, 0, 0);
 
-  return nextFriday; // ✅ Returns a Date object
+  return nextFriday;
 };

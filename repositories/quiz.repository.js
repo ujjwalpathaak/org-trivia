@@ -6,12 +6,16 @@ import WeeklyQuestion from '../models/weeklyQuestion.model.js';
 import { ObjectId } from 'mongodb';
 
 class QuizRepository {
-  async findLiveQuizByOrgId(orgId){
+  async findLiveQuizByOrgId(orgId) {
     return Quiz.findOne({ orgId: new ObjectId(orgId), status: 'live' });
   }
 
   async doesWeeklyQuizExist(orgId, dateNextFriday) {
-    return Quiz.findOne({ orgId: new ObjectId(orgId), scheduledDate: dateNextFriday, status: { $ne: 'expired' } });
+    return Quiz.findOne({
+      orgId: new ObjectId(orgId),
+      scheduledDate: dateNextFriday,
+      status: { $ne: 'expired' },
+    });
   }
 
   async scheduleNewWeeklyQuiz(orgId, dateNextFriday, genre) {
@@ -31,29 +35,32 @@ class QuizRepository {
   }
 
   async makeQuizLiveTest() {
-    return Quiz.updateMany({ status: 'approved' }, { $set: { status: 'live' } });
+    return Quiz.updateMany(
+      { status: 'approved' },
+      { $set: { status: 'live' } },
+    );
   }
 
   // move to ques repo
-  async getApprovedWeeklyQuizQuestion(orgId){
+  async getApprovedWeeklyQuizQuestion(orgId) {
     return WeeklyQuestion.find({
       orgId: new ObjectId(orgId),
       isApproved: true,
     })
-    .select({ 'question.answer': 0 })
-    .lean();
+      .select({ 'question.answer': 0 })
+      .lean();
   }
   // move to ques repo
-  async dropWeeklyQuizCollection(){
+  async dropWeeklyQuizCollection() {
     return WeeklyQuestion.deleteMany({});
   }
-  
+
   // move to ques repo
-  async updateWeeklyQuestionsStatusToApproved (idsOfQuestionsToApprove) {
+  async updateWeeklyQuestionsStatusToApproved(idsOfQuestionsToApprove) {
     return WeeklyQuestion.updateMany(
-        { 'question._id': { $in: idsOfQuestionsToApprove } },
-        { $set: { isApproved: true } },
-      );
+      { 'question._id': { $in: idsOfQuestionsToApprove } },
+      { $set: { isApproved: true } },
+    );
   }
 
   async markAllQuizAsExpired() {
@@ -61,7 +68,10 @@ class QuizRepository {
   }
 
   async updateQuizStatusToApproved(quizId) {
-    return Quiz.updateMany({ _id: new ObjectId(quizId) }, { $set: { status: 'approved' } });
+    return Quiz.updateMany(
+      { _id: new ObjectId(quizId) },
+      { $set: { status: 'approved' } },
+    );
   }
 }
 

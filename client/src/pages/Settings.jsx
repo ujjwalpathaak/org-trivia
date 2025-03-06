@@ -2,12 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { useOrgId } from '../context/auth.context';
 import { getSettings, toggleTrivia } from '../api';
 import ListManager from '../components/ListManager';
+import { useNavigate } from 'react-router-dom';
 
 const Settings = () => {
   const [isTriviaEnabled, setIsTriviaEnabled] = useState(false);
   const [selectedGenre, setSelectedGenre] = useState([]);
   const [currentGenre, setCurrentGenre] = useState(0);
   const [settings, setSettings] = useState(null);
+  const navigate = useNavigate();
 
   const orgId = useOrgId();
 
@@ -16,7 +18,6 @@ const Settings = () => {
       if (!orgId) return;
       try {
         const response = await getSettings(orgId);
-        console.log('Fetched Settings:', response);
 
         setSettings(response);
         setIsTriviaEnabled(response.isTriviaEnabled);
@@ -31,13 +32,23 @@ const Settings = () => {
   }, [orgId]);
 
   const toggleIsTriviaEnabled = async () => {
+    setIsTriviaEnabled(!isTriviaEnabled);
     await toggleTrivia(orgId);
   };
 
   return (
     <div className=" flex items-center justify-center bg-gray-100">
       <div className="mt-[6rem] w-1/2 floating-div p-6 shadow-lg rounded-lg bg-white">
-        <h2 className="text-xl font-bold text-gray-900">Admin Settings</h2>
+        <div className="flex justify-between w-full mb-6">
+          <h2 className="text-xl font-bold text-gray-900">Admin Settings</h2>
+          <button
+            onClick={() => navigate('/dashboard')}
+            className="text-base text-gray-900"
+          >
+            Go Back
+          </button>
+        </div>
+        <hr></hr>
         <div className="mt-4 space-y-4">
           <div className="flex items-center justify-between">
             <label className="font-medium text-gray-700">Weekly Trivia</label>

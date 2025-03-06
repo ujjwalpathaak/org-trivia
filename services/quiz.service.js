@@ -21,7 +21,10 @@ class QuizService {
   async scheduleNewWeeklyQuiz(orgId, genre) {
     const dateNextFriday = getNextFridayDate();
 
-    const existingWeeklyQuiz = await this.quizRepository.doesWeeklyQuizExist(orgId, dateNextFriday);
+    const existingWeeklyQuiz = await this.quizRepository.doesWeeklyQuizExist(
+      orgId,
+      dateNextFriday,
+    );
 
     if (existingWeeklyQuiz) {
       return false;
@@ -44,13 +47,13 @@ class QuizService {
 
     await this.quizRepository.makeWeeklyQuizLive(today);
 
-    return { message: 'All weekly quiz are live' }
+    return { message: 'All weekly quiz are live' };
   }
 
   async makeQuizLiveTest() {
     await this.quizRepository.makeQuizLiveTest();
 
-    return { message: 'All weekly quiz are live' }
+    return { message: 'All weekly quiz are live' };
   }
 
   // move to ques service
@@ -73,12 +76,10 @@ class QuizService {
       this.quizRepository.markAllQuizAsExpired(),
       this.employeeRepository.markAllEmployeesAsQuizNotGiven(),
       this.quizRepository.dropWeeklyQuizCollection(),
-
     ]);
 
     return {
-      message:
-        'Cleaned up weekly quiz.',
+      message: 'Cleaned up weekly quiz.',
     };
   }
 
@@ -90,27 +91,16 @@ class QuizService {
 
     await this.orgRepository.updateQuestionsStatus(orgId);
     await this.quizRepository.updateQuizStatusToApproved(quizId);
-    await this.quizRepository.updateWeeklyQuestionsStatusToApproved(idsOfQuestionsToApprove)
+    await this.quizRepository.updateWeeklyQuestionsStatusToApproved(
+      idsOfQuestionsToApprove,
+    );
 
     return {
       message: 'Questions approved.',
     };
   }
-  
+
   // ----------------------------------------------------------------
-
-  async formatQuestionsWeeklyFormat(questions, orgId, quizId) {
-    const dateNextFriday = getNextFridayDate();
-
-    const formatedWeeklyQuestions = questions.map((curr) => ({
-      scheduledDate: dateNextFriday,
-      quizId: quizId,
-      question: curr,
-      orgId: orgId,
-    }));
-
-    return formatedWeeklyQuestions;
-  }
 
   async formatQuestions(questions, orgId, category) {
     const weeklyQuestions = questions.map((curr) => ({

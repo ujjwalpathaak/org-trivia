@@ -5,7 +5,11 @@ import QuestionService from '../services/question.service.js';
 import EmployeeRepository from '../repositories/employee.repository.js';
 import OrgRepository from '../repositories/org.repository.js';
 
-const quizService = new QuizService(new QuizRepository(), new EmployeeRepository(), new OrgRepository());
+const quizService = new QuizService(
+  new QuizRepository(),
+  new EmployeeRepository(),
+  new OrgRepository(),
+);
 const questionService = new QuestionService(new QuestionRepository());
 
 class QuizController {
@@ -67,8 +71,14 @@ class QuizController {
         next(new Error('Invalid request body'));
         return;
       }
-      console.log("handleLambdaCallback", questions)
-      if(category === 'CAnIT') await questionService.addLambdaCallbackQuestions(questions, category, orgId, quizId);
+
+      if (category === 'CAnIT')
+        await questionService.addLambdaCallbackQuestions(
+          questions,
+          category,
+          orgId,
+          quizId,
+        );
 
       res.status(200).json({ message: 'Scheduled new questions' });
     } catch (error) {

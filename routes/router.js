@@ -6,7 +6,7 @@ import { checkRole, protectRoute } from '../middleware/auth.middleware.js';
 import orgRouter from './org.route.js';
 import questionRouter from './question.route.js';
 import cronTestRouter from './cron.test.route.js';
-import answerRouter from './answer.route.js';
+import resultRouter from './result.route.js';
 import quizRouter from './quiz.route.js';
 
 const router = express.Router();
@@ -18,7 +18,7 @@ router.use('/employee', protectRoute, checkRole('Admin'), employeeRouter);
 router.use('/org', orgRouter);
 router.use('/question', questionRouter);
 router.use('/cron', cronTestRouter);
-router.use('/answer', protectRoute, checkRole('Employee'), answerRouter);
+router.use('/result', protectRoute, checkRole('Employee'), resultRouter);
 router.use('/quiz', quizRouter);
 
 router.use('*', (req, res, next) => {

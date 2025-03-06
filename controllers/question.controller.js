@@ -1,12 +1,17 @@
+import OrgRepository from '../repositories/org.repository.js';
 import QuestionRepository from '../repositories/question.repository.js';
 import QuestionService from '../services/question.service.js';
 
-const questionService = new QuestionService(new QuestionRepository());
+const questionService = new QuestionService(
+  new QuestionRepository(),
+  new OrgRepository(),
+);
 
 class QuestionController {
   async addQuestion(req, res, next) {
     try {
       const question = req.body;
+      // move backgend validation
       if (!question) {
         return res.status(400).json({ message: 'All fields are required' });
       }
@@ -20,6 +25,9 @@ class QuestionController {
       next(error);
     }
   }
+
+  // ----------------------------------------------------------------
+
   async getWeeklyUnapprovedQuestions(req, res, next) {
     try {
       const { orgId } = req.params;
@@ -40,8 +48,6 @@ class QuestionController {
       next(error);
     }
   }
-
-  // ----------------------------------------------------------------
 
   async saveHRdocQuestions(req, res, next) {
     try {
