@@ -1,18 +1,22 @@
 import { getNextFridayDate } from '../middleware/utils.js';
 
 class QuizService {
-  constructor(quizRepository) {
+  constructor(quizRepository, employeeRepository) {
     this.quizRepository = quizRepository;
+    this.employeeRepository = employeeRepository;
   }
 
   async isWeeklyQuizLive(orgId, employeeId) {
-    const isWeeklyQuizLive = this.quizRepository.isWeeklyQuizLive(
-      orgId,
-      employeeId,
-    );
+    const [isWeeklyQuizLive, employee] = await Promise.all([
+      this.quizRepository.findLiveQuizByOrgId(orgId),
+      this.employeeRepository.didEmployeeGaveWeeklyQuiz(employeeId),
+    ]);
 
-    return isWeeklyQuizLive;
+    if (isWeeklyQuizLive && !employee.isQuizGiven) return true;
+
+    return false;
   }
+    // ----------------------------------------------------------------
 
   async scheduleNewQuiz(orgId, genre) {
     const dateNextFriday = getNextFridayDate();
@@ -74,7 +78,7 @@ class QuizService {
 
     return;
   }
-  // ----------------------------------------------------------------
+
 
   async cleanWeeklyQuizQuestions(questions, orgId) {
     await this.quizRepository.cleanWeeklyQuizQuestions(questions, orgId);

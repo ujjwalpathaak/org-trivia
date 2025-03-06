@@ -1,12 +1,17 @@
 import Employee from '../models/employee.model.js';
 import Org from '../models/org.model.js';
-import Question from '../models/question.model.js';
 import Quiz from '../models/quiz.model.js';
 import WeeklyQuestion from '../models/weeklyQuestion.model.js';
 
 import { ObjectId } from 'mongodb';
 
 class QuizRepository {
+  async findLiveQuizByOrgId(orgId){
+    return Quiz.findOne({ orgId: new ObjectId(orgId), status: 'live' });
+  }
+
+  // ----------------------------------------------------------------
+
   async isWeeklyQuizLive(orgId, employeeId) {
     const [isWeeklyQuizLive, employee] = await Promise.all([
       Quiz.findOne({ orgId: new ObjectId(orgId), status: 'live' }),
