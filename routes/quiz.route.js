@@ -10,8 +10,6 @@ quizRouter.get('/status/:orgId/:employeeId', quizController.isWeeklyQuizLive);
 
 quizRouter.post('/weekly/lambda/callback', quizController.handleLambdaCallback);
 
-quizRouter.post('/new/:orgId', quizController.scheduleNewQuiz);
-
 quizRouter.post('/approve/:orgId', quizController.approveWeeklyQuizQuestions);
 
 quizRouter.get(

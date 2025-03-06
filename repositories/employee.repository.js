@@ -14,6 +14,10 @@ class EmployeeRepository {
     );
   }
 
+  async markAllEmployeesAsQuizNotGiven(){
+    return Employee.updateMany({}, { $set: { isQuizGiven: false } });
+  }
+
   // ----------------------------------------------------------------
 
   async getAllOrgEmployeesByOrgId(orgId) {

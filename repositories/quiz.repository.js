@@ -10,74 +10,49 @@ class QuizRepository {
     return Quiz.findOne({ orgId: new ObjectId(orgId), status: 'live' });
   }
 
-  // ----------------------------------------------------------------
-
-  async isWeeklyQuizLive(orgId, employeeId) {
-    const [isWeeklyQuizLive, employee] = await Promise.all([
-      Quiz.findOne({ orgId: new ObjectId(orgId), status: 'live' }),
-      Employee.findOne({ _id: new ObjectId(employeeId) }),
-    ]);
-
-    const isQuizGiven = employee?.get('isQuizGiven');
-    // console.log()
-    if (isWeeklyQuizLive && !isQuizGiven) return true;
-
-    return false;
+  async doesWeeklyQuizExist(orgId, dateNextFriday) {
+    return Quiz.findOne({ orgId: new ObjectId(orgId), scheduledDate: dateNextFriday, status: { $ne: 'expired' } });
   }
 
-  async scheduleNewQuiz(orgId, date, genre) {
-    const newDate = new Date(date);
-    newDate.setUTCHours(0, 0, 0, 0);
-
-    const existingWeeklyQuiz = await Quiz.findOne({
-      orgId,
-      scheduledDate: newDate,
-      status: { $ne: 'expired' },
-    });
-
-    if (existingWeeklyQuiz) {
-      return false;
-    }
-
-    const newWeeklyQuiz = await Quiz.create({
+  async scheduleNewWeeklyQuiz(orgId, dateNextFriday, genre) {
+    return Quiz.create({
       orgId,
       status: 'upcoming',
-      scheduledDate: newDate,
+      scheduledDate: dateNextFriday,
       genre,
     });
-
-    return newWeeklyQuiz;
   }
 
-  async makeWeeklyQuizLive() {
-    const today = new Date();
-    today.setUTCHours(0, 0, 0, 0);
-    await Quiz.updateMany(
+  async makeWeeklyQuizLive(today) {
+    return Quiz.updateMany(
       { scheduledDate: today, status: 'approved' },
       { $set: { status: 'live' } },
     );
   }
+
   async makeQuizLiveTest() {
-    await Quiz.updateMany({ status: 'approved' }, { $set: { status: 'live' } });
+    return Quiz.updateMany({ status: 'approved' }, { $set: { status: 'live' } });
   }
 
-  async getWeeklyQuizQuestions(orgId) {
-    const questions = await WeeklyQuestion.find({
+  // move to ques repo
+  async getApprovedWeeklyQuizQuestion(orgId){
+    return WeeklyQuestion.find({
       orgId: new ObjectId(orgId),
       isApproved: true,
     })
-      .select({ 'question.answer': 0 })
-      .lean();
-
-    const weeklyQuizQuestions = questions.map((curr) => {
-      return curr.question;
-    });
-
-    return {
-      weeklyQuizQuestions: weeklyQuizQuestions || [],
-      quizId: questions[0]?.quizId || null,
-    };
+    .select({ 'question.answer': 0 })
+    .lean();
   }
+  // move to ques repo
+  async dropWeeklyQuizCollection(){
+    return WeeklyQuestion.deleteMany({});
+  }
+
+  async markAllQuizAsExpired() {
+    return Quiz.updateMany({}, { $set: { status: 'expired' } });
+  }
+
+  // ----------------------------------------------------------------
 
   async approveWeeklyQuizQuestions(questions, orgId) {
     const idsOfQuestionsToApprove = questions.map(
@@ -152,44 +127,6 @@ class QuizRepository {
       { $set: { isApproved: true } },
     );
     console.log(updatedWeeklyQuestion)
-  }
-
-  async cleanUpWeeklyQuiz() {
-    await Promise.all([
-      Quiz.updateMany({}, { $set: { status: 'expired' } }),
-      Employee.updateMany({}, { $set: { isQuizGiven: false } }),
-    ]);
-
-    return {
-      message:
-        'Cleaned up weekly quiz questions and updated status of quiz, employee.',
-    };
-  }
-
-  // ----------------------------------------------------------------
-
-  async cleanWeeklyQuizQuestions() {
-    const questionsToClean = await WeeklyQuestion.find({})
-      .select('question._id')
-      .lean();
-
-    const idsOfQuestionsToClean = questionsToClean.map(
-      (currentQuestion) => currentQuestion._id,
-    );
-
-    await Quiz.updateMany(
-      {},
-      {
-        $set: { status: 'expired' },
-      },
-    );
-
-    // await Question.updateMany(
-    //   { _id: { $in: idsOfQuestionsToClean } },
-    //   { $set: { 'question.status': 'done' } },
-    // );
-
-    await WeeklyQuestion.deleteMany({});
   }
 }
 

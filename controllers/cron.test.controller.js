@@ -60,7 +60,7 @@ class CronTestController {
 
   async cleanWeeklyQuiz(req, res, next) {
     try {
-      const response = await quizService.cleanWeeklyQuizQuestions();
+      const response = await quizService.cleanUpWeeklyQuiz();
 
       res.status(response.status).json(response.data);
     } catch (error) {

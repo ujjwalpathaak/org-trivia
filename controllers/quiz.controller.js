@@ -41,6 +41,9 @@ class QuizController {
     }
   }
 
+  // ---------------------------------------------------------
+
+
   async approveWeeklyQuizQuestions(req, res, next) {
     try {
       const { orgId } = req.params;
@@ -56,7 +59,6 @@ class QuizController {
       next(error);
     }
   }
-  //  ----------------------------------------------------------------
   async handleLambdaCallback(req, res, next) {
     try {
       const { questions, orgId, category, quizId } = req.body;
@@ -68,21 +70,6 @@ class QuizController {
       if(category === 'CAnIT') await questionService.addLambdaCallbackQuestions(questions, category, orgId, quizId);
 
       res.status(200).json({ message: 'Scheduled new questions' });
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  async scheduleNewQuiz(req, res, next) {
-    try {
-      const { orgId } = req.params;
-      if (!orgId) {
-        return res.status(400).json({ message: 'Missing required fields' });
-      }
-
-      const response = await quizService.scheduleNewQuiz(orgId);
-
-      res.status(response.status).json(response.data);
     } catch (error) {
       next(error);
     }

@@ -61,7 +61,7 @@ class QuestionService {
       const genre =
         element.settings.selectedGenre[element.settings.currentGenre];
 
-      const newWeeklyQuiz = await quizService.scheduleNewQuiz(
+      const newWeeklyQuiz = await quizService.scheduleNewWeeklyQuiz(
         element._id,
         genre,
       );

@@ -16,20 +16,71 @@ class QuizService {
 
     return false;
   }
-    // ----------------------------------------------------------------
 
-  async scheduleNewQuiz(orgId, genre) {
+  async scheduleNewWeeklyQuiz(orgId, genre) {
     const dateNextFriday = getNextFridayDate();
 
-    const newWeeklyQuiz = await this.quizRepository.scheduleNewQuiz(
+    const existingWeeklyQuiz = await this.quizRepository.doesWeeklyQuizExist(orgId, dateNextFriday);
+
+    if (existingWeeklyQuiz) {
+      return false;
+    }
+
+    const newWeeklyQuiz = await this.quizRepository.scheduleNewWeeklyQuiz(
       orgId,
       dateNextFriday,
       genre,
     );
+
     if (!newWeeklyQuiz) return false;
 
     return newWeeklyQuiz;
   }
+
+  async makeWeeklyQuizLive() {
+    const today = new Date();
+    today.setUTCHours(0, 0, 0, 0);
+
+    await this.quizRepository.makeWeeklyQuizLive(today);
+
+    return { message: 'All weekly quiz are live' }
+  }
+
+  async makeQuizLiveTest() {
+    await this.quizRepository.makeQuizLiveTest();
+
+    return { message: 'All weekly quiz are live' }
+  }
+  // move to ques service
+  async getWeeklyQuizQuestions(orgId) {
+    const approvedWeeklyQuizQuestion =
+      await this.quizRepository.getApprovedWeeklyQuizQuestion(orgId);
+
+    const quizQuestions = approvedWeeklyQuizQuestion.map((ques) => {
+      return ques.question;
+    });
+
+    return {
+      weeklyQuizQuestions: quizQuestions || [],
+      quizId: approvedWeeklyQuizQuestion[0]?.quizId || null,
+    };
+  }
+
+  async cleanUpWeeklyQuiz() {
+    await Promise.all([
+      this.quizRepository.markAllQuizAsExpired(),
+      this.employeeRepository.markAllEmployeesAsQuizNotGiven(),
+      this.quizRepository.dropWeeklyQuizCollection(),
+
+    ]);
+
+    return {
+      message:
+        'Cleaned up weekly quiz.',
+    };
+  }
+  
+  // ----------------------------------------------------------------
 
   async formatQuestionsWeeklyFormat(questions, orgId, quizId) {
     const dateNextFriday = getNextFridayDate();
@@ -56,34 +107,8 @@ class QuizService {
     return weeklyQuestions;
   }
 
-  async makeWeeklyQuizLive() {
-    this.quizRepository.makeWeeklyQuizLive();
-  }
-  async makeQuizLiveTest() {
-    this.quizRepository.makeQuizLiveTest();
-  }
-  async getWeeklyQuizQuestions(orgId) {
-    const weeklyQuizQuestions =
-      await this.quizRepository.getWeeklyQuizQuestions(orgId);
-
-    return weeklyQuizQuestions;
-  }
-
   async approveWeeklyQuizQuestions(questions, orgId) {
     await this.quizRepository.approveWeeklyQuizQuestions(questions, orgId);
-  }
-
-  async cleanUpWeeklyQuiz() {
-    this.quizRepository.cleanUpWeeklyQuiz();
-
-    return;
-  }
-
-
-  async cleanWeeklyQuizQuestions(questions, orgId) {
-    await this.quizRepository.cleanWeeklyQuizQuestions(questions, orgId);
-
-    return { status: 200, message: 'Questions cleaned successfully' };
   }
 }
 
