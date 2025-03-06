@@ -3,6 +3,36 @@ import Org from '../models/org.model.js';
 import { ObjectId } from 'mongodb';
 
 class OrgRepository {
+  async updateQuestionsStatus (orgId, category, idsOfQuestionsToApprove) {
+    const categoryMap = {
+      PnA: 'questionsPnA',
+      CAnIT: 'questionsCAnIT',
+      HRD: 'questionsHRD',
+    };
+  
+    const questionField = categoryMap[category];
+    if (!questionField) {
+      throw new Error('Invalid category');
+    }
+  
+    return await Org.updateMany(
+      { _id: new ObjectId(orgId) },
+      {
+        $set: { [`${questionField}.$[elem].isUsed`]: true },
+      },
+      {
+        arrayFilters: [
+          {
+            'elem.questionId': {
+              $in: idsOfQuestionsToApprove,
+            },
+          },
+        ],
+      }
+    );
+  };
+
+  // ----------------------------------------------------------------
   async addQuestionToOrg(question, orgId) {
     const questionId = question._id;
     const questionCategory = question.category;

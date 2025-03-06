@@ -3,8 +3,9 @@ import QuizRepository from '../repositories/quiz.repository.js';
 import QuestionRepository from '../repositories/question.repository.js';
 import QuestionService from '../services/question.service.js';
 import EmployeeRepository from '../repositories/employee.repository.js';
+import OrgRepository from '../repositories/org.repository.js';
 
-const quizService = new QuizService(new QuizRepository(), new EmployeeRepository());
+const quizService = new QuizService(new QuizRepository(), new EmployeeRepository(), new OrgRepository());
 const questionService = new QuestionService(new QuestionRepository());
 
 class QuizController {
@@ -41,9 +42,6 @@ class QuizController {
     }
   }
 
-  // ---------------------------------------------------------
-
-
   async approveWeeklyQuizQuestions(req, res, next) {
     try {
       const { orgId } = req.params;
@@ -59,6 +57,9 @@ class QuizController {
       next(error);
     }
   }
+
+  // ---------------------------------------------------------
+
   async handleLambdaCallback(req, res, next) {
     try {
       const { questions, orgId, category, quizId } = req.body;

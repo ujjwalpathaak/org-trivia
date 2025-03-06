@@ -1,9 +1,10 @@
 import { getNextFridayDate } from '../middleware/utils.js';
 
 class QuizService {
-  constructor(quizRepository, employeeRepository) {
+  constructor(quizRepository, employeeRepository, orgRepository) {
     this.quizRepository = quizRepository;
     this.employeeRepository = employeeRepository;
+    this.orgRepository = orgRepository;
   }
 
   async isWeeklyQuizLive(orgId, employeeId) {
@@ -51,6 +52,7 @@ class QuizService {
 
     return { message: 'All weekly quiz are live' }
   }
+
   // move to ques service
   async getWeeklyQuizQuestions(orgId) {
     const approvedWeeklyQuizQuestion =
@@ -79,6 +81,21 @@ class QuizService {
         'Cleaned up weekly quiz.',
     };
   }
+
+  async approveWeeklyQuizQuestions(unapprovedQuestions, orgId) {
+    const idsOfQuestionsToApprove = unapprovedQuestions.map(
+      (q) => new ObjectId(q.question._id),
+    );
+    const quizId = unapprovedQuestions[0].quizId || null;
+
+    await this.orgRepository.updateQuestionsStatus(orgId);
+    await this.quizRepository.updateQuizStatusToApproved(quizId);
+    await this.quizRepository.updateWeeklyQuestionsStatusToApproved(idsOfQuestionsToApprove)
+
+    return {
+      message: 'Questions approved.',
+    };
+  }
   
   // ----------------------------------------------------------------
 
@@ -105,10 +122,6 @@ class QuizService {
     }));
 
     return weeklyQuestions;
-  }
-
-  async approveWeeklyQuizQuestions(questions, orgId) {
-    await this.quizRepository.approveWeeklyQuizQuestions(questions, orgId);
   }
 }
 
