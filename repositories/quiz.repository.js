@@ -67,7 +67,7 @@ class QuizRepository {
     const weeklyQuizQuestions = questions.map((curr) => {
       return curr.question;
     });
-    console.log(weeklyQuizQuestions)
+
     return {
       weeklyQuizQuestions: weeklyQuizQuestions || [],
       quizId: questions[0]?.quizId || null,
@@ -106,6 +106,24 @@ class QuizRepository {
         { _id: new ObjectId(orgId) },
         {
           $set: { 'questionsCAnIT.$[elem].isUsed': true },
+        },
+        {
+          arrayFilters: [
+            {
+              'elem.questionId': {
+                $in: idsOfQuestionsToApprove,
+              },
+            },
+          ],
+        },
+      );
+      console.log(temp)
+    }
+    else if(category === 'HRD'){
+      const temp = await Org.updateMany(
+        { _id: new ObjectId(orgId) },
+        {
+          $set: { 'questionsHRD.$[elem].isUsed': true },
         },
         {
           arrayFilters: [

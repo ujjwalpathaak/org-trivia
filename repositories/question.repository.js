@@ -76,6 +76,40 @@ class QuestionRepository {
     return simplePnAQuestions;
   }
 
+  async fetchHRDQuestions(orgId) {
+    const HRDQuestions = await Org.aggregate([
+      {
+        $match: { _id: orgId }
+      },
+      {
+        $unwind: '$questionsHRD'
+      },
+      {
+        $match: { 'questionsHRD.isUsed': false } // Filter only where isUsed is false
+      },
+      {
+        $sample: { size: 5 } // Get 5 random questions from isUsed: false
+      },
+      {
+        $lookup: {
+          from: 'questions',
+          localField: 'questionsHRD.questionId',
+          foreignField: '_id',
+          as: 'questionDetails'
+        }
+      },
+      {
+        $unwind: '$questionDetails'
+      },
+      {
+        $replaceRoot: { newRoot: '$questionDetails' }
+      }
+    ]);
+    
+
+    return HRDQuestions;
+  }
+
   async pushQuestionsForApproval(refactoredQuestions, orgId, quizId) {
     const formatedQuestionsWeeklyFormat =
     await quizService.formatQuestionsWeeklyFormat(
@@ -96,6 +130,34 @@ class QuestionRepository {
     }, {
       $push: {
         questionsCAnIT: {
+          $each: temp,
+        },
+      },
+    })
+    
+    await this.saveWeeklyQuizQuestions(formatedQuestionsWeeklyFormat);
+  }
+
+  async pushQuestionsForApprovalHRD(refactoredQuestions, orgId, quizId) {
+    const formatedQuestionsWeeklyFormat =
+    await quizService.formatQuestionsWeeklyFormat(
+      refactoredQuestions,
+      orgId,
+      quizId,
+    );
+
+    const temp = refactoredQuestions.map((question) => {
+      return {
+        questionId: new ObjectId(question._id),
+        isUsed: false,
+      };
+    })
+
+    await Org.updateMany({
+      _id: new ObjectId(orgId),
+    }, {
+      $push: {
+        questionsHRD: {
           $each: temp,
         },
       },
@@ -136,7 +198,7 @@ class QuestionRepository {
   }
 
   async saveHRdocQuestions(orgId, questions) {    
-    return Question.insertMany(questions);
+    return await Question.insertMany(questions);
   }
 }
 

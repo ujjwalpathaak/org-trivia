@@ -7,6 +7,9 @@ import {
 } from '../api/lambda.api.js';
 import QuizService from './quiz.service.js';
 import QuizRepository from '../repositories/quiz.repository.js';
+import Org from '../models/org.model.js';
+
+import { ObjectId} from 'mongodb'
 
 const orgService = new OrgService(new OrgRepository());
 const quizService = new QuizService(new QuizRepository());
@@ -25,7 +28,7 @@ class QuestionService {
   }
 
   async startQuestionGenerationWorkflow(genre, element, quizId) {
-    switch ('CAnIT') {
+    switch ('HRD') {
       case 'PnA':
         console.log('starting PnA');
         this.startPnAWorkflow(element.name, element._id, quizId);
@@ -33,7 +36,7 @@ class QuestionService {
 
       case 'HRD':
         console.log('starting HRD');
-        // this.startHRDWorkflow();
+        this.startHRDWorkflow(element._id, quizId);
         break;
 
       case 'CAnIT':
@@ -133,12 +136,9 @@ class QuestionService {
     return weeklyQuestions;
   }
 
-  async startHRDWorkflow() {
-    // startHRDWorkflow
-  }
-
-  async fetchHRDQuestions() {
-    // logic for fetchHRDQuestions
+  async startHRDWorkflow(orgId, quizId) {
+    const questionToPushToWeeklyQuiz = await this.questionRepository.fetchHRDQuestions(orgId);
+    await this.questionRepository.pushQuestionsForApprovalHRD(questionToPushToWeeklyQuiz, orgId, quizId);
   }
 
   async getWeeklyQuizCorrectAnswers(orgId) {
@@ -160,7 +160,30 @@ class QuestionService {
 
   async saveHRdocQuestions(orgId, questions) {
     const formatedQuestions = await this.formatHRDQuestions(orgId, questions);
-    await this.questionRepository.saveHRdocQuestions(orgId, formatedQuestions);
+    const newQuestions = await this.questionRepository.saveHRdocQuestions(orgId, formatedQuestions);
+
+    console.log('newQuestions', newQuestions)
+    
+    const temp = newQuestions.map(question => {
+      return {
+        questionId: question._id,
+        isUsed: false,
+      }
+    })
+
+    console.log('temp', temp)
+
+    const update = await Org.updateMany({
+      _id: new ObjectId(orgId),
+    }, {
+      $push: {
+        questionsHRD: {
+          $each: temp,
+        },
+      },
+    })
+
+    console.log('update', update)
 
     return { status: 200, message: 'Content saved successfully' };
   }
