@@ -63,13 +63,8 @@ class QuizController {
         next(new Error('Invalid request body'));
         return;
       }
-
-      await questionService.pushQuestionsForApproval(
-        questions,
-        category,
-        orgId,
-        quizId,
-      );
+      console.log("handleLambdaCallback", questions)
+      if(category === 'CAnIT') await questionService.addLambdaCallbackQuestions(questions, category, orgId, quizId);
 
       res.status(200).json({ message: 'Scheduled new questions' });
     } catch (error) {

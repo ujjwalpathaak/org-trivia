@@ -31,7 +31,6 @@ export default function ListManager({ orgId, selectedGenre }) {
   };
 
   const [selectedItems, setSelectedItems] = useState(() => {
-    console.log(selectedGenre);
     return selectedGenre.map((genre) => ({
       key: getGenre(genre),
       value: genre,
@@ -75,9 +74,14 @@ export default function ListManager({ orgId, selectedGenre }) {
   };
 
   return (
-    <div className="p-4 border rounded w-64 mx-auto">
+    <div className="px-4 mx-auto">
       <h3 className="mb-2">Available Genres</h3>
       <ul>
+        {availableItems.length === 0 && (
+          <span className="font-bold text-slate-400 flex justify-between items-center mb-2 border p-2">
+            No available genres
+          </span>
+        )}
         {availableItems.map((item) => (
           <li
             key={item.value}
@@ -93,13 +97,12 @@ export default function ListManager({ orgId, selectedGenre }) {
           </li>
         ))}
       </ul>
-      <hr></hr>
       <h3 className="mb-2">Selected Items</h3>
       <ul>
         {selectedItems.map((item, index) => (
           <li
             key={item.value}
-            className="flex justify-between items-center mb-2 border p-2"
+            className="font-bold text-slate-400 flex justify-between items-center mb-2 border p-2"
           >
             <span>{item.key}</span>
             <div>
@@ -113,7 +116,10 @@ export default function ListManager({ orgId, selectedGenre }) {
                   ⬇️
                 </button>
               )}
-              <button onClick={() => removeItem(item)} className="text-red-500">
+              <button
+                onClick={() => removeItem(item)}
+                className="ml-6 text-red-500"
+              >
                 ❌
               </button>
             </div>

@@ -15,7 +15,6 @@ export const ProtectedRoute = ({ children, route }) => {
       (async () => {
         try {
           const live = await isWeeklyQuizLive(orgId, employeeId);
-          console.log('Quiz Live Status:', live);
           setIsQuizLive(live);
         } catch (error) {
           console.error('Error checking quiz status:', error);

@@ -25,8 +25,7 @@ class QuestionService {
   }
 
   async startQuestionGenerationWorkflow(genre, element, quizId) {
-    // console.log(genre, element, quizId);
-    switch (genre) {
+    switch ('CAnIT') {
       case 'PnA':
         console.log('starting PnA');
         this.startPnAWorkflow(element.name, element._id, quizId);
@@ -39,7 +38,12 @@ class QuestionService {
 
       case 'CAnIT':
         console.log('starting CAnIT');
-        // fetchNewCAnITQuestions('Microsoft', 'IT Services', orgId, quizId);
+        fetchNewCAnITQuestions(
+          element.name,
+          'Information Technology',
+          element._id,
+          quizId,
+        );
         break;
 
       default:
@@ -83,11 +87,19 @@ class QuestionService {
       orgId,
     );
 
+    await this.pushQuestionsForApproval(refactoredPnAQuestions, orgId, quizId);
+  }
+
+  async pushQuestionsForApproval(questions, orgId, quizId) {
     await this.questionRepository.pushQuestionsForApproval(
-      refactoredPnAQuestions,
+      questions,
       orgId,
       quizId,
     );
+  }
+
+  async addLambdaCallbackQuestions(questions, category, orgId, quizId){
+    await this.questionRepository.addLambdaCallbackQuestions(questions, category, orgId, quizId);
   }
 
   async getWeeklyUnapprovedQuestions(orgId) {

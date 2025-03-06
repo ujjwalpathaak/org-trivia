@@ -10,7 +10,7 @@ const Navbar = () => {
   const { isAuthenticated, data, logout } = useAuth();
 
   return (
-    <nav className="bg-blue-600 h-16 px-12 fixed top-0 w-full shadow-md text-white flex items-center justify-between">
+    <nav className="bg-blue-600 h-[7vh] px-12 top-0 w-full shadow-md text-white flex items-center justify-between">
       <Link to="/">
         <div className="text-lg h-16 flex items-center bg-white font-bold">
           <img src={DarwinboxLogo} />

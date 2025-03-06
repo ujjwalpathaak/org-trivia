@@ -64,13 +64,12 @@ const QuestionMaker = () => {
   };
 
   return (
-    <div className="parent-page-div flex justify-center items-center">
-      <div className="max-w-2xl mx-auto p-6 bg-white floating-div rounded-xl">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-semibold">Create Question</h1>
-          <button onClick={() => navigate(-1)}>Go back</button>
-        </div>
-
+    <div className="w-1/3 bg-white shine mx-12 floating-div rounded-2xl p-6">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-semibold">Create Question</h1>
+        {/* <button onClick={() => navigate(-1)}>Go back</button> */}
+      </div>
+      <div className="">
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700">
             Question
@@ -83,7 +82,6 @@ const QuestionMaker = () => {
             placeholder="Enter the question here"
           />
         </div>
-
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700">
             Category
@@ -171,15 +169,6 @@ const QuestionMaker = () => {
               </option>
             ))}
           </select>
-        </div>
-
-        <div className="mt-6 flex justify-end">
-          <button
-            onClick={handleSubmit}
-            className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-          >
-            Submit Question
-          </button>
         </div>
       </div>
     </div>

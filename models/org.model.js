@@ -59,8 +59,6 @@ const orgSchema = new mongoose.Schema({
         },
         category: {
           type: String,
-          enum: ['CompanyNews', 'IndustryNews'],
-          required: true,
         },
       },
     ],

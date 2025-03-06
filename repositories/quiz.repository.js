@@ -14,6 +14,7 @@ class QuizRepository {
     ]);
 
     const isQuizGiven = employee?.get('isQuizGiven');
+    // console.log()
     if (isWeeklyQuizLive && !isQuizGiven) return true;
 
     return false;
@@ -66,6 +67,7 @@ class QuizRepository {
     const weeklyQuizQuestions = questions.map((curr) => {
       return curr.question;
     });
+    console.log(weeklyQuizQuestions)
     return {
       weeklyQuizQuestions: weeklyQuizQuestions || [],
       quizId: questions[0]?.quizId || null,
@@ -73,12 +75,14 @@ class QuizRepository {
   }
 
   async approveWeeklyQuizQuestions(questions, orgId) {
-
     const idsOfQuestionsToApprove = questions.map(
       (question) => new ObjectId(question.question._id),
     );
     const category = questions[0].question.category;
     const quizId = questions[0].quizId;
+
+    console.log("category, quizId, orgId", category, quizId, orgId)
+    console.log(idsOfQuestionsToApprove)
 
     if (category === 'PnA') {
       await Org.updateMany(
@@ -97,15 +101,34 @@ class QuizRepository {
         },
       );
     }
+    else if(category === 'CAnIT'){
+      const temp = await Org.updateMany(
+        { _id: new ObjectId(orgId) },
+        {
+          $set: { 'questionsCAnIT.$[elem].isUsed': true },
+        },
+        {
+          arrayFilters: [
+            {
+              'elem.questionId': {
+                $in: idsOfQuestionsToApprove,
+              },
+            },
+          ],
+        },
+      );
+      console.log(temp)
+    }
 
-    await Quiz.updateOne(
+    const updatedQuiz = await Quiz.updateOne(
       { _id: new ObjectId(quizId) },
       { $set: { status: 'approved' } },
     );
-    await WeeklyQuestion.updateMany(
-      { _id: { $in: idsOfQuestionsToApprove } },
+    const updatedWeeklyQuestion = await WeeklyQuestion.updateMany(
+      { 'question._id': { $in: idsOfQuestionsToApprove } },
       { $set: { isApproved: true } },
     );
+    console.log(updatedWeeklyQuestion)
   }
 
   async cleanUpWeeklyQuiz() {
@@ -131,10 +154,12 @@ class QuizRepository {
       (currentQuestion) => currentQuestion._id,
     );
 
-    await Quiz.updateMany({
-    }, {
-      $set: { status: 'expired' },
-    });
+    await Quiz.updateMany(
+      {},
+      {
+        $set: { status: 'expired' },
+      },
+    );
 
     // await Question.updateMany(
     //   { _id: { $in: idsOfQuestionsToClean } },

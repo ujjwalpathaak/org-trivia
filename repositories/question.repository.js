@@ -20,6 +20,25 @@ class QuestionRepository {
     return true;
   }
 
+  async addLambdaCallbackQuestions(newQuestions, category, orgId, quizId){
+    console.log("newQuestions", newQuestions)
+    const formatedQuestions = newQuestions.map((question) => {
+      return {
+        question: question.question,
+        answer: question.answer,
+        options: question.options,
+        category: category,
+        source: 'AI',
+        status: 'extra',
+        image: null,
+        config: { },
+      };
+    })    
+    const temp = await Question.insertMany(formatedQuestions)
+    console.log("temp", temp)
+    await this.pushQuestionsForApproval(temp, orgId, quizId);
+  }
+
   async fetchPnAQuestions(orgId) {
     const simplePnAQuestions = await Org.aggregate([
       {
@@ -57,15 +76,31 @@ class QuestionRepository {
     return simplePnAQuestions;
   }
 
-  async pushQuestionsForApproval(refactoredPnAQuestions, orgId, quizId) {
-    console.log(orgId);
+  async pushQuestionsForApproval(refactoredQuestions, orgId, quizId) {
     const formatedQuestionsWeeklyFormat =
-      await quizService.formatQuestionsWeeklyFormat(
-        refactoredPnAQuestions,
-        orgId,
-        quizId,
-      );
+    await quizService.formatQuestionsWeeklyFormat(
+      refactoredQuestions,
+      orgId,
+      quizId,
+    );
 
+    const temp = refactoredQuestions.map((question) => {
+      return {
+        questionId: new ObjectId(question._id),
+        isUsed: false,
+      };
+    })
+
+    await Org.updateMany({
+      _id: new ObjectId(orgId),
+    }, {
+      $push: {
+        questionsCAnIT: {
+          $each: temp,
+        },
+      },
+    })
+    
     await this.saveWeeklyQuizQuestions(formatedQuestionsWeeklyFormat);
   }
 
@@ -100,7 +135,7 @@ class QuestionRepository {
     return formatedWeeklyQuizCorrectAnswers;
   }
 
-  async saveHRdocQuestions(orgId, questions) {
+  async saveHRdocQuestions(orgId, questions) {    
     return Question.insertMany(questions);
   }
 }

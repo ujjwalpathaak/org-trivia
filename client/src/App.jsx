@@ -30,14 +30,6 @@ function App() {
               }
             />
             <Route
-              path="question-maker"
-              element={
-                <ProtectedRoute>
-                  <QuestionMaker />
-                </ProtectedRoute>
-              }
-            />
-            <Route
               path="quiz"
               element={
                 <ProtectedRoute route="quiz">

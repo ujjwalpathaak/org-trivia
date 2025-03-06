@@ -8,7 +8,6 @@ const Dashboard = () => {
 
   return (
     <div className="font-black flex flex-col justify-center items-center">
-      <div className="h-[6rem]">a</div>
       {data?.user?.role === 'Employee' ? (
         <EmployeeDashboard />
       ) : (
