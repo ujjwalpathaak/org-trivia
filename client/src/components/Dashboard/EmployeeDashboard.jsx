@@ -11,7 +11,6 @@ import {
   Bookmark as BookmarkSimple,
 } from 'lucide-react';
 
-import leaderboard from '../../assets/leaderboard.png';
 import shield1 from '../../assets/lg50.png';
 import shield2 from '../../assets/lg2550.png';
 
@@ -19,6 +18,7 @@ import { createNewQuestion } from '../../api';
 import Quiz from '../../pages/Quiz';
 import { toast } from 'react-toastify';
 import QuestionMaker from '../../pages/QuestionMaker';
+import Leaderboard from '../Leaderboard';
 
 const EmployeeDashboard = () => {
   const orgId = useOrgId();
@@ -230,10 +230,7 @@ const EmployeeDashboard = () => {
 
           <div className="bg-white rounded-lg p-6 shadow mb-4">
             <div className="flex justify-between items-center ">
-              <h3 className="font-semibold">Leaderboard</h3>
-            </div>
-            <div className="relative pt-8">
-              <img src={leaderboard} className="h-ful" />
+              <Leaderboard />
             </div>
           </div>
           <div className="bg-white rounded-lg p-6 shadow mb-4">

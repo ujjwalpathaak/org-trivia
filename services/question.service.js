@@ -132,7 +132,7 @@ class QuestionService {
     return await this.questionRepository.pushQuestionsInOrg(
       refactoredQuestions,
       orgId,
-      genre
+      genre,
     );
   }
 
@@ -164,7 +164,7 @@ class QuestionService {
     );
 
     await this.pushQuestionsForApprovals(questions, orgId, quizId);
-    await this.pushQuestionsInOrg(questions, orgId, "CAnIT");
+    await this.pushQuestionsInOrg(questions, orgId, 'CAnIT');
   }
 
   async validateEmployeeQuestionSubmission(question) {
@@ -235,10 +235,10 @@ class QuestionService {
   async saveHRdocQuestions(orgId, questions) {
     const refactoredQuestions = await this.pushQuestionsToDatabase(
       questions,
-      "HRD",
+      'HRD',
     );
 
-    await this.pushQuestionsInOrg(refactoredQuestions, orgId, "HRD");
+    await this.pushQuestionsInOrg(refactoredQuestions, orgId, 'HRD');
 
     return { status: 200, message: 'HRD Questions saved successfully' };
   }

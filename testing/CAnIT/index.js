@@ -18,6 +18,46 @@ const model = genAI.getGenerativeModel({
 
 const days = 30;
 
+import { pipeline } from "@xenova/transformers";
+
+// Cosine similarity function
+function cosineSimilarity(vecA, vecB) {
+    let dotProduct = vecA.reduce((sum, val, i) => sum + val * vecB[i], 0);
+    let magnitudeA = Math.sqrt(vecA.reduce((sum, val) => sum + val * val, 0));
+    let magnitudeB = Math.sqrt(vecB.reduce((sum, val) => sum + val * val, 0));
+    return dotProduct / (magnitudeA * magnitudeB);
+}
+
+// Function to remove similar headlines
+async function removeSimilarHeadlines(headlines, threshold = 0.8) {
+    const model = await pipeline("feature-extraction", "Xenova/all-MiniLM-L6-v2");
+
+    // Generate embeddings
+    const embeddings = await Promise.all(
+        headlines.map(async (headline) => {
+            const output = await model(headline, { pooling: "mean", normalize: true });
+            return output.data;
+        })
+    );
+
+    const uniqueHeadlines = [];
+    const seenEmbeddings = [];
+
+    for (let i = 0; i < embeddings.length; i++) {
+        let isSimilar = seenEmbeddings.some(seenEmb => 
+            cosineSimilarity(embeddings[i], seenEmb) > threshold
+        );
+
+        if (!isSimilar) {
+            uniqueHeadlines.push(headlines[i]);
+            seenEmbeddings.push(embeddings[i]);
+        }
+    }
+
+    return uniqueHeadlines;
+}
+
+
 async function fetchNews(query) {
   try {
     const rssUrl = 'https://news.google.com/rss/search?q=' + query;
@@ -30,24 +70,7 @@ async function fetchNews(query) {
       .filter((entry) => new Date(entry.pubDate) >= oneMonthAgo)
       .sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
 
-    const uniqueNews = [];
-    const seenTitles = new Set();
-
-    for (const entry of recentNews) {
-      const normalizedTitle = entry.title.toLowerCase().trim();
-
-      if (!seenTitles.has(normalizedTitle)) {
-        seenTitles.add(normalizedTitle);
-        uniqueNews.push(entry);
-      }
-    }
-
-    if (uniqueNews.length === 0) {
-      console.log('No unique news found in the last 1 month.');
-      return;
-    }
-
-    return uniqueNews.map((curr, index) => {
+    return recentNews.map((curr, index) => {
       return `${curr.title}`;
     });
   } catch (error) {
@@ -101,11 +124,9 @@ const generateMCQQuizFromNews = async (pdfText) => {
   return [...JSON.parse(responseText)];
 };
 
-const latestNewsOrg = await fetchNews('Darwinbox');
-console.log('latestNewsOrg: ', latestNewsOrg);
-generateMCQQuizFromNews(JSON.stringify(latestNewsOrg));
+const countryOfOrg = 'India';
+const latestNewsOrg = await fetchNews(`Google ${countryOfOrg}`);
 const latestNewsIndustry = await fetchNews(
-  'HRTech: Human Resources Technology',
+  `Technology ${countryOfOrg}`,
 );
-console.log('latestNewsIndustry: ', latestNewsIndustry);
-generateMCQQuizFromNews(JSON.stringify(latestNewsIndustry));
+removeSimilarHeadlines([...latestNewsOrg, ...latestNewsIndustry]).then(filtered => console.log(filtered));

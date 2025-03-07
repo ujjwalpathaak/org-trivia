@@ -31,7 +31,6 @@ export const getAllOrgs = async () => {
 };
 
 export const createNewQuestion = async (formData) => {
-  console.log(formData)
   try {
     const response = await fetch(`${BACKEND_URL}/question`, {
       method: 'POST',

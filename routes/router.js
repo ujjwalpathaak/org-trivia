@@ -8,6 +8,7 @@ import questionRouter from './question.route.js';
 import cronTestRouter from './cron.test.route.js';
 import resultRouter from './result.route.js';
 import quizRouter from './quiz.route.js';
+import leaderboardRouter from './leaderboard.route.js';
 
 const router = express.Router();
 
@@ -19,6 +20,7 @@ router.use('/org', orgRouter);
 router.use('/question', questionRouter);
 router.use('/cron', cronTestRouter);
 router.use('/result', protectRoute, checkRole('Employee'), resultRouter);
+router.use('/leaderboard', leaderboardRouter);
 router.use('/quiz', quizRouter);
 
 router.use('*', (req, res, next) => {
