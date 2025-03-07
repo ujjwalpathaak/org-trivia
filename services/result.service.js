@@ -1,12 +1,20 @@
+import { getMonthAndYear, mergeAnswers } from '../client/src/utils.js';
 import QuestionRepository from '../repositories/question.repository.js';
 import QuestionService from './question.service.js';
 
 const questionService = new QuestionService(new QuestionRepository());
 
 class ResultService {
-  constructor(resultRepository, employeeRepository) {
+  constructor(
+    resultRepository,
+    employeeRepository,
+    quizRepository,
+    leaderboardRespository,
+  ) {
     this.resultRepository = resultRepository;
     this.employeeRepository = employeeRepository;
+    this.quizRepository = quizRepository;
+    this.leaderboardRespository = leaderboardRespository;
   }
 
   async calculateWeeklyQuizScore(userAnswers, correctAnswers) {
@@ -25,25 +33,57 @@ class ResultService {
     return weeklyQuizScore;
   }
 
+  async getEmployeePastRecords(employeeId) {
+    return await this.leaderboardRespository.getEmployeePastRecords(employeeId);
+  }
+
   async submitWeeklyQuizAnswers(userAnswers, employeeId, orgId, quizId) {
     const correctAnswers = await questionService.getWeeklyQuizCorrectAnswers(
       orgId,
       quizId,
     );
-
+    const quiz = await this.quizRepository.findLiveQuizByOrgId(orgId);
     const userAnswersJSON = JSON.parse(userAnswers);
+    console.log(userAnswersJSON)
     const weeklyQuizScore = await this.calculateWeeklyQuizScore(
       userAnswersJSON,
       correctAnswers,
     );
+    const [month, year] = getMonthAndYear();
 
-    await this.resultRepository.submitWeeklyQuizAnswers();
+    await this.leaderboardRespository.updateLeaderboard(
+      orgId,
+      employeeId,
+      weeklyQuizScore,
+      month,
+      year,
+    );
+
     await this.employeeRepository.updateWeeklyQuizScore(
       employeeId,
       weeklyQuizScore,
     );
 
-    return;
+    const answers = mergeAnswers(correctAnswers, userAnswersJSON)
+
+    await this.resultRepository.submitWeeklyQuizAnswers(
+      employeeId,
+      orgId,
+      quizId,
+      weeklyQuizScore,
+      quiz.scheduledDate,
+      quiz.genre,
+      answers,
+    );
+
+    return true;
+  }
+
+  async fetchEmployeeScore(employeeId) {
+    console.log(employeeId);
+    const quiz = await this.quizRepository.getLiveQuizByEmployeeId(employeeId);
+    console.log(quiz);
+    return await this.resultRepository.getEmployeeScore(employeeId, quiz);
   }
 }
 

@@ -107,20 +107,6 @@ class QuizService {
       message: 'Questions approved.',
     };
   }
-
-  // ----------------------------------------------------------------
-
-  async formatQuestions(questions, orgId, category) {
-    const weeklyQuestions = questions.map((curr) => ({
-      ...curr,
-      source: 'AI',
-      category: category,
-      status: 'live',
-      org: orgId,
-    }));
-
-    return weeklyQuestions;
-  }
 }
 
 export default QuizService;

@@ -8,6 +8,10 @@ class QuizRepository {
     return Quiz.findOne({ orgId: new ObjectId(orgId), status: 'live' });
   }
 
+  async getLiveQuizByEmployeeId(employeeId) {
+    return Quiz.findOne({ employeeId: new ObjectId(employeeId), status: 'live' });
+  }
+
   async doesWeeklyQuizExist(orgId, dateNextFriday) {
     return Quiz.findOne({
       orgId: new ObjectId(orgId),

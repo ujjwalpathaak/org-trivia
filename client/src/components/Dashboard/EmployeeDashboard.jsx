@@ -269,9 +269,6 @@ const EmployeeDashboard = () => {
                       <h6 className="text-slate-400">
                         Score in last quiz: {score.lastQuizScore}
                       </h6>
-                      <h6 className="text-slate-400 mb-2 font-sm">
-                        Total Score: {score.currentPoints}
-                      </h6>
                       <h6 className="text-slate-300 italic font-sm">
                         Next in {daysUntilNextFriday()} days
                       </h6>

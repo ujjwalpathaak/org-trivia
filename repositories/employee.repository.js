@@ -25,7 +25,7 @@ class EmployeeRepository {
   async getEmployeeScore(employeeId) {
     return Employee.findOne(
       { _id: new ObjectId(employeeId) },
-      { lastQuizScore: 1, currentPoints: 1 },
+      { lastQuizScore: 1 },
     );
   }
 
@@ -33,7 +33,6 @@ class EmployeeRepository {
     return Employee.updateOne(
       { _id: new ObjectId(employeeId) },
       {
-        $inc: { currentPoints: updatedWeeklyQuizScore },
         $set: { isQuizGiven: true, lastQuizScore: updatedWeeklyQuizScore },
       },
     );

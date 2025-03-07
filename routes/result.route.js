@@ -9,5 +9,7 @@ resultRouter.post(
   '/submitWeeklyQuizAnswers',
   resultController.submitWeeklyQuizAnswers,
 );
+//
+resultRouter.get('/past/:employeeId', resultController.getEmployeePastRecords);
 
 export default resultRouter;

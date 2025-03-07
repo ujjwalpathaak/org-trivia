@@ -21,6 +21,10 @@ const resultSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    date: {
+      type: Date,
+      required: true,
+    },
     genre: {
       type: String,
       enum: ['PnA', 'CAnIT', 'HRD'],
@@ -32,9 +36,11 @@ const resultSchema = new mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Question',
           },
-          answer: Number,
+          correctAns: Number,
+          myAns: Number,
         },
       ],
+      _id: false,
     },
   },
   { timestamps: true },

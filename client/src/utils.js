@@ -35,3 +35,21 @@ export const validateForm = (formData, setErrors, isLogin = false) => {
   setErrors(newErrors);
   return Object.keys(newErrors).length === 0;
 };
+
+export const mergeAnswers = (correctAnswers, myAnswers) => {
+  return correctAnswers.map(({ _id, answer }) => {
+      const myAnswerObj = myAnswers.find(({ questionId }) => questionId === _id.toString());
+      return {
+        questionId: _id,
+          correctAns: answer,
+          myAns: myAnswerObj ? myAnswerObj.answer : null
+      };
+  });
+}
+
+export const getMonthAndYear = () => {
+  const today = new Date();
+  const month = today.getMonth() + 1;
+  const year = today.getFullYear();
+  return [month, year];
+};

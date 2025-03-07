@@ -22,7 +22,6 @@ const questionSchema = new mongoose.Schema(
     question: {
       type: String,
       trim: true,
-      unique: true,
       required: true,
     },
     answer: {
