@@ -11,9 +11,10 @@ class QuestionController {
   async addQuestion(req, res, next) {
     try {
       const question = req.body;
-      // move backgend validation
-      if (!question) {
-        return res.status(400).json({ message: 'All fields are required' });
+      const errors =
+        await questionService.validateEmployeeQuestionSubmission(question);
+      if (errors) {
+        return res.status(400).json(errors);
       }
 
       const isQuestionAdded = await questionService.saveQuestion(question);
@@ -25,8 +26,6 @@ class QuestionController {
       next(error);
     }
   }
-
-  // ----------------------------------------------------------------
 
   async getWeeklyUnapprovedQuestions(req, res, next) {
     try {

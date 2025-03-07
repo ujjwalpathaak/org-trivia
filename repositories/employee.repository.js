@@ -22,12 +22,19 @@ class EmployeeRepository {
     return Employee.find({ orgId: new ObjectId(orgId) });
   }
 
+  async getEmployeeScore(employeeId) {
+    return Employee.findOne(
+      { _id: new ObjectId(employeeId) },
+      { lastQuizScore: 1, currentPoints: 1 },
+    );
+  }
+
   async updateWeeklyQuizScore(employeeId, updatedWeeklyQuizScore) {
     return Employee.updateOne(
       { _id: new ObjectId(employeeId) },
       {
         $inc: { currentPoints: updatedWeeklyQuizScore },
-        $set: { isQuizGiven: true },
+        $set: { isQuizGiven: true, lastQuizScore: updatedWeeklyQuizScore },
       },
     );
   }

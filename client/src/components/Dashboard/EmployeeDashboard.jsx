@@ -1,7 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { isWeeklyQuizLive } from '../../api';
+import { isWeeklyQuizLive, fetchEmployeeScore } from '../../api';
 import { useOrgId, useUserId } from '../../context/auth.context';
+import {
+  User,
+  Share2,
+  Image,
+  Zap,
+  MessageSquare,
+  Award,
+  Bookmark as BookmarkSimple,
+} from 'lucide-react';
 
 import leaderboard from '../../assets/leaderboard.png';
 import shield1 from '../../assets/lg50.png';
@@ -13,12 +21,23 @@ import { toast } from 'react-toastify';
 import QuestionMaker from '../../pages/QuestionMaker';
 
 const EmployeeDashboard = () => {
-  const navigate = useNavigate();
   const orgId = useOrgId();
   const employeeId = useUserId();
   const [isQuizLive, setIsQuizLive] = useState(false);
   const [isQuestionMakerOpen, setIsQuestionMakerOpen] = useState(false);
   const [isQuizOpen, setIsQuizOpen] = useState(false);
+  const [score, setScore] = useState({
+    currentPoints: 0,
+    lastQuizScore: 0,
+  });
+
+  function daysUntilNextFriday() {
+    const today = new Date();
+    const dayOfWeek = today.getDay();
+    const daysUntilFriday = (5 - dayOfWeek + 7) % 7 || 7;
+
+    return daysUntilFriday;
+  }
 
   useEffect(() => {
     const fetchIsWeeklyQuizLive = async () => {
@@ -30,7 +49,20 @@ const EmployeeDashboard = () => {
         setIsQuizLive(false);
       }
     };
+    const getEmployeeScore = async () => {
+      try {
+        const score = await fetchEmployeeScore(employeeId);
+        setScore({
+          currentPoints: score.currentPoints,
+          lastQuizScore: score.lastQuizScore,
+        });
+      } catch (error) {
+        console.error('Error checking score status:', error);
+        setIsQuizLive(false);
+      }
+    };
     fetchIsWeeklyQuizLive();
+    getEmployeeScore();
   }, [orgId, employeeId]);
 
   const notifyQuestionSubmitted = () => toast('New question submitted!');
@@ -41,188 +73,225 @@ const EmployeeDashboard = () => {
   };
 
   return (
-    <>
-      <div className="w-full bg-[#f2f9ff] h-[93vh] justify-center px-[100px] flex py-16 px-auto">
-        <div className="w-1/5 bg-white floating-div rounded-2xl">
-          <div
-            role="status"
-            className="p-4 rounded-sm shadow-sm animate-pulse md:p-6 "
-          >
-            <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4"></div>
-            <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
-            <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
-            <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
-            <div className="flex items-center mt-4">
-              <svg
-                className="w-10 h-10 me-3 text-gray-200 dark:text-gray-700"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm0 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 13a8.949 8.949 0 0 1-4.951-1.488A3.987 3.987 0 0 1 9 13h2a3.987 3.987 0 0 1 3.951 3.512A8.949 8.949 0 0 1 10 18Z" />
-              </svg>
-              <div>
-                <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-32 mb-2"></div>
-                <div className="w-48 h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
+    <div className="min-h-[93vh] flex justify-center bg-[#f0f2f5]">
+      {/* Main Content */}
+      <div className="pt-4 px-4 grid grid-cols-11 gap-4">
+        {/* Left Sidebar */}
+        <div className="col-span-2 col-start-2">
+          <div className="bg-white rounded-lg p-6 shadow">
+            <div className="flex flex-col items-center">
+              <img
+                src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                alt="Profile"
+                className="w-20 h-20 rounded-full mb-4"
+              />
+              <div className="flex justify-between w-full mb-6">
+                <div className="text-center">
+                  <div className="flex items-center gap-1">
+                    <User className="h-4 w-4" />
+                    <span>0</span>
+                  </div>
+                  <span className="text-sm text-gray-500">Appreciations</span>
+                </div>
+                <div className="text-center">
+                  <div className="flex items-center gap-1">
+                    <Award className="h-4 w-4" />
+                    <span>0</span>
+                  </div>
+                  <span className="text-sm text-gray-500">Awards</span>
+                </div>
               </div>
+              <div className="bg-white">
+                <h2 className="text-lg font-semibold mb-2">My Badges</h2>
+                <div className="flex space-x-2 mb-6">
+                  <span className="text-black px-3 flex flex-col items-center py-1 rounded-lg">
+                    <img className="w-8" src={shield1} />
+                    Star Performer
+                  </span>
+                  <span className="text-black px-3 flex flex-col items-center py-1 rounded-lg">
+                    <img className="w-8" src={shield2} />
+                    Top Scorer
+                  </span>
+                </div>
+              </div>
+              <nav className="w-full space-y-4">
+                <button className="w-full text-left px-4 rounded hover:bg-gray-100 flex items-center gap-2">
+                  <Zap className="h-4 w-4" />
+                  My Activity
+                </button>
+                <button className="w-full text-left px-4 rounded hover:bg-gray-100 flex items-center gap-2">
+                  <BookmarkSimple className="h-4 w-4" />
+                  Saved Posts
+                </button>
+              </nav>
             </div>
-            <span className="sr-only">Loading...</span>
           </div>
-          <div className="bg-white h-1/4 p-4 pb-0">
-            <h2 className="text-lg font-semibold mb-2">My Badges</h2>
-            <div className="flex space-x-2">
-              <span className="border-2 text-black px-3 flex flex-col items-center py-1 rounded-lg">
-                <img className="w-16" src={shield1} />
-                Star Performer
-              </span>
-              <span className="border-2 text-black px-3 flex flex-col items-center py-1 rounded-lg">
-                <img className="w-16" src={shield2} />
-                Top Scorer
-              </span>
+
+          {/* Groups Section */}
+          <div className="bg-white rounded-lg p-6 mt-4 shadow">
+            <div className=" p-3 rounded-xl">
+              <h2 className="text-lg font-semibold mb-2">Submit Question</h2>
+              <ul className="text-slate-400 mb-4">
+                <li>Total Submissions: 25</li>
+                <li>Submissions Accepted: 10</li>
+              </ul>
+              {!isQuestionMakerOpen && (
+                <button
+                  onClick={() => setIsQuestionMakerOpen(true)}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                >
+                  Write Question
+                </button>
+              )}
             </div>
-          </div>
-          <div className="bg-white p-4 pb-0 rounded-2xl">
-            <h2 className="text-lg font-semibold mb-2">Leaderboard</h2>
-            <img src={leaderboard} className="h-ful" />
           </div>
         </div>
         {isQuestionMakerOpen ? (
-          <QuestionMaker />
+          <QuestionMaker setIsQuestionMakerOpen={setIsQuestionMakerOpen} />
         ) : isQuizOpen ? (
           <Quiz setIsQuizLive={setIsQuizLive} setIsQuizOpen={setIsQuizOpen} />
         ) : (
-          <div className="w-1/3 bg-white shine mx-12 floating-div rounded-2xl">
-            <div
-              role="status"
-              className="p-4 border h-full rounded-sm shadow-sm animate-pulse md:p-6 "
-            >
-              <div className="flex items-center justify-center h-48 mb-4 bg-gray-300 rounded-sm dark:bg-gray-700">
-                <svg
-                  className="w-10 h-10 text-gray-200 dark:text-gray-600"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="currentColor"
-                  viewBox="0 0 16 20"
-                >
-                  <path d="M14.066 0H7v5a2 2 0 0 1-2 2H0v11a1.97 1.97 0 0 0 1.934 2h12.132A1.97 1.97 0 0 0 16 18V2a1.97 1.97 0 0 0-1.934-2ZM10.5 6a1.5 1.5 0 1 1 0 2.999A1.5 1.5 0 0 1 10.5 6Zm2.221 10.515a1 1 0 0 1-.858.485h-8a1 1 0 0 1-.9-1.43L5.6 10.039a.978.978 0 0 1 .936-.57 1 1 0 0 1 .9.632l1.181 2.981.541-1a.945.945 0 0 1 .883-.522 1 1 0 0 1 .879.529l1.832 3.438a1 1 0 0 1-.031.988Z" />
-                  <path d="M5 5V.13a2.96 2.96 0 0 0-1.293.749L.879 3.707A2.98 2.98 0 0 0 .13 5H5Z" />
-                </svg>
+          <div className="col-span-5">
+            <div className="bg-white rounded-lg p-6 shadow mb-4">
+              <div className="flex gap-4">
+                <img
+                  src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                  alt="Profile"
+                  className="w-10 h-10 rounded-full"
+                />
+                <input
+                  type="text"
+                  placeholder="Share new learnings!"
+                  className="w-full bg-gray-100 rounded-lg px-4"
+                />
               </div>
-              <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4"></div>
-              <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
-              <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
-              <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
-              <div className="flex items-center mt-4">
-                <svg
-                  className="w-10 h-10 me-3 text-gray-200 dark:text-gray-700"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm0 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 13a8.949 8.949 0 0 1-4.951-1.488A3.987 3.987 0 0 1 9 13h2a3.987 3.987 0 0 1 3.951 3.512A8.949 8.949 0 0 1 10 18Z" />
-                </svg>
-                <div>
-                  <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-32 mb-2"></div>
-                  <div className="w-48 h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
+
+              <div className="mt-4">
+                <h4 className="font-medium mb-4 flex items-center gap-2">
+                  <Share2 className="h-5 w-5 text-blue-500" />
+                  Share-worthy Vibes
+                </h4>
+
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="bg-gray-50 p-4 rounded-lg text-center">
+                    <Image className="h-8 w-8 mx-auto mb-2" />
+                    <p className="text-sm">
+                      Express in pictures! From latest reads to travels
+                    </p>
+                  </div>
+                  <div className="bg-gray-50 p-4 rounded-lg text-center">
+                    <Zap className="h-8 w-8 mx-auto mb-2" />
+                    <p className="text-sm">
+                      Ignite Learning Sparks! Discuss to expand...
+                    </p>
+                  </div>
+                  <div className="bg-gray-50 p-4 rounded-lg text-center">
+                    <MessageSquare className="h-8 w-8 mx-auto mb-2" />
+                    <p className="text-sm">
+                      Share ideas! Get feedback and grow.
+                    </p>
+                  </div>
                 </div>
               </div>
-              <span className="sr-only">Loading...</span>
+            </div>
+
+            <div className="bg-blue-500 text-white rounded-lg p-6 shadow mb-4">
+              <div className="flex items-center gap-4">
+                <div className="flex -space-x-4">
+                  <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+                    AI
+                  </div>
+                  <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+                    RA
+                  </div>
+                  <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+                    +1
+                  </div>
+                </div>
+                <p className="flex-1">
+                  4 people in your organization are celebrating their Birthdays
+                  today!
+                </p>
+              </div>
             </div>
           </div>
         )}
-        <div className="w-1/5 bg-white rounded-2xl floating-div">
-          <div
-            role="status"
-            className="p-4 rounded-sm shadow-sm animate-pulse md:p-6 "
-          >
-            <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4"></div>
-            <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
-            <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
-            <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
-            <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
-            <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
-            <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
-            <span className="sr-only">Loading...</span>
+        <div className="col-span-2">
+          <div className="bg-white rounded-lg p-6 shadow mb-4">
+            <h3 className="font-semibold mb-4">Appreciate your colleagues!</h3>
+            <div className="flex items-center gap-4">
+              <img
+                src="https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                alt="Colleague"
+                className="w-16 h-16 rounded-full"
+              />
+              <div>
+                <p className="text-sm">
+                  Express gratitude and acknowledgment to your colleagues ✨
+                </p>
+              </div>
+            </div>
           </div>
-          {isQuizOpen ? (
-            <>
-              <div className="p-4">
-                <div className="bg-green-100 p-3 rounded-xl">
-                  <h2 className="text-lg font-semibold mb-2">
-                    Weekly Quiz is active! 🎉
-                  </h2>
-                  <h6 className="text-slate-400 font-sm">All the best</h6>
+
+          <div className="bg-white rounded-lg p-6 shadow mb-4">
+            <div className="flex justify-between items-center ">
+              <h3 className="font-semibold">Leaderboard</h3>
+            </div>
+            <div className="relative pt-8">
+              <img src={leaderboard} className="h-ful" />
+            </div>
+          </div>
+          <div className="bg-white rounded-lg p-6 shadow mb-4">
+            {isQuizOpen ? (
+              <>
+                <div className="p-1">
+                  <div className="p-3 rounded-xl">
+                    <h2 className="text-lg font-semibold mb-2">
+                      Weekly Quiz is active! 🎉
+                    </h2>
+                    <h6 className="text-slate-400 font-sm">All the best</h6>
+                  </div>
                 </div>
-              </div>
-            </>
-          ) : (
-            <>
-              <div className="p-4">
-                {isQuizLive ? (
-                  <div className="bg-green-100 p-3 rounded-xl">
-                    <h2 className="text-lg font-semibold mb-2">
-                      Weekly Quiz is live! 🎉
-                    </h2>
-                    <h6 className="text-slate-400 font-sm">
-                      Puzzles and Aptitude
-                    </h6>
-                    <button
-                      onClick={() => setIsQuizOpen(true)}
-                      className="mt-3 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                    >
-                      Start Quiz
-                    </button>
-                  </div>
-                ) : (
-                  <div className="bg-red-100 p-3 rounded-xl">
-                    <h2 className="text-lg font-semibold mb-2">
-                      Quiz has ended
-                    </h2>
-                    <h6 className="text-slate-400 font-sm">Next in 3days</h6>
-                  </div>
-                )}
-              </div>
-              <div className="p-4 ">
-                <div className="bg-purple-100 p-3 rounded-xl">
-                  <h2 className="text-lg font-semibold mb-2">
-                    Submit Question
-                  </h2>
-                  <ul className="text-slate-400 mb-4">
-                    <li>Total Submissions: 25</li>
-                    <li>Submissions Accepted: 10</li>
-                  </ul>
-                  {isQuestionMakerOpen ? (
-                    <div className="flex justify-between items-center">
+              </>
+            ) : (
+              <>
+                <div className="p-1">
+                  {isQuizLive ? (
+                    <div className=" rounded-xl">
+                      <h2 className="text-lg font-semibold mb-2">
+                        Weekly Quiz is live! 🎉
+                      </h2>
+                      <h6 className="text-slate-400 font-sm">
+                        Puzzles and Aptitude
+                      </h6>
                       <button
-                        onClick={handleSubmit}
-                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                        onClick={() => setIsQuizOpen(true)}
+                        className="mt-3 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                       >
-                        Submit Question
-                      </button>
-                      <button
-                        onClick={() => setIsQuestionMakerOpen(false)}
-                        className="text-gray-600 hover:text-red-900 bg-gray-200 hover:bg-red-300 bg-red-200 rounded w-fit px-2 py-1 h-8 flex items-center justify-center"
-                      >
-                        Close
+                        Start Quiz
                       </button>
                     </div>
                   ) : (
-                    <button
-                      onClick={() => setIsQuestionMakerOpen(true)}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                    >
-                      Write Question
-                    </button>
+                    <div className="rounded-xl">
+                      <h2 className="text-lg mb-2">Quiz has ended</h2>
+                      <h6 className="text-slate-400">
+                        Score in last quiz: {score.lastQuizScore}
+                      </h6>
+                      <h6 className="text-slate-400 mb-2 font-sm">
+                        Total Score: {score.currentPoints}
+                      </h6>
+                      <h6 className="text-slate-300 italic font-sm">
+                        Next in {daysUntilNextFriday()} days
+                      </h6>
+                    </div>
                   )}
                 </div>
-              </div>
-            </>
-          )}
+              </>
+            )}
+          </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

@@ -14,7 +14,7 @@ const router = express.Router();
 router.get('/', (req, res) => res.send('API Working'));
 
 router.use('/auth', authRouter);
-router.use('/employee', protectRoute, checkRole('Admin'), employeeRouter);
+router.use('/employee', protectRoute, employeeRouter);
 router.use('/org', orgRouter);
 router.use('/question', questionRouter);
 router.use('/cron', cronTestRouter);

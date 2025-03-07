@@ -37,16 +37,10 @@ const Settings = () => {
   };
 
   return (
-    <div className=" flex items-center justify-center bg-gray-100">
-      <div className="mt-[6rem] w-1/2 floating-div p-6 shadow-lg rounded-lg bg-white">
+    <div className="grid-span-1">
+      <div className="floating-div p-6 shadow-lg rounded-lg bg-white">
         <div className="flex justify-between w-full mb-6">
           <h2 className="text-xl font-bold text-gray-900">Admin Settings</h2>
-          <button
-            onClick={() => navigate('/dashboard')}
-            className="text-base text-gray-900"
-          >
-            Go Back
-          </button>
         </div>
         <hr></hr>
         <div className="mt-4 space-y-4">

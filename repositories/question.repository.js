@@ -1,12 +1,8 @@
 import Question from '../models/question.model.js';
 import WeeklyQuestion from '../models/weeklyQuestion.model.js';
 import { ObjectId } from 'mongodb';
-import QuizRepository from './quiz.repository.js';
-import QuizService from '../services/quiz.service.js';
 import Quiz from '../models/quiz.model.js';
 import Org from '../models/org.model.js';
-
-const quizService = new QuizService(new QuizRepository());
 
 class QuestionRepository {
   async saveQuestion(newQuestion) {
@@ -26,6 +22,11 @@ class QuestionRepository {
       },
       {
         $unwind: '$questionsPnA',
+      },
+      {
+        $match: {
+          'questionsPnA.isUsed': false,
+        },
       },
       {
         $group: {

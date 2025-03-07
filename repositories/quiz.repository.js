@@ -1,5 +1,3 @@
-import Employee from '../models/employee.model.js';
-import Org from '../models/org.model.js';
 import Quiz from '../models/quiz.model.js';
 import WeeklyQuestion from '../models/weeklyQuestion.model.js';
 

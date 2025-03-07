@@ -16,7 +16,7 @@ class QuestionService {
   }
 
   async saveQuestion(newQuestionData) {
-    const orgId = newQuestion.orgId;
+    const orgId = newQuestionData.orgId;
     const newQuestion =
       await this.questionRepository.saveQuestion(newQuestionData);
     const addedToList = await this.orgRepository.addQuestionToOrg(
@@ -56,8 +56,7 @@ class QuestionService {
   }
 
   async startQuestionGenerationWorkflow(genre, element, quizId) {
-    // switch (genre) {
-    switch ('CAnIT') {
+    switch ('PnA') {
       case 'PnA':
         console.log('starting PnA');
         this.startPnAWorkflow(element.name, element._id, quizId);
@@ -171,6 +170,43 @@ class QuestionService {
     );
 
     await this.questionsPipeline(questions, orgId, quizId);
+  }
+
+  async validateEmployeeQuestionSubmission(question) {
+    let errors = {};
+
+    if (!question.question.trim()) {
+      errors.question = 'Question is required.';
+    }
+
+    if (!question.category) {
+      errors.category = 'Category is required.';
+    }
+
+    if (question.category === 'PnA' && !question.config.puzzleType) {
+      errors.puzzleType = 'Puzzle type is required for PnA.';
+    }
+
+    const nonEmptyOptions = question.options.filter((opt) => opt.trim() !== '');
+    if (nonEmptyOptions.length !== 4) {
+      errors.options = 'Four options are required.';
+    }
+
+    if (question.answer === '') {
+      errors.answer = 'Correct answer must be selected.';
+    }
+
+    if (question.image) {
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+      if (!allowedTypes.includes(question.image.type)) {
+        errors.image = 'Only JPG, PNG, and GIF images are allowed.';
+      }
+      if (question.image.size > 5 * 1024 * 1024) {
+        errors.image = 'Image size must be less than 5MB.';
+      }
+    }
+
+    return Object.keys(errors).length;
   }
 
   async getWeeklyUnapprovedQuestions(orgId) {

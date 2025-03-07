@@ -86,7 +86,7 @@ const Quiz = ({ setIsQuizOpen, setIsQuizLive }) => {
   };
 
   return (
-    <div className="w-1/3 bg-white mx-12 floating-div rounded-2xl p-6">
+    <div className="col-span-5 bg-white h-5/6 floating-div rounded-2xl p-6">
       <div className="flex mb-2 justify-between items-center">
         Questions: {`${currentQuestion + 1}/${questions.length}`}
         <p className="text-red-500">Time Left: {timeLeftCurrentQuestion}s</p>
@@ -107,6 +107,10 @@ const Quiz = ({ setIsQuizOpen, setIsQuizLive }) => {
               <h3 className="text-lg font-semibold">
                 {questions[currentQuestion]?.question}
               </h3>
+              <img
+                className="w-1/2 mx-auto mt-6"
+                src={questions[currentQuestion]?.image}
+              />
             </div>
             <div className="grid grid-cols-2 font-normal gap-4">
               {questions[currentQuestion]?.options?.map((option, index) => (

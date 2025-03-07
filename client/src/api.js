@@ -207,7 +207,7 @@ export const submitWeeklyQuizAnswers = async (
       quizId: quizId,
     };
     const response = await fetch(
-      `${BACKEND_URL}/answer/submitWeeklyQuizAnswers`,
+      `${BACKEND_URL}/result/submitWeeklyQuizAnswers`,
       {
         method: 'POST',
         headers: {
@@ -233,6 +233,30 @@ export const isWeeklyQuizLive = async (orgId, employeeId) => {
   try {
     const response = await fetch(
       `${BACKEND_URL}/quiz/status/${orgId}/${employeeId}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to create question');
+    }
+
+    return await response.json();
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+};
+
+export const fetchEmployeeScore = async (employeeId) => {
+  try {
+    const response = await fetch(
+      `${BACKEND_URL}/employee/score/${employeeId}`,
       {
         method: 'GET',
         headers: {

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { getEmployeesByOrg } from '../../api';
 import { useOrgId } from '../../context/auth.context';
 import { useNavigate } from 'react-router-dom';
+import Settings from '../../pages/Settings';
 
 const AdminDashboard = () => {
   const orgId = useOrgId();
@@ -40,23 +41,10 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="bg-[#f2f9ff] flex flex-col pt-12 items-center h-[93vh] w-[100vw] p-6">
-      <div className="grid max-w-6xl grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white p-4 rounded-2xl shadow-lg">
-          <h2 className="text-lg font-semibold mb-2">All Employees</h2>
-          <ListEmployees />
-        </div>
-
-        <div className="bg-white p-4 rounded-2xl shadow-lg">
-          <h2 className="text-lg font-semibold mb-2">Leaderboard</h2>
-          <ul className="text-gray-700">
-            <li>🥇 Alice - 980 pts</li>
-            <li>🥈 Bob - 920 pts</li>
-            <li>🥉 Charlie - 860 pts</li>
-          </ul>
-        </div>
-
-        <div className="bg-white p-4 rounded-2xl shadow-lg">
+    <div className="bg-[#f2f9ff] pt-12 items-center h-[93vh] w-[100vw] p-6">
+      <div className="grid grid-cols-2 gap-6">
+        <Settings />
+        <div className="bg-white w-fit h-fit p-4 rounded-2xl shadow-lg">
           <h2 className="text-lg font-semibold mb-2">Approve Questions</h2>
           <p className="text-gray-600">Review and approve pending questions.</p>
           <button
@@ -64,19 +52,6 @@ const AdminDashboard = () => {
             className="mt-3 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
           >
             View Pending Questions
-          </button>
-        </div>
-
-        <div className="bg-white p-4 rounded-2xl shadow-lg">
-          <h2 className="text-lg font-semibold mb-2">Settings</h2>
-          <p className="text-gray-600">
-            Manage admin settings and configurations.
-          </p>
-          <button
-            onClick={() => navigate('settings')}
-            className="mt-3 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
-          >
-            Open Settings
           </button>
         </div>
       </div>

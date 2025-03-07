@@ -3,7 +3,11 @@ import Org from '../models/org.model.js';
 import { ObjectId } from 'mongodb';
 
 class OrgRepository {
-  async updateQuestionsStatus(orgId, category, idsOfQuestionsToApprove) {
+  async updateQuestionsStatusInOrgToUsed(
+    orgId,
+    category,
+    idsOfQuestionsToApprove,
+  ) {
     const categoryMap = {
       PnA: 'questionsPnA',
       CAnIT: 'questionsCAnIT',

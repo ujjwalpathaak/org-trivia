@@ -39,7 +39,7 @@ export const fetchNewCAnITQuestions = (orgName, orgIndustry, orgId, quizId) => {
     },
     body: JSON.stringify({
       orgName: orgName,
-      callbackUrl: 'https://886b-110-235-225-137.ngrok-free.app',
+      callbackUrl: 'https://cd21-122-187-121-22.ngrok-free.app',
       orgIndustry: orgIndustry,
       orgId: orgId,
       quizId: quizId,

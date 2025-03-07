@@ -1,5 +1,7 @@
 import { getNextFridayDate } from '../middleware/utils.js';
 
+import { ObjectId } from 'mongodb';
+
 class QuizService {
   constructor(quizRepository, employeeRepository, orgRepository) {
     this.quizRepository = quizRepository;
@@ -87,9 +89,15 @@ class QuizService {
     const idsOfQuestionsToApprove = unapprovedQuestions.map(
       (q) => new ObjectId(q.question._id),
     );
-    const quizId = unapprovedQuestions[0].quizId || null;
 
-    await this.orgRepository.updateQuestionsStatus(orgId);
+    const quizId = unapprovedQuestions[0].quizId || null;
+    const category = unapprovedQuestions[0].question.category || null;
+
+    await this.orgRepository.updateQuestionsStatusInOrgToUsed(
+      orgId,
+      category,
+      idsOfQuestionsToApprove,
+    );
     await this.quizRepository.updateQuizStatusToApproved(quizId);
     await this.quizRepository.updateWeeklyQuestionsStatusToApproved(
       idsOfQuestionsToApprove,

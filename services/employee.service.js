@@ -9,6 +9,10 @@ class EmployeeService {
 
     return orgEmployees;
   }
+
+  async fetchEmployeeScore(employeeId) {
+    return await this.employeeRepository.getEmployeeScore(employeeId);
+  }
 }
 
 export default EmployeeService;

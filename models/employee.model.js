@@ -25,6 +25,10 @@ const employeeSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    lastQuizScore: {
+      type: Number,
+      default: 0,
+    },
     role: {
       type: String,
       default: 'Employee',
