@@ -1,46 +1,20 @@
 import Question from '../models/question.model.js';
 import WeeklyQuestion from '../models/weeklyQuestion.model.js';
 import { ObjectId } from 'mongodb';
-import OrgRepository from './org.repository.js';
-import QuizRepository from './quiz.repository.js';
-import QuizService from '../services/quiz.service.js';
 import Quiz from '../models/quiz.model.js';
 import Org from '../models/org.model.js';
 
-const orgRepository = new OrgRepository();
-const quizService = new QuizService(new QuizRepository());
-
 class QuestionRepository {
   async saveQuestion(newQuestion) {
-    const orgId = newQuestion.orgId;
-    const question = await new Question(newQuestion).save();
-    const addedToList = await orgRepository.addQuestionToOrg(question, orgId);
-    if (!question || !addedToList) return false;
-
-    return true;
+    return new Question(newQuestion).save();
   }
 
-  async addLambdaCallbackQuestions(newQuestions, category, orgId, quizId){
-    console.log("newQuestions", newQuestions)
-    const formatedQuestions = newQuestions.map((question) => {
-      return {
-        question: question.question,
-        answer: question.answer,
-        options: question.options,
-        category: category,
-        source: 'AI',
-        status: 'extra',
-        image: null,
-        config: { },
-      };
-    })    
-    const temp = await Question.insertMany(formatedQuestions)
-    console.log("temp", temp)
-    await this.pushQuestionsForApproval(temp, orgId, quizId);
+  async addQuestions(newQuestions) {
+    return Question.insertMany(newQuestions);
   }
 
   async fetchPnAQuestions(orgId) {
-    const simplePnAQuestions = await Org.aggregate([
+    return Org.aggregate([
       {
         $match: {
           _id: orgId,
@@ -48,6 +22,11 @@ class QuestionRepository {
       },
       {
         $unwind: '$questionsPnA',
+      },
+      {
+        $match: {
+          'questionsPnA.isUsed': false,
+        },
       },
       {
         $group: {
@@ -72,133 +51,76 @@ class QuestionRepository {
         },
       },
     ]);
+  }
 
-    return simplePnAQuestions;
+  async pushQuestionsInOrg(finalFormatedRefactoredQuestions, orgId) {
+    return Org.updateMany(
+      {
+        _id: new ObjectId(orgId),
+      },
+      {
+        $push: {
+          questionsCAnIT: {
+            $each: finalFormatedRefactoredQuestions,
+          },
+        },
+      },
+    );
+  }
+
+  async getCorrectWeeklyQuizAnswers(orgId) {
+    return WeeklyQuestion.find({
+      orgId: new ObjectId(orgId),
+    })
+      .select('question._id question.answer')
+      .lean();
+  }
+
+  async saveWeeklyQuizQuestions(newQuestions) {
+    return WeeklyQuestion.insertMany(newQuestions);
+  }
+
+  // move to quiz repo
+  async getUpcomingWeeklyQuiz(orgId) {
+    return Quiz.findOne({
+      orgId: new ObjectId(orgId),
+      status: 'upcoming',
+    });
+  }
+
+  async getWeeklyUnapprovedQuestions(quizId) {
+    return WeeklyQuestion.find({ quizId: quizId });
   }
 
   async fetchHRDQuestions(orgId) {
-    const HRDQuestions = await Org.aggregate([
+    return Org.aggregate([
       {
-        $match: { _id: orgId }
+        $match: { _id: orgId },
       },
       {
-        $unwind: '$questionsHRD'
+        $unwind: '$questionsHRD',
       },
       {
-        $match: { 'questionsHRD.isUsed': false } // Filter only where isUsed is false
+        $match: { 'questionsHRD.isUsed': false },
       },
       {
-        $sample: { size: 5 } // Get 5 random questions from isUsed: false
+        $sample: { size: 5 },
       },
       {
         $lookup: {
           from: 'questions',
           localField: 'questionsHRD.questionId',
           foreignField: '_id',
-          as: 'questionDetails'
-        }
+          as: 'questionDetails',
+        },
       },
       {
-        $unwind: '$questionDetails'
+        $unwind: '$questionDetails',
       },
       {
-        $replaceRoot: { newRoot: '$questionDetails' }
-      }
+        $replaceRoot: { newRoot: '$questionDetails' },
+      },
     ]);
-    
-
-    return HRDQuestions;
-  }
-
-  async pushQuestionsForApproval(refactoredQuestions, orgId, quizId) {
-    const formatedQuestionsWeeklyFormat =
-    await quizService.formatQuestionsWeeklyFormat(
-      refactoredQuestions,
-      orgId,
-      quizId,
-    );
-
-    const temp = refactoredQuestions.map((question) => {
-      return {
-        questionId: new ObjectId(question._id),
-        isUsed: false,
-      };
-    })
-
-    await Org.updateMany({
-      _id: new ObjectId(orgId),
-    }, {
-      $push: {
-        questionsCAnIT: {
-          $each: temp,
-        },
-      },
-    })
-    
-    await this.saveWeeklyQuizQuestions(formatedQuestionsWeeklyFormat);
-  }
-
-  async pushQuestionsForApprovalHRD(refactoredQuestions, orgId, quizId) {
-    const formatedQuestionsWeeklyFormat =
-    await quizService.formatQuestionsWeeklyFormat(
-      refactoredQuestions,
-      orgId,
-      quizId,
-    );
-
-    const temp = refactoredQuestions.map((question) => {
-      return {
-        questionId: new ObjectId(question._id),
-        isUsed: false,
-      };
-    })
-
-    await Org.updateMany({
-      _id: new ObjectId(orgId),
-    }, {
-      $push: {
-        questionsHRD: {
-          $each: temp,
-        },
-      },
-    })
-    
-    await this.saveWeeklyQuizQuestions(formatedQuestionsWeeklyFormat);
-  }
-
-  async saveWeeklyQuizQuestions(newQuestions) {
-    return await WeeklyQuestion.insertMany(newQuestions);
-  }
-
-  async getWeeklyUnapprovedQuestions(orgId) {
-    const quiz = await Quiz.findOne({
-      orgId: new ObjectId(orgId),
-      status: 'upcoming',
-    });
-    if (!quiz) return false;
-
-    const quizId = quiz._id;
-
-    const weeklyQuizQuestions = await WeeklyQuestion.find({ quizId: quizId });
-    return weeklyQuizQuestions || [];
-  }
-
-  async getWeeklyQuizCorrectAnswers(orgId) {
-    const weeklyQuizCorrectAnswers = await WeeklyQuestion.find({
-      orgId: new ObjectId(orgId),
-    })
-      .select('question._id question.answer')
-      .lean();
-
-    const formatedWeeklyQuizCorrectAnswers = weeklyQuizCorrectAnswers.map(
-      (curr) => curr.question,
-    );
-
-    return formatedWeeklyQuizCorrectAnswers;
-  }
-
-  async saveHRdocQuestions(orgId, questions) {    
-    return await Question.insertMany(questions);
   }
 }
 

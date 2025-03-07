@@ -20,7 +20,20 @@ class EmployeeController {
     }
   }
 
-  // ------------------------
+  async fetchEmployeeScore(req, res, next) {
+    try {
+      const { employeeId } = req.params;
+      if (!employeeId) {
+        return res.status(400).json({ message: 'Missing required fields' });
+      }
+      const employeeScore =
+        await employeeService.fetchEmployeeScore(employeeId);
+
+      res.status(200).json(employeeScore);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export default EmployeeController;

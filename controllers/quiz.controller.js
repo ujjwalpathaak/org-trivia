@@ -2,8 +2,14 @@ import QuizService from '../services/quiz.service.js';
 import QuizRepository from '../repositories/quiz.repository.js';
 import QuestionRepository from '../repositories/question.repository.js';
 import QuestionService from '../services/question.service.js';
+import EmployeeRepository from '../repositories/employee.repository.js';
+import OrgRepository from '../repositories/org.repository.js';
 
-const quizService = new QuizService(new QuizRepository());
+const quizService = new QuizService(
+  new QuizRepository(),
+  new EmployeeRepository(),
+  new OrgRepository(),
+);
 const questionService = new QuestionService(new QuestionRepository());
 
 class QuizController {
@@ -55,7 +61,9 @@ class QuizController {
       next(error);
     }
   }
-  //  ----------------------------------------------------------------
+
+  // ---------------------------------------------------------
+
   async handleLambdaCallback(req, res, next) {
     try {
       const { questions, orgId, category, quizId } = req.body;
@@ -63,25 +71,16 @@ class QuizController {
         next(new Error('Invalid request body'));
         return;
       }
-      console.log("handleLambdaCallback", questions)
-      if(category === 'CAnIT') await questionService.addLambdaCallbackQuestions(questions, category, orgId, quizId);
+
+      if (category === 'CAnIT')
+        await questionService.addLambdaCallbackQuestions(
+          questions,
+          category,
+          orgId,
+          quizId,
+        );
 
       res.status(200).json({ message: 'Scheduled new questions' });
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  async scheduleNewQuiz(req, res, next) {
-    try {
-      const { orgId } = req.params;
-      if (!orgId) {
-        return res.status(400).json({ message: 'Missing required fields' });
-      }
-
-      const response = await quizService.scheduleNewQuiz(orgId);
-
-      res.status(response.status).json(response.data);
     } catch (error) {
       next(error);
     }

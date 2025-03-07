@@ -1,9 +1,13 @@
-import AnswerRepository from '../repositories/answer.repository.js';
-import AnswerService from '../services/answer.service.js';
+import EmployeeRepository from '../repositories/employee.repository.js';
+import ResultRepository from '../repositories/result.repository.js';
+import ResultService from '../services/result.service.js';
 
-const answerService = new AnswerService(new AnswerRepository());
+const resultService = new ResultService(
+  new ResultRepository(),
+  new EmployeeRepository(),
+);
 
-class AnswerController {
+class ResultController {
   async submitWeeklyQuizAnswers(req, res, next) {
     try {
       const { answers, employeeId, orgId, quizId } = req.body;
@@ -11,7 +15,7 @@ class AnswerController {
         return res.status(400).json({ message: 'All fields are required' });
       }
 
-      await answerService.submitWeeklyQuizAnswers(
+      await resultService.submitWeeklyQuizAnswers(
         answers,
         employeeId,
         orgId,
@@ -25,4 +29,4 @@ class AnswerController {
   }
 }
 
-export default AnswerController;
+export default ResultController;

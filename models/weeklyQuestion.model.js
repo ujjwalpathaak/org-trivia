@@ -22,6 +22,7 @@ const questionSchema = new mongoose.Schema(
     question: {
       type: String,
       trim: true,
+      unique: true,
       required: true,
     },
     answer: {
@@ -43,18 +44,11 @@ const questionSchema = new mongoose.Schema(
       type: String,
       enum: ['done', 'extra', 'live'],
       required: true,
-      default: 'live',
+      default: 'extra',
     },
-    date: {
-      type: Date,
-    },
-    lastModifiedBy: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Admin',
-    },
-    lastModifiedAt: {
-      type: Date,
-      default: Date.now,
+    config: {
+      type: Object,
+      default: {},
     },
   },
   { timestamps: true },

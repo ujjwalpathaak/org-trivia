@@ -16,9 +16,9 @@ export const getNextFridayDate = () => {
   const dayOfWeek = today.getDay();
   const daysUntilFriday = (5 - dayOfWeek + 7) % 7 || 7;
 
-  const nextFriday = new Date();
+  const nextFriday = new Date(today);
   nextFriday.setDate(today.getDate() + daysUntilFriday);
   nextFriday.setHours(0, 0, 0, 0);
 
-  return nextFriday.toISOString().split('T')[0];
+  return nextFriday;
 };

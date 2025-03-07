@@ -50,14 +50,6 @@ const questionSchema = new mongoose.Schema(
       type: Object,
       default: {},
     },
-    lastModifiedBy: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Admin',
-    },
-    lastModifiedAt: {
-      type: Date,
-      default: Date.now,
-    },
   },
   { timestamps: true },
 );

@@ -4,10 +4,15 @@ import QuestionRepository from '../repositories/question.repository.js';
 import QuestionService from '../services/question.service.js';
 import QuizService from '../services/quiz.service.js';
 import QuizRepository from '../repositories/quiz.repository.js';
+import EmployeeRepository from '../repositories/employee.repository.js';
 
 const questionservice = new QuestionService(new QuestionRepository());
 const orgService = new OrgService(new OrgRepository());
-const quizService = new QuizService(new QuizRepository());
+const quizService = new QuizService(
+  new QuizRepository(),
+  new EmployeeRepository(),
+  new OrgRepository(),
+);
 
 class CronTestController {
   async startPnAWorkflow(req, res, next) {
@@ -60,9 +65,9 @@ class CronTestController {
 
   async cleanWeeklyQuiz(req, res, next) {
     try {
-      const response = await quizService.cleanWeeklyQuizQuestions();
+      const response = await quizService.cleanUpWeeklyQuiz();
 
-      res.status(response.status).json(response.data);
+      res.status(200).json({ message: 'Weekly quiz cleaned successfully' });
     } catch (error) {
       next(error);
     }

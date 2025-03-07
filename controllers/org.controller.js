@@ -34,16 +34,6 @@ class OrgController {
       next(error);
     }
   }
-  // ----------------------------------------------------------------
-  async getAllOrgNames(req, res, next) {
-    try {
-      const response = await orgService.getAllOrgNames();
-
-      res.status(response.status).json(response.data);
-    } catch (error) {
-      next(error);
-    }
-  }
 
   async toggleTrivia(req, res, next) {
     try {
@@ -53,6 +43,17 @@ class OrgController {
       }
 
       const response = await orgService.toggleTrivia(orgId);
+
+      res.status(200).json(response);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // ----------------------------------------------------------------
+  async getAllOrgNames(req, res, next) {
+    try {
+      const response = await orgService.getAllOrgNames();
 
       res.status(response.status).json(response.data);
     } catch (error) {

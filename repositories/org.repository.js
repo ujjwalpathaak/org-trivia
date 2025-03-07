@@ -3,6 +3,39 @@ import Org from '../models/org.model.js';
 import { ObjectId } from 'mongodb';
 
 class OrgRepository {
+  async updateQuestionsStatusInOrgToUsed(
+    orgId,
+    category,
+    idsOfQuestionsToApprove,
+  ) {
+    const categoryMap = {
+      PnA: 'questionsPnA',
+      CAnIT: 'questionsCAnIT',
+      HRD: 'questionsHRD',
+    };
+
+    const questionField = categoryMap[category];
+    if (!questionField) {
+      throw new Error('Invalid category');
+    }
+
+    return await Org.updateMany(
+      { _id: new ObjectId(orgId) },
+      {
+        $set: { [`${questionField}.$[elem].isUsed`]: true },
+      },
+      {
+        arrayFilters: [
+          {
+            'elem.questionId': {
+              $in: idsOfQuestionsToApprove,
+            },
+          },
+        ],
+      },
+    );
+  }
+
   async addQuestionToOrg(question, orgId) {
     const questionId = question._id;
     const questionCategory = question.category;
@@ -39,10 +72,9 @@ class OrgRepository {
   }
 
   async getTriviaEnabledOrgs() {
-    const triviaEnabledOrgs = await Org.find({
+    return Org.find({
       'settings.isTriviaEnabled': true,
     });
-    return triviaEnabledOrgs;
   }
 
   async setNextQuestionGenre(orgId, currentGenreIndex) {
@@ -62,42 +94,33 @@ class OrgRepository {
   }
 
   async changeGenreSettings(genre, orgId) {
-    await Org.updateOne(
+    return Org.updateOne(
       { _id: orgId },
       { $set: { 'settings.selectedGenre': genre } },
     );
-
-    return true;
   }
 
   async getSettings(orgId) {
     return Org.findById(orgId).select('settings');
   }
 
-  // ----------------------------------------------------------------
   async getAllOrgNames() {
-    const orgs = await Org.find({}).select('id name');
-
-    return orgs;
+    return Org.find({}).select('id name');
   }
 
   async getOrgById(orgId) {
-    const org = await Org.findById(orgId);
-
-    return org;
+    return Org.findById(orgId);
   }
 
-  async toggleTrivia(orgId) {
-    const org = await Org.findById(orgId).select('settings.isTriviaEnabled');
-    if (!org) throw new Error('Organization not found');
+  async isTriviaEnabled(orgId) {
+    return Org.findById(orgId).select('settings.isTriviaEnabled');
+  }
 
-    const newStatus = !org.settings.isTriviaEnabled;
-    await Org.updateOne(
+  async updateTriviaSettings(orgId, newStatus) {
+    return Org.updateOne(
       { _id: orgId },
       { $set: { 'settings.isTriviaEnabled': newStatus } },
     );
-
-    return newStatus;
   }
 }
 
