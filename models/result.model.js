@@ -7,6 +7,11 @@ const resultSchema = new mongoose.Schema(
       ref: 'Employee',
       required: true,
     },
+    orgId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Org',
+      required: true,
+    },
     quizId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Quiz',
@@ -16,7 +21,11 @@ const resultSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    results: {
+    genre: {
+      type: String,
+      enum: ['PnA', 'CAnIT', 'HRD'],
+    },
+    answers: {
       type: [
         {
           questionId: {
