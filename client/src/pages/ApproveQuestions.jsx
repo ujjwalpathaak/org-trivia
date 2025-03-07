@@ -49,7 +49,7 @@ export default function ScheduleQuestions() {
   const [questions, setQuestions] = useState([]);
   const orgId = useOrgId();
 
-  const noQuestionFound = () => toast('No questions found to approve');
+  const noQuestionFound = () => toast('No pending questions found');
   const toastShownRef = useRef(false);
 
   useEffect(() => {

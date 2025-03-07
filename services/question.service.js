@@ -56,7 +56,7 @@ class QuestionService {
   }
 
   async startQuestionGenerationWorkflow(genre, element, quizId) {
-    switch ('PnA') {
+    switch ('HRD') {
       case 'PnA':
         console.log('starting PnA');
         this.startPnAWorkflow(element.name, element._id, quizId);
@@ -126,12 +126,13 @@ class QuestionService {
     );
   }
 
-  async pushQuestionsInOrg(questions, orgId) {
+  async pushQuestionsInOrg(questions, orgId, genre) {
     const refactoredQuestions = await this.formatQuestionsForOrgs(questions);
 
     return await this.questionRepository.pushQuestionsInOrg(
       refactoredQuestions,
       orgId,
+      genre
     );
   }
 
@@ -140,15 +141,8 @@ class QuestionService {
       questions,
       category,
     );
-    const response =
-      await this.questionRepository.addQuestions(refactoredQuestions);
 
-    return response;
-  }
-
-  async questionsPipeline(refactoredPnAQuestions, orgId, quizId) {
-    await this.pushQuestionsForApprovals(refactoredPnAQuestions, orgId, quizId);
-    await this.pushQuestionsInOrg(refactoredPnAQuestions, orgId, quizId);
+    return await this.questionRepository.addQuestions(refactoredQuestions);
   }
 
   async startPnAWorkflow(companyName, orgId, quizId) {
@@ -160,16 +154,17 @@ class QuestionService {
       orgId,
     );
 
-    await this.questionsPipeline(refactoredPnAQuestions, orgId, quizId);
+    await this.pushQuestionsForApprovals(refactoredPnAQuestions, orgId, quizId);
   }
 
-  async addLambdaCallbackQuestions(newQuestions, category, orgId, quizId) {
+  async addLambdaCallbackCAnITQuestions(newQuestions, category, orgId, quizId) {
     const questions = await this.pushQuestionsToDatabase(
       newQuestions,
       category,
     );
 
-    await this.questionsPipeline(questions, orgId, quizId);
+    await this.pushQuestionsForApprovals(questions, orgId, quizId);
+    await this.pushQuestionsInOrg(questions, orgId, "CAnIT");
   }
 
   async validateEmployeeQuestionSubmission(question) {
@@ -230,56 +225,23 @@ class QuestionService {
   }
 
   async startHRDWorkflow(orgId, quizId) {
-    const hrdQuestions = await this.questionRepository.fetchHRDQuestions(orgId);
+    const questions = await this.questionRepository.fetchHRDQuestions(orgId);
 
-    await this.questionsPipeline(hrdQuestions, orgId, quizId);
+    await this.pushQuestionsForApprovals(questions, orgId, quizId);
   }
 
-  // formatHRDQuestions(orgId, questions) {
-  //   return questions.map((curr) => ({
-  //     ...curr,
-  //     source: 'AI',
-  //     category: 'HRD',
-  //     status: 'extra',
-  //     org: orgId,
-  //   }));
-  // }
+  // async savePnAQuestion(orgId, quizId, question) { return }
 
-  // async saveHRdocQuestions(orgId, questions) {
-  //   const formatedQuestions = await this.formatHRDQuestions(orgId, questions);
-  //   const newQuestions = await this.questionRepository.saveHRdocQuestions(
-  //     orgId,
-  //     formatedQuestions,
-  //   );
+  async saveHRdocQuestions(orgId, questions) {
+    const refactoredQuestions = await this.pushQuestionsToDatabase(
+      questions,
+      "HRD",
+    );
 
-  //   console.log('newQuestions', newQuestions);
+    await this.pushQuestionsInOrg(refactoredQuestions, orgId, "HRD");
 
-  //   const temp = newQuestions.map((question) => {
-  //     return {
-  //       questionId: question._id,
-  //       isUsed: false,
-  //     };
-  //   });
-
-  //   console.log('temp', temp);
-
-  //   const update = await Org.updateMany(
-  //     {
-  //       _id: new ObjectId(orgId),
-  //     },
-  //     {
-  //       $push: {
-  //         questionsHRD: {
-  //           $each: temp,
-  //         },
-  //       },
-  //     },
-  //   );
-
-  //   console.log('update', update);
-
-  //   return { status: 200, message: 'Content saved successfully' };
-  // }
+    return { status: 200, message: 'HRD Questions saved successfully' };
+  }
 }
 
 export default QuestionService;

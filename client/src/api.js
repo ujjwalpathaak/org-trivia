@@ -30,19 +30,8 @@ export const getAllOrgs = async () => {
   return response;
 };
 
-export const getEmployeesByOrg = async (orgId) => {
-  const response = await fetch(BACKEND_URL + `/employee/org/${orgId}`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-  });
-  const responseJSON = await response.json();
-  return responseJSON;
-};
-
 export const createNewQuestion = async (formData) => {
+  console.log(formData)
   try {
     const response = await fetch(`${BACKEND_URL}/question`, {
       method: 'POST',

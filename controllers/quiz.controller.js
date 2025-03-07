@@ -73,7 +73,7 @@ class QuizController {
       }
 
       if (category === 'CAnIT')
-        await questionService.addLambdaCallbackQuestions(
+        await questionService.addLambdaCallbackCAnITQuestions(
           questions,
           category,
           orgId,

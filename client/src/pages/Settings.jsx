@@ -38,7 +38,7 @@ const Settings = () => {
 
   return (
     <div className="grid-span-1">
-      <div className="floating-div p-6 shadow-lg rounded-lg bg-white">
+      <div className="rounded-lg bg-white">
         <div className="flex justify-between w-full mb-6">
           <h2 className="text-xl font-bold text-gray-900">Admin Settings</h2>
         </div>

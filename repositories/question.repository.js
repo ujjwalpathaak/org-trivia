@@ -53,20 +53,21 @@ class QuestionRepository {
     ]);
   }
 
-  async pushQuestionsInOrg(finalFormatedRefactoredQuestions, orgId) {
+  async pushQuestionsInOrg(finalFormatedRefactoredQuestions, orgId, genre) {
+    const fieldName = `questions${genre}`;
+  
     return Org.updateMany(
-      {
-        _id: new ObjectId(orgId),
-      },
+      { _id: new ObjectId(orgId) },
       {
         $push: {
-          questionsCAnIT: {
+          [fieldName]: {
             $each: finalFormatedRefactoredQuestions,
           },
         },
-      },
+      }
     );
   }
+  
 
   async getCorrectWeeklyQuizAnswers(orgId) {
     return WeeklyQuestion.find({

@@ -106,20 +106,25 @@ export default function ListManager({ orgId, selectedGenre }) {
           >
             <span>{item.key}</span>
             <div>
-              {index !== 0 && (
-                <button onClick={() => moveItem(index, -1)} className="mr-1">
-                  ⬆️
-                </button>
-              )}
-              {index !== selectedItems.length - 1 && (
-                <button onClick={() => moveItem(index, 1)} className="mr-1">
-                  ⬇️
-                </button>
-              )}
-              <button
-                onClick={() => removeItem(item)}
-                className="ml-6 text-red-500"
-              >
+              <div className="">
+                {index !== 0 && (
+                  <button
+                    onClick={() => moveItem(index, -1)}
+                    className="mx-auto"
+                  >
+                    ⬆️
+                  </button>
+                )}
+                {index !== selectedItems.length - 1 && (
+                  <button
+                    onClick={() => moveItem(index, 1)}
+                    className="mx-auto"
+                  >
+                    ⬇️
+                  </button>
+                )}
+              </div>
+              <button onClick={() => removeItem(item)} className="text-red-500">
                 ❌
               </button>
             </div>

@@ -60,7 +60,7 @@ class QuestionController {
         questions,
       );
 
-      res.status(response.status).json(response.data);
+      res.status(200).json(response);
     } catch (error) {
       next(error);
     }

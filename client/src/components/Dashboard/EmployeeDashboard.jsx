@@ -220,11 +220,6 @@ const EmployeeDashboard = () => {
           <div className="bg-white rounded-lg p-6 shadow mb-4">
             <h3 className="font-semibold mb-4">Appreciate your colleagues!</h3>
             <div className="flex items-center gap-4">
-              <img
-                src="https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                alt="Colleague"
-                className="w-16 h-16 rounded-full"
-              />
               <div>
                 <p className="text-sm">
                   Express gratitude and acknowledgment to your colleagues ✨
