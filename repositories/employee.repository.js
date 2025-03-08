@@ -29,11 +29,36 @@ class EmployeeRepository {
     );
   }
 
+  async newMultiplier(updatedStreak){
+    switch(updatedStreak) {
+      case 7:
+        return 1.5;
+      default:
+        return 1;
+    }
+  }
+
   async updateWeeklyQuizScore(employeeId, updatedWeeklyQuizScore) {
+    const thisQuizDate = new Date().setHours(0, 0, 0, 0);
+    const employee = await Employee.findOne(
+      { _id: new ObjectId(employeeId) },
+      { lastQuizDate: 1, currentStreak: 1, multiplier: 1 }
+    );
+
+    const lastQuizDate = employee.lastQuizDate ? new Date(employee.lastQuizDate).setHours(0, 0, 0, 0) : null;
+    let updatedStreak = 0;
+
+    if (lastQuizDate && thisQuizDate - lastQuizDate === 7 * 24 * 60 * 60 * 1000) {
+      updatedStreak = employee.currentStreak + 1;
+    }
+
+    const multi = this.newMultiplier(updatedStreak);
+    updatedWeeklyQuizScore *= multi;
+
     return Employee.updateOne(
       { _id: new ObjectId(employeeId) },
       {
-        $set: { isQuizGiven: true, lastQuizScore: updatedWeeklyQuizScore },
+        $set: { isQuizGiven: true, lastQuizDate: thisQuizDate, currentStreak: updatedStreak, lastQuizScore: updatedWeeklyQuizScore },
       },
     );
   }

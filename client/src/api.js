@@ -217,6 +217,30 @@ export const submitWeeklyQuizAnswers = async (
   }
 };
 
+export const getLeaderboardByOrgId = async (orgId) => {
+  try {
+    const response = await fetch(
+      `${BACKEND_URL}/leaderboard/${orgId}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to create question');
+    }
+
+    return await response.json();
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+};
+
 export const isWeeklyQuizLive = async (orgId, employeeId) => {
   try {
     const response = await fetch(

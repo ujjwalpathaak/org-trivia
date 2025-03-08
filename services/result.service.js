@@ -34,7 +34,7 @@ class ResultService {
   }
 
   async getEmployeePastRecords(employeeId) {
-    return await this.leaderboardRespository.getEmployeePastRecords(employeeId);
+    return await this.resultRepository.getEmployeePastRecords(employeeId);
   }
 
   async submitWeeklyQuizAnswers(userAnswers, employeeId, orgId, quizId) {
@@ -44,12 +44,16 @@ class ResultService {
     );
     const quiz = await this.quizRepository.findLiveQuizByOrgId(orgId);
     const userAnswersJSON = JSON.parse(userAnswers);
-    console.log(userAnswersJSON)
     const weeklyQuizScore = await this.calculateWeeklyQuizScore(
       userAnswersJSON,
       correctAnswers,
     );
     const [month, year] = getMonthAndYear();
+
+    await this.employeeRepository.updateWeeklyQuizScore(
+      employeeId,
+      weeklyQuizScore,
+    );
 
     await this.leaderboardRespository.updateLeaderboard(
       orgId,
@@ -57,11 +61,6 @@ class ResultService {
       weeklyQuizScore,
       month,
       year,
-    );
-
-    await this.employeeRepository.updateWeeklyQuizScore(
-      employeeId,
-      weeklyQuizScore,
     );
 
     const answers = mergeAnswers(correctAnswers, userAnswersJSON)

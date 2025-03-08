@@ -17,6 +17,19 @@ const employeeSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    multiplier: {
+      type: {
+        value: {
+          type: Number,
+          required: true,
+          default: 1,
+        },
+        reason: {
+          type: String,
+          required: true,
+        }
+      },
+    },
     currentStreak: {
       type: Number,
       default: 0,
@@ -24,6 +37,10 @@ const employeeSchema = new mongoose.Schema(
     lastQuizScore: {
       type: Number,
       default: 0,
+    },
+    lastQuizDate: {
+      type: Date,
+      default: () => new Date().setHours(0, 0, 0, 0),
     },
     role: {
       type: String,

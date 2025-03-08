@@ -16,6 +16,16 @@ class LeaderboardController {
       next(error);
     }
   }
+
+  async resetLeaderboardTest(req, res, next) {
+    try {
+      await leaderboardService.resetLeaderboard();
+      res.status(200).json({ message: 'Leaderboard refreshed successfully' });
+    } catch (error) {
+      next(error);
+    }
+  }
+
 }
 
 export default LeaderboardController;

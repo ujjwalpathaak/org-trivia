@@ -101,14 +101,14 @@ const EmployeeDashboard = () => {
                   <span className="text-sm text-gray-500">Awards</span>
                 </div>
               </div>
-              <div className="bg-white">
+              <div className="bg-white w-full">
                 <h2 className="text-lg font-semibold mb-2">My Badges</h2>
-                <div className="flex space-x-2 mb-6">
-                  <span className="text-black px-3 flex flex-col items-center py-1 rounded-lg">
+                <div className="flex flex-col mb-6">
+                  <span className="text-black flex flex py-1 rounded-lg">
                     <img className="w-8" src={shield1} />
                     Star Performer
                   </span>
-                  <span className="text-black px-3 flex flex-col items-center py-1 rounded-lg">
+                  <span className="text-black flex flex py-1 rounded-lg">
                     <img className="w-8" src={shield2} />
                     Top Scorer
                   </span>

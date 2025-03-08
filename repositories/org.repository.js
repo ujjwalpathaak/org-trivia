@@ -108,6 +108,10 @@ class OrgRepository {
     return Org.find({}).select('id name');
   }
 
+  async getAllOrgIds() {
+    return Org.find({}).select('id');
+  }
+
   async getOrgById(orgId) {
     return Org.findById(orgId);
   }

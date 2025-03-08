@@ -1,8 +1,9 @@
 import { getMonthAndYear } from '../client/src/utils.js';
 
-class leaderboardService {
-  constructor(leaderboardRespository) {
+class LeaderboardService {
+  constructor(leaderboardRespository, orgRepository) {
     this.leaderboardRespository = leaderboardRespository;
+    this.orgRepository = orgRepository;
   }
 
   async getLeaderboardByOrg(orgId) {
@@ -13,6 +14,11 @@ class leaderboardService {
       year,
     );
   }
+
+  async resetLeaderboard(){
+    const [month, year] = getMonthAndYear();
+    return await this.leaderboardRespository.resetLeaderboard(month, year);
+  }
 }
 
-export default leaderboardService;
+export default LeaderboardService;

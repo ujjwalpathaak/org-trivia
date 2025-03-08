@@ -20,6 +20,13 @@ class ResultRepository {
       answers: answers,
     });
   }
+
+  async getEmployeePastRecords(employeeId) {
+    return Result.aggregate([
+      { $match: { employeeId: new ObjectId(employeeId) } },
+      { $sort: {date: -1} },
+    ]);
+  }
 }
 
 export default ResultRepository;
