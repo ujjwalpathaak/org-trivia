@@ -1,5 +1,24 @@
 import mongoose from 'mongoose';
 
+const questionSchema = new mongoose.Schema(
+  {
+    questionId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Question',
+      required: true,
+    },
+    isUsed: {
+      type: Boolean,
+      default: false,
+    },
+    category: {
+      type: String,
+      required: true,
+    },
+  },
+  { _id: false },
+);
+
 const orgSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -7,64 +26,15 @@ const orgSchema = new mongoose.Schema({
     unique: true,
   },
   questionsPnA: {
-    type: [
-      {
-        questionId: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: 'Question',
-        },
-        isUsed: {
-          type: Boolean,
-          default: false,
-        },
-        category: {
-          type: String,
-          enum: ['BloodRelation', 'Direction', 'Analytical', 'Arithmetic'],
-          required: true,
-          default: 'PnA',
-        },
-      },
-    ],
-    _id: false,
+    type: [questionSchema],
     default: [],
   },
   questionsHRD: {
-    type: [
-      {
-        questionId: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: 'Question',
-        },
-        isUsed: {
-          type: Boolean,
-          default: false,
-        },
-        category: {
-          type: String,
-          required: true,
-        },
-      },
-    ],
-    _id: false,
+    type: [questionSchema],
     default: [],
   },
   questionsCAnIT: {
-    type: [
-      {
-        questionId: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: 'Question',
-        },
-        isUsed: {
-          type: Boolean,
-          default: false,
-        },
-        category: {
-          type: String,
-        },
-      },
-    ],
-    _id: false,
+    type: [questionSchema],
     default: [],
   },
   admins: {

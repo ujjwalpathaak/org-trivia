@@ -25,7 +25,6 @@ class LeaderboardController {
       next(error);
     }
   }
-
 }
 
 export default LeaderboardController;

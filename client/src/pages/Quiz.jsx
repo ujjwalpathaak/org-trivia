@@ -6,7 +6,6 @@ import { useOrgId, useUserId } from '../context/auth.context';
 import { toast } from 'react-toastify';
 
 const Quiz = ({ setIsQuizOpen, setIsQuizLive }) => {
-  const navigate = useNavigate();
   const orgId = useOrgId();
   const userId = useUserId();
 
@@ -22,7 +21,6 @@ const Quiz = ({ setIsQuizOpen, setIsQuizLive }) => {
       try {
         const quizState = localStorage.getItem('state');
         const quizStateJSON = JSON.parse(quizState);
-        console.log(quizStateJSON);
         if (quizStateJSON) {
           setAnswers(quizStateJSON.answers);
           setIsQuizFinished(quizStateJSON.isQuizFinished);
@@ -76,7 +74,6 @@ const Quiz = ({ setIsQuizOpen, setIsQuizLive }) => {
       answers: [],
       currentQuestion: 0,
     };
-    console.log(quizState);
     quizState.answers.push(newAnswer);
 
     setAnswers(quizState.answers);
@@ -92,11 +89,18 @@ const Quiz = ({ setIsQuizOpen, setIsQuizLive }) => {
   };
 
   const handleSubmitAnswers = async () => {
+    console.log(currentQuestion, questions.length - 1);
     if (currentQuestion >= questions.length - 1) {
-      const optionsSelected = localStorage.getItem('answers');
-      if (optionsSelected) {
-        await submitWeeklyQuizAnswers(optionsSelected, orgId, userId, quizId);
-        localStorage.removeItem('answers');
+      const state = localStorage.getItem('state');
+      const optionsSelected = JSON.parse(state);
+      if (optionsSelected.answers) {
+        await submitWeeklyQuizAnswers(
+          optionsSelected.answers,
+          orgId,
+          userId,
+          quizId,
+        );
+        localStorage.removeItem('state');
       }
       notifyAnswersSubmitted();
       setIsQuizOpen(false);
@@ -116,7 +120,8 @@ const Quiz = ({ setIsQuizOpen, setIsQuizLive }) => {
   return (
     <div className="col-span-5 bg-white h-5/6 floating-div rounded-2xl p-6">
       <div className="flex mb-2 justify-between items-center">
-        Questions: {`${currentQuestion + 1}/${questions.length}`}
+        Questions:{' '}
+        {`${currentQuestion < questions.length ? currentQuestion + 1 : currentQuestion}/${questions.length}`}
         <p className="text-red-500">Time Left: {timeLeftCurrentQuestion}s</p>
       </div>
       <div className="max-w-2xl mt-2 mx-auto bg-white rounded-xl">

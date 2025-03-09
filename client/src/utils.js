@@ -36,16 +36,21 @@ export const validateForm = (formData, setErrors, isLogin = false) => {
   return Object.keys(newErrors).length === 0;
 };
 
-export const mergeUserAnswersAndCorrectAnswers = (correctAnswers, myAnswers) => {
+export const mergeUserAnswersAndCorrectAnswers = (
+  correctAnswers,
+  myAnswers,
+) => {
   return correctAnswers.map(({ _id, answer }) => {
-      const myAnswerObj = myAnswers.find(({ questionId }) => questionId === _id.toString());
-      return {
-        questionId: _id,
-          correctAns: answer,
-          myAns: myAnswerObj ? myAnswerObj.answer : null
-      };
+    const myAnswerObj = myAnswers.find(
+      ({ questionId }) => questionId === _id.toString(),
+    );
+    return {
+      questionId: _id,
+      correctAnswer: answer,
+      employeeAnswer: myAnswerObj ? myAnswerObj.answer : null,
+    };
   });
-}
+};
 
 export const getMonthAndYear = () => {
   const today = new Date();

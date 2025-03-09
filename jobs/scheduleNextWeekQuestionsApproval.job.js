@@ -5,11 +5,14 @@ import QuizService from '../services/quiz.service.js';
 import QuizRepository from '../repositories/quiz.repository.js';
 import LeaderboardService from '../services/leaderboard.service.js';
 import LeaderboardRepository from '../repositories/leaderboard.respository.js';
-import OrgRepository from '../repositories/org.repository.js'
+import OrgRepository from '../repositories/org.repository.js';
 
 const quizService = new QuizService(new QuizRepository());
 const questionService = new QuestionService(new QuestionRepository());
-const leaderboardService = new LeaderboardService(new LeaderboardRepository(), new OrgRepository());
+const leaderboardService = new LeaderboardService(
+  new LeaderboardRepository(),
+  new OrgRepository(),
+);
 
 export const scheduleNextWeekQuestionsApproval = cron.schedule(
   '5 0 * * 6',

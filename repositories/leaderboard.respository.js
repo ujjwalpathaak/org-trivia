@@ -17,7 +17,14 @@ class LeaderboardRepository {
 
   async getLeaderboardByOrg(orgId, month, year) {
     return Leaderboard.aggregate([
-      { $match: { orgId: new ObjectId(orgId), month: month, year: year, totalScore: { $ne: 0} } },
+      {
+        $match: {
+          orgId: new ObjectId(orgId),
+          month: month,
+          year: year,
+          totalScore: { $ne: 0 },
+        },
+      },
       { $sort: { totalScore: -1 } },
       { $limit: 10 },
       {
@@ -53,19 +60,19 @@ class LeaderboardRepository {
     const uniqueCombinations = await Leaderboard.aggregate([
       {
         $group: {
-          _id: { orgId: "$orgId", employeeId: "$employeeId" }
-        }
+          _id: { orgId: '$orgId', employeeId: '$employeeId' },
+        },
       },
       {
         $project: {
           _id: 0,
-          orgId: "$_id.orgId",
-          employeeId: "$_id.employeeId",
+          orgId: '$_id.orgId',
+          employeeId: '$_id.employeeId',
           month: { $literal: month },
           year: { $literal: year },
-          totalScore: { $literal: 0 }
-        }
-      }
+          totalScore: { $literal: 0 },
+        },
+      },
     ]);
 
     return Leaderboard.insertMany(uniqueCombinations);

@@ -10,6 +10,12 @@ const quizSchema = new mongoose.Schema(
     scheduledDate: {
       type: Date,
       required: true,
+      validate: {
+        validator: function (v) {
+          return v >= new Date().setHours(0, 0, 0, 0);
+        },
+        message: 'Scheduled date must be in the future.',
+      },
     },
     status: {
       type: String,
@@ -19,6 +25,7 @@ const quizSchema = new mongoose.Schema(
     },
     genre: {
       type: String,
+      enum: ['PnA', 'CAnIT', 'HRD'],
       required: true,
     },
   },

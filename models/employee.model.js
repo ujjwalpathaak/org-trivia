@@ -1,5 +1,21 @@
 import mongoose from 'mongoose';
 
+const badgeSchema = new mongoose.Schema(
+  {
+    badgeId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Badge',
+      required: true,
+    },
+    earnedAt: {
+      type: Date,
+      default: Date.now,
+      required: true,
+    },
+  },
+  { _id: false },
+);
+
 const employeeSchema = new mongoose.Schema(
   {
     name: {
@@ -16,19 +32,6 @@ const employeeSchema = new mongoose.Schema(
     password: {
       type: String,
       required: true,
-    },
-    multiplier: {
-      type: {
-        value: {
-          type: Number,
-          required: true,
-          default: 1,
-        },
-        reason: {
-          type: String,
-          required: true,
-        }
-      },
     },
     currentStreak: {
       type: Number,
@@ -49,23 +52,11 @@ const employeeSchema = new mongoose.Schema(
       immutable: true,
     },
     badges: {
-      type: [
-        {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: 'Badge',
-          required: true,
-          earnedAt: {
-            type: Date,
-            default: Date.now,
-            required: true,
-          },
-        },
-      ],
+      type: [badgeSchema],
       default: [],
     },
     submittedQuestion: {
-      type: [mongoose.Schema.Types.ObjectId],
-      ref: 'usedQuestion',
+      type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Question' }],
       default: [],
     },
     orgId: {

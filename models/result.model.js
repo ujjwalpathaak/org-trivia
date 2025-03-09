@@ -1,5 +1,24 @@
 import mongoose from 'mongoose';
 
+const answerSchema = new mongoose.Schema(
+  {
+    questionId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Question',
+      required: true,
+    },
+    correctAns: {
+      type: Number,
+      required: true,
+    },
+    employeeAnswer: {
+      type: Number,
+      required: true,
+    },
+  },
+  { _id: false },
+);
+
 const resultSchema = new mongoose.Schema(
   {
     employeeId: {
@@ -30,17 +49,8 @@ const resultSchema = new mongoose.Schema(
       enum: ['PnA', 'CAnIT', 'HRD'],
     },
     answers: {
-      type: [
-        {
-          questionId: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Question',
-          },
-          correctAns: Number,
-          myAns: Number,
-        },
-      ],
-      _id: false,
+      type: [answerSchema],
+      default: [],
     },
   },
   { timestamps: true },

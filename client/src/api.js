@@ -219,16 +219,13 @@ export const submitWeeklyQuizAnswers = async (
 
 export const getLeaderboardByOrgId = async (orgId) => {
   try {
-    const response = await fetch(
-      `${BACKEND_URL}/leaderboard/${orgId}`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
+    const response = await fetch(`${BACKEND_URL}/leaderboard/${orgId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
       },
-    );
+    });
 
     if (!response.ok) {
       const errorData = await response.json();

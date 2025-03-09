@@ -15,7 +15,7 @@ class LeaderboardService {
     );
   }
 
-  async resetLeaderboard(){
+  async resetLeaderboard() {
     const [month, year] = getMonthAndYear();
     return await this.leaderboardRespository.resetLeaderboard(month, year);
   }
