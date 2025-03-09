@@ -8,7 +8,7 @@ class ResultRepository {
     weeklyQuizScore,
     date,
     genre,
-    answers,
+    mergedUserAnswersAndCorrectAnswers,
   ) {
     return Result.create({
       employeeId: employeeId,
@@ -17,7 +17,7 @@ class ResultRepository {
       score: weeklyQuizScore,
       date: date,
       genre: genre,
-      answers: answers,
+      answers: mergedUserAnswersAndCorrectAnswers,
     });
   }
 

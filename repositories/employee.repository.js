@@ -29,14 +29,14 @@ class EmployeeRepository {
     );
   }
 
-  async newMultiplier(updatedStreak){
-    switch(updatedStreak) {
-      case 7:
+  async newMultiplier(updatedStreak) {
+    switch (true) {
+      case updatedStreak >= 4:
         return 1.5;
       default:
         return 1;
     }
-  }
+  }  
 
   async updateWeeklyQuizScore(employeeId, updatedWeeklyQuizScore) {
     const thisQuizDate = new Date().setHours(0, 0, 0, 0);
@@ -45,7 +45,9 @@ class EmployeeRepository {
       { lastQuizDate: 1, currentStreak: 1, multiplier: 1 }
     );
 
+    // normalize the date
     const lastQuizDate = employee.lastQuizDate ? new Date(employee.lastQuizDate).setHours(0, 0, 0, 0) : null;
+    
     let updatedStreak = 0;
 
     if (lastQuizDate && thisQuizDate - lastQuizDate === 7 * 24 * 60 * 60 * 1000) {
@@ -53,6 +55,7 @@ class EmployeeRepository {
     }
 
     const multi = this.newMultiplier(updatedStreak);
+  
     updatedWeeklyQuizScore *= multi;
 
     return Employee.updateOne(

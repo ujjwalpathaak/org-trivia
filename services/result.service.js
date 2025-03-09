@@ -1,4 +1,4 @@
-import { getMonthAndYear, mergeAnswers } from '../client/src/utils.js';
+import { getMonthAndYear, mergeUserAnswersAndCorrectAnswers } from '../client/src/utils.js';
 import QuestionRepository from '../repositories/question.repository.js';
 import QuestionService from './question.service.js';
 
@@ -38,23 +38,23 @@ class ResultService {
   }
 
   async submitWeeklyQuizAnswers(userAnswers, employeeId, orgId, quizId) {
+    const userAnswersJSON = JSON.parse(userAnswers);
     const correctAnswers = await questionService.getWeeklyQuizCorrectAnswers(
       orgId,
       quizId,
     );
-    const quiz = await this.quizRepository.findLiveQuizByOrgId(orgId);
-    const userAnswersJSON = JSON.parse(userAnswers);
+    // check logic
     const weeklyQuizScore = await this.calculateWeeklyQuizScore(
       userAnswersJSON,
       correctAnswers,
     );
-    const [month, year] = getMonthAndYear();
-
+    
     await this.employeeRepository.updateWeeklyQuizScore(
       employeeId,
       weeklyQuizScore,
     );
-
+    
+    const [month, year] = getMonthAndYear();
     await this.leaderboardRespository.updateLeaderboard(
       orgId,
       employeeId,
@@ -63,8 +63,9 @@ class ResultService {
       year,
     );
 
-    const answers = mergeAnswers(correctAnswers, userAnswersJSON)
+    const mergedUserAnswersAndCorrectAnswers = mergeUserAnswersAndCorrectAnswers(correctAnswers, userAnswersJSON)
 
+    const quiz = await this.quizRepository.findLiveQuizByOrgId(orgId);
     await this.resultRepository.submitWeeklyQuizAnswers(
       employeeId,
       orgId,
@@ -72,7 +73,7 @@ class ResultService {
       weeklyQuizScore,
       quiz.scheduledDate,
       quiz.genre,
-      answers,
+      mergedUserAnswersAndCorrectAnswers,
     );
 
     return true;

@@ -36,7 +36,7 @@ export const validateForm = (formData, setErrors, isLogin = false) => {
   return Object.keys(newErrors).length === 0;
 };
 
-export const mergeAnswers = (correctAnswers, myAnswers) => {
+export const mergeUserAnswersAndCorrectAnswers = (correctAnswers, myAnswers) => {
   return correctAnswers.map(({ _id, answer }) => {
       const myAnswerObj = myAnswers.find(({ questionId }) => questionId === _id.toString());
       return {
