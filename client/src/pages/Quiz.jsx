@@ -18,6 +18,25 @@ const Quiz = ({ setIsQuizOpen, setIsQuizLive }) => {
   const [timeLeftCurrentQuestion, setTimeLeftCurrentQuestion] = useState(5);
 
   useEffect(() => {
+    const getLiveQuizState = async () => {
+      try {
+        const quizState = localStorage.getItem('state');
+        const quizStateJSON = JSON.parse(quizState);
+        console.log(quizStateJSON);
+        if (quizStateJSON) {
+          setAnswers(quizStateJSON.answers);
+          setIsQuizFinished(quizStateJSON.isQuizFinished);
+          setCurrentQuestion(quizStateJSON.currentQuestion);
+        }
+      } catch (error) {
+        console.error('Error checking quiz status:', error);
+      }
+    };
+
+    getLiveQuizState();
+  }, []);
+
+  useEffect(() => {
     const fetchWeeklyQuizQuestions = async () => {
       if (!orgId || !userId) return;
       let response = await getWeeklyQuizQuestions(orgId);
@@ -53,18 +72,27 @@ const Quiz = ({ setIsQuizOpen, setIsQuizLive }) => {
       answer: option,
     };
 
-    let storedAnswers = JSON.parse(localStorage.getItem('answers')) || [];
+    let quizState = JSON.parse(localStorage.getItem('state')) || {
+      answers: [],
+      currentQuestion: 0,
+    };
+    console.log(quizState);
+    quizState.answers.push(newAnswer);
 
-    const updatedAnswers = [...storedAnswers, newAnswer];
+    setAnswers(quizState.answers);
 
-    setAnswers(updatedAnswers);
-    localStorage.setItem('answers', JSON.stringify(updatedAnswers));
+    const state = {
+      answers: quizState.answers,
+      currentQuestion: currentQuestion + 1,
+      isQuizFinished: currentQuestion + 1 === questions.length ? true : false,
+    };
+    localStorage.setItem('state', JSON.stringify(state));
 
     handleNextQuestion();
   };
 
   const handleSubmitAnswers = async () => {
-    if (currentQuestion === questions.length - 1) {
+    if (currentQuestion >= questions.length - 1) {
       const optionsSelected = localStorage.getItem('answers');
       if (optionsSelected) {
         await submitWeeklyQuizAnswers(optionsSelected, orgId, userId, quizId);

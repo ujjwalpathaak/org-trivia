@@ -1,12 +1,20 @@
+import { getMonthAndYear, mergeUserAnswersAndCorrectAnswers } from '../client/src/utils.js';
 import QuestionRepository from '../repositories/question.repository.js';
 import QuestionService from './question.service.js';
 
 const questionService = new QuestionService(new QuestionRepository());
 
 class ResultService {
-  constructor(resultRepository, employeeRepository) {
+  constructor(
+    resultRepository,
+    employeeRepository,
+    quizRepository,
+    leaderboardRespository,
+  ) {
     this.resultRepository = resultRepository;
     this.employeeRepository = employeeRepository;
+    this.quizRepository = quizRepository;
+    this.leaderboardRespository = leaderboardRespository;
   }
 
   async calculateWeeklyQuizScore(userAnswers, correctAnswers) {
@@ -25,25 +33,57 @@ class ResultService {
     return weeklyQuizScore;
   }
 
+  async getEmployeePastRecords(employeeId) {
+    return await this.resultRepository.getEmployeePastRecords(employeeId);
+  }
+
   async submitWeeklyQuizAnswers(userAnswers, employeeId, orgId, quizId) {
+    const userAnswersJSON = JSON.parse(userAnswers);
     const correctAnswers = await questionService.getWeeklyQuizCorrectAnswers(
       orgId,
       quizId,
     );
-
-    const userAnswersJSON = JSON.parse(userAnswers);
+    // check logic
     const weeklyQuizScore = await this.calculateWeeklyQuizScore(
       userAnswersJSON,
       correctAnswers,
     );
-
-    await this.resultRepository.submitWeeklyQuizAnswers();
+    
     await this.employeeRepository.updateWeeklyQuizScore(
       employeeId,
       weeklyQuizScore,
     );
+    
+    const [month, year] = getMonthAndYear();
+    await this.leaderboardRespository.updateLeaderboard(
+      orgId,
+      employeeId,
+      weeklyQuizScore,
+      month,
+      year,
+    );
 
-    return;
+    const mergedUserAnswersAndCorrectAnswers = mergeUserAnswersAndCorrectAnswers(correctAnswers, userAnswersJSON)
+
+    const quiz = await this.quizRepository.findLiveQuizByOrgId(orgId);
+    await this.resultRepository.submitWeeklyQuizAnswers(
+      employeeId,
+      orgId,
+      quizId,
+      weeklyQuizScore,
+      quiz.scheduledDate,
+      quiz.genre,
+      mergedUserAnswersAndCorrectAnswers,
+    );
+
+    return true;
+  }
+
+  async fetchEmployeeScore(employeeId) {
+    console.log(employeeId);
+    const quiz = await this.quizRepository.getLiveQuizByEmployeeId(employeeId);
+    console.log(quiz);
+    return await this.resultRepository.getEmployeeScore(employeeId, quiz);
   }
 }
 

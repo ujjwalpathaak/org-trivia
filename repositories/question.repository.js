@@ -55,7 +55,7 @@ class QuestionRepository {
 
   async pushQuestionsInOrg(finalFormatedRefactoredQuestions, orgId, genre) {
     const fieldName = `questions${genre}`;
-  
+
     return Org.updateMany(
       { _id: new ObjectId(orgId) },
       {
@@ -64,10 +64,9 @@ class QuestionRepository {
             $each: finalFormatedRefactoredQuestions,
           },
         },
-      }
+      },
     );
   }
-  
 
   async getCorrectWeeklyQuizAnswers(orgId) {
     return WeeklyQuestion.find({

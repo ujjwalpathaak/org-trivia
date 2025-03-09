@@ -7,6 +7,11 @@ const resultSchema = new mongoose.Schema(
       ref: 'Employee',
       required: true,
     },
+    orgId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Org',
+      required: true,
+    },
     quizId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Quiz',
@@ -16,16 +21,26 @@ const resultSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    results: {
+    date: {
+      type: Date,
+      required: true,
+    },
+    genre: {
+      type: String,
+      enum: ['PnA', 'CAnIT', 'HRD'],
+    },
+    answers: {
       type: [
         {
           questionId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Question',
           },
-          answer: Number,
+          correctAns: Number,
+          myAns: Number,
         },
       ],
+      _id: false,
     },
   },
   { timestamps: true },

@@ -56,7 +56,7 @@ class QuestionService {
   }
 
   async startQuestionGenerationWorkflow(genre, element, quizId) {
-    switch ('HRD') {
+    switch ('PnA') {
       case 'PnA':
         console.log('starting PnA');
         this.startPnAWorkflow(element.name, element._id, quizId);

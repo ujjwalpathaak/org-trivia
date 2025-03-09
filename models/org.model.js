@@ -25,6 +25,7 @@ const orgSchema = new mongoose.Schema({
         },
       },
     ],
+    _id: false,
     default: [],
   },
   questionsHRD: {
@@ -44,6 +45,7 @@ const orgSchema = new mongoose.Schema({
         },
       },
     ],
+    _id: false,
     default: [],
   },
   questionsCAnIT: {
@@ -62,6 +64,7 @@ const orgSchema = new mongoose.Schema({
         },
       },
     ],
+    _id: false,
     default: [],
   },
   admins: {
