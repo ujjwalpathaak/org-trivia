@@ -3,48 +3,39 @@ import { getQuestionsToApprove, handleApproveWeeklyQuiz } from '../api.js';
 import { useOrgId } from '../context/auth.context.jsx';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import {
-  PlusCircle,
-  X,
-  Upload,
-  Wand2,
-  Save,
-  CalendarCheck,
-} from 'lucide-react';
 
 export default function ScheduleQuestions() {
-  // State management
-  const [aiQuestions] = useState([
+  const [aiQuestions, setAiQuestions] = useState([
     {
       question:
         "One morning, Udai and Vishal were facing each other at a crossing. If Vishal's shadow was exactly to the left of Udai, which direction was Udai facing?",
       options: ['Option 1', 'Option 2'],
-      correctAnswer: 'Option 1',
+      answer: 'Option 1',
     },
     {
       question:
         'A Google employee receives ₹480 as expense reimbursement in ₹1, ₹5, and ₹10 notes. The number of notes of each denomination is the same. What is the total number of notes the employee received?',
       options: ['Option A', 'Option B'],
-      correctAnswer: 'Option B',
+      answer: 'Option B',
     },
   ]);
 
-  const [empQuestions] = useState([
+  const [empQuestions, setEmpQuestions] = useState([
     {
       question: 'How many triangles are present in the given diagram?',
       options: ['Yes', 'No'],
-      correctAnswer: 'Yes',
+      answer: 'Yes',
     },
   ]);
 
   const [customQuestions, setCustomQuestions] = useState([]);
   const [newQuestion, setNewQuestion] = useState('');
-  const [newOptions, setNewOptions] = useState(['', '', '', '']);
-  const [newCorrectAnswer, setNewCorrectAnswer] = useState(0);
   const [addQuestion, setAddQuestion] = useState(false);
-  const [removedQuestionIndex, setRemovedQuestionIndex] = useState(null);
-  const [questions, setQuestions] = useState([]);
-  const [selectedWeek, setSelectedWeek] = useState(() => {
+  const [removedQuestionIndex, setRemovedQuestionIndex] = useState(-1);
+  const [unsavedChanges, setUnsavedChanges] = useState(false);
+  const navigate = useNavigate();
+  const [uploadedFile, setUploadedFile] = useState(null);
+  const getNextWeek = () => {
     const today = new Date();
     today.setDate(today.getDate() + 7);
     const year = today.getFullYear();
@@ -55,371 +46,330 @@ export default function ScheduleQuestions() {
         7,
     );
     return `${year}-W${week.toString().padStart(2, '0')}`;
-  });
-  const [uploadedFile, setUploadedFile] = useState(null);
-
-  const navigate = useNavigate();
+  };
+  const [selectedWeek, setSelectedWeek] = useState(getNextWeek);
+  const [questions, setQuestions] = useState([]);
   const orgId = useOrgId();
   const toastShownRef = useRef(false);
 
-  // Effects
+  const noQuestionFound = () => toast.info('No pending questions found');
+
   useEffect(() => {
-    const fetchQuestions = async () => {
-      try {
-        const response = await getQuestionsToApprove(orgId);
-        if (response.status === 404) {
-          if (!toastShownRef.current) {
-            toast('No pending questions found');
-            toastShownRef.current = true;
-          }
-          navigate('/dashboard');
-          return;
+    const getQuestionsToApproveFunc = async () => {
+      const response = await getQuestionsToApprove(orgId);
+      if (response.status === 404) {
+        if (!toastShownRef.current) {
+          noQuestionFound();
+          toastShownRef.current = true;
         }
-        setQuestions(response.data);
-      } catch (error) {
-        toast.error('Failed to fetch questions');
+        navigate('/dashboard');
+        return;
       }
+      setQuestions(response.data.weeklyUnapprovedQuestions);
     };
 
-    fetchQuestions();
-  }, [orgId, navigate]);
+    getQuestionsToApproveFunc();
+  }, []);
 
-  // Event handlers
   const handleApproveQuiz = async () => {
-    try {
-      // Filter out null questions (removed ones)
-      const filteredQuestions = questions.filter((q) => q !== null);
-      await handleApproveWeeklyQuiz(filteredQuestions, orgId);
+    if (addQuestion) {
+      toast.error(`Not all questions are selected`);
+    } else {
+      await handleApproveWeeklyQuiz(questions, orgId);
       toast.success('Quiz approved successfully');
       navigate('/dashboard');
-    } catch (error) {
-      toast.error('Failed to approve quiz');
     }
   };
 
-  const handleQuestionChangeType = (idx, newQuestionText) => {
-    const updatedQuestions = [...questions];
-    if (updatedQuestions[idx] && updatedQuestions[idx].question) {
-      updatedQuestions[idx].question.question = newQuestionText;
-      setQuestions(updatedQuestions);
+  const addCustomQuestion = () => {
+    if (newQuestion.trim()) {
+      setCustomQuestions([
+        ...customQuestions,
+        { question: newQuestion, options: [], correctAnswer: '' },
+      ]);
+      setNewQuestion('');
     }
+  };
+
+  const handleFileUpload = (event) => {
+    setUploadedFile(event.target.files[0]);
+  };
+
+  const generateAIQuestion = () => {
+    const aiGeneratedQuestion = 'Generated AI Question';
+    setCustomQuestions([
+      ...customQuestions,
+      { question: aiGeneratedQuestion, options: [], correctAnswer: '' },
+    ]);
+  };
+
+  const selectQuestion = (question) => {
+    const updatedQuestions = [...questions];
+    updatedQuestions[removedQuestionIndex].question = question;
+    setAddQuestion(false);
+    setRemovedQuestionIndex(-1);
+    setQuestions(updatedQuestions);
+  };
+
+  const handleQuestionChangeType = (idx, newQuestion) => {
+    setUnsavedChanges(true);
+    const updatedQuestions = [...questions];
+    updatedQuestions[idx].question.question = newQuestion;
+    setQuestions(updatedQuestions);
   };
 
   const handleOptionChange = (qIdx, optionIdx, newOption) => {
+    setUnsavedChanges(true);
     const updatedQuestions = [...questions];
-    if (
-      updatedQuestions[qIdx] &&
-      updatedQuestions[qIdx].question &&
-      updatedQuestions[qIdx].question.options
-    ) {
-      updatedQuestions[qIdx].question.options[optionIdx] = newOption;
-      setQuestions(updatedQuestions);
-    }
+    updatedQuestions[qIdx].question.options[optionIdx] = newOption;
+    setQuestions(updatedQuestions);
   };
 
   const handleCorrectAnswerChange = (idx, correctOption) => {
+    setUnsavedChanges(true);
     const updatedQuestions = [...questions];
-    if (updatedQuestions[idx] && updatedQuestions[idx].question) {
-      updatedQuestions[idx].question.answer = parseInt(correctOption, 10);
-      setQuestions(updatedQuestions);
-    }
+    updatedQuestions[idx].question.answer = parseInt(correctOption, 10);
+    setQuestions(updatedQuestions);
   };
 
   const handleQuestionRemove = (idx) => {
+    setUnsavedChanges(true);
     const updatedQuestions = [...questions];
-    updatedQuestions[idx] = null;
+    updatedQuestions[idx].question = null;
     setAddQuestion(true);
     setRemovedQuestionIndex(idx);
     setQuestions(updatedQuestions);
   };
 
-  const handleNewOptionChange = (index, value) => {
-    const updatedOptions = [...newOptions];
-    updatedOptions[index] = value;
-    setNewOptions(updatedOptions);
-  };
-
-  const addCustomQuestion = () => {
-    if (newQuestion.trim()) {
-      // Filter out empty options
-      const filteredOptions = newOptions.filter((opt) => opt.trim() !== '');
-
-      // Only add if we have at least two options
-      if (filteredOptions.length >= 2) {
-        const newCustomQuestion = {
-          question: {
-            question: newQuestion,
-            options: filteredOptions,
-            answer: newCorrectAnswer,
-          },
-        };
-
-        if (removedQuestionIndex !== null) {
-          // Replace the removed question
-          const updatedQuestions = [...questions];
-          updatedQuestions[removedQuestionIndex] = newCustomQuestion;
-          setQuestions(updatedQuestions);
-          setRemovedQuestionIndex(null);
-        } else {
-          // Add as a new question
-          setQuestions([...questions, newCustomQuestion]);
-        }
-
-        // Reset form
-        setNewQuestion('');
-        setNewOptions(['', '', '', '']);
-        setNewCorrectAnswer(0);
-        setAddQuestion(false);
-      } else {
-        toast.error('Please add at least two options');
-      }
-    } else {
-      toast.error('Please enter a question');
-    }
-  };
-
-  const selectQuestion = (question) => {
-    // Convert from aiQuestions/empQuestions format to questions format
-    const formattedQuestion = {
-      question: {
-        question: question.question,
-        options: question.options,
-        answer: question.options.indexOf(question.correctAnswer),
-      },
-    };
-
-    if (removedQuestionIndex !== null) {
-      // Replace the removed question
-      const updatedQuestions = [...questions];
-      updatedQuestions[removedQuestionIndex] = formattedQuestion;
-      setQuestions(updatedQuestions);
-      setRemovedQuestionIndex(null);
-      setAddQuestion(false);
-    } else {
-      // Add as a new question
-      setQuestions([...questions, formattedQuestion]);
-      setAddQuestion(false);
-    }
-  };
-
-  // UI Components
-  const QuestionCard = ({ question, index }) => {
-    // Check if question exists and has the expected structure
-    if (!question || !question.question) {
-      return null;
-    }
-
-    return (
-      <div className="bg-white rounded-lg shadow-md p-6 mb-6 transition-all hover:shadow-lg">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold text-gray-800">
-            Question {index + 1}
-          </h3>
-          <button
-            onClick={() => handleQuestionRemove(index)}
-            className="p-2 rounded-full hover:bg-red-100 text-red-500 transition-colors"
-          >
-            <X size={20} />
-          </button>
-        </div>
-        <textarea
-          value={question.question.question || ''}
-          onChange={(e) => handleQuestionChangeType(index, e.target.value)}
-          className="w-full p-3 border rounded-lg mb-4 min-h-[100px] focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-        />
-        {question.question.image && (
-          <img
-            src={question.question.image}
-            alt="Question"
-            className="w-1/2 max-w-64 rounded-lg mb-4"
-          />
-        )}
-        <div className="space-y-3">
-          <h4 className="font-medium text-gray-700">Options:</h4>
-          {(question.question.options || []).map((option, i) => (
-            <input
-              key={i}
-              type="text"
-              value={option || ''}
-              onChange={(e) => handleOptionChange(index, i, e.target.value)}
-              className={`w-full p-3 border rounded-lg ${
-                i === question.question.answer
-                  ? 'bg-green-50 border-green-200'
-                  : 'bg-red-50 border-gray-200'
-              } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
-            />
-          ))}
-        </div>
-        <div className="mt-4">
-          <h4 className="font-medium text-gray-700 mb-2">Correct Answer:</h4>
-          <select
-            value={question.question.answer || 0}
-            onChange={(e) => handleCorrectAnswerChange(index, e.target.value)}
-            className="w-full p-3 border rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-            {(question.question.options || []).map((option, i) => (
-              <option key={i} value={i}>
-                {option}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
-    );
-  };
-
-  const QuestionBank = () => (
-    <div className="bg-white rounded-lg shadow-md p-6 h-full">
-      <h2 className="text-xl font-bold mb-6">Question Bank</h2>
-
-      <div className="space-y-6 overflow-y-auto h-[90%]">
-        <section className="bg-gray-50 rounded-lg p-4">
-          <h3 className="font-semibold mb-4">Upload Question</h3>
-          <div className="flex items-center space-x-4">
-            <input
-              type="file"
-              onChange={(e) => setUploadedFile(e.target.files?.[0] || null)}
-              className="hidden"
-              id="file-upload"
-            />
-            <label
-              htmlFor="file-upload"
-              className="flex items-center space-x-2 px-4 py-2 bg-white rounded-lg border cursor-pointer hover:bg-gray-50"
-            >
-              <Upload size={20} />
-              <span>Choose file</span>
-            </label>
-            <button className="flex items-center space-x-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
-              <Wand2 size={20} />
-              <span>Generate AI Question</span>
-            </button>
-          </div>
-        </section>
-
-        <section className="bg-gray-50 rounded-lg p-4">
-          <h3 className="font-semibold mb-4">AI Questions</h3>
-          <div className="space-y-2">
-            {aiQuestions.map((q, idx) => (
-              <button
-                key={idx}
-                onClick={() => selectQuestion(q)}
-                className="w-full text-left p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow"
-              >
-                {q.question}
-              </button>
-            ))}
-          </div>
-        </section>
-
-        <section className="bg-gray-50 rounded-lg p-4">
-          <h3 className="font-semibold mb-4">Employee Questions</h3>
-          <div className="space-y-2">
-            {empQuestions.map((q, idx) => (
-              <button
-                key={idx}
-                onClick={() => selectQuestion(q)}
-                className="w-full text-left p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow"
-              >
-                {q.question}
-              </button>
-            ))}
-          </div>
-        </section>
-
-        <section className="bg-gray-50 rounded-lg p-4">
-          <h3 className="font-semibold mb-4">Custom Question</h3>
-          <div className="space-y-4">
-            <textarea
-              value={newQuestion}
-              onChange={(e) => setNewQuestion(e.target.value)}
-              placeholder="Type your question here..."
-              className="w-full p-3 border rounded-lg min-h-[100px] focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-            <div className="space-y-2">
-              {['A', 'B', 'C', 'D'].map((letter, index) => (
-                <input
-                  key={letter}
-                  type="text"
-                  value={newOptions[index]}
-                  onChange={(e) => handleNewOptionChange(index, e.target.value)}
-                  placeholder={`Option ${letter}`}
-                  className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              ))}
-            </div>
-            <select
-              className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              value={newCorrectAnswer}
-              onChange={(e) =>
-                setNewCorrectAnswer(parseInt(e.target.value, 10))
-              }
-            >
-              {['A', 'B', 'C', 'D'].map((letter, index) => (
-                <option key={letter} value={index}>
-                  Option {letter}
-                </option>
-              ))}
-            </select>
-            <div className="flex space-x-4">
-              <button className="flex-1 flex items-center justify-center space-x-2 px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600">
-                <Wand2 size={20} />
-                <span>Refactor with AI</span>
-              </button>
-              <button
-                onClick={addCustomQuestion}
-                className="flex-1 flex items-center justify-center space-x-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
-              >
-                <PlusCircle size={20} />
-                <span>Add Question</span>
-              </button>
-            </div>
-          </div>
-        </section>
-      </div>
-    </div>
-  );
-
   return (
-    <div className="flex gap-6 p-6 bg-gray-100 h-[93vh]">
-      {addQuestion && (
-        <div className="w-1/3">
-          <QuestionBank />
-        </div>
-      )}
+    <div className="h-[93vh] bg-gradient-to-br from-blue-50 to-indigo-50 p-6">
+      <div className="flex gap-6 h-full">
+        {addQuestion && (
+          <div className="w-1/3 bg-white rounded-xl shadow-lg p-6 flex-1">
+            <h2 className="text-2xl font-bold text-gray-800 mb-6">
+              Extra Questions
+            </h2>
+            <div className="space-y-6">
+              {/* <div className="bg-gray-50 rounded-lg p-6 shadow-sm">
+                <h3 className="text-lg font-semibold text-gray-700 mb-4">
+                  AI Question Generator
+                </h3>
+                <div className="space-y-4">
+                  <div className="relative">
+                    <input
+                      type="file"
+                      onChange={handleFileUpload}
+                      className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                    />
+                  </div>
+                  <button
+                    onClick={generateAIQuestion}
+                    className="w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-200 font-medium"
+                  >
+                    Generate AI Question
+                  </button>
+                </div>
+              </div> */}
 
-      <div className={`flex-1 ${addQuestion ? '' : 'mx-auto max-w-4xl'}`}>
-        <div className="bg-white rounded-lg shadow-md p-6 h-full">
+              <div className="bg-gray-50 rounded-lg p-6 shadow-sm">
+                <h3 className="text-lg font-semibold text-gray-700 mb-4">
+                  AI Questions
+                </h3>
+                <div className="space-y-2">
+                  {aiQuestions?.map((q, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => selectQuestion(q)}
+                      className="w-full text-left p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition duration-200 border border-gray-100"
+                    >
+                      {q.question}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="bg-gray-50 rounded-lg p-6 shadow-sm">
+                <h3 className="text-lg font-semibold text-gray-700 mb-4">
+                  Employee Questions
+                </h3>
+                <div className="space-y-2">
+                  {empQuestions?.map((q, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => selectQuestion(q)}
+                      className="w-full text-left p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition duration-200 border border-gray-100"
+                    >
+                      {q.question}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* <div className="bg-gray-50 rounded-lg p-6 shadow-sm">
+                <h3 className="text-lg font-semibold text-gray-700 mb-4">
+                  Custom Question
+                </h3>
+                <div className="space-y-4">
+                  <textarea
+                    value={newQuestion}
+                    onChange={(e) => setNewQuestion(e.target.value)}
+                    placeholder="Type your question here..."
+                    className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+                    rows={4}
+                  />
+                  <div className="space-y-3">
+                    <p className="font-medium text-gray-700">Options:</p>
+                    {['A', 'B', 'C', 'D'].map((letter) => (
+                      <input
+                        key={letter}
+                        type="text"
+                        placeholder={`Option ${letter}`}
+                        className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      />
+                    ))}
+                  </div>
+                  <div className="space-y-2">
+                    <p className="font-medium text-gray-700">Correct Answer:</p>
+                    <select className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                      {['A', 'B', 'C', 'D'].map((letter) => (
+                        <option key={letter}>Option {letter}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="flex gap-4">
+                    <button
+                      onClick={addCustomQuestion}
+                      className="flex-1 py-2 px-4 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition duration-200 font-medium"
+                    >
+                      Refactor using AI
+                    </button>
+                    <button
+                      onClick={addCustomQuestion}
+                      className="flex-1 py-2 px-4 bg-green-600 text-white rounded-md hover:bg-green-700 transition duration-200 font-medium"
+                    >
+                      Add Question
+                    </button>
+                  </div>
+                </div>
+              </div> */}
+            </div>
+          </div>
+        )}
+
+        <div
+          className={`bg-white rounded-xl shadow-lg p-6 ${addQuestion ? 'flex-1' : 'w-full'}`}
+        >
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-bold text-gray-800">
               Questions for {selectedWeek}
             </h2>
+            {/* {unsavedChanges ? (
+              <button
+                onClick={() => setAddQuestion(true)}
+                className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-200 font-medium"
+              >
+                Save Changes
+              </button>
+            ) : ( */}
             <button
               onClick={handleApproveQuiz}
-              className="flex items-center space-x-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
+              className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition duration-200 font-medium"
             >
-              <CalendarCheck size={20} />
-              <span>Schedule Quiz</span>
+              Schedule Quiz
             </button>
+            {/* )} */}
           </div>
 
-          <div className="space-y-4 max-h-[90%] overflow-y-auto">
-            {questions.map((q, idx) =>
-              q ? (
-                <QuestionCard key={idx} question={q} index={idx} />
-              ) : (
-                <div
-                  key={idx}
-                  className="bg-gray-100 rounded-lg p-6 text-center"
-                >
-                  <div className="font-bold text-gray-600 mb-2">
-                    Question {idx + 1}
+          <div className="space-y-6 overflow-auto max-h-[calc(100vh-14rem)]">
+            {questions?.map((q, idx) => {
+              if (q.question) {
+                return (
+                  <div
+                    key={idx}
+                    className="bg-gray-50 rounded-lg p-6 shadow-sm relative"
+                  >
+                    <div className="flex justify-between items-center mb-4">
+                      <h3 className="text-lg font-semibold text-gray-700">
+                        Question {idx + 1}
+                      </h3>
+                      {!addQuestion && (
+                        <button
+                          onClick={() => handleQuestionRemove(idx)}
+                          className="w-fit p-3 h-8 flex items-center justify-center rounded-full bg-red-100 text-red-600 hover:bg-red-200 transition duration-200"
+                        >
+                          Replace
+                        </button>
+                      )}
+                    </div>
+                    <textarea
+                      value={q.question?.question}
+                      onChange={(e) =>
+                        handleQuestionChangeType(idx, e.target.value)
+                      }
+                      className="w-full p-4 border border-gray-200 rounded-lg mb-4 focus:ring-2 focus:ring-blue-500 focus:border-transparent min-h-[150px]"
+                    />
+                    {q.question?.image && (
+                      <img
+                        src={q.question.image}
+                        alt="Question"
+                        className="w-[20%] mx-auto mb-4 rounded-lg shadow-sm"
+                      />
+                    )}
+                    <div className="space-y-4">
+                      <p className="font-medium text-gray-700">Options:</p>
+                      {q?.question?.options?.map((option, i) => (
+                        <input
+                          key={i}
+                          type="text"
+                          value={option}
+                          onChange={(e) =>
+                            handleOptionChange(idx, i, e.target.value)
+                          }
+                          className={`w-full p-3 border rounded-lg transition duration-200 ${
+                            i === q.question.answer
+                              ? 'bg-green-50 border-green-200'
+                              : 'bg-red-50 border-red-200'
+                          }`}
+                        />
+                      ))}
+                    </div>
+                    <div className="mt-4">
+                      <p className="font-medium text-gray-700 mb-2">
+                        Correct Answer:
+                      </p>
+                      <select
+                        value={q.question?.answer || ''}
+                        onChange={(e) =>
+                          handleCorrectAnswerChange(idx, e.target.value)
+                        }
+                        className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      >
+                        {q?.question?.options?.map((option, i) => (
+                          <option key={i} value={i}>
+                            {option}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
-                  <div className="animate-pulse text-gray-500">
-                    Adding new question...
+                );
+              } else {
+                return (
+                  <div
+                    key={idx}
+                    className="bg-gray-100 rounded-lg p-6 animate-pulse"
+                  >
+                    <h3 className="text-lg font-semibold text-gray-700 mb-2">
+                      Question {idx + 1}
+                    </h3>
+                    <div className="h-32 bg-gray-200 rounded-lg mb-4"></div>
+                    <p className="text-gray-600 font-medium">
+                      Adding new question...
+                    </p>
                   </div>
-                </div>
-              ),
-            )}
+                );
+              }
+            })}
           </div>
         </div>
       </div>

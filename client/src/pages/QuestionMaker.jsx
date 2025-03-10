@@ -124,7 +124,7 @@ const QuestionMaker = ({ setIsQuestionMakerOpen }) => {
       </div>
       <div className="">
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">
+          <label className="block font-semibold text-lg text-gray-700">
             Question
           </label>
           <textarea
@@ -140,7 +140,7 @@ const QuestionMaker = ({ setIsQuestionMakerOpen }) => {
         </div>
 
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">
+          <label className="block font-semibold text-lg font-medium text-gray-700">
             Category
           </label>
           <select
@@ -163,7 +163,7 @@ const QuestionMaker = ({ setIsQuestionMakerOpen }) => {
 
         {question.category === 'PnA' && (
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block font-semibold text-lg text-gray-700">
               Puzzle Type
             </label>
             <select
@@ -185,17 +185,7 @@ const QuestionMaker = ({ setIsQuestionMakerOpen }) => {
         )}
 
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">
-            Upload Image (Optional)
-          </label>
-          <input type="file" onChange={handleImageChange} />
-          {errors.image && (
-            <p className="text-red-500 text-sm">{errors.image}</p>
-          )}
-        </div>
-
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">
+          <label className="block font-semibold text-lg text-gray-700">
             Options
           </label>
           {question.options.map((option, index) => (
@@ -215,7 +205,7 @@ const QuestionMaker = ({ setIsQuestionMakerOpen }) => {
         </div>
 
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">
+          <label className="block font-semibold text-lg text-gray-700">
             Correct Answer
           </label>
           <select
@@ -236,7 +226,17 @@ const QuestionMaker = ({ setIsQuestionMakerOpen }) => {
             <p className="text-red-500 text-sm">{errors.answer}</p>
           )}
         </div>
-        <div className="w-full flex justify-between">
+
+        <div className="mb-4">
+          <label className="block font-semibold text-lg text-gray-700">
+            Upload Image (Optional)
+          </label>
+          <input type="file" onChange={handleImageChange} />
+          {errors.image && (
+            <p className="text-red-500 text-sm">{errors.image}</p>
+          )}
+        </div>
+        <div className="w-full mt-6 flex justify-between">
           <button
             onClick={() => setIsQuestionMakerOpen(false)}
             className="hover:text-red-900 bg-gray-200 hover:bg-red-300 rounded w-fit px-2 py-1 h-8 flex items-center justify-center"

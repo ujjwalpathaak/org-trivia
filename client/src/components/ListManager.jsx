@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { saveGenreSettings } from '../api';
+import { toast } from 'react-toastify';
 
 export default function ListManager({ orgId, selectedGenre }) {
   const allItems = [
@@ -44,6 +45,7 @@ export default function ListManager({ orgId, selectedGenre }) {
   const [isSaved, setIsSaved] = useState(true);
 
   const handleSaveChanges = async () => {
+    toast.success('New settings saved');
     const genres = selectedItems.map((genre) => genre.value);
     await saveGenreSettings(genres, orgId);
     setIsSaved(true);
@@ -74,76 +76,93 @@ export default function ListManager({ orgId, selectedGenre }) {
   };
 
   return (
-    <div className="px-4 mx-auto">
-      <h3 className="mb-2">Available Genres</h3>
-      <ul>
-        {availableItems.length === 0 && (
-          <span className="font-bold text-slate-400 flex justify-between items-center mb-2 border p-2">
-            No available genres
-          </span>
-        )}
-        {availableItems.map((item) => (
-          <li
-            key={item.value}
-            className="flex justify-between items-center mb-2 border p-2"
-          >
-            <span>{item.key}</span>
-            <button
-              onClick={() => addItem(item)}
-              className="bg-green-500 text-white p-1"
+    <div className="max-w-2xl mx-auto bg-white rounded-xl">
+      <div className="mb-8">
+        <h3 className="font-semibold text-gray-800 mb-4">Available Genres</h3>
+        <ul className="space-y-3">
+          {availableItems.length === 0 && (
+            <li className="bg-gray-50 rounded-lg p-4 text-gray-500 text-center">
+              No available genres
+            </li>
+          )}
+          {availableItems.map((item) => (
+            <li
+              key={item.value}
+              className="flex justify-between items-center bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors"
             >
-              ➕
-            </button>
-          </li>
-        ))}
-      </ul>
-      <h3 className="mb-2">Selected Items</h3>
-      <ul>
-        {selectedItems.map((item, index) => (
-          <li
-            key={item.value}
-            className="font-bold text-slate-400 flex justify-between items-center mb-2 border p-2"
-          >
-            <span>{item.key}</span>
-            <div>
-              <div className="">
-                {index !== 0 && (
-                  <button
-                    onClick={() => moveItem(index, -1)}
-                    className="mx-auto"
-                  >
-                    ⬆️
-                  </button>
-                )}
-                {index !== selectedItems.length - 1 && (
-                  <button
-                    onClick={() => moveItem(index, 1)}
-                    className="mx-auto"
-                  >
-                    ⬇️
-                  </button>
-                )}
-              </div>
-              <button onClick={() => removeItem(item)} className="text-red-500">
-                ❌
+              <span className="text-gray-700">{item.key}</span>
+              <button
+                onClick={() => addItem(item)}
+                className="bg-green-500 hover:bg-green-600 text-white rounded-full p-1 transition-colors"
+                title="Add genre"
+              >
+                <span className="block transform hover:scale-110 transition-transform">
+                  ➕
+                </span>
               </button>
-            </div>
-          </li>
-        ))}
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div>
+        <h3 className="font-semibold text-gray-800 mb-4">Selected Genres</h3>
+        <ul className="space-y-3">
+          {selectedItems.map((item, index) => (
+            <li
+              key={item.value}
+              className="bg-blue-50 rounded-lg p-4 hover:bg-blue-100 transition-colors"
+            >
+              <div className="flex justify-between items-center">
+                <span className="text-gray-700">{item.key}</span>
+                <div className="flex items-center space-x-2">
+                  <div className="flex flex-col space-y-1">
+                    {index !== 0 && (
+                      <button
+                        onClick={() => moveItem(index, -1)}
+                        className="hover:scale-110 transition-transform"
+                        title="Move up"
+                      >
+                        ⬆️
+                      </button>
+                    )}
+                    {index !== selectedItems.length - 1 && (
+                      <button
+                        onClick={() => moveItem(index, 1)}
+                        className="hover:scale-110 transition-transform"
+                        title="Move down"
+                      >
+                        ⬇️
+                      </button>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => removeItem(item)}
+                    className="ml-4 text-red-500 hover:text-red-600 hover:scale-110 transition-all"
+                    title="Remove genre"
+                  >
+                    ❌
+                  </button>
+                </div>
+              </div>
+            </li>
+          ))}
+        </ul>
+
         {!isSaved && (
-          <>
-            <p className="text-red-500 text-xs mt-1">
+          <div className="mt-6 space-y-3">
+            <p className="text-red-500 text-sm">
               Changes not saved. Click "Save Changes" to save your changes.
             </p>
             <button
               onClick={handleSaveChanges}
-              className="p-2 bg-blue-500 text-white rounded-lg"
+              className="w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-3 px-6 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
             >
               Save Changes
             </button>
-          </>
+          </div>
         )}
-      </ul>
+      </div>
     </div>
   );
 }

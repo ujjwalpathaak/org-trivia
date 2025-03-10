@@ -56,7 +56,7 @@ class QuestionService {
   }
 
   async startQuestionGenerationWorkflow(genre, element, quizId) {
-    switch ('PnA') {
+    switch (genre) {
       case 'PnA':
         console.log('starting PnA');
         this.startPnAWorkflow(element.name, element._id, quizId);
@@ -204,17 +204,30 @@ class QuestionService {
     return Object.keys(errors).length;
   }
 
-  async getWeeklyUnapprovedQuestions(orgId) {
-    const upcomingQuiz =
-      await this.questionRepository.getUpcomingWeeklyQuiz(orgId);
-    if (!upcomingQuiz) return false;
+  async getExtraAIQuestions(orgId, quizId, quizGenre) {
+    return (
+      (await this.questionRepository.getExtraAIQuestions(quizId, quizGenre)) ||
+      []
+    );
+  }
 
-    const quizId = upcomingQuiz._id;
+  async getExtraEmployeeQuestions(orgId, quizId, quizGenre) {
+    return (
+      (await this.questionRepository.getExtraEmployeeQuestions(
+        quizId,
+        quizGenre,
+      )) || []
+    );
+  }
 
-    const weeklyUnapprovedQuestions =
-      await this.questionRepository.getWeeklyUnapprovedQuestions(quizId);
+  async getUpcomingWeeklyQuizByOrgId(orgId) {
+    return this.questionRepository.getUpcomingWeeklyQuiz(orgId);
+  }
 
-    return weeklyUnapprovedQuestions || [];
+  async getWeeklyUnapprovedQuestions(orgId, quizId) {
+    return (
+      (await this.questionRepository.getWeeklyUnapprovedQuestions(quizId)) || []
+    );
   }
 
   async getWeeklyQuizCorrectAnswers(orgId) {

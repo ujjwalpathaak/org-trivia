@@ -8,6 +8,7 @@ export const refactorPnAQuestionsToOrgContext = async (
   PnAQuestions,
   orgId,
 ) => {
+  console.log(PnAQuestions);
   const response = await fetch(API_GATEWAY_URL + '/generatePnA_Questions', {
     method: 'POST',
     headers: {

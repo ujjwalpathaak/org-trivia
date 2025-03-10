@@ -88,6 +88,16 @@ class QuestionRepository {
     });
   }
 
+  async getExtraAIQuestions(quizId, genre) {
+    return [];
+    // return Question.find({ source: 'AI' });
+  }
+
+  async getExtraEmployeeQuestions(quizId, genre) {
+    return [];
+    // return Question.find({ source: 'Employee' });
+  }
+
   async getWeeklyUnapprovedQuestions(quizId) {
     return WeeklyQuestion.find({ quizId: quizId });
   }
