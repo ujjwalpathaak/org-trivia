@@ -32,7 +32,7 @@ export const refactorPnAQuestionsToOrgContext = async (
   return refactoredPnAQuestions;
 };
 
-export const fetchNewCAnITQuestions = (orgName, orgIndustry, orgId, quizId) => {
+export const fetchNewCAnITQuestions = (orgName, orgIndustry, orgCountry, orgId, quizId) => {
   fetch(API_GATEWAY_URL + '/generateCAnIT_Questions', {
     method: 'POST',
     headers: {
@@ -40,8 +40,9 @@ export const fetchNewCAnITQuestions = (orgName, orgIndustry, orgId, quizId) => {
     },
     body: JSON.stringify({
       orgName: orgName,
-      callbackUrl: 'https://cd21-122-187-121-22.ngrok-free.app',
+      callbackUrl: 'https://7047-122-187-121-22.ngrok-free.app',
       orgIndustry: orgIndustry,
+      orgCountry: orgCountry,
       orgId: orgId,
       quizId: quizId,
     }),

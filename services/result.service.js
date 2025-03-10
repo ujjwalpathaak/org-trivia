@@ -45,11 +45,12 @@ class ResultService {
       orgId,
       quizId,
     );
+
     const weeklyQuizScore = await this.calculateWeeklyQuizScore(
       userAnswers,
       correctAnswers,
     );
-
+    
     await this.employeeRepository.updateWeeklyQuizScore(
       employeeId,
       weeklyQuizScore,

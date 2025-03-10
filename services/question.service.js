@@ -71,7 +71,8 @@ class QuestionService {
         console.log('starting CAnIT');
         fetchNewCAnITQuestions(
           element.name,
-          'Information Technology',
+          element.orgIndustry,
+          element.orgCountry,
           element._id,
           quizId,
         );

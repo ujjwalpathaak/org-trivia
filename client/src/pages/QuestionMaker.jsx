@@ -121,6 +121,12 @@ const QuestionMaker = ({ setIsQuestionMakerOpen }) => {
     <div className="col-span-5 h-fit bg-white shine floating-div rounded-2xl p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-semibold">Create Question</h1>
+        <button
+          onClick={() => setIsQuestionMakerOpen(false)}
+          className="hover:text-red-900 bg-gray-200 hover:bg-red-300 rounded-full px-2 py-2 w-8 h-8 flex items-center justify-center"
+        >
+          X
+        </button>
       </div>
       <div className="">
         <div className="mb-4">
@@ -236,13 +242,7 @@ const QuestionMaker = ({ setIsQuestionMakerOpen }) => {
             <p className="text-red-500 text-sm">{errors.image}</p>
           )}
         </div>
-        <div className="w-full mt-6 flex justify-between">
-          <button
-            onClick={() => setIsQuestionMakerOpen(false)}
-            className="hover:text-red-900 bg-gray-200 hover:bg-red-300 rounded w-fit px-2 py-1 h-8 flex items-center justify-center"
-          >
-            Close
-          </button>
+        <div className="w-full mt-6 flex justify-end">
           <button
             onClick={handleSubmit}
             className="bg-blue-500 text-white px-4 py-2 rounded-md"

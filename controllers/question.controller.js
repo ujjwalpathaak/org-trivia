@@ -70,13 +70,11 @@ class QuestionController {
           .status(404)
           .json({ message: 'No questions scheduled till now' });
 
-      res
-        .status(200)
-        .json({
-          weeklyUnapprovedQuestions: weeklyUnapprovedQuestions,
-          extraAIQuestions: extraAIQuestions,
-          extraEmployeeQuestions: extraEmployeeQuestions,
-        });
+      res.status(200).json({
+        weeklyUnapprovedQuestions: weeklyUnapprovedQuestions,
+        extraAIQuestions: extraAIQuestions,
+        extraEmployeeQuestions: extraEmployeeQuestions,
+      });
     } catch (error) {
       next(error);
     }

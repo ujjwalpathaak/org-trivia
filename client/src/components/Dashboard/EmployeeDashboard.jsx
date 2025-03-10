@@ -24,6 +24,7 @@ const EmployeeDashboard = () => {
   const orgId = useOrgId();
   const employeeId = useUserId();
   const [isQuizLive, setIsQuizLive] = useState(false);
+  const [resumeQuiz, setResumeQuiz] = useState(false);
   const [isQuestionMakerOpen, setIsQuestionMakerOpen] = useState(false);
   const [isQuizOpen, setIsQuizOpen] = useState(false);
   const [score, setScore] = useState({
@@ -38,6 +39,21 @@ const EmployeeDashboard = () => {
 
     return daysUntilFriday;
   }
+
+  useEffect(() => {
+    const getIsQuizAttempting = async () => {
+      try {
+        const quizState = localStorage.getItem('state');
+        if (quizState) {
+          setResumeQuiz(true);
+        }
+      } catch (error) {
+        console.error('Error checking quiz status:', error);
+      }
+    };
+
+    getIsQuizAttempting();
+  }, []);
 
   useEffect(() => {
     const fetchIsWeeklyQuizLive = async () => {
@@ -77,68 +93,74 @@ const EmployeeDashboard = () => {
       {/* Main Content */}
       <div className="pt-4 px-4 grid grid-cols-11 gap-4">
         {/* Left Sidebar */}
+
         <div className="col-span-2 col-start-2">
-          <div className="bg-white rounded-lg p-6 shadow">
+          <div className="bg-white rounded-2xl p-6 floating-div">
             <div className="flex flex-col items-center">
               <img
                 src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
                 alt="Profile"
-                className="w-20 h-20 rounded-full mb-4"
+                className="w-24 h-24 rounded-full mb-4 border-4 border-gray-200"
               />
-              <div className="flex justify-between w-full mb-6">
+              <div className="flex justify-between w-full px-8 mb-6">
                 <div className="text-center">
-                  <div className="flex items-center gap-1">
-                    <User className="h-4 w-4" />
-                    <span>0</span>
+                  <div className="flex items-center gap-2 text-gray-700">
+                    <User className="h-5 w-5 text-blue-600" />
+                    <span className="text-lg font-semibold">0</span>
                   </div>
                   <span className="text-sm text-gray-500">Appreciations</span>
                 </div>
                 <div className="text-center">
-                  <div className="flex items-center gap-1">
-                    <Award className="h-4 w-4" />
-                    <span>0</span>
+                  <div className="flex items-center gap-2 text-gray-700">
+                    <Award className="h-5 w-5 text-yellow-500" />
+                    <span className="text-lg font-semibold">0</span>
                   </div>
                   <span className="text-sm text-gray-500">Awards</span>
                 </div>
               </div>
-              <div className="bg-white w-full">
-                <h2 className="text-lg font-semibold mb-2">My Badges</h2>
-                <div className="flex flex-col mb-6">
-                  <span className="text-black flex flex py-1 rounded-lg">
+              <div className="w-full text-center">
+                <h2 className="text-lg font-semibold mb-3">My Badges</h2>
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center gap-2 bg-gray-100 py-2 px-3 rounded-lg shadow-sm">
                     <img className="w-8" src={shield1} />
-                    Star Performer
-                  </span>
-                  <span className="text-black flex flex py-1 rounded-lg">
+                    <span className="font-medium">Star Performer</span>
+                  </div>
+                  <div className="flex items-center gap-2 bg-gray-100 py-2 px-3 rounded-lg shadow-sm">
                     <img className="w-8" src={shield2} />
-                    Top Scorer
-                  </span>
+                    <span className="font-medium">Top Scorer</span>
+                  </div>
                 </div>
               </div>
-              <nav className="w-full space-y-4">
-                <button className="w-full text-left px-4 rounded hover:bg-gray-100 flex items-center gap-2">
-                  <Zap className="h-4 w-4" />
-                  My Activity
+              <nav className="w-full mt-6 space-y-3">
+                <button className="w-full text-left px-5 py-3 rounded-lg bg-gray-50 hover:bg-gray-100 flex items-center gap-3 transition">
+                  <Zap className="h-5 w-5 text-purple-500" />
+                  <span className="font-medium">My Activity</span>
                 </button>
-                <button className="w-full text-left px-4 rounded hover:bg-gray-100 flex items-center gap-2">
-                  <BookmarkSimple className="h-4 w-4" />
-                  Saved Posts
+                <button className="w-full text-left px-5 py-3 rounded-lg bg-gray-50 hover:bg-gray-100 flex items-center gap-3 transition">
+                  <BookmarkSimple className="h-5 w-5 text-green-500" />
+                  <span className="font-medium">Saved Posts</span>
                 </button>
               </nav>
             </div>
           </div>
 
           {/* Groups Section */}
-          <div className="bg-white rounded-lg p-6 mt-4 shadow">
-            <div className=" p-3 rounded-xl">
-              <h2 className="text-lg font-semibold mb-2">Submit Question</h2>
-              <ul className="text-slate-400 mb-4">
-                <li>Total Submissions: 25</li>
-                <li>Submissions Accepted: 10</li>
+          <div className="bg-white rounded-2xl p-6 mt-6 shadow-lg">
+            <div className="p-4 rounded-xl">
+              <h2 className="text-lg font-semibold mb-3">Submit Question</h2>
+              <ul className="text-gray-500 mb-4">
+                <li className="font-medium">
+                  Total Submissions: <span className="text-gray-800">25</span>
+                </li>
+                <li className="font-medium">
+                  Submissions Accepted:{' '}
+                  <span className="text-gray-800">10</span>
+                </li>
               </ul>
               {!isQuestionMakerOpen && (
                 <button
                   onClick={() => setIsQuestionMakerOpen(true)}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  className="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium w-full"
                 >
                   Write Question
                 </button>
@@ -146,6 +168,7 @@ const EmployeeDashboard = () => {
             </div>
           </div>
         </div>
+
         {isQuestionMakerOpen ? (
           <QuestionMaker setIsQuestionMakerOpen={setIsQuestionMakerOpen} />
         ) : isQuizOpen ? (
@@ -239,7 +262,7 @@ const EmployeeDashboard = () => {
                 <div className="p-1">
                   <div className="p-3 rounded-xl">
                     <h2 className="text-lg font-semibold mb-2">
-                      Weekly Quiz is active! 🎉
+                      Attempting Weekly Quiz! 🎉
                     </h2>
                     <h6 className="text-slate-400 font-sm">All the best</h6>
                   </div>
@@ -249,20 +272,41 @@ const EmployeeDashboard = () => {
               <>
                 <div className="p-1">
                   {isQuizLive ? (
-                    <div className=" rounded-xl">
-                      <h2 className="text-lg font-semibold mb-2">
-                        Weekly Quiz is live! 🎉
-                      </h2>
-                      <h6 className="text-slate-400 font-sm">
-                        Puzzles and Aptitude
-                      </h6>
-                      <button
-                        onClick={() => setIsQuizOpen(true)}
-                        className="mt-3 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                      >
-                        Start Quiz
-                      </button>
-                    </div>
+                    resumeQuiz ? (
+                      <>
+                        <div className="rounded-xl">
+                          <h2 className="text-lg font-semibold mb-2">
+                            Quiz already started
+                          </h2>
+                          <h6 className="text-slate-400 font-sm">
+                            Puzzles and Aptitude
+                          </h6>
+                          <button
+                            onClick={() => setIsQuizOpen(true)}
+                            className="mt-3 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                          >
+                            Resume Quiz
+                          </button>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="rounded-xl">
+                          <h2 className="text-lg font-semibold mb-2">
+                            Weekly Quiz is live! 🎉
+                          </h2>
+                          <h6 className="text-slate-400 font-sm">
+                            Puzzles and Aptitude
+                          </h6>
+                          <button
+                            onClick={() => setIsQuizOpen(true)}
+                            className="mt-3 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                          >
+                            Start Quiz
+                          </button>
+                        </div>
+                      </>
+                    )
                   ) : (
                     <div className="rounded-xl">
                       <h2 className="text-lg mb-2">Quiz has ended</h2>

@@ -44,12 +44,12 @@ class EmployeeRepository {
       { _id: new ObjectId(employeeId) },
       { lastQuizDate: 1, currentStreak: 1 },
     );
-
+    
     const lastQuizDate = employee.lastQuizDate
-      ? new Date(employee.lastQuizDate).setHours(0, 0, 0, 0)
-      : null;
+    ? new Date(employee.lastQuizDate).setHours(0, 0, 0, 0)
+    : null;
     let updatedStreak = 0;
-
+    
     if (
       lastQuizDate &&
       thisQuizDate - lastQuizDate === 7 * 24 * 60 * 60 * 1000
@@ -57,9 +57,9 @@ class EmployeeRepository {
       updatedStreak = employee.currentStreak + 1;
     }
     const multi = await this.newMultiplier(updatedStreak);
-
+    
     updatedWeeklyQuizScore *= multi;
-
+    
     return Employee.updateOne(
       { _id: new ObjectId(employeeId) },
       {

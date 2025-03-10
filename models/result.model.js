@@ -7,7 +7,7 @@ const answerSchema = new mongoose.Schema(
       ref: 'Question',
       required: true,
     },
-    correctAns: {
+    correctAnswer: {
       type: Number,
       required: true,
     },
