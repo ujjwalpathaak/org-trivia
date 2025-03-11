@@ -7,11 +7,16 @@ const badgeSchema = new mongoose.Schema(
       ref: 'Badge',
       required: true,
     },
+    description: {
+      type: String,
+      required: true,
+      trim: true,
+    },
     earnedAt: {
       type: Date,
-      default: Date.now,
+      default: new Date(),
       required: true,
-    },
+    }
   },
   { _id: false },
 );

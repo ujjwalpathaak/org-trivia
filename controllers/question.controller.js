@@ -59,12 +59,6 @@ class QuestionController {
         ),
       ]);
 
-      console.log(
-        weeklyUnapprovedQuestions,
-        extraAIQuestions,
-        extraEmployeeQuestions,
-      );
-
       if (!weeklyUnapprovedQuestions)
         return res
           .status(404)

@@ -58,3 +58,13 @@ export const getMonthAndYear = () => {
   const year = today.getFullYear();
   return [month, year];
 };
+
+export const getPreviousMonthAndYear = () => {
+  const today = new Date();
+
+  let pMonth = today.getMonth();
+  let pYear = today.getFullYear();
+  
+  return [pMonth, pYear];
+};
+

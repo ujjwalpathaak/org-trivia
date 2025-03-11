@@ -21,6 +21,15 @@ export const registerRequest = async (formData) => {
   return response;
 };
 
+export const getEmployeeBadges = async (employeeId) => {
+  const response = await fetch(BACKEND_URL + `/badge/employee/${employeeId}`, {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' },
+  });
+
+  return await response.json();
+}
+
 export const getAllOrgs = async () => {
   const response = await fetch(BACKEND_URL + '/org', {
     method: 'GET',

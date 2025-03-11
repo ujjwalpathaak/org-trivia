@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { isWeeklyQuizLive, fetchEmployeeScore } from '../../api';
+import {
+  isWeeklyQuizLive,
+  fetchEmployeeScore,
+  getEmployeeBadges,
+} from '../../api';
 import { useOrgId, useUserId } from '../../context/auth.context';
 import {
   User,
@@ -26,6 +30,7 @@ const EmployeeDashboard = () => {
   const [isQuizLive, setIsQuizLive] = useState(false);
   const [resumeQuiz, setResumeQuiz] = useState(false);
   const [isQuestionMakerOpen, setIsQuestionMakerOpen] = useState(false);
+  const [badges, setBadges] = useState([]);
   const [isQuizOpen, setIsQuizOpen] = useState(false);
   const [score, setScore] = useState({
     currentPoints: 0,
@@ -54,6 +59,20 @@ const EmployeeDashboard = () => {
 
     getIsQuizAttempting();
   }, []);
+
+  useEffect(() => {
+    const fetchEmployeeBadges = async () => {
+      if (!employeeId) return;
+      try {
+        const data = await getEmployeeBadges(employeeId);
+        setBadges(data.badges);
+      } catch (error) {
+        console.error('Error checking quiz status:', error);
+      }
+    };
+
+    fetchEmployeeBadges();
+  }, [employeeId]);
 
   useEffect(() => {
     const fetchIsWeeklyQuizLive = async () => {
@@ -121,14 +140,15 @@ const EmployeeDashboard = () => {
               <div className="w-full text-center">
                 <h2 className="text-lg font-semibold mb-3">My Badges</h2>
                 <div className="flex flex-col gap-2">
-                  <div className="flex items-center gap-2 bg-gray-100 py-2 px-3 rounded-lg shadow-sm">
-                    <img className="w-8" src={shield1} />
-                    <span className="font-medium">Star Performer</span>
-                  </div>
-                  <div className="flex items-center gap-2 bg-gray-100 py-2 px-3 rounded-lg shadow-sm">
-                    <img className="w-8" src={shield2} />
-                    <span className="font-medium">Top Scorer</span>
-                  </div>
+                  {badges.map((badge, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center gap-2 bg-gray-100 py-2 px-3 rounded-lg shadow-sm"
+                    >
+                      <img className="w-8" src={badge.badgeDetails.url} />
+                      <span className="font-medium">{badge.description}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
               <nav className="w-full mt-6 space-y-3">

@@ -2,13 +2,14 @@ import mongoose from 'mongoose';
 
 const badgeSchema = new mongoose.Schema(
   {
-    shieldUrl: {
+    url: {
       type: String,
       required: true,
       trim: true,
     },
-    description: {
+    rank: {
       type: String,
+      enum: ['Silver', 'Gold', 'Bronze'],
       required: true,
       trim: true,
     },
