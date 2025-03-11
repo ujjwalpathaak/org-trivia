@@ -6,7 +6,6 @@ import {
 } from '../../api';
 import { useOrgId, useUserId } from '../../context/auth.context';
 import {
-  User,
   Share2,
   Image,
   Zap,
@@ -14,23 +13,18 @@ import {
   Award,
   Bookmark as BookmarkSimple,
   CalendarCheck,
-  CircleHelp,
   Book,
-  X,
 } from 'lucide-react';
 
-import shield1 from '../../assets/lg50.png';
-import shield2 from '../../assets/lg2550.png';
-
-import { createNewQuestion } from '../../api';
 import Quiz from '../../pages/Quiz';
-import { toast } from 'react-toastify';
 import QuestionMaker from '../../pages/QuestionMaker';
 import Leaderboard from '../Leaderboard';
+import { daysUntilNextFriday } from '../../utils';
 
 const EmployeeDashboard = () => {
   const orgId = useOrgId();
   const employeeId = useUserId();
+
   const [isQuizLive, setIsQuizLive] = useState(false);
   const [resumeQuiz, setResumeQuiz] = useState(false);
   const [isQuestionMakerOpen, setIsQuestionMakerOpen] = useState(false);
@@ -40,14 +34,6 @@ const EmployeeDashboard = () => {
     currentPoints: 0,
     lastQuizScore: 0,
   });
-
-  function daysUntilNextFriday() {
-    const today = new Date();
-    const dayOfWeek = today.getDay();
-    const daysUntilFriday = (5 - dayOfWeek + 7) % 7 || 7;
-
-    return daysUntilFriday;
-  }
 
   useEffect(() => {
     const getIsQuizAttempting = async () => {
@@ -104,19 +90,9 @@ const EmployeeDashboard = () => {
     getEmployeeScore();
   }, [orgId, employeeId]);
 
-  const notifyQuestionSubmitted = () => toast('New question submitted!');
-
-  const handleSubmit = () => {
-    notifyQuestionSubmitted();
-    createNewQuestion(question);
-  };
-
   return (
     <div className="min-h-[93vh] flex justify-center bg-[#f0f2f5]">
-      {/* Main Content */}
       <div className="pt-4 px-4 grid grid-cols-11 gap-4">
-        {/* Left Sidebar */}
-
         <div className="col-span-2 col-start-2">
           <div className="bg-white rounded-2xl p-6 floating-div">
             <div className="flex flex-col items-center">
@@ -181,7 +157,6 @@ const EmployeeDashboard = () => {
             </div>
           </div>
         </div>
-
         {isQuestionMakerOpen ? (
           <QuestionMaker
             setIsQuestionMakerOpen={setIsQuestionMakerOpen}
@@ -233,7 +208,6 @@ const EmployeeDashboard = () => {
                 </div>
               </div>
             </div>
-
             <div className="bg-blue-500 text-white rounded-lg p-6 shadow mb-4">
               <div className="flex items-center gap-4">
                 <div className="flex -space-x-4">

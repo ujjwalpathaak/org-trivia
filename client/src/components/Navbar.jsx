@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 
 import ProfilePhoto from '../assets/profile_photo.avif';
 
-import DarwinboxLogo from '../assets/darwinboxlogo.png';
 import { useAuth } from '../context/auth.context';
 
 const Navbar = () => {
@@ -13,7 +12,7 @@ const Navbar = () => {
     <nav className="bg-blue-600 h-[7vh] px-12 top-0 w-full shadow-md text-white flex items-center justify-between">
       <Link to="/">
         <div className="text-lg h-16 flex items-center bg-white font-bold">
-          <img src={DarwinboxLogo} />
+          <img src="https://s3.eu-north-1.amazonaws.com/asset.orgtrivia/darwinboxlogo.png" />
         </div>
       </Link>
       {isAuthenticated && (

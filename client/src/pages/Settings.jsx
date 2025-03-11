@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { useOrgId } from '../context/auth.context';
+
 import { getSettings, toggleTrivia } from '../api';
+
+import { useOrgId } from '../context/auth.context';
 import ListManager from '../components/ListManager';
-import { useNavigate } from 'react-router-dom';
 
 const Settings = () => {
   const [isTriviaEnabled, setIsTriviaEnabled] = useState(false);
-  const [selectedGenre, setSelectedGenre] = useState([]);
-  const [currentGenre, setCurrentGenre] = useState(0);
   const [settings, setSettings] = useState(null);
-  const navigate = useNavigate();
 
   const orgId = useOrgId();
 
@@ -21,8 +19,6 @@ const Settings = () => {
 
         setSettings(response);
         setIsTriviaEnabled(response.isTriviaEnabled);
-        setCurrentGenre(response.currentGenre);
-        setSelectedGenre(response.selectedGenre);
       } catch (error) {
         console.error(error);
       }

@@ -54,8 +54,7 @@ class OrgController {
   async getAllOrgNames(req, res, next) {
     try {
       const response = await orgService.getAllOrgNames();
-
-      res.status(response.status).json(response.data);
+      res.status(200).json(response);
     } catch (error) {
       next(error);
     }

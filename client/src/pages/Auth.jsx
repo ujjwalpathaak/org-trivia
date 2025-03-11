@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+import { useAuth } from '../context/auth.context';
+
 import LoginForm from '../components/Auth/LoginForm';
 import RegistrationFormForm from '../components/Auth/RegistrationForm';
-import { useAuth } from '../context/auth.context';
-import { redirect, useNavigate } from 'react-router-dom';
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);

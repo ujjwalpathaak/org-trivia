@@ -9,14 +9,7 @@ import {
   Pie,
   Cell,
 } from 'recharts';
-import { Users, BarChart2, Award, Activity } from 'lucide-react';
-
-// const quizData = [
-//   { category: 'Tech', participants: 120 },
-//   { category: 'HR', participants: 85 },
-//   { category: 'Marketing', participants: 60 },
-//   { category: 'Finance', participants: 45 },
-// ];
+import { Users, BarChart2, Activity } from 'lucide-react';
 
 const performanceData = [
   { name: 'Excellent', value: 40 },
@@ -34,6 +27,7 @@ export default function QuizAnalytics({ analytics }) {
       participants: item.count,
     };
   });
+
   return (
     <div className="col-span-5">
       <div className="bg-white rounded-lg p-6 shadow mb-4">

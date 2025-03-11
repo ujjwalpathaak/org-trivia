@@ -68,3 +68,10 @@ export const getPreviousMonthAndYear = () => {
   return [pMonth, pYear];
 };
 
+export const daysUntilNextFriday = () => {
+  const today = new Date();
+  const dayOfWeek = today.getDay();
+  const daysUntilFriday = (5 - dayOfWeek + 7) % 7 || 7;
+
+  return daysUntilFriday;
+}
