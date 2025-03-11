@@ -20,6 +20,21 @@ class EmployeeController {
     }
   }
 
+  async getEmployeeDetails(req, res, next){
+    try {
+      const { employeeId } = req.params;
+      if (!employeeId) {
+        return res.status(400).json({ message: 'Missing required fields' });
+      }
+      const employeeDetails =
+        await employeeService.getEmployeeDetails(employeeId);
+
+      res.status(200).json(employeeDetails);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async fetchEmployeeScore(req, res, next) {
     try {
       const { employeeId } = req.params;

@@ -1,7 +1,5 @@
 import { useState, createContext, useContext, useEffect } from 'react';
 import { jwtDecode } from 'jwt-decode';
-import { Navigate } from 'react-router-dom';
-import { isWeeklyQuizLive } from '../api.js';
 
 const AuthContext = createContext({
   isAuthenticated: false,

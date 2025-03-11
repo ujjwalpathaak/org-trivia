@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { toast } from 'react-toastify';
+
 import { validateForm } from '../../utils';
 import { registerRequest } from '../../api';
 import OrgSearch from './OrgSearch';
@@ -38,7 +40,7 @@ const RegistrationForm = () => {
       const data = await response.json();
 
       if (response.ok) {
-        alert(
+        toast.success(
           `Successfully registered you as an ${
             formData.isAdmin ? 'Admin' : 'Employee'
           }. Login again to get access to the dashboard!`,

@@ -2,11 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getWeeklyQuizQuestions, submitWeeklyQuizAnswers } from '../api';
 import { useOrgId, useUserId } from '../context/auth.context';
-
 import { toast } from 'react-toastify';
+import { Loader, Clock, CheckCircle } from 'lucide-react';
 
 const Quiz = ({ setIsQuizOpen, setIsQuizLive }) => {
-  const navigate = useNavigate();
   const orgId = useOrgId();
   const userId = useUserId();
 
@@ -22,7 +21,6 @@ const Quiz = ({ setIsQuizOpen, setIsQuizLive }) => {
       try {
         const quizState = localStorage.getItem('state');
         const quizStateJSON = JSON.parse(quizState);
-        console.log(quizStateJSON);
         if (quizStateJSON) {
           setAnswers(quizStateJSON.answers);
           setIsQuizFinished(quizStateJSON.isQuizFinished);
@@ -64,7 +62,7 @@ const Quiz = ({ setIsQuizOpen, setIsQuizLive }) => {
     return () => clearInterval(timer);
   }, [currentQuestion, isQuizFinished, questions.length]);
 
-  const notifyAnswersSubmitted = () => toast('Answers Submitted!');
+  const notifyAnswersSubmitted = () => toast.success('Answers Submitted!');
 
   const handleAnswer = (option) => {
     const newAnswer = {
@@ -76,7 +74,6 @@ const Quiz = ({ setIsQuizOpen, setIsQuizLive }) => {
       answers: [],
       currentQuestion: 0,
     };
-    console.log(quizState);
     quizState.answers.push(newAnswer);
 
     setAnswers(quizState.answers);
@@ -84,7 +81,7 @@ const Quiz = ({ setIsQuizOpen, setIsQuizLive }) => {
     const state = {
       answers: quizState.answers,
       currentQuestion: currentQuestion + 1,
-      isQuizFinished: currentQuestion + 1 === questions.length ? true : false,
+      isQuizFinished: currentQuestion + 1 === questions.length,
     };
     localStorage.setItem('state', JSON.stringify(state));
 
@@ -93,10 +90,16 @@ const Quiz = ({ setIsQuizOpen, setIsQuizLive }) => {
 
   const handleSubmitAnswers = async () => {
     if (currentQuestion >= questions.length - 1) {
-      const optionsSelected = localStorage.getItem('answers');
-      if (optionsSelected) {
-        await submitWeeklyQuizAnswers(optionsSelected, orgId, userId, quizId);
-        localStorage.removeItem('answers');
+      const state = localStorage.getItem('state');
+      const optionsSelected = JSON.parse(state);
+      if (optionsSelected.answers) {
+        await submitWeeklyQuizAnswers(
+          optionsSelected.answers,
+          orgId,
+          userId,
+          quizId,
+        );
+        localStorage.removeItem('state');
       }
       notifyAnswersSubmitted();
       setIsQuizOpen(false);
@@ -114,37 +117,43 @@ const Quiz = ({ setIsQuizOpen, setIsQuizLive }) => {
   };
 
   return (
-    <div className="col-span-5 bg-white h-5/6 floating-div rounded-2xl p-6">
-      <div className="flex mb-2 justify-between items-center">
-        Questions: {`${currentQuestion + 1}/${questions.length}`}
-        <p className="text-red-500">Time Left: {timeLeftCurrentQuestion}s</p>
+    <div className="col-span-5 bg-white floating-div h-fit rounded-2xl p-6">
+      <div className="flex justify-between items-center w-full mb-4">
+        <p className="text-lg font-semibold">
+          Question {currentQuestion + 1}/{questions.length}
+        </p>
+        <p className="text-red-500 flex items-center gap-2">
+          <Clock className="w-5 h-5" /> {timeLeftCurrentQuestion}s
+        </p>
       </div>
-      <div className="max-w-2xl mt-2 mx-auto bg-white rounded-xl">
+      <div className="w-full p-4 rounded-lg text-center">
         {isQuizFinished ? (
-          <div>
+          <div className="flex flex-col items-center">
+            <CheckCircle className="w-12 h-12 text-green-500" />
             <button
               onClick={handleSubmitAnswers}
-              className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+              className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all"
             >
-              Are you sure you want to submit your quiz?
+              Submit Quiz
             </button>
           </div>
         ) : questions.length > 0 ? (
           <>
-            <div className="border-2 p-2 rounded-lg mb-6">
-              <h3 className="text-lg font-semibold">
-                {questions[currentQuestion]?.question}
-              </h3>
+            <h3 className="text-lg font-semibold mb-2">
+              {questions[currentQuestion]?.question}
+            </h3>
+            {questions[currentQuestion]?.image && (
               <img
-                className="w-1/2 mx-auto mt-6"
+                className="w-2/3 max-w-xs mx-auto mt-4 rounded-md shadow-sm"
                 src={questions[currentQuestion]?.image}
+                alt="Question"
               />
-            </div>
-            <div className="grid grid-cols-2 font-normal gap-4">
+            )}
+            <div className="grid grid-cols-2 gap-4 mt-6">
               {questions[currentQuestion]?.options?.map((option, index) => (
                 <div
                   key={index}
-                  className="border-2 p-2 rounded-lg cursor-pointer hover:bg-gray-200"
+                  className="border-2 p-3 rounded-lg cursor-pointer hover:bg-slate-200 transition-all text-lg font-medium"
                   onClick={() => handleAnswer(index)}
                 >
                   {`(${String.fromCharCode(65 + index)}) ${option}`}
@@ -153,7 +162,10 @@ const Quiz = ({ setIsQuizOpen, setIsQuizLive }) => {
             </div>
           </>
         ) : (
-          <p>Loading questions...</p>
+          <div className="flex flex-col items-center">
+            <Loader className="w-8 h-8 animate-spin" />
+            <p className="mt-2">Loading questions...</p>
+          </div>
         )}
       </div>
     </div>

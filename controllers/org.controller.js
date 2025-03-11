@@ -54,8 +54,22 @@ class OrgController {
   async getAllOrgNames(req, res, next) {
     try {
       const response = await orgService.getAllOrgNames();
+      res.status(200).json(response);
+    } catch (error) {
+      next(error);
+    }
+  }
 
-      res.status(response.status).json(response.data);
+  async getAnalytics(req, res, next){
+    try {
+      const { orgId } = req.params;
+      if (!orgId) {
+        return res.status(400).json({ message: 'Missing required fields' });
+      }
+
+      const analytics = await orgService.getAnalytics(orgId);
+
+      res.status(200).json(analytics);
     } catch (error) {
       next(error);
     }

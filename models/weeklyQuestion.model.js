@@ -28,13 +28,19 @@ const questionSchema = new mongoose.Schema(
       type: Number,
       required: true,
       immutable: true,
+      validate: {
+        validator: function (v) {
+          return v >= 0 && v < 4;
+        },
+        message: 'Answer must be an index between 0 and 3.',
+      },
     },
     options: {
       type: [String],
       required: true,
       validate: {
         validator: function (v) {
-          return v.length === 4;
+          return Array.isArray(v) && v.length === 4;
         },
         message: 'Options array must have exactly 4 items.',
       },

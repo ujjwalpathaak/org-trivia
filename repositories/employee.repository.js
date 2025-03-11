@@ -36,32 +36,90 @@ class EmployeeRepository {
       default:
         return 1;
     }
-  }  
+  }
+
+  async addSubmittedQuestion(questionId, employeeId){
+    return Employee.updateOne(
+      { _id: new ObjectId(employeeId) },
+      { $push: { submittedQuestions: new ObjectId(questionId) } },
+    );
+  }
+
+  async getEmployeeDetails(employeeId){
+    const badges = await Employee.aggregate([
+      {
+          $match: { _id: new ObjectId(employeeId) }
+      },
+      {
+          $unwind: "$badges"
+      },
+      {
+          $lookup: {
+              from: "badges",
+              localField: "badges.badgeId",
+              foreignField: "_id",
+              as: "badgeDetails"
+          }
+      },
+      {
+          $unwind: "$badgeDetails"
+      },
+      {
+          $group: {
+              _id: "$_id",
+              badges: { 
+                  $push: {  
+                      badgeDetails: "$badgeDetails",
+                      description: "$badges.description"
+                  }
+              }
+          }
+      }
+  ])
+
+    const employee = await Employee.findOne(
+      { _id: new ObjectId(employeeId) },
+    );
+    const multiplier = await this.newMultiplier(employee.currentStreak);
+
+    return {
+      employee,
+      badges: badges[0]?.badges || [],
+      multiplier: multiplier,
+    }
+  }
 
   async updateWeeklyQuizScore(employeeId, updatedWeeklyQuizScore) {
     const thisQuizDate = new Date().setHours(0, 0, 0, 0);
     const employee = await Employee.findOne(
       { _id: new ObjectId(employeeId) },
-      { lastQuizDate: 1, currentStreak: 1, multiplier: 1 }
+      { lastQuizDate: 1, currentStreak: 1 },
     );
-
-    // normalize the date
-    const lastQuizDate = employee.lastQuizDate ? new Date(employee.lastQuizDate).setHours(0, 0, 0, 0) : null;
     
+    const lastQuizDate = employee.lastQuizDate
+    ? new Date(employee.lastQuizDate).setHours(0, 0, 0, 0)
+    : null;
     let updatedStreak = 0;
-
-    if (lastQuizDate && thisQuizDate - lastQuizDate === 7 * 24 * 60 * 60 * 1000) {
+    
+    if (
+      lastQuizDate &&
+      thisQuizDate - lastQuizDate === 7 * 24 * 60 * 60 * 1000
+    ) {
       updatedStreak = employee.currentStreak + 1;
     }
-
-    const multi = this.newMultiplier(updatedStreak);
-  
+    const multi = await this.newMultiplier(updatedStreak);
+    
     updatedWeeklyQuizScore *= multi;
-
+    
     return Employee.updateOne(
       { _id: new ObjectId(employeeId) },
       {
-        $set: { isQuizGiven: true, lastQuizDate: thisQuizDate, currentStreak: updatedStreak, lastQuizScore: updatedWeeklyQuizScore },
+        $set: {
+          isQuizGiven: true,
+          lastQuizDate: thisQuizDate,
+          currentStreak: updatedStreak,
+          lastQuizScore: updatedWeeklyQuizScore,
+        },
       },
     );
   }

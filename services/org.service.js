@@ -30,6 +30,10 @@ class OrgService {
 
     return await this.orgRepository.updateTriviaSettings(orgId, newStatus);
   }
+
+  async getAnalytics(orgId){
+    return await this.orgRepository.getAnalytics(orgId);
+  }
 }
 
 export default OrgService;

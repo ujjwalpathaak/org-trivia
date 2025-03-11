@@ -36,16 +36,58 @@ export const validateForm = (formData, setErrors, isLogin = false) => {
   return Object.keys(newErrors).length === 0;
 };
 
-export const mergeUserAnswersAndCorrectAnswers = (correctAnswers, myAnswers) => {
+export const validateQuestionMakerForm = (question) => {
+  let errors = {};
+
+  if (!question.question.trim()) {
+    errors.question = 'Question is required.';
+  }
+
+  if (!question.category) {
+    errors.category = 'Category is required.';
+  }
+
+  if (question.category === 'PnA' && !question.config.puzzleType) {
+    errors.puzzleType = 'Puzzle type is required for PnA.';
+  }
+
+  const nonEmptyOptions = question.options.filter((opt) => opt.trim() !== '');
+  if (nonEmptyOptions.length !== 4) {
+    errors.options = 'Four options are required.';
+  }
+
+  if (question.answer === '') {
+    errors.answer = 'Correct answer must be selected.';
+  }
+
+  if (question.image) {
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+    if (!allowedTypes.includes(question.image.type)) {
+      errors.image = 'Only JPG, PNG, and GIF images are allowed.';
+    }
+    if (question.image.size > 5 * 1024 * 1024) {
+      errors.image = 'Image size must be less than 5MB.';
+    }
+  }
+
+  return {errors: errors, error: Object.keys(errors).length === 0};
+};
+
+export const mergeUserAnswersAndCorrectAnswers = (
+  correctAnswers,
+  myAnswers,
+) => {
   return correctAnswers.map(({ _id, answer }) => {
-      const myAnswerObj = myAnswers.find(({ questionId }) => questionId === _id.toString());
-      return {
-        questionId: _id,
-          correctAns: answer,
-          myAns: myAnswerObj ? myAnswerObj.answer : null
-      };
+    const myAnswerObj = myAnswers.find(
+      ({ questionId }) => questionId === _id.toString(),
+    );
+    return {
+      questionId: _id,
+      correctAnswer: answer,
+      employeeAnswer: myAnswerObj ? myAnswerObj.answer : null,
+    };
   });
-}
+};
 
 export const getMonthAndYear = () => {
   const today = new Date();
@@ -53,3 +95,51 @@ export const getMonthAndYear = () => {
   const year = today.getFullYear();
   return [month, year];
 };
+
+export const getPreviousMonthAndYear = () => {
+  const today = new Date();
+
+  let pMonth = today.getMonth();
+  let pYear = today.getFullYear();
+  
+  return [pMonth, pYear];
+};
+
+export const daysUntilNextFriday = () => {
+  const today = new Date();
+  const dayOfWeek = today.getDay();
+  const daysUntilFriday = (5 - dayOfWeek + 7) % 7 || 7;
+
+  return daysUntilFriday;
+}
+
+export const getMonth = (month) => {
+  const months = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+  ];
+  return months[month];
+}
+
+export const getNextWeek = () => {
+    const today = new Date();
+    today.setDate(today.getDate() + 7);
+    const year = today.getFullYear();
+    const week = Math.ceil(
+      ((today - new Date(year, 0, 1)) / 86400000 +
+        new Date(year, 0, 1).getDay() +
+        1) /
+        7,
+    );
+    return `${year}-W${week.toString().padStart(2, '0')}`;
+  };

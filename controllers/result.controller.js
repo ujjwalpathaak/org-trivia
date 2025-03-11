@@ -39,14 +39,14 @@ class ResultController {
         return res.status(400).json({ message: 'Missing required fields' });
       }
 
-      const pastRecords = await resultService.getEmployeePastRecords(employeeId);
+      const pastRecords =
+        await resultService.getEmployeePastRecords(employeeId);
 
       res.status(200).json(pastRecords);
     } catch (err) {
       next(err);
     }
   }
-
 }
 
 export default ResultController;

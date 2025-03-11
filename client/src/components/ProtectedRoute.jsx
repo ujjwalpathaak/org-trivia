@@ -8,11 +8,11 @@ export const ProtectedRoute = ({ children, route }) => {
   const { isAuthenticated, data, loading } = useAuth();
   const orgId = useOrgId();
   const employeeId = useUserId();
-  const [isQuizLive, setIsQuizLive] = useState(false); // Default to false
+  const [isQuizLive, setIsQuizLive] = useState(false);
 
   useEffect(() => {
     if (route === 'quiz' && orgId && employeeId) {
-      (async () => {
+      const checkIsWeeklyQuizLive = async () => {
         try {
           const live = await isWeeklyQuizLive(orgId, employeeId);
           setIsQuizLive(live);
@@ -20,7 +20,9 @@ export const ProtectedRoute = ({ children, route }) => {
           console.error('Error checking quiz status:', error);
           setIsQuizLive(false);
         }
-      })();
+      };
+
+      checkIsWeeklyQuizLive();
     }
   }, [route, orgId, employeeId]);
 

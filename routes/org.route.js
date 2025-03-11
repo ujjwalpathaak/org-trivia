@@ -27,5 +27,11 @@ orgRouter.post(
   // checkRole('Admin'),
   orgController.changeGenreSettings,
 );
+orgRouter.get(
+  '/analytics/:orgId',
+  // protectRoute,
+  // checkRole('Admin'),
+  orgController.getAnalytics,
+);
 
 export default orgRouter;
