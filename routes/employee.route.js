@@ -11,5 +11,6 @@ employeeRouter.get(
   employeeController.getAllOrgEmployeesByOrgId,
 );
 employeeRouter.get('/score/:employeeId', employeeController.fetchEmployeeScore);
+employeeRouter.get('/:employeeId', employeeController.getEmployeeDetails);
 
 export default employeeRouter;

@@ -1,3 +1,4 @@
+import EmployeeRepository from '../repositories/employee.repository.js';
 import OrgRepository from '../repositories/org.repository.js';
 import QuestionRepository from '../repositories/question.repository.js';
 import QuestionService from '../services/question.service.js';
@@ -5,19 +6,20 @@ import QuestionService from '../services/question.service.js';
 const questionService = new QuestionService(
   new QuestionRepository(),
   new OrgRepository(),
+  new EmployeeRepository()
 );
 
 class QuestionController {
   async addQuestion(req, res, next) {
     try {
-      const question = req.body;
+      const data = req.body;
       const errors =
-        await questionService.validateEmployeeQuestionSubmission(question);
+        await questionService.validateEmployeeQuestionSubmission(data.question);
       if (errors) {
         return res.status(400).json(errors);
       }
 
-      const isQuestionAdded = await questionService.saveQuestion(question);
+      const isQuestionAdded = await questionService.saveQuestion(data.question, data.employeeId);
       if (!isQuestionAdded)
         res.status(404).json({ message: 'Not able to save question' });
 

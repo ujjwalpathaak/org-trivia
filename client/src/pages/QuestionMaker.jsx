@@ -4,7 +4,7 @@ import { createNewQuestion } from '../api';
 import { useOrgId } from '../context/auth.context';
 import { toast } from 'react-toastify';
 
-const QuestionMaker = ({ setIsQuestionMakerOpen }) => {
+const QuestionMaker = ({ setIsQuestionMakerOpen, employeeId }) => {
   const navigate = useNavigate();
   const orgId = useOrgId();
 
@@ -104,7 +104,7 @@ const QuestionMaker = ({ setIsQuestionMakerOpen }) => {
     }
 
     notifyQuestionSubmitted();
-    createNewQuestion(question);
+    createNewQuestion(question, employeeId);
     setQuestion({
       question: '',
       answer: '',

@@ -38,6 +38,57 @@ class EmployeeRepository {
     }
   }
 
+  async addSubmittedQuestion(questionId, employeeId){
+    return Employee.updateOne(
+      { _id: new ObjectId(employeeId) },
+      { $push: { submittedQuestions: new ObjectId(questionId) } },
+    );
+  }
+
+  async getEmployeeDetails(employeeId){
+    const badges = await Employee.aggregate([
+      {
+          $match: { _id: new ObjectId(employeeId) }
+      },
+      {
+          $unwind: "$badges"
+      },
+      {
+          $lookup: {
+              from: "badges",
+              localField: "badges.badgeId",
+              foreignField: "_id",
+              as: "badgeDetails"
+          }
+      },
+      {
+          $unwind: "$badgeDetails"
+      },
+      {
+          $group: {
+              _id: "$_id",
+              badges: { 
+                  $push: {  
+                      badgeDetails: "$badgeDetails",
+                      description: "$badges.description"
+                  }
+              }
+          }
+      }
+  ])
+    const employee = await Employee.findOne(
+      { _id: new ObjectId(employeeId) },
+    );
+    console.log(employee)
+    const multiplier = await this.newMultiplier(employee.currentStreak);
+
+    return {
+      employee,
+      badges: badges[0].badges,
+      multiplier: multiplier,
+    }
+  }
+
   async updateWeeklyQuizScore(employeeId, updatedWeeklyQuizScore) {
     const thisQuizDate = new Date().setHours(0, 0, 0, 0);
     const employee = await Employee.findOne(

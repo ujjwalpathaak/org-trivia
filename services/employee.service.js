@@ -13,6 +13,10 @@ class EmployeeService {
   async fetchEmployeeScore(employeeId) {
     return await this.employeeRepository.getEmployeeScore(employeeId);
   }
+
+  async getEmployeeDetails(employeeId){
+    return await this.employeeRepository.getEmployeeDetails(employeeId);
+  }
 }
 
 export default EmployeeService;

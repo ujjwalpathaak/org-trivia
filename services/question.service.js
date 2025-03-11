@@ -10,12 +10,13 @@ import { ObjectId } from 'mongodb';
 const quizService = new QuizService(new QuizRepository());
 
 class QuestionService {
-  constructor(questionRepository, orgRepository) {
+  constructor(questionRepository, orgRepository, employeeRepository) {
     this.questionRepository = questionRepository;
     this.orgRepository = orgRepository;
+    this.employeeRepository = employeeRepository;
   }
 
-  async saveQuestion(newQuestionData) {
+  async saveQuestion(newQuestionData, employeeId) {
     const orgId = newQuestionData.orgId;
     const newQuestion =
       await this.questionRepository.saveQuestion(newQuestionData);
@@ -23,6 +24,7 @@ class QuestionService {
       newQuestion,
       orgId,
     );
+    await this.employeeRepository.addSubmittedQuestion(newQuestion._id, employeeId);
     if (!newQuestion || !addedToList) return false;
 
     return true;

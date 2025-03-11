@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import {
   isWeeklyQuizLive,
   fetchEmployeeScore,
-  getEmployeeBadges,
+  getEmployeeDetails,
 } from '../../api';
 import { useOrgId, useUserId } from '../../context/auth.context';
 import {
@@ -13,6 +13,10 @@ import {
   MessageSquare,
   Award,
   Bookmark as BookmarkSimple,
+  CalendarCheck,
+  CircleHelp,
+  Book,
+  X,
 } from 'lucide-react';
 
 import shield1 from '../../assets/lg50.png';
@@ -30,7 +34,7 @@ const EmployeeDashboard = () => {
   const [isQuizLive, setIsQuizLive] = useState(false);
   const [resumeQuiz, setResumeQuiz] = useState(false);
   const [isQuestionMakerOpen, setIsQuestionMakerOpen] = useState(false);
-  const [badges, setBadges] = useState([]);
+  const [details, setDetails] = useState({});
   const [isQuizOpen, setIsQuizOpen] = useState(false);
   const [score, setScore] = useState({
     currentPoints: 0,
@@ -61,17 +65,18 @@ const EmployeeDashboard = () => {
   }, []);
 
   useEffect(() => {
-    const fetchEmployeeBadges = async () => {
+    const fetchEmployeeDetails = async () => {
       if (!employeeId) return;
       try {
-        const data = await getEmployeeBadges(employeeId);
-        setBadges(data.badges);
+        const data = await getEmployeeDetails(employeeId);
+        console.log(data);
+        setDetails(data);
       } catch (error) {
         console.error('Error checking quiz status:', error);
       }
     };
 
-    fetchEmployeeBadges();
+    fetchEmployeeDetails();
   }, [employeeId]);
 
   useEffect(() => {
@@ -124,23 +129,36 @@ const EmployeeDashboard = () => {
               <div className="flex justify-between w-full px-8 mb-6">
                 <div className="text-center">
                   <div className="flex items-center gap-2 text-gray-700">
-                    <User className="h-5 w-5 text-blue-600" />
-                    <span className="text-lg font-semibold">0</span>
+                    <Award className="h-5 w-5 text-blue-600" />
+                    <span className="text-lg font-semibold">
+                      {details?.badges?.length}
+                    </span>
                   </div>
-                  <span className="text-sm text-gray-500">Appreciations</span>
+                  <span className="text-sm text-gray-500">Badges</span>
                 </div>
                 <div className="text-center">
                   <div className="flex items-center gap-2 text-gray-700">
-                    <Award className="h-5 w-5 text-yellow-500" />
-                    <span className="text-lg font-semibold">0</span>
+                    <CalendarCheck className="h-5 w-5 text-green-500" />
+                    <span className="text-lg font-semibold">
+                      {details?.employee?.currentStreak}
+                    </span>
                   </div>
-                  <span className="text-sm text-gray-500">Awards</span>
+                  <span className="text-sm text-gray-500">Streak</span>
+                </div>
+                <div className="text-center">
+                  <div className="flex items-center gap-2 text-gray-700">
+                    <Book className="h-5 w-5 text-red-500" />
+                    <span className="text-lg font-semibold">
+                      {details?.employee?.submittedQuestions.length}
+                    </span>
+                  </div>
+                  <span className="text-sm text-gray-500">Questions</span>
                 </div>
               </div>
               <div className="w-full text-center">
                 <h2 className="text-lg font-semibold mb-3">My Badges</h2>
                 <div className="flex flex-col gap-2">
-                  {badges.map((badge, index) => (
+                  {details?.badges?.map((badge, index) => (
                     <div
                       key={index}
                       className="flex items-center gap-2 bg-gray-100 py-2 px-3 rounded-lg shadow-sm"
@@ -163,34 +181,13 @@ const EmployeeDashboard = () => {
               </nav>
             </div>
           </div>
-
-          {/* Groups Section */}
-          <div className="bg-white rounded-2xl p-6 mt-6 shadow-lg">
-            <div className="p-4 rounded-xl">
-              <h2 className="text-lg font-semibold mb-3">Submit Question</h2>
-              <ul className="text-gray-500 mb-4">
-                <li className="font-medium">
-                  Total Submissions: <span className="text-gray-800">25</span>
-                </li>
-                <li className="font-medium">
-                  Submissions Accepted:{' '}
-                  <span className="text-gray-800">10</span>
-                </li>
-              </ul>
-              {!isQuestionMakerOpen && (
-                <button
-                  onClick={() => setIsQuestionMakerOpen(true)}
-                  className="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium w-full"
-                >
-                  Write Question
-                </button>
-              )}
-            </div>
-          </div>
         </div>
 
         {isQuestionMakerOpen ? (
-          <QuestionMaker setIsQuestionMakerOpen={setIsQuestionMakerOpen} />
+          <QuestionMaker
+            setIsQuestionMakerOpen={setIsQuestionMakerOpen}
+            employeeId={employeeId}
+          />
         ) : isQuizOpen ? (
           <Quiz setIsQuizLive={setIsQuizLive} setIsQuizOpen={setIsQuizOpen} />
         ) : (
@@ -332,6 +329,9 @@ const EmployeeDashboard = () => {
                       <h2 className="text-lg mb-2">Quiz has ended</h2>
                       <h6 className="text-slate-400">
                         Score in last quiz: {score.lastQuizScore}
+                      </h6>
+                      <h6 className="text-slate-400">
+                        {`Multiplier: x${details?.multiplier}`}
                       </h6>
                       <h6 className="text-slate-300 italic font-sm">
                         Next in {daysUntilNextFriday()} days

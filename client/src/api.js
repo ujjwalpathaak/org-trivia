@@ -21,10 +21,13 @@ export const registerRequest = async (formData) => {
   return response;
 };
 
-export const getEmployeeBadges = async (employeeId) => {
-  const response = await fetch(BACKEND_URL + `/badge/employee/${employeeId}`, {
+export const getEmployeeDetails = async (employeeId) => {
+  const response = await fetch(BACKEND_URL + `/employee/${employeeId}`, {
     method: 'GET',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
   });
 
   return await response.json();
@@ -39,7 +42,7 @@ export const getAllOrgs = async () => {
   return response;
 };
 
-export const createNewQuestion = async (formData) => {
+export const createNewQuestion = async (formData, employeeId) => {
   try {
     const response = await fetch(`${BACKEND_URL}/question`, {
       method: 'POST',
@@ -47,7 +50,7 @@ export const createNewQuestion = async (formData) => {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify(formData),
+      body: JSON.stringify({question: formData, employeeId: employeeId}),
     });
 
     if (!response.ok) {

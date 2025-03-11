@@ -60,7 +60,7 @@ const employeeSchema = new mongoose.Schema(
       type: [badgeSchema],
       default: [],
     },
-    submittedQuestion: {
+    submittedQuestions: {
       type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Question' }],
       default: [],
     },
