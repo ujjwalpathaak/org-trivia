@@ -1,6 +1,11 @@
+import Leaderboard from '../models/leaderboard.model.js';
 import Org from '../models/org.model.js';
 
 import { ObjectId } from 'mongodb';
+import Result from '../models/result.model.js';
+import LeaderboardRepository from './leaderboard.respository.js';
+
+const leaderboardRepository = new LeaderboardRepository();
 
 class OrgRepository {
   async updateQuestionsStatusInOrgToUsed(
@@ -125,6 +130,88 @@ class OrgRepository {
       { _id: orgId },
       { $set: { 'settings.isTriviaEnabled': newStatus } },
     );
+  }
+
+  async getAnalytics(orgId){
+    const participationByGenre = await Result.aggregate([
+      { $match: { orgId: new ObjectId(orgId) } },  // Filter by orgId
+      { $group: { 
+          _id: "$genre",  // Group by genre
+          count: { $sum: 1 }  // Count occurrences per genre
+      }}
+    ]);
+
+    const last3Leaderboards = await Leaderboard.aggregate([
+      { $match: { orgId: new ObjectId(orgId) } },
+    
+      // Group by month and year to get last 3 leaderboards
+      {
+        $group: {
+          _id: { month: "$month", year: "$year" },
+          leaderboard: { $push: "$$ROOT" } // Push all leaderboard entries into an array
+        }
+      },
+    
+      // Sort by most recent leaderboards
+      { $sort: { "_id.year": -1, "_id.month": -1 } },
+    
+      // Get last 3 leaderboards
+      { $limit: 3 },
+      { $skip: 1 },
+      // Unwind leaderboard to get top employees per leaderboard
+      { $unwind: "$leaderboard" },
+    
+      // Lookup employee details
+      {
+        $lookup: {
+          from: "employees", // Assuming the employee collection is named 'employees'
+          localField: "leaderboard.employeeId",
+          foreignField: "_id",
+          as: "employeeDetails"
+        }
+      },
+    
+      // Unwind employee details to extract name
+      { $unwind: "$employeeDetails" },
+    
+      // Sort by score within each leaderboard
+      { $sort: { "leaderboard.totalScore": -1 } },
+    
+      // Group again to restructure the data
+      {
+        $group: {
+          _id: { month: "$_id.month", year: "$_id.year" },
+          employees: {
+            $push: {
+              employeeId: "$leaderboard.employeeId",
+              name: "$employeeDetails.name", // Add employee name
+              totalScore: "$leaderboard.totalScore"
+            }
+          }
+        }
+      },
+    
+      // Limit to top 3 employees per leaderboard
+      {
+        $project: {
+          _id: 0,
+          month: "$_id.month",
+          year: "$_id.year",
+          employees: { $slice: ["$employees", 3] } // Limit to top 3 employees per leaderboard
+        }
+      }
+    ]);
+    
+    
+    
+    // const last3LeaderboardTop3Employees = await leaderboardRepository.getEmployeePastRecords(orgId);
+
+    console.log(last3Leaderboards)
+    
+    return{
+      participationByGenre,
+      last3Leaderboards
+    }
   }
 }
 

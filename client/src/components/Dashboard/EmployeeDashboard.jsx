@@ -69,7 +69,6 @@ const EmployeeDashboard = () => {
       if (!employeeId) return;
       try {
         const data = await getEmployeeDetails(employeeId);
-        console.log(data);
         setDetails(data);
       } catch (error) {
         console.error('Error checking quiz status:', error);
@@ -268,10 +267,8 @@ const EmployeeDashboard = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-lg p-6 shadow mb-4">
-            <div className="flex justify-between items-center ">
-              <Leaderboard />
-            </div>
+          <div className="flex justify-between items-center ">
+            <Leaderboard />
           </div>
           <div className="bg-white rounded-lg p-6 shadow mb-4">
             {isQuizOpen ? (

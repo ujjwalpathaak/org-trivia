@@ -21,6 +21,18 @@ export const registerRequest = async (formData) => {
   return response;
 };
 
+export const getAnalytics = async (orgId) => {
+  const response = await fetch(`${BACKEND_URL}/org/analytics/${orgId}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return await response.json();
+}
+
 export const getEmployeeDetails = async (employeeId) => {
   const response = await fetch(BACKEND_URL + `/employee/${employeeId}`, {
     method: 'GET',

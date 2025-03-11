@@ -60,6 +60,21 @@ class OrgController {
       next(error);
     }
   }
+
+  async getAnalytics(req, res, next){
+    try {
+      const { orgId } = req.params;
+      if (!orgId) {
+        return res.status(400).json({ message: 'Missing required fields' });
+      }
+
+      const analytics = await orgService.getAnalytics(orgId);
+
+      res.status(200).json(analytics);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export default OrgController;

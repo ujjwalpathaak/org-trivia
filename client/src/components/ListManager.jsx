@@ -82,7 +82,7 @@ export default function ListManager({ orgId, selectedGenre }) {
         <ul className="space-y-3">
           {availableItems.length === 0 && (
             <li className="bg-gray-50 rounded-lg p-4 text-gray-500 text-center">
-              No available genres
+              All genres selected
             </li>
           )}
           {availableItems.map((item) => (
@@ -108,6 +108,11 @@ export default function ListManager({ orgId, selectedGenre }) {
       <div>
         <h3 className="font-semibold text-gray-800 mb-4">Selected Genres</h3>
         <ul className="space-y-3">
+          {selectedItems.length === 0 && (
+            <li className="bg-gray-50 rounded-lg p-4 text-gray-500 text-center">
+              No genres selected
+            </li>
+          )}
           {selectedItems.map((item, index) => (
             <li
               key={item.value}

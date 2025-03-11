@@ -11,12 +11,12 @@ import {
 } from 'recharts';
 import { Users, BarChart2, Award, Activity } from 'lucide-react';
 
-const quizData = [
-  { category: 'Tech', participants: 120 },
-  { category: 'HR', participants: 85 },
-  { category: 'Marketing', participants: 60 },
-  { category: 'Finance', participants: 45 },
-];
+// const quizData = [
+//   { category: 'Tech', participants: 120 },
+//   { category: 'HR', participants: 85 },
+//   { category: 'Marketing', participants: 60 },
+//   { category: 'Finance', participants: 45 },
+// ];
 
 const performanceData = [
   { name: 'Excellent', value: 40 },
@@ -27,7 +27,13 @@ const performanceData = [
 
 const COLORS = ['#22c55e', '#3b82f6', '#facc15', '#ef4444'];
 
-export default function QuizAnalytics() {
+export default function QuizAnalytics({ analytics }) {
+  const quizData = analytics?.participationByGenre?.map((item) => {
+    return {
+      category: item._id,
+      participants: item.count,
+    };
+  });
   return (
     <div className="col-span-5">
       <div className="bg-white rounded-lg p-6 shadow mb-4">
@@ -53,7 +59,7 @@ export default function QuizAnalytics() {
         </div>
       </div>
 
-      <div className="bg-white rounded-lg p-6 shadow mb-4">
+      <div className="bg-white rounded-lg p-6 pb-0 h-fit shadow">
         <div className="flex gap-4">
           <Activity className="h-10 w-10 text-green-500" />
           <h2 className="text-lg font-semibold">Performance Breakdown</h2>
