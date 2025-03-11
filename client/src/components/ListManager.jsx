@@ -18,7 +18,7 @@ export default function ListManager({ orgId, selectedGenre }) {
     },
   ];
 
-  const getGenre = (value) => {
+  const getGenreFullName = (value) => {
     switch (value) {
       case 'PnA':
         return 'Puzzles and Aptitude';
@@ -33,15 +33,17 @@ export default function ListManager({ orgId, selectedGenre }) {
 
   const [selectedItems, setSelectedItems] = useState(() => {
     return selectedGenre.map((genre) => ({
-      key: getGenre(genre),
+      key: getGenreFullName(genre),
       value: genre,
     }));
   });
+
   const [availableItems, setAvailableItems] = useState(() => {
     return allItems.filter(
       (item) => !selectedItems.some((i) => i.value === item.value),
     );
   });
+
   const [isSaved, setIsSaved] = useState(true);
 
   const handleSaveChanges = async () => {

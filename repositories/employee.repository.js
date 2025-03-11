@@ -76,15 +76,15 @@ class EmployeeRepository {
           }
       }
   ])
+
     const employee = await Employee.findOne(
       { _id: new ObjectId(employeeId) },
     );
-    console.log(employee)
     const multiplier = await this.newMultiplier(employee.currentStreak);
 
     return {
       employee,
-      badges: badges[0].badges,
+      badges: badges[0]?.badges || [],
       multiplier: multiplier,
     }
   }

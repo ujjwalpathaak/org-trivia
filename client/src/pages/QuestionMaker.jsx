@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { createNewQuestion } from '../api';
 import { useOrgId } from '../context/auth.context';
 import { toast } from 'react-toastify';
+import { validateQuestionMakerForm } from '../utils';
 
 const QuestionMaker = ({ setIsQuestionMakerOpen, employeeId }) => {
-  const navigate = useNavigate();
   const orgId = useOrgId();
 
   const [question, setQuestion] = useState({
@@ -22,44 +21,6 @@ const QuestionMaker = ({ setIsQuestionMakerOpen, employeeId }) => {
   const [errors, setErrors] = useState({});
 
   const notifyQuestionSubmitted = () => toast('New question submitted!');
-
-  const validateForm = () => {
-    let errors = {};
-
-    if (!question.question.trim()) {
-      errors.question = 'Question is required.';
-    }
-
-    if (!question.category) {
-      errors.category = 'Category is required.';
-    }
-
-    if (question.category === 'PnA' && !question.config.puzzleType) {
-      errors.puzzleType = 'Puzzle type is required for PnA.';
-    }
-
-    const nonEmptyOptions = question.options.filter((opt) => opt.trim() !== '');
-    if (nonEmptyOptions.length !== 4) {
-      errors.options = 'Four options are required.';
-    }
-
-    if (question.answer === '') {
-      errors.answer = 'Correct answer must be selected.';
-    }
-
-    if (question.image) {
-      const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
-      if (!allowedTypes.includes(question.image.type)) {
-        errors.image = 'Only JPG, PNG, and GIF images are allowed.';
-      }
-      if (question.image.size > 5 * 1024 * 1024) {
-        errors.image = 'Image size must be less than 5MB.';
-      }
-    }
-
-    setErrors(errors);
-    return Object.keys(errors).length === 0;
-  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -98,7 +59,9 @@ const QuestionMaker = ({ setIsQuestionMakerOpen, employeeId }) => {
   };
 
   const handleSubmit = () => {
-    if (!validateForm()) {
+    const { errors, error } = validateQuestionMakerForm(question);
+    if (!error) {
+      setErrors(errors);
       toast.error('Please fix validation errors.');
       return;
     }
@@ -233,7 +196,7 @@ const QuestionMaker = ({ setIsQuestionMakerOpen, employeeId }) => {
           )}
         </div>
 
-        <div className="mb-4">
+        {/* <div className="mb-4">
           <label className="block font-semibold text-lg text-gray-700">
             Upload Image (Optional)
           </label>
@@ -241,7 +204,7 @@ const QuestionMaker = ({ setIsQuestionMakerOpen, employeeId }) => {
           {errors.image && (
             <p className="text-red-500 text-sm">{errors.image}</p>
           )}
-        </div>
+        </div> */}
         <div className="w-full mt-6 flex justify-end">
           <button
             onClick={handleSubmit}

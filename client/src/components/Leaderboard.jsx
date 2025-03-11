@@ -1,24 +1,12 @@
 import { useEffect, useState } from 'react';
 import { getLeaderboardByOrgId } from '../api';
 import { useOrgId } from '../context/auth.context';
+import { getMonth } from '../utils';
+import { CalendarDays } from 'lucide-react';
 
-const Leaderboard = ({ isAdmin, last3Leaderboards }) => {
+const Leaderboard = ({ last3Leaderboards }) => {
   const orgId = useOrgId();
   const [leaderboard, setLeaderboard] = useState([]);
-  const months = [
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
-    'May',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec',
-  ];
 
   useEffect(() => {
     const fetchLeaderboardByOrgId = async () => {
@@ -65,17 +53,16 @@ const Leaderboard = ({ isAdmin, last3Leaderboards }) => {
           </div>
         </div>
       </div>
-
-      {/* Last 3 Leaderboards */}
       {last3Leaderboards &&
         last3Leaderboards.map((leaderboard) => (
           <div className="bg-white rounded-lg p-6 shadow mb-4">
             <div
-              key={`${months[leaderboard.month]}-${leaderboard.year}`}
+              key={`${leaderboard.month}-${leaderboard.year}`}
               className="w-full bg-white rounded-lg"
             >
               <h1 className="text-xl font-bold text-gray-800 flex items-center gap-2 mb-6">
-                {`Leaderboard ${months[leaderboard.month]} ${leaderboard.year}`}
+                <CalendarDays className="w-4 h-4 text-red-500" />
+                {`Leaderboard ${getMonth(leaderboard.month)} ${leaderboard.year}`}
               </h1>
               <div className="overflow-x-auto">
                 <table className="w-full border border-gray-200 rounded-lg overflow-hidden">

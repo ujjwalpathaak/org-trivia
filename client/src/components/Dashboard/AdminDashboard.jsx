@@ -43,10 +43,7 @@ const AdminDashboard = () => {
               )}
             </div>
           </div> */}
-          <Leaderboard
-            isAdmin={true}
-            last3Leaderboards={analytics.last3Leaderboards}
-          />
+          <Leaderboard last3Leaderboards={analytics.last3Leaderboards} />
         </div>
 
         {isQuestionMakerOpen ? (

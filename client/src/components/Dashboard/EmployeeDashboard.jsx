@@ -14,6 +14,10 @@ import {
   Bookmark as BookmarkSimple,
   CalendarCheck,
   Book,
+  CirclePlus,
+  TrendingUp,
+  CalendarDays,
+  CircleCheck,
 } from 'lucide-react';
 
 import Quiz from '../../pages/Quiz';
@@ -127,12 +131,17 @@ const EmployeeDashboard = () => {
                       {details?.employee?.submittedQuestions.length}
                     </span>
                   </div>
-                  <span className="text-sm text-gray-500">Questions</span>
+                  <span className="text-sm text-gray-500">Submissions</span>
                 </div>
               </div>
               <div className="w-full text-center">
                 <h2 className="text-lg font-semibold mb-3">My Badges</h2>
                 <div className="flex flex-col gap-2">
+                  {details?.badges?.length === 0 && (
+                    <span className="text-slate-400 font-semibold">
+                      No badges. Participate More!
+                    </span>
+                  )}
                   {details?.badges?.map((badge, index) => (
                     <div
                       key={index}
@@ -145,13 +154,18 @@ const EmployeeDashboard = () => {
                 </div>
               </div>
               <nav className="w-full mt-6 space-y-3">
-                <button className="w-full text-left px-5 py-3 rounded-lg bg-gray-50 hover:bg-gray-100 flex items-center gap-3 transition">
-                  <Zap className="h-5 w-5 text-purple-500" />
-                  <span className="font-medium">My Activity</span>
-                </button>
+                {!isQuestionMakerOpen && (
+                  <button
+                    onClick={() => setIsQuestionMakerOpen(true)}
+                    className="w-full text-left px-5 py-3 rounded-lg bg-gray-50 hover:bg-gray-100 flex items-center gap-3 transition"
+                  >
+                    <CirclePlus className="h-5 w-5 text-purple-500" />
+                    <span className="font-medium">Submit new question</span>
+                  </button>
+                )}
                 <button className="w-full text-left px-5 py-3 rounded-lg bg-gray-50 hover:bg-gray-100 flex items-center gap-3 transition">
                   <BookmarkSimple className="h-5 w-5 text-green-500" />
-                  <span className="font-medium">Saved Posts</span>
+                  <span className="font-medium">Past quizzes</span>
                 </button>
               </nav>
             </div>
@@ -297,14 +311,20 @@ const EmployeeDashboard = () => {
                     )
                   ) : (
                     <div className="rounded-xl">
-                      <h2 className="text-lg mb-2">Quiz has ended</h2>
-                      <h6 className="text-slate-400">
+                      <h2 className="text-lg mb-2 flex items-center gap-2">
+                        <CircleCheck className="w-5 h-5 text-yellow-500" />
+                        Quiz has ended
+                      </h2>
+                      <h6 className="text-slate-400 flex items-center gap-2">
+                        <TrendingUp className="w-4 h-4 text-blue-500" />
                         Score in last quiz: {score.lastQuizScore}
                       </h6>
-                      <h6 className="text-slate-400">
+                      <h6 className="text-slate-400 flex items-center gap-2">
+                        <TrendingUp className="w-4 h-4 text-green-500" />
                         {`Multiplier: x${details?.multiplier}`}
                       </h6>
-                      <h6 className="text-slate-300 italic font-sm">
+                      <h6 className="text-slate-300 italic font-sm flex items-center gap-2">
+                        <CalendarDays className="w-4 h-4 text-purple-500" />
                         Next in {daysUntilNextFriday()} days
                       </h6>
                     </div>

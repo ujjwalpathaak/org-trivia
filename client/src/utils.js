@@ -36,6 +36,43 @@ export const validateForm = (formData, setErrors, isLogin = false) => {
   return Object.keys(newErrors).length === 0;
 };
 
+export const validateQuestionMakerForm = (question) => {
+  let errors = {};
+
+  if (!question.question.trim()) {
+    errors.question = 'Question is required.';
+  }
+
+  if (!question.category) {
+    errors.category = 'Category is required.';
+  }
+
+  if (question.category === 'PnA' && !question.config.puzzleType) {
+    errors.puzzleType = 'Puzzle type is required for PnA.';
+  }
+
+  const nonEmptyOptions = question.options.filter((opt) => opt.trim() !== '');
+  if (nonEmptyOptions.length !== 4) {
+    errors.options = 'Four options are required.';
+  }
+
+  if (question.answer === '') {
+    errors.answer = 'Correct answer must be selected.';
+  }
+
+  if (question.image) {
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+    if (!allowedTypes.includes(question.image.type)) {
+      errors.image = 'Only JPG, PNG, and GIF images are allowed.';
+    }
+    if (question.image.size > 5 * 1024 * 1024) {
+      errors.image = 'Image size must be less than 5MB.';
+    }
+  }
+
+  return {errors: errors, error: Object.keys(errors).length === 0};
+};
+
 export const mergeUserAnswersAndCorrectAnswers = (
   correctAnswers,
   myAnswers,
@@ -75,3 +112,34 @@ export const daysUntilNextFriday = () => {
 
   return daysUntilFriday;
 }
+
+export const getMonth = (month) => {
+  const months = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+  ];
+  return months[month];
+}
+
+export const getNextWeek = () => {
+    const today = new Date();
+    today.setDate(today.getDate() + 7);
+    const year = today.getFullYear();
+    const week = Math.ceil(
+      ((today - new Date(year, 0, 1)) / 86400000 +
+        new Date(year, 0, 1).getDay() +
+        1) /
+        7,
+    );
+    return `${year}-W${week.toString().padStart(2, '0')}`;
+  };

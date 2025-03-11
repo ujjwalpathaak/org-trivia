@@ -1,8 +1,10 @@
-import { useEffect, useRef, useState } from 'react';
-import { getQuestionsToApprove, handleApproveWeeklyQuiz } from '../api.js';
-import { useOrgId } from '../context/auth.context.jsx';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+
+import { getQuestionsToApprove, handleApproveWeeklyQuiz } from '../api.js';
+import { getNextWeek } from '../utils.js';
+import { useOrgId } from '../context/auth.context.jsx';
 
 export default function ScheduleQuestions() {
   const [aiQuestions, setAiQuestions] = useState([
@@ -28,29 +30,14 @@ export default function ScheduleQuestions() {
     },
   ]);
 
-  const [customQuestions, setCustomQuestions] = useState([]);
-  const [newQuestion, setNewQuestion] = useState('');
   const [addQuestion, setAddQuestion] = useState(false);
   const [removedQuestionIndex, setRemovedQuestionIndex] = useState(-1);
-  const [unsavedChanges, setUnsavedChanges] = useState(false);
-  const navigate = useNavigate();
-  const [uploadedFile, setUploadedFile] = useState(null);
-  const getNextWeek = () => {
-    const today = new Date();
-    today.setDate(today.getDate() + 7);
-    const year = today.getFullYear();
-    const week = Math.ceil(
-      ((today - new Date(year, 0, 1)) / 86400000 +
-        new Date(year, 0, 1).getDay() +
-        1) /
-        7,
-    );
-    return `${year}-W${week.toString().padStart(2, '0')}`;
-  };
-  const [selectedWeek, setSelectedWeek] = useState(getNextWeek);
   const [questions, setQuestions] = useState([]);
+
   const orgId = useOrgId();
-  const toastShownRef = useRef(false);
+
+  const navigate = useNavigate();
+  const selectedWeek = getNextWeek();
 
   const noQuestionFound = () => toast.info('No pending questions found');
 
@@ -58,10 +45,7 @@ export default function ScheduleQuestions() {
     const getQuestionsToApproveFunc = async () => {
       const response = await getQuestionsToApprove(orgId);
       if (response.status === 404) {
-        if (!toastShownRef.current) {
-          noQuestionFound();
-          toastShownRef.current = true;
-        }
+        noQuestionFound();
         navigate('/dashboard');
         return;
       }
@@ -81,28 +65,6 @@ export default function ScheduleQuestions() {
     }
   };
 
-  const addCustomQuestion = () => {
-    if (newQuestion.trim()) {
-      setCustomQuestions([
-        ...customQuestions,
-        { question: newQuestion, options: [], correctAnswer: '' },
-      ]);
-      setNewQuestion('');
-    }
-  };
-
-  const handleFileUpload = (event) => {
-    setUploadedFile(event.target.files[0]);
-  };
-
-  const generateAIQuestion = () => {
-    const aiGeneratedQuestion = 'Generated AI Question';
-    setCustomQuestions([
-      ...customQuestions,
-      { question: aiGeneratedQuestion, options: [], correctAnswer: '' },
-    ]);
-  };
-
   const selectQuestion = (question) => {
     const updatedQuestions = [...questions];
     updatedQuestions[removedQuestionIndex].question = question;
@@ -112,28 +74,24 @@ export default function ScheduleQuestions() {
   };
 
   const handleQuestionChangeType = (idx, newQuestion) => {
-    setUnsavedChanges(true);
     const updatedQuestions = [...questions];
     updatedQuestions[idx].question.question = newQuestion;
     setQuestions(updatedQuestions);
   };
 
   const handleOptionChange = (qIdx, optionIdx, newOption) => {
-    setUnsavedChanges(true);
     const updatedQuestions = [...questions];
     updatedQuestions[qIdx].question.options[optionIdx] = newOption;
     setQuestions(updatedQuestions);
   };
 
   const handleCorrectAnswerChange = (idx, correctOption) => {
-    setUnsavedChanges(true);
     const updatedQuestions = [...questions];
     updatedQuestions[idx].question.answer = parseInt(correctOption, 10);
     setQuestions(updatedQuestions);
   };
 
   const handleQuestionRemove = (idx) => {
-    setUnsavedChanges(true);
     const updatedQuestions = [...questions];
     updatedQuestions[idx].question = null;
     setAddQuestion(true);
@@ -150,27 +108,6 @@ export default function ScheduleQuestions() {
               Extra Questions
             </h2>
             <div className="space-y-6">
-              {/* <div className="bg-gray-50 rounded-lg p-6 shadow-sm">
-                <h3 className="text-lg font-semibold text-gray-700 mb-4">
-                  AI Question Generator
-                </h3>
-                <div className="space-y-4">
-                  <div className="relative">
-                    <input
-                      type="file"
-                      onChange={handleFileUpload}
-                      className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                    />
-                  </div>
-                  <button
-                    onClick={generateAIQuestion}
-                    className="w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-200 font-medium"
-                  >
-                    Generate AI Question
-                  </button>
-                </div>
-              </div> */}
-
               <div className="bg-gray-50 rounded-lg p-6 shadow-sm">
                 <h3 className="text-lg font-semibold text-gray-700 mb-4">
                   AI Questions
@@ -204,54 +141,6 @@ export default function ScheduleQuestions() {
                   ))}
                 </div>
               </div>
-
-              {/* <div className="bg-gray-50 rounded-lg p-6 shadow-sm">
-                <h3 className="text-lg font-semibold text-gray-700 mb-4">
-                  Custom Question
-                </h3>
-                <div className="space-y-4">
-                  <textarea
-                    value={newQuestion}
-                    onChange={(e) => setNewQuestion(e.target.value)}
-                    placeholder="Type your question here..."
-                    className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
-                    rows={4}
-                  />
-                  <div className="space-y-3">
-                    <p className="font-medium text-gray-700">Options:</p>
-                    {['A', 'B', 'C', 'D'].map((letter) => (
-                      <input
-                        key={letter}
-                        type="text"
-                        placeholder={`Option ${letter}`}
-                        className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      />
-                    ))}
-                  </div>
-                  <div className="space-y-2">
-                    <p className="font-medium text-gray-700">Correct Answer:</p>
-                    <select className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                      {['A', 'B', 'C', 'D'].map((letter) => (
-                        <option key={letter}>Option {letter}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="flex gap-4">
-                    <button
-                      onClick={addCustomQuestion}
-                      className="flex-1 py-2 px-4 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition duration-200 font-medium"
-                    >
-                      Refactor using AI
-                    </button>
-                    <button
-                      onClick={addCustomQuestion}
-                      className="flex-1 py-2 px-4 bg-green-600 text-white rounded-md hover:bg-green-700 transition duration-200 font-medium"
-                    >
-                      Add Question
-                    </button>
-                  </div>
-                </div>
-              </div> */}
             </div>
           </div>
         )}
@@ -263,21 +152,12 @@ export default function ScheduleQuestions() {
             <h2 className="text-2xl font-bold text-gray-800">
               Questions for {selectedWeek}
             </h2>
-            {/* {unsavedChanges ? (
-              <button
-                onClick={() => setAddQuestion(true)}
-                className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-200 font-medium"
-              >
-                Save Changes
-              </button>
-            ) : ( */}
             <button
               onClick={handleApproveQuiz}
               className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition duration-200 font-medium"
             >
               Schedule Quiz
             </button>
-            {/* )} */}
           </div>
 
           <div className="space-y-6 overflow-auto max-h-[calc(100vh-14rem)]">

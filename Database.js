@@ -10,11 +10,14 @@ export const connectDatabase = async () => {
     if (!DATABASE_URL) {
       throw new Error('not found DATABASE_URL');
     }
+    await mongoose.connect(DATABASE_URL, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
 
-    await mongoose.connect(DATABASE_URL);
-
-    console.log('Database Connected Successfully');
+    console.log("MongoDB Connected Successfully!");
   } catch (error) {
-    console.error('Database Connection Error:', error.message);
+    console.error("MongoDB Connection Error:", error);
+    process.exit(1);
   }
-};
+}
