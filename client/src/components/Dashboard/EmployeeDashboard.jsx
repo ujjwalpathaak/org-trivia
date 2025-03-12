@@ -3,6 +3,7 @@ import {
   isWeeklyQuizLive,
   fetchEmployeeScore,
   getEmployeeDetails,
+  getPastQuizResults,
 } from '../../api';
 import { useOrgId, useUserId } from '../../context/auth.context';
 import {
@@ -18,6 +19,10 @@ import {
   TrendingUp,
   CalendarDays,
   CircleCheck,
+  ListChecks,
+  Timer,
+  Trophy,
+  Calendar,
 } from 'lucide-react';
 
 import Quiz from '../../pages/Quiz';
@@ -31,7 +36,9 @@ const EmployeeDashboard = () => {
 
   const [isQuizLive, setIsQuizLive] = useState(false);
   const [resumeQuiz, setResumeQuiz] = useState(false);
+  const [pastQuizzes, setPastQuizzes] = useState([]);
   const [isQuestionMakerOpen, setIsQuestionMakerOpen] = useState(false);
+  const [isPastQuizViewerOpen, setIsPastQuizViewerOpen] = useState(false);
   const [details, setDetails] = useState({});
   const [isQuizOpen, setIsQuizOpen] = useState(false);
   const [score, setScore] = useState({
@@ -53,6 +60,12 @@ const EmployeeDashboard = () => {
 
     getIsQuizAttempting();
   }, []);
+
+  const fetchPastQuizzes = async () => {
+    const pastQuizzes = await getPastQuizResults(employeeId);
+    console.log(pastQuizzes);
+    setPastQuizzes(pastQuizzes);
+  };
 
   useEffect(() => {
     const fetchEmployeeDetails = async () => {
@@ -163,7 +176,13 @@ const EmployeeDashboard = () => {
                     <span className="font-medium">Submit new question</span>
                   </button>
                 )}
-                <button className="w-full text-left px-5 py-3 rounded-lg bg-gray-50 hover:bg-gray-100 flex items-center gap-3 transition">
+                <button
+                  onClick={async () => {
+                    await fetchPastQuizzes();
+                    setIsPastQuizViewerOpen(true);
+                  }}
+                  className="w-full text-left px-5 py-3 rounded-lg bg-gray-50 hover:bg-gray-100 flex items-center gap-3 transition"
+                >
                   <BookmarkSimple className="h-5 w-5 text-green-500" />
                   <span className="font-medium">Past quizzes</span>
                 </button>
@@ -178,6 +197,61 @@ const EmployeeDashboard = () => {
           />
         ) : isQuizOpen ? (
           <Quiz setIsQuizLive={setIsQuizLive} setIsQuizOpen={setIsQuizOpen} />
+        ) : isPastQuizViewerOpen ? (
+          <div className="col-span-5">
+            <div className="bg-white rounded-lg p-6 shadow-md">
+              <div className="flex w-full justify-between">
+                <h2 className="text-lg font-semibold mb-4">Past Quizzes</h2>
+                <button
+                  onClick={() => setIsPastQuizViewerOpen(false)}
+                  className="hover:text-red-900 bg-gray-200 hover:bg-red-300 rounded-full px-2 py-2 w-8 h-8 flex items-center justify-center"
+                >
+                  X
+                </button>
+              </div>
+
+              {pastQuizzes?.length > 0 ? (
+                <div className="space-y-4">
+                  {pastQuizzes.map((quiz) => (
+                    <div
+                      key={quiz._id}
+                      className="border border-gray-200 rounded-lg p-4 shadow-sm flex items-center justify-between"
+                    >
+                      {/* Left Side: Quiz Details */}
+                      <div>
+                        <h3 className="text-base font-medium text-gray-700 flex items-center gap-2">
+                          <ListChecks size={18} className="text-blue-500" />
+                          {quiz.genre}
+                        </h3>
+                        <p className="text-sm text-gray-500 flex items-center gap-2">
+                          <Calendar size={16} className="text-gray-400" />
+                          {new Date(quiz.date).toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric',
+                          })}
+                        </p>
+                        <p className="text-sm text-gray-500 flex items-center gap-2">
+                          <Timer size={16} className="text-gray-400" />
+                          {new Date(quiz.createdAt).toLocaleString()}
+                        </p>
+                      </div>
+
+                      {/* Right Side: Score */}
+                      <div className="flex items-center gap-2 text-blue-600 font-medium">
+                        <Trophy size={20} className="text-yellow-500" />
+                        {quiz.score} Points
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-gray-500 text-sm">
+                  No past quizzes available.
+                </p>
+              )}
+            </div>
+          </div>
         ) : (
           <div className="col-span-5">
             <div className="bg-white rounded-lg p-6 shadow mb-4">

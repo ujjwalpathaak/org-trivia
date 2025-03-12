@@ -7,28 +7,9 @@ import { getNextWeek } from '../utils.js';
 import { useOrgId } from '../context/auth.context.jsx';
 
 export default function ScheduleQuestions() {
-  const [aiQuestions, setAiQuestions] = useState([
-    {
-      question:
-        "One morning, Udai and Vishal were facing each other at a crossing. If Vishal's shadow was exactly to the left of Udai, which direction was Udai facing?",
-      options: ['Option 1', 'Option 2'],
-      answer: 'Option 1',
-    },
-    {
-      question:
-        'A Google employee receives ₹480 as expense reimbursement in ₹1, ₹5, and ₹10 notes. The number of notes of each denomination is the same. What is the total number of notes the employee received?',
-      options: ['Option A', 'Option B'],
-      answer: 'Option B',
-    },
-  ]);
+  const [aiQuestions, setAiQuestions] = useState([]);
 
-  const [empQuestions, setEmpQuestions] = useState([
-    {
-      question: 'How many triangles are present in the given diagram?',
-      options: ['Yes', 'No'],
-      answer: 'Yes',
-    },
-  ]);
+  const [empQuestions, setEmpQuestions] = useState([]);
 
   const [addQuestion, setAddQuestion] = useState(false);
   const [removedQuestionIndex, setRemovedQuestionIndex] = useState(-1);
@@ -50,6 +31,8 @@ export default function ScheduleQuestions() {
         return;
       }
       setQuestions(response.data.weeklyUnapprovedQuestions);
+      setAiQuestions(response.data.extraAIQuestions);
+      setEmpQuestions(response.data.extraEmployeeQuestions);
     };
 
     getQuestionsToApproveFunc();

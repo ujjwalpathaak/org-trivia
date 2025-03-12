@@ -209,7 +209,7 @@ class QuestionService {
 
   async getExtraAIQuestions(orgId, quizId, quizGenre) {
     return (
-      (await this.questionRepository.getExtraAIQuestions(quizId, quizGenre)) ||
+      (await this.questionRepository.getExtraAIQuestions(orgId, quizId, quizGenre)) ||
       []
     );
   }
@@ -217,6 +217,7 @@ class QuestionService {
   async getExtraEmployeeQuestions(orgId, quizId, quizGenre) {
     return (
       (await this.questionRepository.getExtraEmployeeQuestions(
+        orgId,
         quizId,
         quizGenre,
       )) || []

@@ -12,5 +12,6 @@ employeeRouter.get(
 );
 employeeRouter.get('/score/:employeeId', employeeController.fetchEmployeeScore);
 employeeRouter.get('/:employeeId', employeeController.getEmployeeDetails);
+employeeRouter.get('/quizzes/results/:employeeId', employeeController.getPastQuizResults);
 
 export default employeeRouter;

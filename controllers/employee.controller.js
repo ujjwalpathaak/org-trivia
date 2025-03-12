@@ -49,6 +49,17 @@ class EmployeeController {
       next(error);
     }
   }
+
+  async getPastQuizResults(req , res, next) {
+    try {
+      const { employeeId } = req.params;
+      const pastQuizResults = await employeeService.getPastQuizResults(employeeId);
+
+      res.status(200).json(pastQuizResults);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export default EmployeeController;

@@ -1,6 +1,7 @@
 import Employee from '../models/employee.model.js';
 
 import { ObjectId } from 'mongodb';
+import Result from '../models/result.model.js';
 
 class EmployeeRepository {
   async findEmployeeById(employeeId) {
@@ -17,6 +18,12 @@ class EmployeeRepository {
   async markAllEmployeesAsQuizNotGiven() {
     return Employee.updateMany({}, { $set: { isQuizGiven: false } });
   }
+
+  async getPastQuizResults(employeeId) {
+    return Result.find(
+      { employeeId: new ObjectId(employeeId) }
+    ).sort({ date: -1 });
+  }  
 
   async getAllOrgEmployeesByOrgId(orgId) {
     return Employee.find({ orgId: new ObjectId(orgId) });
