@@ -101,7 +101,7 @@ class OrgRepository {
   async changeGenreSettings(genre, orgId) {
     return Org.updateOne(
       { _id: orgId },
-      { $set: { 'settings.selectedGenre': genre } },
+      { $set: { 'settings.selectedGenre': genre, 'settings.currentGenre': 0 } },
     );
   }
 

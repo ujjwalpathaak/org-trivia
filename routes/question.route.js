@@ -15,6 +15,7 @@ questionRouter.get(
 );
 
 questionRouter.post('/new/HRdocs', questionController.saveHRdocQuestions);
+questionRouter.post('/new/PnA', questionController.savePnAQuestions);
 
 questionRouter.get(
   '/test/scheduleNextWeekQuestionsApproval',

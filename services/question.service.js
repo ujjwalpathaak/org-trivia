@@ -129,13 +129,13 @@ class QuestionService {
     );
   }
 
-  async pushQuestionsInOrg(questions, orgId, genre) {
+  async pushQuestionsInOrg(questions, genre, orgId = null) {
     const refactoredQuestions = await this.formatQuestionsForOrgs(questions);
 
     return await this.questionRepository.pushQuestionsInOrg(
       refactoredQuestions,
-      orgId,
       genre,
+      orgId,
     );
   }
 
@@ -167,7 +167,7 @@ class QuestionService {
     );
 
     await this.pushQuestionsForApprovals(questions, orgId, quizId);
-    await this.pushQuestionsInOrg(questions, orgId, 'CAnIT');
+    await this.pushQuestionsInOrg(questions, 'CAnIT', orgId);
   }
 
   async validateEmployeeQuestionSubmission(question) {
@@ -207,22 +207,22 @@ class QuestionService {
     return Object.keys(errors).length;
   }
 
-  async getExtraAIQuestions(orgId, quizId, quizGenre) {
-    return (
-      (await this.questionRepository.getExtraAIQuestions(orgId, quizId, quizGenre)) ||
-      []
-    );
-  }
+  // async getExtraAIQuestions(orgId, quizId, quizGenre) {
+  //   return (
+  //     (await this.questionRepository.getExtraAIQuestions(orgId, quizId, quizGenre)) ||
+  //     []
+  //   );
+  // }
 
-  async getExtraEmployeeQuestions(orgId, quizId, quizGenre) {
-    return (
-      (await this.questionRepository.getExtraEmployeeQuestions(
-        orgId,
-        quizId,
-        quizGenre,
-      )) || []
-    );
-  }
+  // async getExtraEmployeeQuestions(orgId, quizId, quizGenre) {
+  //   return (
+  //     (await this.questionRepository.getExtraEmployeeQuestions(
+  //       orgId,
+  //       quizId,
+  //       quizGenre,
+  //     )) || []
+  //   );
+  // }
 
   async getUpcomingWeeklyQuizByOrgId(orgId) {
     return this.questionRepository.getUpcomingWeeklyQuiz(orgId);
@@ -256,6 +256,17 @@ class QuestionService {
     );
 
     await this.pushQuestionsInOrg(refactoredQuestions, orgId, 'HRD');
+
+    return { status: 200, message: 'HRD Questions saved successfully' };
+  }
+
+  async savePnAQuestions(questions) {
+    const refactoredQuestions = await this.pushQuestionsToDatabase(
+      questions,
+      'PnA',
+    );
+
+    await this.pushQuestionsInOrg(refactoredQuestions, 'PnA');
 
     return { status: 200, message: 'HRD Questions saved successfully' };
   }

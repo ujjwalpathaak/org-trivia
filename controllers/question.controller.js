@@ -94,6 +94,23 @@ class QuestionController {
     }
   }
 
+  async savePnAQuestions(req, res, next) {
+    try {
+      const { questions } = req.body;
+      if (!questions) {
+        return res.status(400).json({ message: 'Missing required fields' });
+      }
+
+      const response = await questionService.savePnAQuestions(
+      questions
+      );
+
+      res.status(200).json(response);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async testScheduleNextWeekQuestionsApproval(req, res, next) {
     try {
       await questionService.scheduleNextWeekQuestionsApproval();
