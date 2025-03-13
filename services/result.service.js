@@ -52,6 +52,7 @@ class ResultService {
     );
     
     await this.employeeRepository.updateWeeklyQuizScore(
+      quizId,
       employeeId,
       weeklyQuizScore,
     );

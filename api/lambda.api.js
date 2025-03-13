@@ -11,7 +11,7 @@ export const fetchNewCAnITQuestions = (orgName, orgIndustry, orgCountry, orgId, 
     },
     body: JSON.stringify({
       orgName: orgName,
-      callbackUrl: 'https://b3e3-183-82-55-162.ngrok-free.app',
+      callbackUrl: 'https://643f-122-187-121-22.ngrok-free.app',
       orgIndustry: orgIndustry,
       orgCountry: orgCountry,
       orgId: orgId,
@@ -28,7 +28,7 @@ export const fetchNewPnAQuestions = (orgName, orgId, quizId) => {
     },
     body: JSON.stringify({
       orgName: orgName,
-      callbackUrl: 'https://b3e3-183-82-55-162.ngrok-free.app',
+      callbackUrl: 'https://643f-122-187-121-22.ngrok-free.app',
       orgId: orgId,
       quizId: quizId,
     }),

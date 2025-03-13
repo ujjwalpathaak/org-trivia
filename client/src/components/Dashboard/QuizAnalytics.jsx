@@ -55,7 +55,7 @@ export default function QuizAnalytics({ analytics }) {
           )}
         </div>
       </div>
-
+      {/* 
       <div className="bg-white rounded-lg p-6 pb-0 h-fit shadow">
         <div className="flex gap-4">
           <Activity className="h-10 w-10 text-green-500" />
@@ -82,7 +82,7 @@ export default function QuizAnalytics({ analytics }) {
             <Tooltip />
           </PieChart>
         </ResponsiveContainer>
-      </div>
+      </div> */}
     </div>
   );
 }

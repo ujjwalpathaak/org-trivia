@@ -31,7 +31,7 @@ export default function ScheduleQuestions() {
         return;
       }
       setQuestions(response.data.weeklyUnapprovedQuestions);
-      // setAiQuestions(response.data.extraAIQuestions);
+      // setAiQuestions(response.data.
       setEmpQuestions(response.data.extraEmployeeQuestions);
     };
 

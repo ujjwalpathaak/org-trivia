@@ -5,7 +5,7 @@ import {
   getEmployeeDetails,
   getPastQuizResults,
 } from '../../api';
-import { useOrgId, useUserId } from '../../context/auth.context';
+import { useAuth, useOrgId, useUserId } from '../../context/auth.context';
 import {
   Share2,
   Image,
@@ -23,6 +23,7 @@ import {
   Timer,
   Trophy,
   Calendar,
+  Gamepad2,
 } from 'lucide-react';
 
 import Quiz from '../../pages/Quiz';
@@ -33,6 +34,7 @@ import { daysUntilNextFriday } from '../../utils';
 const EmployeeDashboard = () => {
   const orgId = useOrgId();
   const employeeId = useUserId();
+  const { data } = useAuth();
 
   const [isQuizLive, setIsQuizLive] = useState(false);
   const [resumeQuiz, setResumeQuiz] = useState(false);
@@ -63,7 +65,6 @@ const EmployeeDashboard = () => {
 
   const fetchPastQuizzes = async () => {
     const pastQuizzes = await getPastQuizResults(employeeId);
-    console.log(pastQuizzes);
     setPastQuizzes(pastQuizzes);
   };
 
@@ -118,7 +119,8 @@ const EmployeeDashboard = () => {
                 alt="Profile"
                 className="w-24 h-24 rounded-full mb-4 border-4 border-gray-200"
               />
-              <div className="flex justify-between w-full px-8 mb-6">
+              {data?.user?.name && `${data.user.name}`}
+              <div className="flex justify-between w-full mt-2 px-8 mb-6">
                 <div className="text-center">
                   <div className="flex items-center gap-2 text-gray-700">
                     <Award className="h-5 w-5 text-blue-600" />
@@ -167,18 +169,21 @@ const EmployeeDashboard = () => {
                 </div>
               </div>
               <nav className="w-full mt-6 space-y-3">
-                {!isQuestionMakerOpen && (
-                  <button
-                    onClick={() => setIsQuestionMakerOpen(true)}
-                    className="w-full text-left px-5 py-3 rounded-lg bg-gray-50 hover:bg-gray-100 flex items-center gap-3 transition"
-                  >
-                    <CirclePlus className="h-5 w-5 text-purple-500" />
-                    <span className="font-medium">Submit new question</span>
-                  </button>
-                )}
+                <button
+                  onClick={() => {
+                    setIsQuestionMakerOpen(true);
+                    setIsPastQuizViewerOpen(false);
+                  }}
+                  className="w-full text-left px-5 py-3 rounded-lg bg-gray-50 hover:bg-gray-100 flex items-center gap-3 transition"
+                >
+                  <CirclePlus className="h-5 w-5 text-purple-500" />
+                  <span className="font-medium">Submit new question</span>
+                </button>
+
                 <button
                   onClick={async () => {
                     await fetchPastQuizzes();
+                    setIsQuestionMakerOpen(false);
                     setIsPastQuizViewerOpen(true);
                   }}
                   className="w-full text-left px-5 py-3 rounded-lg bg-gray-50 hover:bg-gray-100 flex items-center gap-3 transition"
@@ -386,8 +391,8 @@ const EmployeeDashboard = () => {
                   ) : (
                     <div className="rounded-xl">
                       <h2 className="text-lg mb-2 flex items-center gap-2">
-                        <CircleCheck className="w-5 h-5 text-yellow-500" />
-                        Quiz has ended
+                        <Gamepad2 className="w-6 h-6 text-green-500" />
+                        Weekly Quiz Trivia
                       </h2>
                       <h6 className="text-slate-400 flex items-center gap-2">
                         <TrendingUp className="w-4 h-4 text-blue-500" />

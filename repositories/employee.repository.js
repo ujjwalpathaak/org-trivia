@@ -96,24 +96,18 @@ class EmployeeRepository {
     }
   }
 
-  async updateWeeklyQuizScore(employeeId, updatedWeeklyQuizScore) {
-    const thisQuizDate = new Date().setHours(0, 0, 0, 0);
+  async updateWeeklyQuizScore(quizId, employeeId, updatedWeeklyQuizScore) {
     const employee = await Employee.findOne(
       { _id: new ObjectId(employeeId) },
-      { lastQuizDate: 1, currentStreak: 1 },
+      { lastQuizGiven: 1, currentStreak: 1 },
     );
-    
-    const lastQuizDate = employee.lastQuizDate
-    ? new Date(employee.lastQuizDate).setHours(0, 0, 0, 0)
-    : null;
+
     let updatedStreak = 0;
     
-    if (
-      lastQuizDate &&
-      thisQuizDate - lastQuizDate === 7 * 24 * 60 * 60 * 1000
-    ) {
+    if (employee.lastQuizGiven) {
       updatedStreak = employee.currentStreak + 1;
     }
+
     const multi = await this.newMultiplier(updatedStreak);
     
     updatedWeeklyQuizScore *= multi;
@@ -122,8 +116,9 @@ class EmployeeRepository {
       { _id: new ObjectId(employeeId) },
       {
         $set: {
+          idLastGivenQuiz: new ObjectId(quizId),
           isQuizGiven: true,
-          lastQuizDate: thisQuizDate,
+          lastQuizGiven: true,
           currentStreak: updatedStreak,
           lastQuizScore: updatedWeeklyQuizScore,
         },
