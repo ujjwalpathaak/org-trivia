@@ -88,7 +88,7 @@ class LeaderboardRepository {
     ]);
     
     const goldBadge = await Badge.findOne({ rank: "Gold" });
-      const silverBadge = await Badge.findOne({ rank: "Silver" });
+    const silverBadge = await Badge.findOne({ rank: "Silver" });
     const bronzeBadge = await Badge.findOne({ rank: "Bronze" });
 
     for (const { orgId, topEmployees } of topThreePerOrg) {

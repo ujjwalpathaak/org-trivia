@@ -31,7 +31,7 @@ export default function ScheduleQuestions() {
         return;
       }
       setQuestions(response.data.weeklyUnapprovedQuestions);
-      setAiQuestions(response.data.extraAIQuestions);
+      // setAiQuestions(response.data.extraAIQuestions);
       setEmpQuestions(response.data.extraEmployeeQuestions);
     };
 
@@ -96,11 +96,16 @@ export default function ScheduleQuestions() {
                   AI Questions
                 </h3>
                 <div className="space-y-2">
+                  {aiQuestions?.length === 0 && (
+                    <span className="italic text-slate-400">
+                      No extra questions found
+                    </span>
+                  )}
                   {aiQuestions?.map((q, idx) => (
                     <button
                       key={idx}
                       onClick={() => selectQuestion(q)}
-                      className="w-full text-left p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition duration-200 border border-gray-100"
+                      className="w-full text-left p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition duration-200 border border-gray-200"
                     >
                       {q.question}
                     </button>
@@ -113,11 +118,16 @@ export default function ScheduleQuestions() {
                   Employee Questions
                 </h3>
                 <div className="space-y-2">
+                  {empQuestions.length === 0 && (
+                    <span className="italic text-slate-400">
+                      No extra questions found
+                    </span>
+                  )}
                   {empQuestions?.map((q, idx) => (
                     <button
                       key={idx}
                       onClick={() => selectQuestion(q)}
-                      className="w-full text-left p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition duration-200 border border-gray-100"
+                      className="w-full text-left p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition duration-200 border border-gray-200"
                     >
                       {q.question}
                     </button>
@@ -169,7 +179,7 @@ export default function ScheduleQuestions() {
                       onChange={(e) =>
                         handleQuestionChangeType(idx, e.target.value)
                       }
-                      className="w-full p-4 border border-gray-200 rounded-lg mb-4 focus:ring-2 focus:ring-blue-500 focus:border-transparent min-h-[150px]"
+                      className="w-full p-4 border border-gray-200 rounded-lg mb-4 focus:ring-2 focus:ring-blue-500 focus:border-transparent min-h-[100px]"
                     />
                     {q.question?.image && (
                       <img

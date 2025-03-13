@@ -74,7 +74,7 @@ const Leaderboard = ({ last3Leaderboards }) => {
                     </tr>
                   </thead>
                   <tbody>
-                    {leaderboard.employees?.map((player, index) => (
+                    {leaderboard?.employees?.map((player, index) => (
                       <tr
                         key={player.employeeId}
                         className="border-t bg-gray-100"

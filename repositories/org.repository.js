@@ -64,7 +64,7 @@ class OrgRepository {
       { _id: new ObjectId(orgId) },
       {
         $push: {
-          [query]: { questionId, isUsed: false, category: questionCategory },
+          [query]: { questionId, isUsed: false, category: questionCategory, source: question.source },
         },
       },
     );

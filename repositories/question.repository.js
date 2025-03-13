@@ -13,47 +13,7 @@ class QuestionRepository {
     return Question.insertMany(newQuestions);
   }
 
-  async fetchPnAQuestions(orgId) {
-    return Org.aggregate([
-      {
-        $match: {
-          _id: orgId,
-        },
-      },
-      {
-        $unwind: '$questionsPnA',
-      },
-      {
-        $match: {
-          'questionsPnA.isUsed': false,
-        },
-      },
-      {
-        $group: {
-          _id: '$questionsPnA.puzzleType',
-          question: { $first: '$questionsPnA' },
-        },
-      },
-      {
-        $lookup: {
-          from: 'questions',
-          localField: 'question.questionId',
-          foreignField: '_id',
-          as: 'questionDetails',
-        },
-      },
-      {
-        $unwind: '$questionDetails',
-      },
-      {
-        $replaceRoot: {
-          newRoot: '$questionDetails',
-        },
-      },
-    ]);
-  }
-
-  async pushQuestionsInOrg(finalFormatedRefactoredQuestions, orgId, genre) {
+  async pushQuestionsInOrg(finalFormatedRefactoredQuestions, genre, orgId) {
     const fieldName = `questions${genre}`;
 
     return Org.updateMany(
@@ -76,7 +36,10 @@ class QuestionRepository {
       .lean();
   }
 
-  async saveWeeklyQuizQuestions(newQuestions) {
+  async saveWeeklyQuizQuestions(quizId, newQuestions) {
+    await Quiz.updateOne({_id: new ObjectId(quizId)}, {$set: {
+      status: 'unapproved'
+    }})
     return WeeklyQuestion.insertMany(newQuestions);
   }
 
@@ -84,18 +47,41 @@ class QuestionRepository {
   async getUpcomingWeeklyQuiz(orgId) {
     return Quiz.findOne({
       orgId: new ObjectId(orgId),
-      status: 'upcoming',
+      status: 'unapproved',
     });
   }
 
-  async getExtraAIQuestions(quizId, genre) {
-    return [];
-    // return Question.find({ source: 'AI' });
-  }
-
-  async getExtraEmployeeQuestions(quizId, genre) {
-    return [];
-    // return Question.find({ source: 'Employee' });
+  async getExtraEmployeeQuestions(orgId, quizId, genre) {
+    return Org.aggregate([
+      {
+        $match: { _id: new ObjectId(orgId) }
+      },
+      {
+        $unwind: '$questionsPnA'
+      },
+      {
+        $match: {
+          'questionsPnA.isUsed': false,
+          'questionsPnA.source': 'Employee'
+        }
+      },
+      {
+        $lookup: {
+          from: 'questions',
+          localField: 'questionsPnA.questionId',
+          foreignField: '_id',
+          as: 'questionDetails'
+        }
+      },
+      {
+        $unwind: '$questionDetails'
+      },
+      {
+        $replaceRoot: {
+          newRoot: '$questionDetails'
+        }
+      }
+    ]);
   }
 
   async getWeeklyUnapprovedQuestions(quizId) {
@@ -105,7 +91,7 @@ class QuestionRepository {
   async fetchHRDQuestions(orgId) {
     return Org.aggregate([
       {
-        $match: { _id: orgId },
+        $match: { _id: new ObjectId(orgId) },
       },
       {
         $unwind: '$questionsHRD',
@@ -114,12 +100,24 @@ class QuestionRepository {
         $match: { 'questionsHRD.isUsed': false },
       },
       {
-        $sample: { size: 5 },
+        $group: {
+          _id: '$questionsHRD.file',
+          questions: { $push: '$questionsHRD' },
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          questions: { $slice: ['$questions', 2] },
+        },
+      },
+      {
+        $unwind: '$questions',
       },
       {
         $lookup: {
           from: 'questions',
-          localField: 'questionsHRD.questionId',
+          localField: 'questions.questionId',
           foreignField: '_id',
           as: 'questionDetails',
         },

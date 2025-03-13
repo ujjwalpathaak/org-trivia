@@ -13,6 +13,11 @@ const questionSchema = new mongoose.Schema(
     },
     category: {
       type: String,
+      default: null,
+    },
+    file: {
+      type: String,
+      default: null,
     },
     source: {
       type: String,

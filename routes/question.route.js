@@ -5,7 +5,7 @@ import QuestionController from '../controllers/question.controller.js';
 const questionController = new QuestionController();
 const questionRouter = express.Router();
 
-questionRouter.post('/', protectRoute, questionController.addQuestion);
+questionRouter.post('/', protectRoute, checkRole('Employee'), questionController.addQuestion);
 
 questionRouter.get(
   '/weekly/unapproved/:orgId',
@@ -14,8 +14,7 @@ questionRouter.get(
   questionController.getWeeklyUnapprovedQuestions,
 );
 
-questionRouter.post('/new/HRdocs', questionController.saveHRdocQuestions);
-questionRouter.post('/new/PnA', questionController.savePnAQuestions);
+// questionRouter.post('/new/HRdocs', questionController.saveHRdocQuestions);
 
 questionRouter.get(
   '/test/scheduleNextWeekQuestionsApproval',

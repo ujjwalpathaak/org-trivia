@@ -1,6 +1,6 @@
 import {
   fetchNewCAnITQuestions,
-  refactorPnAQuestionsToOrgContext,
+  fetchNewPnAQuestions,
 } from '../api/lambda.api.js';
 import QuizService from './quiz.service.js';
 import QuizRepository from '../repositories/quiz.repository.js';
@@ -61,7 +61,11 @@ class QuestionService {
     switch (genre) {
       case 'PnA':
         console.log('starting PnA');
-        this.startPnAWorkflow(element.name, element._id, quizId);
+        fetchNewPnAQuestions(
+          element.name,
+          element._id,
+          quizId,
+        );
         break;
 
       case 'HRD':
@@ -85,7 +89,7 @@ class QuestionService {
     }
   }
 
-  async formatQuestionsWeeklyFormat(questions, orgId, quizId) {
+  formatQuestionsWeeklyFormat(questions, orgId, quizId) {
     return questions.map((curr) => ({
       isApproved: false,
       quizId: quizId,
@@ -94,16 +98,17 @@ class QuestionService {
     }));
   }
 
-  async formatQuestionsForOrgs(questions) {
+  formatQuestionsForOrgs(questions, file) {
     return questions.map((question) => {
       return {
         questionId: new ObjectId(question._id),
         isUsed: false,
+        ...(file && {file: file})
       };
     });
   }
 
-  async formatQuestionsForDatabase(questions, category) {
+  formatQuestionsForDatabase(questions, category) {
     return questions.map((question) => {
       return {
         question: question.question,
@@ -119,18 +124,19 @@ class QuestionService {
   }
 
   async pushQuestionsForApprovals(questions, orgId, quizId) {
-    const refactoredQuestions = await this.formatQuestionsWeeklyFormat(
+    const refactoredQuestions = this.formatQuestionsWeeklyFormat(
       questions,
       orgId,
       quizId,
     );
     return await this.questionRepository.saveWeeklyQuizQuestions(
+      quizId,
       refactoredQuestions,
     );
   }
 
-  async pushQuestionsInOrg(questions, genre, orgId = null) {
-    const refactoredQuestions = await this.formatQuestionsForOrgs(questions);
+  async pushQuestionsInOrg(questions, genre, orgId, file) {
+    const refactoredQuestions = this.formatQuestionsForOrgs(questions, file);
 
     return await this.questionRepository.pushQuestionsInOrg(
       refactoredQuestions,
@@ -140,7 +146,7 @@ class QuestionService {
   }
 
   async pushQuestionsToDatabase(questions, category) {
-    const refactoredQuestions = await this.formatQuestionsForDatabase(
+    const refactoredQuestions = this.formatQuestionsForDatabase(
       questions,
       category,
     );
@@ -148,26 +154,14 @@ class QuestionService {
     return await this.questionRepository.addQuestions(refactoredQuestions);
   }
 
-  async startPnAWorkflow(companyName, orgId, quizId) {
-    const pnAQuestions = await this.questionRepository.fetchPnAQuestions(orgId);
-
-    const refactoredPnAQuestions = await refactorPnAQuestionsToOrgContext(
-      companyName,
-      pnAQuestions,
-      orgId,
-    );
-
-    await this.pushQuestionsForApprovals(refactoredPnAQuestions, orgId, quizId);
-  }
-
-  async addLambdaCallbackCAnITQuestions(newQuestions, category, orgId, quizId) {
+  async addLambdaCallbackQuestions(newQuestions, category, orgId, quizId, file) {
     const questions = await this.pushQuestionsToDatabase(
       newQuestions,
       category,
     );
 
-    await this.pushQuestionsForApprovals(questions, orgId, quizId);
-    await this.pushQuestionsInOrg(questions, 'CAnIT', orgId);
+    await this.pushQuestionsInOrg(questions, category, orgId, file);
+    if(quizId) await this.pushQuestionsForApprovals(questions, orgId, quizId);
   }
 
   async validateEmployeeQuestionSubmission(question) {
@@ -207,22 +201,15 @@ class QuestionService {
     return Object.keys(errors).length;
   }
 
-  // async getExtraAIQuestions(orgId, quizId, quizGenre) {
-  //   return (
-  //     (await this.questionRepository.getExtraAIQuestions(orgId, quizId, quizGenre)) ||
-  //     []
-  //   );
-  // }
-
-  // async getExtraEmployeeQuestions(orgId, quizId, quizGenre) {
-  //   return (
-  //     (await this.questionRepository.getExtraEmployeeQuestions(
-  //       orgId,
-  //       quizId,
-  //       quizGenre,
-  //     )) || []
-  //   );
-  // }
+  async getExtraEmployeeQuestions(orgId, quizId, quizGenre) {
+    return (
+      (await this.questionRepository.getExtraEmployeeQuestions(
+        orgId,
+        quizId,
+        quizGenre,
+      )) || []
+    );
+  }
 
   async getUpcomingWeeklyQuizByOrgId(orgId) {
     return this.questionRepository.getUpcomingWeeklyQuiz(orgId);
@@ -245,30 +232,6 @@ class QuestionService {
     const questions = await this.questionRepository.fetchHRDQuestions(orgId);
 
     await this.pushQuestionsForApprovals(questions, orgId, quizId);
-  }
-
-  // async savePnAQuestion(orgId, quizId, question) { return }
-
-  async saveHRdocQuestions(orgId, questions) {
-    const refactoredQuestions = await this.pushQuestionsToDatabase(
-      questions,
-      'HRD',
-    );
-
-    await this.pushQuestionsInOrg(refactoredQuestions, orgId, 'HRD');
-
-    return { status: 200, message: 'HRD Questions saved successfully' };
-  }
-
-  async savePnAQuestions(questions) {
-    const refactoredQuestions = await this.pushQuestionsToDatabase(
-      questions,
-      'PnA',
-    );
-
-    await this.pushQuestionsInOrg(refactoredQuestions, 'PnA');
-
-    return { status: 200, message: 'HRD Questions saved successfully' };
   }
 }
 

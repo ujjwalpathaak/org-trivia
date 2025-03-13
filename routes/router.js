@@ -22,7 +22,6 @@ router.use('/question', questionRouter);
 router.use('/cron', cronTestRouter);
 router.use('/result', protectRoute, checkRole('Employee'), resultRouter);
 router.use('/leaderboard', leaderboardRouter);
-// router.use('/badge', badgeRouter);
 router.use('/quiz', quizRouter);
 
 router.use('*', (req, res, next) => {

@@ -17,28 +17,29 @@ const Quiz = ({ setIsQuizOpen, setIsQuizLive }) => {
   const [timeLeftCurrentQuestion, setTimeLeftCurrentQuestion] = useState(5);
 
   useEffect(() => {
-    const getLiveQuizState = async () => {
+    const getLiveQuizState = async (quizId) => {
       try {
         const quizState = localStorage.getItem('state');
         const quizStateJSON = JSON.parse(quizState);
         if (quizStateJSON) {
-          setAnswers(quizStateJSON.answers);
-          setIsQuizFinished(quizStateJSON.isQuizFinished);
-          setCurrentQuestion(quizStateJSON.currentQuestion);
+          if (quizStateJSON.quizId !== quizId) {
+            localStorage.removeItem('state');
+          } else {
+            setAnswers(quizStateJSON.answers);
+            setIsQuizFinished(quizStateJSON.isQuizFinished);
+            setCurrentQuestion(quizStateJSON.currentQuestion);
+          }
         }
       } catch (error) {
         console.error('Error checking quiz status:', error);
       }
     };
 
-    getLiveQuizState();
-  }, []);
-
-  useEffect(() => {
     const fetchWeeklyQuizQuestions = async () => {
       if (!orgId || !userId) return;
       let response = await getWeeklyQuizQuestions(orgId);
       setQuizId(response.quizId);
+      getLiveQuizState(response.quizId);
       setQuestions(response.weeklyQuizQuestions);
     };
 
@@ -79,6 +80,7 @@ const Quiz = ({ setIsQuizOpen, setIsQuizLive }) => {
     setAnswers(quizState.answers);
 
     const state = {
+      quizId: quizId,
       answers: quizState.answers,
       currentQuestion: currentQuestion + 1,
       isQuizFinished: currentQuestion + 1 === questions.length,

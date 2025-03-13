@@ -23,14 +23,14 @@ orgRouter.get(
 );
 orgRouter.post(
   '/settings/genre/:orgId',
-  // protectRoute,
-  // checkRole('Admin'),
+  protectRoute,
+  checkRole('Admin'),
   orgController.changeGenreSettings,
 );
 orgRouter.get(
   '/analytics/:orgId',
-  // protectRoute,
-  // checkRole('Admin'),
+  protectRoute,
+  checkRole('Admin'),
   orgController.getAnalytics,
 );
 
