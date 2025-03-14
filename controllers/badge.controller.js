@@ -3,8 +3,6 @@ import BadgeService from '../services/badge.service.js';
 
 const badgeService = new BadgeService(new BadgeRepository());
 
-class BadgeController {
-
-}
+class BadgeController {}
 
 export default BadgeController;

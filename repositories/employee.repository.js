@@ -20,10 +20,10 @@ class EmployeeRepository {
   }
 
   async getPastQuizResults(employeeId) {
-    return Result.find(
-      { employeeId: new ObjectId(employeeId) }
-    ).sort({ date: -1 });
-  }  
+    return Result.find({ employeeId: new ObjectId(employeeId) }).sort({
+      date: -1,
+    });
+  }
 
   async getAllOrgEmployeesByOrgId(orgId) {
     return Employee.find({ orgId: new ObjectId(orgId) });
@@ -45,55 +45,53 @@ class EmployeeRepository {
     }
   }
 
-  async addSubmittedQuestion(questionId, employeeId){
+  async addSubmittedQuestion(questionId, employeeId) {
     return Employee.updateOne(
       { _id: new ObjectId(employeeId) },
       { $push: { submittedQuestions: new ObjectId(questionId) } },
     );
   }
 
-  async getEmployeeDetails(employeeId){
-    const badges = await Employee.aggregate([
-      {
-          $match: { _id: new ObjectId(employeeId) }
-      },
-      {
-          $unwind: "$badges"
-      },
-      {
-          $lookup: {
-              from: "badges",
-              localField: "badges.badgeId",
-              foreignField: "_id",
-              as: "badgeDetails"
-          }
-      },
-      {
-          $unwind: "$badgeDetails"
-      },
-      {
-          $group: {
-              _id: "$_id",
-              badges: { 
-                  $push: {  
-                      badgeDetails: "$badgeDetails",
-                      description: "$badges.description"
-                  }
-              }
-          }
-      }
-  ])
+  async getEmployeeDetails(employeeId) {
+    const objectId = new ObjectId(employeeId);
 
-    const employee = await Employee.findOne(
-      { _id: new ObjectId(employeeId) },
-    );
+    // Aggregation to get recent 3 badges
+    const badges = await Employee.aggregate([
+      { $match: { _id: objectId } },
+      { $unwind: '$badges' },
+      { $sort: { 'badges.earnedAt': -1 } }, // Sort before grouping
+      {
+        $lookup: {
+          from: 'badges',
+          localField: 'badges.badgeId',
+          foreignField: '_id',
+          as: 'badgeDetails',
+        },
+      },
+      { $unwind: '$badgeDetails' },
+      {
+        $group: {
+          _id: '$_id',
+          badges: {
+            $push: {
+              badgeDetails: '$badgeDetails',
+              description: '$badges.description',
+              rank: '$badges.rank',
+              earnedAt: '$badges.earnedAt',
+            },
+          },
+        },
+      },
+    ]);
+
+    const employee = await Employee.findOne({ _id: objectId });
     const multiplier = await this.newMultiplier(employee.currentStreak);
 
     return {
       employee,
       badges: badges[0]?.badges || [],
-      multiplier: multiplier,
-    }
+      multiplier,
+    };
   }
 
   async updateWeeklyQuizScore(quizId, employeeId, updatedWeeklyQuizScore) {
@@ -103,15 +101,15 @@ class EmployeeRepository {
     );
 
     let updatedStreak = 0;
-    
+
     if (employee.lastQuizGiven) {
       updatedStreak = employee.currentStreak + 1;
     }
 
     const multi = await this.newMultiplier(updatedStreak);
-    
+
     updatedWeeklyQuizScore *= multi;
-    
+
     return Employee.updateOne(
       { _id: new ObjectId(employeeId) },
       {

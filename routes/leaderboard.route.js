@@ -7,7 +7,14 @@ const leaderboardController = new LeaderboardController();
 const leaderboardRouter = express.Router();
 
 // test
-leaderboardRouter.get('/:orgId', protectRoute, leaderboardController.getLeaderboardByOrg);
-leaderboardRouter.post('/test/reset', leaderboardController.resetLeaderboardTest);
+leaderboardRouter.get(
+  '/:orgId',
+  protectRoute,
+  leaderboardController.getLeaderboardByOrg,
+);
+leaderboardRouter.post(
+  '/test/reset',
+  leaderboardController.resetLeaderboardTest,
+);
 
 export default leaderboardRouter;

@@ -61,7 +61,12 @@ class OrgRepository {
       { _id: new ObjectId(orgId) },
       {
         $push: {
-          [query]: { questionId, isUsed: false, category: questionCategory, source: question.source },
+          [query]: {
+            questionId,
+            isUsed: false,
+            category: questionCategory,
+            source: question.source,
+          },
         },
       },
     );
@@ -129,64 +134,66 @@ class OrgRepository {
     );
   }
 
-  async getAnalytics(orgId){
+  async getAnalytics(orgId) {
     const participationByGenre = await Result.aggregate([
       { $match: { orgId: new ObjectId(orgId) } },
-      { $group: { 
-          _id: "$genre",
-          count: { $sum: 1 }
-      }}
+      {
+        $group: {
+          _id: '$genre',
+          count: { $sum: 1 },
+        },
+      },
     ]);
 
     const last3Leaderboards = await Leaderboard.aggregate([
       { $match: { orgId: new ObjectId(orgId) } },
       {
         $group: {
-          _id: { month: "$month", year: "$year" },
-          leaderboard: { $push: "$$ROOT" }
-        }
+          _id: { month: '$month', year: '$year' },
+          leaderboard: { $push: '$$ROOT' },
+        },
       },
-      { $sort: { "_id.year": -1, "_id.month": -1 } },
+      { $sort: { '_id.year': -1, '_id.month': -1 } },
       { $limit: 3 },
       { $skip: 1 },
-      { $unwind: "$leaderboard" },
+      { $unwind: '$leaderboard' },
       {
         $lookup: {
-          from: "employees",
-          localField: "leaderboard.employeeId",
-          foreignField: "_id",
-          as: "employeeDetails"
-        }
+          from: 'employees',
+          localField: 'leaderboard.employeeId',
+          foreignField: '_id',
+          as: 'employeeDetails',
+        },
       },
-      { $unwind: "$employeeDetails" },
-      { $sort: { "leaderboard.totalScore": -1 } },
+      { $unwind: '$employeeDetails' },
+      { $sort: { 'leaderboard.totalScore': -1 } },
       {
         $group: {
-          _id: { month: "$_id.month", year: "$_id.year" },
+          _id: { month: '$_id.month', year: '$_id.year' },
           employees: {
             $push: {
-              employeeId: "$leaderboard.employeeId",
-              name: "$employeeDetails.name",
-              totalScore: "$leaderboard.totalScore"
-            }
-          }
-        }
+              employeeId: '$leaderboard.employeeId',
+              name: '$employeeDetails.name',
+              totalScore: '$leaderboard.totalScore',
+            },
+          },
+        },
       },
-    
+
       {
         $project: {
           _id: 0,
-          month: "$_id.month",
-          year: "$_id.year",
-          employees: { $slice: ["$employees", 3] }
-        }
-      }
+          month: '$_id.month',
+          year: '$_id.year',
+          employees: { $slice: ['$employees', 3] },
+        },
+      },
     ]);
-    
-    return{
+
+    return {
       participationByGenre,
-      last3Leaderboards
-    }
+      last3Leaderboards,
+    };
   }
 }
 

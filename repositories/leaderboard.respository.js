@@ -43,7 +43,7 @@ class LeaderboardRepository {
   }
 
   async getEmployeePastRecords(orgId) {
-    console.log(orgId)
+    console.log(orgId);
     return Leaderboard.aggregate([
       { $match: { orgId: new ObjectId(orgId) } },
       {
@@ -60,11 +60,31 @@ class LeaderboardRepository {
   }
 
   async addBadgesToEmployees(employeeId, badgeId, month, year) {
-    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
 
     return Employee.updateOne(
       { _id: new ObjectId(employeeId) },
-      { $push: { badges: {badgeId: new ObjectId(badgeId), description: `${months[month]} ${year}`} } },
+      {
+        $push: {
+          badges: {
+            badgeId: new ObjectId(badgeId),
+            description: `${months[month]} ${year}`,
+          },
+        },
+      },
     );
   }
 
@@ -74,29 +94,47 @@ class LeaderboardRepository {
       { $sort: { orgId: 1, totalScore: -1 } },
       {
         $group: {
-          _id: { orgId: "$orgId" },
-          topEmployees: { $push: "$$ROOT" },
+          _id: { orgId: '$orgId' },
+          topEmployees: { $push: '$$ROOT' },
         },
       },
       {
         $project: {
           _id: 0,
-          orgId: "$_id.orgId",
-          topEmployees: { $slice: ["$topEmployees", 3] },
+          orgId: '$_id.orgId',
+          topEmployees: { $slice: ['$topEmployees', 3] },
         },
       },
     ]);
-    
-    const goldBadge = await Badge.findOne({ rank: "Gold" });
-    const silverBadge = await Badge.findOne({ rank: "Silver" });
-    const bronzeBadge = await Badge.findOne({ rank: "Bronze" });
+
+    const goldBadge = await Badge.findOne({ rank: 'Gold' });
+    const silverBadge = await Badge.findOne({ rank: 'Silver' });
+    const bronzeBadge = await Badge.findOne({ rank: 'Bronze' });
 
     for (const { orgId, topEmployees } of topThreePerOrg) {
-      if (topEmployees[0]) await this.addBadgesToEmployees(topEmployees[0].employeeId, goldBadge._id, pMonth, pYear);
-      if (topEmployees[1]) await this.addBadgesToEmployees(topEmployees[1].employeeId, silverBadge._id, pMonth, pYear);
-      if (topEmployees[2]) await this.addBadgesToEmployees(topEmployees[2].employeeId, bronzeBadge._id, pMonth, pYear);
-    }    
-  
+      if (topEmployees[0])
+        await this.addBadgesToEmployees(
+          topEmployees[0].employeeId,
+          goldBadge._id,
+          pMonth,
+          pYear,
+        );
+      if (topEmployees[1])
+        await this.addBadgesToEmployees(
+          topEmployees[1].employeeId,
+          silverBadge._id,
+          pMonth,
+          pYear,
+        );
+      if (topEmployees[2])
+        await this.addBadgesToEmployees(
+          topEmployees[2].employeeId,
+          bronzeBadge._id,
+          pMonth,
+          pYear,
+        );
+    }
+
     const uniqueCombinations = await Leaderboard.aggregate([
       {
         $group: {

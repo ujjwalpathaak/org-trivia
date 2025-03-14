@@ -14,11 +14,11 @@ class EmployeeService {
     return await this.employeeRepository.getEmployeeScore(employeeId);
   }
 
-  async getEmployeeDetails(employeeId){
+  async getEmployeeDetails(employeeId) {
     return await this.employeeRepository.getEmployeeDetails(employeeId);
   }
 
-  async getPastQuizResults(employeeId){
+  async getPastQuizResults(employeeId) {
     return await this.employeeRepository.getPastQuizResults(employeeId);
   }
 }

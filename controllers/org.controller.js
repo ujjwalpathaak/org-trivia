@@ -60,7 +60,7 @@ class OrgController {
     }
   }
 
-  async getAnalytics(req, res, next){
+  async getAnalytics(req, res, next) {
     try {
       const { orgId } = req.params;
       if (!orgId) {

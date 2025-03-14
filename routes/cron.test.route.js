@@ -14,8 +14,14 @@ cronTestRouter.post(
   cronTestController.startCAnITWorkflow,
 );
 
-cronTestRouter.post('/test/cleanWeeklyQuiz', cronTestController.cleanWeeklyQuiz);
+cronTestRouter.post(
+  '/test/cleanWeeklyQuiz',
+  cronTestController.cleanWeeklyQuiz,
+);
 
-cronTestRouter.post('/test/makeQuizLiveTest', cronTestController.makeQuizLiveTest);
+cronTestRouter.post(
+  '/test/makeQuizLiveTest',
+  cronTestController.makeQuizLiveTest,
+);
 
 export default cronTestRouter;

@@ -70,7 +70,7 @@ export const validateQuestionMakerForm = (question) => {
     }
   }
 
-  return {errors: errors, error: Object.keys(errors).length === 0};
+  return { errors: errors, error: Object.keys(errors).length === 0 };
 };
 
 export const mergeUserAnswersAndCorrectAnswers = (
@@ -89,6 +89,21 @@ export const mergeUserAnswersAndCorrectAnswers = (
   });
 };
 
+export const convertToReadableFormat = (utcTimestamp) => {
+  const date = new Date(utcTimestamp);
+  const options = {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: true,
+    timeZoneName: 'short',
+  };
+  return date.toLocaleString('en-US', options);
+};
+
 export const getMonthAndYear = () => {
   const today = new Date();
   const month = today.getMonth() + 1;
@@ -101,7 +116,7 @@ export const getPreviousMonthAndYear = () => {
 
   let pMonth = today.getMonth();
   let pYear = today.getFullYear();
-  
+
   return [pMonth, pYear];
 };
 
@@ -111,7 +126,7 @@ export const daysUntilNextFriday = () => {
   const daysUntilFriday = (5 - dayOfWeek + 7) % 7 || 7;
 
   return daysUntilFriday;
-}
+};
 
 export const getMonth = (month) => {
   const months = [
@@ -129,17 +144,17 @@ export const getMonth = (month) => {
     'Dec',
   ];
   return months[month];
-}
+};
 
 export const getNextWeek = () => {
-    const today = new Date();
-    today.setDate(today.getDate() + 7);
-    const year = today.getFullYear();
-    const week = Math.ceil(
-      ((today - new Date(year, 0, 1)) / 86400000 +
-        new Date(year, 0, 1).getDay() +
-        1) /
-        7,
-    );
-    return `${year}-W${week.toString().padStart(2, '0')}`;
-  };
+  const today = new Date();
+  today.setDate(today.getDate() + 7);
+  const year = today.getFullYear();
+  const week = Math.ceil(
+    ((today - new Date(year, 0, 1)) / 86400000 +
+      new Date(year, 0, 1).getDay() +
+      1) /
+      7,
+  );
+  return `${year}-W${week.toString().padStart(2, '0')}`;
+};

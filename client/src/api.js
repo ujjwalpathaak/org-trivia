@@ -22,16 +22,19 @@ export const registerRequest = async (formData) => {
 };
 
 export const getPastQuizResults = async (employeeId) => {
-  const response = await fetch(`${BACKEND_URL}/employee/quizzes/results/${employeeId}`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
+  const response = await fetch(
+    `${BACKEND_URL}/employee/quizzes/results/${employeeId}`,
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
     },
-  });
+  );
 
   return await response.json();
-}
+};
 
 export const getAnalytics = async (orgId) => {
   const response = await fetch(`${BACKEND_URL}/org/analytics/${orgId}`, {
@@ -43,7 +46,7 @@ export const getAnalytics = async (orgId) => {
   });
 
   return await response.json();
-}
+};
 
 export const getEmployeeDetails = async (employeeId) => {
   const response = await fetch(BACKEND_URL + `/employee/${employeeId}`, {
@@ -55,7 +58,7 @@ export const getEmployeeDetails = async (employeeId) => {
   });
 
   return await response.json();
-}
+};
 
 export const getAllOrgs = async () => {
   const response = await fetch(BACKEND_URL + '/org', {
@@ -74,7 +77,7 @@ export const createNewQuestion = async (formData, employeeId) => {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({question: formData, employeeId: employeeId}),
+      body: JSON.stringify({ question: formData, employeeId: employeeId }),
     });
 
     if (!response.ok) {

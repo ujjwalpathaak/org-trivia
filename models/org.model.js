@@ -24,7 +24,7 @@ const questionSchema = new mongoose.Schema(
       enum: ['AI', 'Employee'],
       required: true,
       default: 'AI',
-    }
+    },
   },
   { _id: false },
 );

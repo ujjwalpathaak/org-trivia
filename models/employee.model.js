@@ -16,7 +16,7 @@ const badgeSchema = new mongoose.Schema(
       type: Date,
       default: new Date(),
       required: true,
-    }
+    },
   },
   { _id: false },
 );

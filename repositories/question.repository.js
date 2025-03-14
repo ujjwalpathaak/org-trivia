@@ -37,9 +37,14 @@ class QuestionRepository {
   }
 
   async saveWeeklyQuizQuestions(quizId, newQuestions) {
-    await Quiz.updateOne({_id: new ObjectId(quizId)}, {$set: {
-      status: 'unapproved'
-    }})
+    await Quiz.updateOne(
+      { _id: new ObjectId(quizId) },
+      {
+        $set: {
+          status: 'unapproved',
+        },
+      },
+    );
     return WeeklyQuestion.insertMany(newQuestions);
   }
 
@@ -54,33 +59,33 @@ class QuestionRepository {
   async getExtraEmployeeQuestions(orgId, quizId, genre) {
     return Org.aggregate([
       {
-        $match: { _id: new ObjectId(orgId) }
+        $match: { _id: new ObjectId(orgId) },
       },
       {
-        $unwind: '$questionsPnA'
+        $unwind: '$questionsPnA',
       },
       {
         $match: {
           'questionsPnA.isUsed': false,
-          'questionsPnA.source': 'Employee'
-        }
+          'questionsPnA.source': 'Employee',
+        },
       },
       {
         $lookup: {
           from: 'questions',
           localField: 'questionsPnA.questionId',
           foreignField: '_id',
-          as: 'questionDetails'
-        }
+          as: 'questionDetails',
+        },
       },
       {
-        $unwind: '$questionDetails'
+        $unwind: '$questionDetails',
       },
       {
         $replaceRoot: {
-          newRoot: '$questionDetails'
-        }
-      }
+          newRoot: '$questionDetails',
+        },
+      },
     ]);
   }
 

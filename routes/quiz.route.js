@@ -6,11 +6,21 @@ import QuizController from '../controllers/quiz.controller.js';
 const quizController = new QuizController();
 const quizRouter = express.Router();
 
-quizRouter.get('/status/:orgId/:employeeId', protectRoute,  checkRole('Employee'), quizController.isWeeklyQuizLive);
+quizRouter.get(
+  '/status/:orgId/:employeeId',
+  protectRoute,
+  checkRole('Employee'),
+  quizController.isWeeklyQuizLive,
+);
 
 quizRouter.post('/weekly/lambda/callback', quizController.handleLambdaCallback);
 
-quizRouter.post('/approve/:orgId', protectRoute, checkRole('Admin'), quizController.approveWeeklyQuizQuestions);
+quizRouter.post(
+  '/approve/:orgId',
+  protectRoute,
+  checkRole('Admin'),
+  quizController.approveWeeklyQuizQuestions,
+);
 
 quizRouter.get(
   '/questions/:orgId',

@@ -50,7 +50,7 @@ class ResultService {
       userAnswers,
       correctAnswers,
     );
-    
+
     await this.employeeRepository.updateWeeklyQuizScore(
       quizId,
       employeeId,

@@ -38,7 +38,7 @@ class AuthRepository {
 
     return isMatch;
   }
-  
+
   generateToken(user) {
     return jwt.sign({ id: user._id, user: user }, process.env.JWT_SECRET, {
       expiresIn: '7d',

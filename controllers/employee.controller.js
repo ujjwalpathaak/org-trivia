@@ -20,7 +20,7 @@ class EmployeeController {
     }
   }
 
-  async getEmployeeDetails(req, res, next){
+  async getEmployeeDetails(req, res, next) {
     try {
       const { employeeId } = req.params;
       if (!employeeId) {
@@ -50,10 +50,11 @@ class EmployeeController {
     }
   }
 
-  async getPastQuizResults(req , res, next) {
+  async getPastQuizResults(req, res, next) {
     try {
       const { employeeId } = req.params;
-      const pastQuizResults = await employeeService.getPastQuizResults(employeeId);
+      const pastQuizResults =
+        await employeeService.getPastQuizResults(employeeId);
 
       res.status(200).json(pastQuizResults);
     } catch (error) {

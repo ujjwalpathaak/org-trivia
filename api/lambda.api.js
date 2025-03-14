@@ -3,7 +3,13 @@ import dotenv from 'dotenv';
 
 const API_GATEWAY_URL = process.env.API_GATEWAY_URL;
 
-export const fetchNewCAnITQuestions = (orgName, orgIndustry, orgCountry, orgId, quizId) => {
+export const fetchNewCAnITQuestions = (
+  orgName,
+  orgIndustry,
+  orgCountry,
+  orgId,
+  quizId,
+) => {
   fetch(API_GATEWAY_URL + '/generateCAnIT_Questions', {
     method: 'POST',
     headers: {

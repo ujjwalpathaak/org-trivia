@@ -24,7 +24,10 @@ class QuestionService {
       newQuestion,
       orgId,
     );
-    await this.employeeRepository.addSubmittedQuestion(newQuestion._id, employeeId);
+    await this.employeeRepository.addSubmittedQuestion(
+      newQuestion._id,
+      employeeId,
+    );
     if (!newQuestion || !addedToList) return false;
 
     return true;
@@ -61,11 +64,7 @@ class QuestionService {
     switch (genre) {
       case 'PnA':
         console.log('starting PnA');
-        fetchNewPnAQuestions(
-          element.name,
-          element._id,
-          quizId,
-        );
+        fetchNewPnAQuestions(element.name, element._id, quizId);
         break;
 
       case 'HRD':
@@ -103,7 +102,7 @@ class QuestionService {
       return {
         questionId: new ObjectId(question._id),
         isUsed: false,
-        ...(file && {file: file})
+        ...(file && { file: file }),
       };
     });
   }
@@ -154,14 +153,20 @@ class QuestionService {
     return await this.questionRepository.addQuestions(refactoredQuestions);
   }
 
-  async addLambdaCallbackQuestions(newQuestions, category, orgId, quizId, file) {
+  async addLambdaCallbackQuestions(
+    newQuestions,
+    category,
+    orgId,
+    quizId,
+    file,
+  ) {
     const questions = await this.pushQuestionsToDatabase(
       newQuestions,
       category,
     );
 
     await this.pushQuestionsInOrg(questions, category, orgId, file);
-    if(quizId) await this.pushQuestionsForApprovals(questions, orgId, quizId);
+    if (quizId) await this.pushQuestionsForApprovals(questions, orgId, quizId);
   }
 
   async validateEmployeeQuestionSubmission(question) {

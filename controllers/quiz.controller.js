@@ -69,13 +69,13 @@ class QuizController {
         next(new Error('Invalid request body'));
         return;
       }
-      
+
       await questionService.addLambdaCallbackQuestions(
         questions,
         category,
         orgId,
         quizId,
-        file
+        file,
       );
 
       res.status(200).json({ message: 'Scheduled new questions' });

@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import { useDrag, useDrop, DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
+import { GripHorizontal } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { saveGenreSettings } from '../api';
 
@@ -9,8 +10,8 @@ const ItemType = 'GENRE';
 export default function ListManager({ orgId, selectedGenre }) {
   const allItems = [
     { key: 'Puzzles and Aptitude', value: 'PnA' },
-    { key: 'Company Achievements and Industry Trends', value: 'CAnIT' },
-    { key: 'Human Resource Documentation', value: 'HRD' },
+    { key: 'Company Achievements', value: 'CAnIT' },
+    { key: 'HR Docs', value: 'HRD' },
   ];
 
   const getGenreFullName = (value) =>
@@ -92,11 +93,11 @@ export default function ListManager({ orgId, selectedGenre }) {
         </div>
 
         <div>
-          <h3 className="font-semibold inline mr-2 text-gray-800">
+          <h3 className="font-semibold mr-2 text-gray-800">
             Selected Genres
           </h3>
           <span className="text-sm italic text-gray-400">
-            {`(Drag and Drop)`}
+            {`(Drag and Drop to Reorder)`}
           </span>
           <ul className="space-y-3 mt-4">
             {selectedItems.length === 0 && (
@@ -164,7 +165,10 @@ function DraggableGenre({ item, index, moveItem, removeItem }) {
       }`}
     >
       <div className="flex justify-between items-center">
-        <span className="text-gray-700">{item.key}</span>
+        <div className="flex">
+          <GripHorizontal className="text-gray-500 mr-2 w-5 cursor-move" />
+          <span className="text-gray-700">{item.key}</span>
+        </div>
         <button
           onClick={() => removeItem(item)}
           className="ml-4 text-red-500 hover:text-red-600 hover:scale-110 transition-all"

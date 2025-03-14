@@ -5,7 +5,12 @@ import QuestionController from '../controllers/question.controller.js';
 const questionController = new QuestionController();
 const questionRouter = express.Router();
 
-questionRouter.post('/', protectRoute, checkRole('Employee'), questionController.addQuestion);
+questionRouter.post(
+  '/',
+  protectRoute,
+  checkRole('Employee'),
+  questionController.addQuestion,
+);
 
 questionRouter.get(
   '/weekly/unapproved/:orgId',
