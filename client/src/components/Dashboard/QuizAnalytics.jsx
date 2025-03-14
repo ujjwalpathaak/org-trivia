@@ -41,18 +41,21 @@ export default function QuizAnalytics({ analytics }) {
             <Users className="h-5 w-5 text-blue-500" />
             Participation Overview
           </h4>
-
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={quizData}>
-              <XAxis dataKey="category" />
-              <YAxis />
-              <Tooltip />
-              <Bar dataKey="participants" fill="#3b82f6" />
-            </BarChart>
-          </ResponsiveContainer>
+          {quizData?.length === 0 ? (
+            <span>No data found!</span>
+          ) : (
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={quizData}>
+                <XAxis dataKey="category" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="participants" fill="#3b82f6" />
+              </BarChart>
+            </ResponsiveContainer>
+          )}
         </div>
       </div>
-
+      {/* 
       <div className="bg-white rounded-lg p-6 pb-0 h-fit shadow">
         <div className="flex gap-4">
           <Activity className="h-10 w-10 text-green-500" />
@@ -79,7 +82,7 @@ export default function QuizAnalytics({ analytics }) {
             <Tooltip />
           </PieChart>
         </ResponsiveContainer>
-      </div>
+      </div> */}
     </div>
   );
 }

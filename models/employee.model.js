@@ -46,9 +46,14 @@ const employeeSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    lastQuizDate: {
-      type: Date,
-      default: () => new Date().setHours(0, 0, 0, 0),
+    lastQuizGiven: {
+      type: Boolean,
+      default: false,
+    },
+    idLastGivenQuiz: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Quiz',
+      default: null,
     },
     role: {
       type: String,

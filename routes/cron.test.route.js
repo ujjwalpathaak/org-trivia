@@ -5,17 +5,17 @@ const cronTestController = new CronTestController();
 const cronTestRouter = express.Router();
 
 cronTestRouter.post(
-  '/startPnAWorkflow/:orgId',
+  '/test/startPnAWorkflow/:orgId',
   cronTestController.startPnAWorkflow,
 );
 
 cronTestRouter.post(
-  '/startCAnITWorkflow/:orgId',
+  '/test/startCAnITWorkflow/:orgId',
   cronTestController.startCAnITWorkflow,
 );
 
-cronTestRouter.post('/cleanWeeklyQuiz', cronTestController.cleanWeeklyQuiz);
+cronTestRouter.post('/test/cleanWeeklyQuiz', cronTestController.cleanWeeklyQuiz);
 
-cronTestRouter.post('/makeQuizLiveTest', cronTestController.makeQuizLiveTest);
+cronTestRouter.post('/test/makeQuizLiveTest', cronTestController.makeQuizLiveTest);
 
 export default cronTestRouter;

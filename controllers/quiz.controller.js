@@ -62,23 +62,21 @@ class QuizController {
     }
   }
 
-  // ---------------------------------------------------------
-
   async handleLambdaCallback(req, res, next) {
     try {
-      const { questions, orgId, category, quizId } = req.body;
-      if (!questions || !orgId || !category || !quizId) {
+      const { questions, orgId, category, quizId, file } = req.body;
+      if (!questions || !orgId || !category) {
         next(new Error('Invalid request body'));
         return;
       }
-
-      if (category === 'CAnIT')
-        await questionService.addLambdaCallbackCAnITQuestions(
-          questions,
-          category,
-          orgId,
-          quizId,
-        );
+      
+      await questionService.addLambdaCallbackQuestions(
+        questions,
+        category,
+        orgId,
+        quizId,
+        file
+      );
 
       res.status(200).json({ message: 'Scheduled new questions' });
     } catch (error) {

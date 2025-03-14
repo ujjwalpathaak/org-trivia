@@ -7,28 +7,9 @@ import { getNextWeek } from '../utils.js';
 import { useOrgId } from '../context/auth.context.jsx';
 
 export default function ScheduleQuestions() {
-  const [aiQuestions, setAiQuestions] = useState([
-    {
-      question:
-        "One morning, Udai and Vishal were facing each other at a crossing. If Vishal's shadow was exactly to the left of Udai, which direction was Udai facing?",
-      options: ['Option 1', 'Option 2'],
-      answer: 'Option 1',
-    },
-    {
-      question:
-        'A Google employee receives ₹480 as expense reimbursement in ₹1, ₹5, and ₹10 notes. The number of notes of each denomination is the same. What is the total number of notes the employee received?',
-      options: ['Option A', 'Option B'],
-      answer: 'Option B',
-    },
-  ]);
+  const [aiQuestions, setAiQuestions] = useState([]);
 
-  const [empQuestions, setEmpQuestions] = useState([
-    {
-      question: 'How many triangles are present in the given diagram?',
-      options: ['Yes', 'No'],
-      answer: 'Yes',
-    },
-  ]);
+  const [empQuestions, setEmpQuestions] = useState([]);
 
   const [addQuestion, setAddQuestion] = useState(false);
   const [removedQuestionIndex, setRemovedQuestionIndex] = useState(-1);
@@ -50,6 +31,8 @@ export default function ScheduleQuestions() {
         return;
       }
       setQuestions(response.data.weeklyUnapprovedQuestions);
+      // setAiQuestions(response.data.
+      setEmpQuestions(response.data.extraEmployeeQuestions);
     };
 
     getQuestionsToApproveFunc();
@@ -113,11 +96,16 @@ export default function ScheduleQuestions() {
                   AI Questions
                 </h3>
                 <div className="space-y-2">
+                  {aiQuestions?.length === 0 && (
+                    <span className="italic text-slate-400">
+                      No extra questions found
+                    </span>
+                  )}
                   {aiQuestions?.map((q, idx) => (
                     <button
                       key={idx}
                       onClick={() => selectQuestion(q)}
-                      className="w-full text-left p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition duration-200 border border-gray-100"
+                      className="w-full text-left p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition duration-200 border border-gray-200"
                     >
                       {q.question}
                     </button>
@@ -130,11 +118,16 @@ export default function ScheduleQuestions() {
                   Employee Questions
                 </h3>
                 <div className="space-y-2">
+                  {empQuestions.length === 0 && (
+                    <span className="italic text-slate-400">
+                      No extra questions found
+                    </span>
+                  )}
                   {empQuestions?.map((q, idx) => (
                     <button
                       key={idx}
                       onClick={() => selectQuestion(q)}
-                      className="w-full text-left p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition duration-200 border border-gray-100"
+                      className="w-full text-left p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition duration-200 border border-gray-200"
                     >
                       {q.question}
                     </button>
@@ -186,7 +179,7 @@ export default function ScheduleQuestions() {
                       onChange={(e) =>
                         handleQuestionChangeType(idx, e.target.value)
                       }
-                      className="w-full p-4 border border-gray-200 rounded-lg mb-4 focus:ring-2 focus:ring-blue-500 focus:border-transparent min-h-[150px]"
+                      className="w-full p-4 border border-gray-200 rounded-lg mb-4 focus:ring-2 focus:ring-blue-500 focus:border-transparent min-h-[100px]"
                     />
                     {q.question?.image && (
                       <img

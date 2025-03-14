@@ -13,8 +13,18 @@ const questionSchema = new mongoose.Schema(
     },
     category: {
       type: String,
-      required: true,
+      default: null,
     },
+    file: {
+      type: String,
+      default: null,
+    },
+    source: {
+      type: String,
+      enum: ['AI', 'Employee'],
+      required: true,
+      default: 'AI',
+    }
   },
   { _id: false },
 );

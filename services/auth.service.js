@@ -41,6 +41,7 @@ class AuthService {
       password,
       user.password,
     );
+    
     if (!isMatch) {
       return { status: 401, data: { message: 'Invalid password' } };
     }

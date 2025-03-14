@@ -43,52 +43,19 @@ class QuestionController {
           .status(404)
           .json({ message: 'No questions scheduled till now' });
 
-      const [
-        weeklyUnapprovedQuestions,
-        extraAIQuestions,
-        extraEmployeeQuestions,
-      ] = await Promise.all([
-        questionService.getWeeklyUnapprovedQuestions(orgId, upcomingQuiz._id),
-        questionService.getExtraAIQuestions(
-          orgId,
-          upcomingQuiz._id,
-          upcomingQuiz.genre,
-        ),
-        questionService.getExtraEmployeeQuestions(
-          orgId,
-          upcomingQuiz._id,
-          upcomingQuiz.genre,
-        ),
-      ]);
+      const weeklyUnapprovedQuestions = await questionService.getWeeklyUnapprovedQuestions(orgId, upcomingQuiz._id);
+      const extraEmployeeQuestions = await questionService.getExtraEmployeeQuestions(
+        orgId,
+        upcomingQuiz._id,
+        upcomingQuiz.genre,
+      );
 
       if (!weeklyUnapprovedQuestions)
         return res
           .status(404)
           .json({ message: 'No questions scheduled till now' });
 
-      res.status(200).json({
-        weeklyUnapprovedQuestions: weeklyUnapprovedQuestions,
-        extraAIQuestions: extraAIQuestions,
-        extraEmployeeQuestions: extraEmployeeQuestions,
-      });
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  async saveHRdocQuestions(req, res, next) {
-    try {
-      const { orgId, questions } = req.body;
-      if (!orgId || !questions) {
-        return res.status(400).json({ message: 'Missing required fields' });
-      }
-
-      const response = await questionService.saveHRdocQuestions(
-        orgId,
-        questions,
-      );
-
-      res.status(200).json(response);
+      res.status(200).json({weeklyUnapprovedQuestions, extraEmployeeQuestions});
     } catch (error) {
       next(error);
     }

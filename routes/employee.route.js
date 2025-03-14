@@ -10,7 +10,8 @@ employeeRouter.get(
   checkRole('Admin'),
   employeeController.getAllOrgEmployeesByOrgId,
 );
-employeeRouter.get('/score/:employeeId', employeeController.fetchEmployeeScore);
-employeeRouter.get('/:employeeId', employeeController.getEmployeeDetails);
+employeeRouter.get('/score/:employeeId',checkRole('Employee'), employeeController.fetchEmployeeScore);
+employeeRouter.get('/:employeeId',checkRole('Employee'), employeeController.getEmployeeDetails);
+employeeRouter.get('/quizzes/results/:employeeId',checkRole('Employee'), employeeController.getPastQuizResults);
 
 export default employeeRouter;

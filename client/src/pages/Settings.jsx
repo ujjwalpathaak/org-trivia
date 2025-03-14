@@ -56,7 +56,7 @@ const Settings = () => {
             </button>
           </div>
           <hr></hr>
-          <h3 className="mb-2">Genres</h3>
+
           {settings && (
             <ListManager orgId={orgId} selectedGenre={settings.selectedGenre} />
           )}
