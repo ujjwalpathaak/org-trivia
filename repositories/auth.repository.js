@@ -1,10 +1,12 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+
 import Admin from '../models/admin.model.js';
 import Employee from '../models/employee.model.js';
-import Org from '../models/org.model.js';
 
-import { ObjectId } from 'mongodb';
+import OrgRepository from './org.repository.js';
+
+const orgRepository = new OrgRepository();
 
 class AuthRepository {
   async getUserByEmail(email) {
@@ -25,10 +27,7 @@ class AuthRepository {
       orgId,
     }).save();
 
-    await Org.updateOne(
-      { _id: new ObjectId(orgId) },
-      { $push: { [isAdmin ? 'admins' : 'employees']: newUser._id } },
-    );
+    await orgRepository.updateNewUserInOrg(orgId, isAdmin, newUser);
 
     return newUser;
   }

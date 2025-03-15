@@ -49,6 +49,24 @@ class QuizRepository {
     );
   }
 
+  async getUpcomingWeeklyQuiz(orgId) {
+    return Quiz.findOne({
+      orgId: new ObjectId(orgId),
+      status: 'unapproved',
+    });
+  }
+
+  async updateQuizStatus(quizId, status) {
+    return Quiz.updateOne(
+      { _id: new ObjectId(quizId) },
+      {
+        $set: {
+          status: status,
+        },
+      },
+    );
+  }
+
   async getLiveQuizByEmployeeId(employeeId) {
     return Quiz.findOne({
       employeeId: new ObjectId(employeeId),

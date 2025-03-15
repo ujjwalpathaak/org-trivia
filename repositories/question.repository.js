@@ -1,8 +1,13 @@
 import Question from '../models/question.model.js';
 import WeeklyQuestion from '../models/weeklyQuestion.model.js';
+
+import QuizRepository from './quiz.repository.js';
+import OrgRepository from './org.repository.js';
+
 import { ObjectId } from 'mongodb';
-import Quiz from '../models/quiz.model.js';
-import Org from '../models/org.model.js';
+
+const quizRepository = new QuizRepository();
+const orgRepository = new OrgRepository();
 
 class QuestionRepository {
   async saveQuestion(newQuestion) {
@@ -13,38 +18,23 @@ class QuestionRepository {
     return Question.insertMany(newQuestions);
   }
 
-    async getApprovedWeeklyQuizQuestion(orgId) {
-      return WeeklyQuestion.find({
-        orgId: new ObjectId(orgId),
-        isApproved: true,
-      })
-        .select({ 'question.answer': 0 })
-        .lean();
-    }
+  async getApprovedWeeklyQuizQuestion(orgId) {
+    return WeeklyQuestion.find({
+      orgId: new ObjectId(orgId),
+      isApproved: true,
+    })
+      .select({ 'question.answer': 0 })
+      .lean();
+  }
 
-    async dropWeeklyQuestionCollection() {
-      return WeeklyQuestion.deleteMany({});
-    }
+  async dropWeeklyQuestionCollection() {
+    return WeeklyQuestion.deleteMany({});
+  }
 
-    async updateWeeklyQuestionsStatusToApproved(idsOfQuestionsToApprove) {
-      return WeeklyQuestion.updateMany(
-        { 'question._id': { $in: idsOfQuestionsToApprove } },
-        { $set: { isApproved: true } },
-      );
-    }
-
-  async pushQuestionsInOrg(finalFormatedRefactoredQuestions, genre, orgId) {
-    const fieldName = `questions${genre}`;
-
-    return Org.updateMany(
-      { _id: new ObjectId(orgId) },
-      {
-        $push: {
-          [fieldName]: {
-            $each: finalFormatedRefactoredQuestions,
-          },
-        },
-      },
+  async updateWeeklyQuestionsStatusToApproved(idsOfQuestionsToApprove) {
+    return WeeklyQuestion.updateMany(
+      { 'question._id': { $in: idsOfQuestionsToApprove } },
+      { $set: { isApproved: true } },
     );
   }
 
@@ -57,56 +47,12 @@ class QuestionRepository {
   }
 
   async saveWeeklyQuizQuestions(quizId, newQuestions) {
-    await Quiz.updateOne(
-      { _id: new ObjectId(quizId) },
-      {
-        $set: {
-          status: 'unapproved',
-        },
-      },
-    );
+    await quizRepository.updateQuizStatus(quizId, 'unapproved');
     return WeeklyQuestion.insertMany(newQuestions);
   }
 
-  // move to quiz repo
-  async getUpcomingWeeklyQuiz(orgId) {
-    return Quiz.findOne({
-      orgId: new ObjectId(orgId),
-      status: 'unapproved',
-    });
-  }
-
   async getExtraEmployeeQuestions(orgId, quizId, genre) {
-    return Org.aggregate([
-      {
-        $match: { _id: new ObjectId(orgId) },
-      },
-      {
-        $unwind: '$questionsPnA',
-      },
-      {
-        $match: {
-          'questionsPnA.isUsed': false,
-          'questionsPnA.source': 'Employee',
-        },
-      },
-      {
-        $lookup: {
-          from: 'questions',
-          localField: 'questionsPnA.questionId',
-          foreignField: '_id',
-          as: 'questionDetails',
-        },
-      },
-      {
-        $unwind: '$questionDetails',
-      },
-      {
-        $replaceRoot: {
-          newRoot: '$questionDetails',
-        },
-      },
-    ]);
+    return orgRepository.fetchExtraEmployeeQuestions(orgId, quizId, genre);
   }
 
   async getWeeklyUnapprovedQuestions(quizId) {
@@ -114,46 +60,7 @@ class QuestionRepository {
   }
 
   async fetchHRDQuestions(orgId) {
-    return Org.aggregate([
-      {
-        $match: { _id: new ObjectId(orgId) },
-      },
-      {
-        $unwind: '$questionsHRD',
-      },
-      {
-        $match: { 'questionsHRD.isUsed': false },
-      },
-      {
-        $group: {
-          _id: '$questionsHRD.file',
-          questions: { $push: '$questionsHRD' },
-        },
-      },
-      {
-        $project: {
-          _id: 1,
-          questions: { $slice: ['$questions', 2] },
-        },
-      },
-      {
-        $unwind: '$questions',
-      },
-      {
-        $lookup: {
-          from: 'questions',
-          localField: 'questions.questionId',
-          foreignField: '_id',
-          as: 'questionDetails',
-        },
-      },
-      {
-        $unwind: '$questionDetails',
-      },
-      {
-        $replaceRoot: { newRoot: '$questionDetails' },
-      },
-    ]);
+    return orgRepository.fetchHRDQuestions(orgId);
   }
 }
 

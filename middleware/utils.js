@@ -29,3 +29,30 @@ export const getNextFridayDate = () => {
 
   return nextFriday;
 };
+
+export const getMonth = (month) => {
+  const months = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+  ];
+  return months[month];
+};
+
+export const calculateMultiplier = (updatedStreak) => {
+  switch (true) {
+    case updatedStreak >= 4:
+      return 1.5;
+    default:
+      return 1;
+  }
+};

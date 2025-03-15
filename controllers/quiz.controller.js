@@ -9,7 +9,7 @@ const quizService = new QuizService(
   new QuizRepository(),
   new EmployeeRepository(),
   new OrgRepository(),
-  new QuestionRepository()
+  new QuestionRepository(),
 );
 const questionService = new QuestionService(new QuestionRepository());
 
@@ -20,10 +20,8 @@ class QuizController {
       if (!orgId || !employeeId)
         return res.status(404).json({ message: 'Missing organizationId' });
 
-      const isWeeklyQuizLiveAndNotGiven = await quizService.isWeeklyQuizLiveAndNotGiven(
-        orgId,
-        employeeId,
-      );
+      const isWeeklyQuizLiveAndNotGiven =
+        await quizService.isWeeklyQuizLiveAndNotGiven(orgId, employeeId);
 
       res.status(200).json(isWeeklyQuizLiveAndNotGiven);
     } catch (error) {

@@ -1,7 +1,12 @@
-import Badge from '../models/badge.model.js';
-import Employee from '../models/employee.model.js';
 import Leaderboard from '../models/leaderboard.model.js';
+
 import { ObjectId } from 'mongodb';
+
+import EmployeeRepository from './employee.repository.js';
+import BadgeRepository from './badge.repository.js';
+
+const employeeRepository = new EmployeeRepository();
+const badgeRepository = new BadgeRepository();
 
 class LeaderboardRepository {
   async updateLeaderboard(orgId, employeeId, score, month, year) {
@@ -58,33 +63,51 @@ class LeaderboardRepository {
     ]);
   }
 
-  async addBadgesToEmployees(employeeId, badgeId, month, year) {
-    const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
-
-    return Employee.updateOne(
-      { _id: new ObjectId(employeeId) },
+  async getLast3Leaderboards(orgId) {
+    return Leaderboard.aggregate([
+      { $match: { orgId: new ObjectId(orgId) } },
       {
-        $push: {
-          badges: {
-            badgeId: new ObjectId(badgeId),
-            description: `${months[month]} ${year}`,
+        $group: {
+          _id: { month: '$month', year: '$year' },
+          leaderboard: { $push: '$$ROOT' },
+        },
+      },
+      { $sort: { '_id.year': -1, '_id.month': -1 } },
+      { $limit: 3 },
+      { $skip: 1 },
+      { $unwind: '$leaderboard' },
+      {
+        $lookup: {
+          from: 'employees',
+          localField: 'leaderboard.employeeId',
+          foreignField: '_id',
+          as: 'employeeDetails',
+        },
+      },
+      { $unwind: '$employeeDetails' },
+      { $sort: { 'leaderboard.totalScore': -1 } },
+      {
+        $group: {
+          _id: { month: '$_id.month', year: '$_id.year' },
+          employees: {
+            $push: {
+              employeeId: '$leaderboard.employeeId',
+              name: '$employeeDetails.name',
+              totalScore: '$leaderboard.totalScore',
+            },
           },
         },
       },
-    );
+
+      {
+        $project: {
+          _id: 0,
+          month: '$_id.month',
+          year: '$_id.year',
+          employees: { $slice: ['$employees', 3] },
+        },
+      },
+    ]);
   }
 
   async resetLeaderboard(month, year, pMonth, pYear) {
@@ -106,27 +129,27 @@ class LeaderboardRepository {
       },
     ]);
 
-    const goldBadge = await Badge.findOne({ rank: 'Gold' });
-    const silverBadge = await Badge.findOne({ rank: 'Silver' });
-    const bronzeBadge = await Badge.findOne({ rank: 'Bronze' });
+    const goldBadge = await badgeRepository.findBadgeByRank('Gold');
+    const silverBadge = await badgeRepository.findBadgeByRank('Silver');
+    const bronzeBadge = await badgeRepository.findBadgeByRank('Bronze');
 
     for (const { orgId, topEmployees } of topThreePerOrg) {
       if (topEmployees[0])
-        await this.addBadgesToEmployees(
+        await employeeRepository.addBadgesToEmployees(
           topEmployees[0].employeeId,
           goldBadge._id,
           pMonth,
           pYear,
         );
       if (topEmployees[1])
-        await this.addBadgesToEmployees(
+        await employeeRepository.addBadgesToEmployees(
           topEmployees[1].employeeId,
           silverBadge._id,
           pMonth,
           pYear,
         );
       if (topEmployees[2])
-        await this.addBadgesToEmployees(
+        await employeeRepository.addBadgesToEmployees(
           topEmployees[2].employeeId,
           bronzeBadge._id,
           pMonth,
@@ -134,7 +157,7 @@ class LeaderboardRepository {
         );
     }
 
-    await Employee.updateMany({}, { $set: { score: 0 } });
+    await employeeRepository.resetAllEmployeesScores();
 
     const uniqueCombinations = await Leaderboard.aggregate([
       {

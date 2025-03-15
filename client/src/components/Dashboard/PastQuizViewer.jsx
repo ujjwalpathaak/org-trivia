@@ -1,5 +1,12 @@
 import React from 'react';
-import { ListChecks, Calendar, Timer, Trophy, TrendingUp, Coins } from 'lucide-react';
+import {
+  ListChecks,
+  Calendar,
+  Timer,
+  Trophy,
+  TrendingUp,
+  Coins,
+} from 'lucide-react';
 
 const PastQuizViewer = ({ pastQuizzes, setIsPastQuizViewerOpen }) => {
   return (
@@ -42,7 +49,6 @@ const PastQuizViewer = ({ pastQuizzes, setIsPastQuizViewerOpen }) => {
                   </p>
                 </div>
                 <div>
-
                   {/* Right Side: Score */}
                   <div className="flex items-center text-blue-600 font-medium">
                     <Coins size={20} className="text-green-500 mr-2" />

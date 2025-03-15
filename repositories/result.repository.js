@@ -1,4 +1,5 @@
 import Result from '../models/result.model.js';
+
 import { ObjectId } from 'mongodb';
 class ResultRepository {
   async submitWeeklyQuizAnswers(
@@ -23,6 +24,18 @@ class ResultRepository {
       genre: genre,
       answers: mergedUserAnswersAndCorrectAnswers,
     });
+  }
+
+  async getParticipationByGenre(orgId) {
+    return Result.aggregate([
+      { $match: { orgId: new ObjectId(orgId) } },
+      {
+        $group: {
+          _id: '$genre',
+          count: { $sum: 1 },
+        },
+      },
+    ]);
   }
 
   async getEmployeePastResults(employeeId) {

@@ -23,7 +23,7 @@ export const registerRequest = async (formData) => {
 
 export const getPastQuizResults = async (employeeId) => {
   const response = await fetch(
-    `${BACKEND_URL}/employee/quizzes/results/${employeeId}`,
+    `${BACKEND_URL}/results/employee/${employeeId}`,
     {
       method: 'GET',
       headers: {

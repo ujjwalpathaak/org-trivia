@@ -1,8 +1,12 @@
-import Leaderboard from '../models/leaderboard.model.js';
 import Org from '../models/org.model.js';
 
 import { ObjectId } from 'mongodb';
-import Result from '../models/result.model.js';
+
+import LeaderboardRepository from './leaderboard.respository.js';
+import ResultRepository from './result.repository.js';
+
+const resultRepository = new ResultRepository();
+const leaderboardRepository = new LeaderboardRepository();
 
 class OrgRepository {
   async updateQuestionsStatusInOrgToUsed(
@@ -100,6 +104,14 @@ class OrgRepository {
     return true;
   }
 
+  async updateNewUserInOrg(orgId, isAdmin, newUser) {
+    const fieldName = isAdmin ? 'admins' : 'employees';
+    return Org.updateOne(
+      { _id: new ObjectId(orgId) },
+      { $push: { [fieldName]: newUser._id } },
+    );
+  }
+
   async changeGenreSettings(genre, orgId) {
     return Org.updateOne(
       { _id: orgId },
@@ -134,61 +146,102 @@ class OrgRepository {
     );
   }
 
-  async getAnalytics(orgId) {
-    const participationByGenre = await Result.aggregate([
-      { $match: { orgId: new ObjectId(orgId) } },
+  async fetchHRDQuestions(orgId) {
+    return Org.aggregate([
+      {
+        $match: { _id: new ObjectId(orgId) },
+      },
+      {
+        $unwind: '$questionsHRD',
+      },
+      {
+        $match: { 'questionsHRD.isUsed': false },
+      },
       {
         $group: {
-          _id: '$genre',
-          count: { $sum: 1 },
+          _id: '$questionsHRD.file',
+          questions: { $push: '$questionsHRD' },
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          questions: { $slice: ['$questions', 2] },
+        },
+      },
+      {
+        $unwind: '$questions',
+      },
+      {
+        $lookup: {
+          from: 'questions',
+          localField: 'questions.questionId',
+          foreignField: '_id',
+          as: 'questionDetails',
+        },
+      },
+      {
+        $unwind: '$questionDetails',
+      },
+      {
+        $replaceRoot: { newRoot: '$questionDetails' },
+      },
+    ]);
+  }
+
+  async fetchExtraEmployeeQuestions(orgId, quizId, genre) {
+    return Org.aggregate([
+      {
+        $match: { _id: new ObjectId(orgId) },
+      },
+      {
+        $unwind: '$questionsPnA',
+      },
+      {
+        $match: {
+          'questionsPnA.isUsed': false,
+          'questionsPnA.source': 'Employee',
+        },
+      },
+      {
+        $lookup: {
+          from: 'questions',
+          localField: 'questionsPnA.questionId',
+          foreignField: '_id',
+          as: 'questionDetails',
+        },
+      },
+      {
+        $unwind: '$questionDetails',
+      },
+      {
+        $replaceRoot: {
+          newRoot: '$questionDetails',
         },
       },
     ]);
+  }
 
-    const last3Leaderboards = await Leaderboard.aggregate([
-      { $match: { orgId: new ObjectId(orgId) } },
+  async pushQuestionsInOrg(finalFormatedRefactoredQuestions, genre, orgId) {
+    const fieldName = `questions${genre}`;
+
+    return Org.updateMany(
+      { _id: new ObjectId(orgId) },
       {
-        $group: {
-          _id: { month: '$month', year: '$year' },
-          leaderboard: { $push: '$$ROOT' },
-        },
-      },
-      { $sort: { '_id.year': -1, '_id.month': -1 } },
-      { $limit: 3 },
-      { $skip: 1 },
-      { $unwind: '$leaderboard' },
-      {
-        $lookup: {
-          from: 'employees',
-          localField: 'leaderboard.employeeId',
-          foreignField: '_id',
-          as: 'employeeDetails',
-        },
-      },
-      { $unwind: '$employeeDetails' },
-      { $sort: { 'leaderboard.totalScore': -1 } },
-      {
-        $group: {
-          _id: { month: '$_id.month', year: '$_id.year' },
-          employees: {
-            $push: {
-              employeeId: '$leaderboard.employeeId',
-              name: '$employeeDetails.name',
-              totalScore: '$leaderboard.totalScore',
-            },
+        $push: {
+          [fieldName]: {
+            $each: finalFormatedRefactoredQuestions,
           },
         },
       },
+    );
+  }
 
-      {
-        $project: {
-          _id: 0,
-          month: '$_id.month',
-          year: '$_id.year',
-          employees: { $slice: ['$employees', 3] },
-        },
-      },
-    ]);
+  async getAnalytics(orgId) {
+    const participationByGenre = resultRepository.getParticipationByGenre(orgId);
+
+    const last3Leaderboards =
+      await leaderboardRepository.getLast3Leaderboards(orgId);
 
     return {
       participationByGenre,

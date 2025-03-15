@@ -10,10 +10,16 @@ import { ObjectId } from 'mongodb';
 const quizService = new QuizService(new QuizRepository());
 
 class QuestionService {
-  constructor(questionRepository, orgRepository, employeeRepository) {
+  constructor(
+    questionRepository,
+    orgRepository,
+    employeeRepository,
+    quizRepository,
+  ) {
     this.questionRepository = questionRepository;
     this.orgRepository = orgRepository;
     this.employeeRepository = employeeRepository;
+    this.quizRepository = quizRepository;
   }
 
   async saveQuestion(newQuestionData, employeeId) {
@@ -137,7 +143,7 @@ class QuestionService {
   async pushQuestionsInOrg(questions, genre, orgId, file) {
     const refactoredQuestions = this.formatQuestionsForOrgs(questions, file);
 
-    return await this.questionRepository.pushQuestionsInOrg(
+    return await this.orgRepository.pushQuestionsInOrg(
       refactoredQuestions,
       genre,
       orgId,
@@ -238,9 +244,9 @@ class QuestionService {
       message: 'Questions approved.',
     };
   }
-  
+
   async getUpcomingWeeklyQuizByOrgId(orgId) {
-    return this.questionRepository.getUpcomingWeeklyQuiz(orgId);
+    return this.quizRepository.getUpcomingWeeklyQuiz(orgId);
   }
 
   async getWeeklyUnapprovedQuestions(orgId, quizId) {

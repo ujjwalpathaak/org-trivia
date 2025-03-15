@@ -3,7 +3,12 @@ import { getNextFridayDate, getTodayDate } from '../middleware/utils.js';
 import { ObjectId } from 'mongodb';
 
 class QuizService {
-  constructor(quizRepository, employeeRepository, questionRepository, orgRepository) {
+  constructor(
+    quizRepository,
+    employeeRepository,
+    questionRepository,
+    orgRepository,
+  ) {
     this.quizRepository = quizRepository;
     this.employeeRepository = employeeRepository;
     this.questionRepository = questionRepository;
@@ -59,7 +64,7 @@ class QuizService {
   }
 
   async getUpcomingWeeklyQuizByOrgId(orgId) {
-    return this.questionRepository.getUpcomingWeeklyQuiz(orgId);
+    return this.quizRepository.getUpcomingWeeklyQuiz(orgId);
   }
 
   async cleanUpWeeklyQuiz() {
