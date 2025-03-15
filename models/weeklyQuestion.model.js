@@ -55,8 +55,7 @@ const questionSchema = new mongoose.Schema(
       type: Object,
       default: {},
     },
-  },
-  { timestamps: true },
+  }
 );
 
 const weeklyQuestionSchema = new mongoose.Schema(
@@ -78,8 +77,7 @@ const weeklyQuestionSchema = new mongoose.Schema(
       immutable: true,
       required: true,
     },
-  },
-  { timestamps: true },
+  }
 );
 
 const WeeklyQuestion = mongoose.model('WeeklyQuestion', weeklyQuestionSchema);

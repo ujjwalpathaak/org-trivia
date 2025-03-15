@@ -11,6 +11,13 @@ export const logService = (request, response, next) => {
   });
 };
 
+export const getTodayDate = () => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  return today;
+};
+
 export const getNextFridayDate = () => {
   const today = new Date();
   const dayOfWeek = today.getDay();

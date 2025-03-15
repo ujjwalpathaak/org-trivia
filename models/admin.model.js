@@ -30,8 +30,7 @@ const adminSchema = new mongoose.Schema(
       immutable: true,
       required: true,
     },
-  },
-  { timestamps: true },
+  }
 );
 
 const Admin = mongoose.model('Admin', adminSchema);

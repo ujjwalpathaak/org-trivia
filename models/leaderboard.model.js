@@ -28,8 +28,7 @@ const leaderboardSchema = new mongoose.Schema(
       min: 2025,
       max: 2100,
     },
-  },
-  { timestamps: true },
+  }
 );
 
 const Leaderboard = mongoose.model('Leaderboard', leaderboardSchema);

@@ -34,7 +34,7 @@ class ResultController {
     }
   }
 
-  async getEmployeePastRecords(req, res, next) {
+  async getEmployeePastResults(req, res, next) {
     try {
       const { employeeId } = req.params;
       if (!employeeId) {
@@ -42,7 +42,7 @@ class ResultController {
       }
 
       const pastRecords =
-        await resultService.getEmployeePastRecords(employeeId);
+        await resultService.getEmployeePastResults(employeeId);
 
       res.status(200).json(pastRecords);
     } catch (err) {

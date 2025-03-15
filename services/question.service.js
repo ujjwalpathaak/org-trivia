@@ -216,6 +216,29 @@ class QuestionService {
     );
   }
 
+  async approveWeeklyQuizQuestions(unapprovedQuestions, orgId) {
+    const idsOfQuestionsToApprove = unapprovedQuestions.map(
+      (q) => new ObjectId(q.question._id),
+    );
+
+    const quizId = unapprovedQuestions[0].quizId || null;
+    const category = unapprovedQuestions[0].question.category || null;
+
+    await this.orgRepository.updateQuestionsStatusInOrgToUsed(
+      orgId,
+      category,
+      idsOfQuestionsToApprove,
+    );
+    await this.quizRepository.updateQuizStatusToApproved(quizId);
+    await this.quizRepository.updateWeeklyQuestionsStatusToApproved(
+      idsOfQuestionsToApprove,
+    );
+
+    return {
+      message: 'Questions approved.',
+    };
+  }
+  
   async getUpcomingWeeklyQuizByOrgId(orgId) {
     return this.questionRepository.getUpcomingWeeklyQuiz(orgId);
   }
@@ -231,6 +254,20 @@ class QuestionService {
       await this.questionRepository.getCorrectWeeklyQuizAnswers(orgId);
 
     return correctWeeklyQuizAnswers.map((curr) => curr.question);
+  }
+
+  async getWeeklyQuizQuestions(orgId) {
+    const approvedWeeklyQuizQuestion =
+      await this.questionRepository.getApprovedWeeklyQuizQuestion(orgId);
+
+    const quizQuestions = approvedWeeklyQuizQuestion.map((ques) => {
+      return ques.question;
+    });
+
+    return {
+      weeklyQuizQuestions: quizQuestions || [],
+      quizId: approvedWeeklyQuizQuestion[0]?.quizId || null,
+    };
   }
 
   async startHRDWorkflow(orgId, quizId) {

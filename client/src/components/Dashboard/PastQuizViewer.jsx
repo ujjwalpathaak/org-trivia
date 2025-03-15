@@ -46,7 +46,7 @@ const PastQuizViewer = ({ pastQuizzes, setIsPastQuizViewerOpen }) => {
                   {/* Right Side: Score */}
                   <div className="flex items-center text-blue-600 font-medium">
                     <Coins size={20} className="text-green-500 mr-2" />
-                    {quiz.rawScore} Points
+                    {quiz.points} Points
                   </div>
                   <div className="flex items-center text-blue-600 font-medium">
                     <TrendingUp size={20} className="text-blue-500 mr-2" />

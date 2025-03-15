@@ -10,7 +10,7 @@ quizRouter.get(
   '/status/:orgId/:employeeId',
   protectRoute,
   checkRole('Employee'),
-  quizController.isWeeklyQuizLive,
+  quizController.isWeeklyQuizLiveAndNotGiven,
 );
 
 quizRouter.post('/weekly/lambda/callback', quizController.handleLambdaCallback);

@@ -109,10 +109,10 @@ const Sidebar = ({
                       <div className="flex items-center gap-2 text-gray-700">
                         <Coins className="h-5 w-5 text-green-500" />
                         <span className="text-lg font-semibold">
-                          {details?.employee?.points}
+                          {details?.employee?.score}
                         </span>
                       </div>
-                      <span className="text-sm text-gray-500">Points</span>
+                      <span className="text-sm text-gray-500">Score</span>
                     </div>
                   </div>
                   <div className="flex gap-2 w-full justify-end mt-8">

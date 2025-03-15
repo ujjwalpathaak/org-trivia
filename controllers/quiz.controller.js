@@ -9,26 +9,29 @@ const quizService = new QuizService(
   new QuizRepository(),
   new EmployeeRepository(),
   new OrgRepository(),
+  new QuestionRepository()
 );
 const questionService = new QuestionService(new QuestionRepository());
 
 class QuizController {
-  async isWeeklyQuizLive(req, res, next) {
+  async isWeeklyQuizLiveAndNotGiven(req, res, next) {
     try {
       const { orgId, employeeId } = req.params;
       if (!orgId || !employeeId)
         return res.status(404).json({ message: 'Missing organizationId' });
 
-      const isWeeklyQuizLive = await quizService.isWeeklyQuizLive(
+      const isWeeklyQuizLiveAndNotGiven = await quizService.isWeeklyQuizLiveAndNotGiven(
         orgId,
         employeeId,
       );
 
-      res.status(200).json(isWeeklyQuizLive);
+      res.status(200).json(isWeeklyQuizLiveAndNotGiven);
     } catch (error) {
       next(error);
     }
   }
+
+  //  ---------------------------------------------------------
 
   async getWeeklyQuizQuestions(req, res, next) {
     try {
@@ -38,7 +41,7 @@ class QuizController {
       }
 
       const weeklyQuizQuestions =
-        await quizService.getWeeklyQuizQuestions(orgId);
+        await questionService.getWeeklyQuizQuestions(orgId);
 
       res.status(200).json(weeklyQuizQuestions);
     } catch (error) {
@@ -54,7 +57,7 @@ class QuizController {
         return res.status(400).json({ message: 'Missing required fields' });
       }
 
-      await quizService.approveWeeklyQuizQuestions(questions, orgId);
+      await questionService.approveWeeklyQuizQuestions(questions, orgId);
 
       res.status(200).json({ message: 'Questions marked as approved' });
     } catch (error) {

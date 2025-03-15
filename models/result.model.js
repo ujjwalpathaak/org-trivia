@@ -36,7 +36,7 @@ const resultSchema = new mongoose.Schema(
       ref: 'Quiz',
       required: true,
     },
-    rawScore: {
+    points: {
       type: Number,
       required: true,
     },
@@ -60,8 +60,7 @@ const resultSchema = new mongoose.Schema(
       type: [answerSchema],
       default: [],
     },
-  },
-  { timestamps: true },
+  }
 );
 
 const Result = mongoose.model('Result', resultSchema);

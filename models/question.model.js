@@ -55,8 +55,7 @@ const questionSchema = new mongoose.Schema(
       type: Object,
       default: {},
     },
-  },
-  { timestamps: true },
+  }
 );
 
 const Question = mongoose.model('Question', questionSchema);

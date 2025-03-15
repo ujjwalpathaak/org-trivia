@@ -13,6 +13,26 @@ class QuestionRepository {
     return Question.insertMany(newQuestions);
   }
 
+    async getApprovedWeeklyQuizQuestion(orgId) {
+      return WeeklyQuestion.find({
+        orgId: new ObjectId(orgId),
+        isApproved: true,
+      })
+        .select({ 'question.answer': 0 })
+        .lean();
+    }
+
+    async dropWeeklyQuestionCollection() {
+      return WeeklyQuestion.deleteMany({});
+    }
+
+    async updateWeeklyQuestionsStatusToApproved(idsOfQuestionsToApprove) {
+      return WeeklyQuestion.updateMany(
+        { 'question._id': { $in: idsOfQuestionsToApprove } },
+        { $set: { isApproved: true } },
+      );
+    }
+
   async pushQuestionsInOrg(finalFormatedRefactoredQuestions, genre, orgId) {
     const fieldName = `questions${genre}`;
 

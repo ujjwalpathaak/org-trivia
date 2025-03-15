@@ -7,7 +7,7 @@ class ResultRepository {
     quizId,
     multiplier,
     score,
-    rawScore,
+    points,
     date,
     genre,
     mergedUserAnswersAndCorrectAnswers,
@@ -17,7 +17,7 @@ class ResultRepository {
       orgId: orgId,
       quizId: quizId,
       score: score,
-      rawScore: rawScore,
+      points: points,
       multiplier: multiplier,
       date: date,
       genre: genre,
@@ -25,7 +25,7 @@ class ResultRepository {
     });
   }
 
-  async getEmployeePastRecords(employeeId) {
+  async getEmployeePastResults(employeeId) {
     return Result.aggregate([
       { $match: { employeeId: new ObjectId(employeeId) } },
       { $sort: { date: -1 } },

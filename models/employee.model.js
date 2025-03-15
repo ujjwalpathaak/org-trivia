@@ -42,7 +42,7 @@ const employeeSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    points: {
+    score: {
       type: Number,
       default: 0,
     },

@@ -4,16 +4,14 @@ import { ObjectId } from 'mongodb';
 import Result from '../models/result.model.js';
 
 class EmployeeRepository {
-  async findEmployeeById(employeeId) {
-    return Employee.findOne({ _id: new ObjectId(employeeId) });
-  }
-
-  async didEmployeeGaveWeeklyQuiz(employeeId) {
+  async isWeeklyQuizGiven(employeeId) {
     return Employee.findOne(
       { _id: new ObjectId(employeeId) },
       { quizGiven: 1 },
     );
   }
+
+  // ---------------------------------
 
   async updateEmployeeStreaksAndMarkAllEmployeesAsQuizNotGiven() {
     await Employee.bulkWrite([
@@ -106,22 +104,22 @@ class EmployeeRepository {
     };
   }
 
-  async updateWeeklyQuizScore(quizId, employeeId, rawScore) {
+  async updateWeeklyQuizScore(quizId, employeeId, points) {
     const employee = await Employee.findOne(
       { _id: new ObjectId(employeeId) },
-      { streak: 1, points: 1 },
+      { streak: 1, score: 1 },
     );
 
     const multiplier = await this.newMultiplier(employee.streak);
 
-    const updatedScore = rawScore * multiplier;
+    const updatedScore = points * multiplier;
 
     await Employee.updateOne(
       { _id: new ObjectId(employeeId) },
       {
         $set: {
           quizGiven: true,
-          points: employee.points + updatedScore,
+          score: employee.score + updatedScore,
         },
       },
     );

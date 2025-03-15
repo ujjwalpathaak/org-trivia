@@ -28,8 +28,7 @@ const quizSchema = new mongoose.Schema(
       enum: ['PnA', 'CAnIT', 'HRD'],
       required: true,
     },
-  },
-  { timestamps: true },
+  }
 );
 
 const Quiz = mongoose.model('Quiz', quizSchema, 'quizzes');

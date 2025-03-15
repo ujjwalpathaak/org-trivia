@@ -36,8 +36,8 @@ class ResultService {
     return weeklyQuizScore;
   }
 
-  async getEmployeePastRecords(employeeId) {
-    return await this.resultRepository.getEmployeePastRecords(employeeId);
+  async getEmployeePastResults(employeeId) {
+    return await this.resultRepository.getEmployeePastResults(employeeId);
   }
 
   async submitWeeklyQuizAnswers(userAnswers, employeeId, orgId, quizId) {
@@ -46,7 +46,7 @@ class ResultService {
       quizId,
     );
 
-    const rawScore = await this.calculateWeeklyQuizScore(
+    const points = await this.calculateWeeklyQuizScore(
       userAnswers,
       correctAnswers,
     );
@@ -54,7 +54,7 @@ class ResultService {
     const data = await this.employeeRepository.updateWeeklyQuizScore(
       quizId,
       employeeId,
-      rawScore,
+      points,
     );
 
     const [month, year] = getMonthAndYear();
@@ -78,7 +78,7 @@ class ResultService {
       quizId,
       data.multiplier,
       data.score,
-      rawScore,
+      points,
       quiz.scheduledDate,
       quiz.genre,
       mergedUserAnswersAndCorrectAnswers,
@@ -87,7 +87,7 @@ class ResultService {
     return {
       multiplier: data.multiplier,
       score: data.score,
-      rawScore: rawScore,
+      points: points,
     };
   }
 

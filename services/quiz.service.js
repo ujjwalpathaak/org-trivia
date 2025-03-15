@@ -1,18 +1,19 @@
-import { getNextFridayDate } from '../middleware/utils.js';
+import { getNextFridayDate, getTodayDate } from '../middleware/utils.js';
 
 import { ObjectId } from 'mongodb';
 
 class QuizService {
-  constructor(quizRepository, employeeRepository, orgRepository) {
+  constructor(quizRepository, employeeRepository, questionRepository, orgRepository) {
     this.quizRepository = quizRepository;
     this.employeeRepository = employeeRepository;
+    this.questionRepository = questionRepository;
     this.orgRepository = orgRepository;
   }
 
-  async isWeeklyQuizLive(orgId, employeeId) {
+  async isWeeklyQuizLiveAndNotGiven(orgId, employeeId) {
     const [isWeeklyQuizLive, employee] = await Promise.all([
       this.quizRepository.findLiveQuizByOrgId(orgId),
-      this.employeeRepository.didEmployeeGaveWeeklyQuiz(employeeId),
+      this.employeeRepository.isWeeklyQuizGiven(employeeId),
     ]);
 
     if (isWeeklyQuizLive && !employee.quizGiven) return true;
@@ -40,12 +41,11 @@ class QuizService {
 
     if (!newWeeklyQuiz) return false;
 
-    return newWeeklyQuiz;
+    return { message: 'New Quiz Scheduled' };
   }
 
   async makeWeeklyQuizLive() {
-    const today = new Date();
-    today.setUTCHours(0, 0, 0, 0);
+    const today = getTodayDate();
 
     await this.quizRepository.makeWeeklyQuizLive(today);
 
@@ -58,53 +58,19 @@ class QuizService {
     return { message: 'All weekly quiz are live' };
   }
 
-  // move to ques service
-  async getWeeklyQuizQuestions(orgId) {
-    const approvedWeeklyQuizQuestion =
-      await this.quizRepository.getApprovedWeeklyQuizQuestion(orgId);
-
-    const quizQuestions = approvedWeeklyQuizQuestion.map((ques) => {
-      return ques.question;
-    });
-
-    return {
-      weeklyQuizQuestions: quizQuestions || [],
-      quizId: approvedWeeklyQuizQuestion[0]?.quizId || null,
-    };
+  async getUpcomingWeeklyQuizByOrgId(orgId) {
+    return this.questionRepository.getUpcomingWeeklyQuiz(orgId);
   }
 
   async cleanUpWeeklyQuiz() {
     await Promise.all([
       this.quizRepository.markAllQuizAsExpired(),
       this.employeeRepository.updateEmployeeStreaksAndMarkAllEmployeesAsQuizNotGiven(),
-      this.quizRepository.dropWeeklyQuizCollection(),
+      this.questionRepository.dropWeeklyQuestionCollection(),
     ]);
 
     return {
       message: 'Cleaned up weekly quiz.',
-    };
-  }
-
-  async approveWeeklyQuizQuestions(unapprovedQuestions, orgId) {
-    const idsOfQuestionsToApprove = unapprovedQuestions.map(
-      (q) => new ObjectId(q.question._id),
-    );
-
-    const quizId = unapprovedQuestions[0].quizId || null;
-    const category = unapprovedQuestions[0].question.category || null;
-
-    await this.orgRepository.updateQuestionsStatusInOrgToUsed(
-      orgId,
-      category,
-      idsOfQuestionsToApprove,
-    );
-    await this.quizRepository.updateQuizStatusToApproved(quizId);
-    await this.quizRepository.updateWeeklyQuestionsStatusToApproved(
-      idsOfQuestionsToApprove,
-    );
-
-    return {
-      message: 'Questions approved.',
     };
   }
 }
