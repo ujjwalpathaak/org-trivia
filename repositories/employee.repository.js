@@ -11,12 +11,31 @@ class EmployeeRepository {
   async didEmployeeGaveWeeklyQuiz(employeeId) {
     return Employee.findOne(
       { _id: new ObjectId(employeeId) },
-      { isQuizGiven: 1 },
+      { quizGiven: 1 },
     );
   }
 
-  async markAllEmployeesAsQuizNotGiven() {
-    return Employee.updateMany({}, { $set: { isQuizGiven: false } });
+  async updateEmployeeStreaksAndMarkAllEmployeesAsQuizNotGiven() {
+    await Employee.bulkWrite([
+      {
+        updateMany: {
+          filter: { quizGiven: true },
+          update: { $inc: { streak: 1 } },
+        },
+      },
+      {
+        updateMany: {
+          filter: { quizGiven: false },
+          update: { $set: { streak: 0 } },
+        },
+      },
+      {
+        updateMany: {
+          filter: {},
+          update: { $set: { quizGiven: false } },
+        },
+      },
+    ]);
   }
 
   async getPastQuizResults(employeeId) {
@@ -27,13 +46,6 @@ class EmployeeRepository {
 
   async getAllOrgEmployeesByOrgId(orgId) {
     return Employee.find({ orgId: new ObjectId(orgId) });
-  }
-
-  async getEmployeeScore(employeeId) {
-    return Employee.findOne(
-      { _id: new ObjectId(employeeId) },
-      { lastQuizScore: 1 },
-    );
   }
 
   async newMultiplier(updatedStreak) {
@@ -85,7 +97,7 @@ class EmployeeRepository {
     ]);
 
     const employee = await Employee.findOne({ _id: objectId });
-    const multiplier = await this.newMultiplier(employee.currentStreak);
+    const multiplier = await this.newMultiplier(employee.streak);
 
     return {
       employee,
@@ -94,34 +106,27 @@ class EmployeeRepository {
     };
   }
 
-  async updateWeeklyQuizScore(quizId, employeeId, updatedWeeklyQuizScore) {
+  async updateWeeklyQuizScore(quizId, employeeId, rawScore) {
     const employee = await Employee.findOne(
       { _id: new ObjectId(employeeId) },
-      { lastQuizGiven: 1, currentStreak: 1 },
+      { streak: 1, points: 1 },
     );
 
-    let updatedStreak = 0;
+    const multiplier = await this.newMultiplier(employee.streak);
 
-    if (employee.lastQuizGiven) {
-      updatedStreak = employee.currentStreak + 1;
-    }
+    const updatedScore = rawScore * multiplier;
 
-    const multi = await this.newMultiplier(updatedStreak);
-
-    updatedWeeklyQuizScore *= multi;
-
-    return Employee.updateOne(
+    await Employee.updateOne(
       { _id: new ObjectId(employeeId) },
       {
         $set: {
-          idLastGivenQuiz: new ObjectId(quizId),
-          isQuizGiven: true,
-          lastQuizGiven: true,
-          currentStreak: updatedStreak,
-          lastQuizScore: updatedWeeklyQuizScore,
+          quizGiven: true,
+          points: employee.points + updatedScore,
         },
       },
     );
+
+    return { multiplier: multiplier, score: updatedScore };
   }
 }
 

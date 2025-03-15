@@ -3,7 +3,15 @@ import QuestionMaker from '../../pages/QuestionMaker';
 import Quiz from '../../pages/Quiz';
 import BadgeViewer from './BadgeViewer';
 import PastQuizViewer from './PastQuizViewer';
-import { Share2, Image, Zap, MessageSquare, Gamepad2, TrendingUp, CalendarDays } from 'lucide-react';
+import {
+  Share2,
+  Image,
+  Zap,
+  MessageSquare,
+  Gamepad2,
+  TrendingUp,
+  CalendarDays,
+} from 'lucide-react';
 
 const MainContent = ({
   isBadgeViewerOpen,
@@ -19,19 +27,26 @@ const MainContent = ({
   fetchPastQuizzes,
   isQuizLive,
   resumeQuiz,
+  setIsQuizLive,
   score,
   daysUntilNextFriday,
 }) => {
   return (
     <div className="col-span-5">
       {isBadgeViewerOpen ? (
-        <BadgeViewer details={details} setIsBadgeViewerOpen={setIsBadgeViewerOpen} />
+        <BadgeViewer
+          details={details}
+          setIsBadgeViewerOpen={setIsBadgeViewerOpen}
+        />
       ) : isQuestionMakerOpen ? (
         <QuestionMaker setIsQuestionMakerOpen={setIsQuestionMakerOpen} />
       ) : isQuizOpen ? (
         <Quiz setIsQuizLive={setIsQuizLive} setIsQuizOpen={setIsQuizOpen} />
       ) : isPastQuizViewerOpen ? (
-        <PastQuizViewer pastQuizzes={pastQuizzes} setIsPastQuizViewerOpen={setIsPastQuizViewerOpen} />
+        <PastQuizViewer
+          pastQuizzes={pastQuizzes}
+          setIsPastQuizViewerOpen={setIsPastQuizViewerOpen}
+        />
       ) : (
         <div className="col-span-5">
           <div className="bg-white rounded-lg p-6 shadow mb-4">
@@ -69,9 +84,7 @@ const MainContent = ({
                 </div>
                 <div className="bg-gray-50 p-4 rounded-lg text-center">
                   <MessageSquare className="h-8 w-8 mx-auto mb-2" />
-                  <p className="text-sm">
-                    Share ideas! Get feedback and grow.
-                  </p>
+                  <p className="text-sm">Share ideas! Get feedback and grow.</p>
                 </div>
               </div>
             </div>
@@ -90,8 +103,8 @@ const MainContent = ({
                 </div>
               </div>
               <p className="flex-1">
-                4 people in your organization are celebrating their
-                Birthdays today!
+                4 people in your organization are celebrating their Birthdays
+                today!
               </p>
             </div>
           </div>

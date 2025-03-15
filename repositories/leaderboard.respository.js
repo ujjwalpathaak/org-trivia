@@ -4,7 +4,7 @@ import Leaderboard from '../models/leaderboard.model.js';
 import { ObjectId } from 'mongodb';
 
 class LeaderboardRepository {
-  async updateLeaderboard(orgId, employeeId, newScore, month, year) {
+  async updateLeaderboard(orgId, employeeId, points, month, year) {
     return Leaderboard.updateOne(
       {
         orgId: new ObjectId(orgId),
@@ -12,7 +12,7 @@ class LeaderboardRepository {
         month: month,
         year: year,
       },
-      { $inc: { totalScore: newScore } },
+      { $inc: { totalScore: points } },
       { upsert: true },
     );
   }
@@ -134,6 +134,8 @@ class LeaderboardRepository {
           pYear,
         );
     }
+
+    await Employee.updateMany({}, { $set: { points: 0 } });
 
     const uniqueCombinations = await Leaderboard.aggregate([
       {

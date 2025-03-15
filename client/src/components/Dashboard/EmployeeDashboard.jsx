@@ -24,12 +24,7 @@ const EmployeeDashboard = () => {
   const [isBadgeViewerOpen, setIsBadgeViewerOpen] = useState(false);
   const [details, setDetails] = useState({});
   const [isQuizOpen, setIsQuizOpen] = useState(false);
-  const [score, setScore] = useState({
-    currentPoints: 0,
-    lastQuizScore: 0,
-  });
 
-  // Fetch quiz status and employee details on component mount
   useEffect(() => {
     const getIsQuizAttempting = async () => {
       try {
@@ -50,7 +45,7 @@ const EmployeeDashboard = () => {
       if (!employeeId) return;
       try {
         const data = await getEmployeeDetails(employeeId);
-        console.log(data);
+        console.log('Employee details:', data);
         setDetails(data);
       } catch (error) {
         console.error('Error fetching employee details:', error);
@@ -71,26 +66,13 @@ const EmployeeDashboard = () => {
       }
     };
 
-    const getEmployeeScore = async () => {
-      try {
-        const score = await fetchEmployeeScore(employeeId);
-        setScore({
-          currentPoints: score.currentPoints,
-          lastQuizScore: score.lastQuizScore,
-        });
-      } catch (error) {
-        console.error('Error fetching score status:', error);
-        setIsQuizLive(false);
-      }
-    };
-
     fetchIsWeeklyQuizLive();
-    getEmployeeScore();
   }, [orgId, employeeId]);
 
   const fetchPastQuizzes = async () => {
     try {
       const pastQuizzes = await getPastQuizResults(employeeId);
+      console.log(pastQuizzes)
       setPastQuizzes(pastQuizzes);
     } catch (error) {
       console.error('Error fetching past quizzes:', error);
@@ -114,6 +96,7 @@ const EmployeeDashboard = () => {
           isQuestionMakerOpen={isQuestionMakerOpen}
           setIsQuestionMakerOpen={setIsQuestionMakerOpen}
           isQuizOpen={isQuizOpen}
+          setIsQuizLive={setIsQuizLive}
           setIsQuizOpen={setIsQuizOpen}
           isPastQuizViewerOpen={isPastQuizViewerOpen}
           setIsPastQuizViewerOpen={setIsPastQuizViewerOpen}
@@ -122,7 +105,6 @@ const EmployeeDashboard = () => {
           fetchPastQuizzes={fetchPastQuizzes}
           isQuizLive={isQuizLive}
           resumeQuiz={resumeQuiz}
-          score={score}
           daysUntilNextFriday={daysUntilNextFriday}
         />
         <Sidebar
@@ -130,7 +112,6 @@ const EmployeeDashboard = () => {
           setIsQuizOpen={setIsQuizOpen}
           isQuizLive={isQuizLive}
           resumeQuiz={resumeQuiz}
-          score={score}
           details={details}
           daysUntilNextFriday={daysUntilNextFriday}
         />

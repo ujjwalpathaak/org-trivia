@@ -46,15 +46,17 @@ class ResultService {
       quizId,
     );
 
-    const weeklyQuizScore = await this.calculateWeeklyQuizScore(
+    const rawScore = await this.calculateWeeklyQuizScore(
       userAnswers,
       correctAnswers,
     );
 
-    await this.employeeRepository.updateWeeklyQuizScore(
+    console.log(rawScore);
+
+    const data = await this.employeeRepository.updateWeeklyQuizScore(
       quizId,
       employeeId,
-      weeklyQuizScore,
+      rawScore,
     );
 
     const [month, year] = getMonthAndYear();
@@ -62,7 +64,7 @@ class ResultService {
     await this.leaderboardRespository.updateLeaderboard(
       orgId,
       employeeId,
-      weeklyQuizScore,
+      data.score,
       month,
       year,
     );
@@ -76,13 +78,19 @@ class ResultService {
       employeeId,
       orgId,
       quizId,
-      weeklyQuizScore,
+      data.multiplier,
+      data.score,
+      rawScore,
       quiz.scheduledDate,
       quiz.genre,
       mergedUserAnswersAndCorrectAnswers,
     );
 
-    return true;
+    return {
+      multiplier: data.multiplier,
+      score: data.score,
+      rawScore: rawScore,
+    };
   }
 
   async fetchEmployeeScore(employeeId) {

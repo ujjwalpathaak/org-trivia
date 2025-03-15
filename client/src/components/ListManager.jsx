@@ -93,9 +93,7 @@ export default function ListManager({ orgId, selectedGenre }) {
         </div>
 
         <div>
-          <h3 className="font-semibold mr-2 text-gray-800">
-            Selected Genres
-          </h3>
+          <h3 className="font-semibold mr-2 text-gray-800">Selected Genres</h3>
           <span className="text-sm italic text-gray-400">
             {`(Drag and Drop to Reorder)`}
           </span>

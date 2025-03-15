@@ -15,7 +15,7 @@ class QuizService {
       this.employeeRepository.didEmployeeGaveWeeklyQuiz(employeeId),
     ]);
 
-    if (isWeeklyQuizLive && !employee.isQuizGiven) return true;
+    if (isWeeklyQuizLive && !employee.quizGiven) return true;
 
     return false;
   }
@@ -76,7 +76,7 @@ class QuizService {
   async cleanUpWeeklyQuiz() {
     await Promise.all([
       this.quizRepository.markAllQuizAsExpired(),
-      this.employeeRepository.markAllEmployeesAsQuizNotGiven(),
+      this.employeeRepository.updateEmployeeStreaksAndMarkAllEmployeesAsQuizNotGiven(),
       this.quizRepository.dropWeeklyQuizCollection(),
     ]);
 

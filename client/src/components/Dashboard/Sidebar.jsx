@@ -1,8 +1,25 @@
 import React from 'react';
 import Leaderboard from '../Leaderboard';
-import { Gamepad2, TrendingUp, CalendarDays, ListChecks, Calendar, Timer, Trophy } from 'lucide-react';
+import {
+  Gamepad2,
+  TrendingUp,
+  CalendarDays,
+  ListChecks,
+  Calendar,
+  Timer,
+  Trophy,
+  ClockAlert,
+  Coins,
+} from 'lucide-react';
 
-const Sidebar = ({ isQuizOpen, setIsQuizOpen, isQuizLive, resumeQuiz, score, details, daysUntilNextFriday }) => {
+const Sidebar = ({
+  isQuizOpen,
+  setIsQuizOpen,
+  isQuizLive,
+  resumeQuiz,
+  details,
+  daysUntilNextFriday,
+}) => {
   return (
     <div className="col-span-2">
       <div className="bg-white rounded-lg p-6 shadow mb-4">
@@ -19,7 +36,7 @@ const Sidebar = ({ isQuizOpen, setIsQuizOpen, isQuizLive, resumeQuiz, score, det
       <div className="flex justify-between items-center ">
         <Leaderboard />
       </div>
-      <div className="bg-white rounded-lg p-6 shadow mb-4">
+      <div className="bg-white rounded-lg p-6 pb-3 shadow mb-4">
         {isQuizOpen ? (
           <>
             <div className="p-1">
@@ -72,22 +89,37 @@ const Sidebar = ({ isQuizOpen, setIsQuizOpen, isQuizLive, resumeQuiz, score, det
                 )
               ) : (
                 <div className="rounded-xl">
-                  <h2 className="text-lg mb-2 flex items-center gap-2">
-                    <Gamepad2 className="w-6 h-6 text-green-500" />
-                    Weekly Quiz Trivia
-                  </h2>
-                  <h6 className="text-slate-400 flex items-center gap-2">
-                    <TrendingUp className="w-4 h-4 text-blue-500" />
-                    Score in last quiz: {score.lastQuizScore}
-                  </h6>
-                  <h6 className="text-slate-400 flex items-center gap-2">
-                    <TrendingUp className="w-4 h-4 text-green-500" />
-                    {`Multiplier: x${details?.multiplier}`}
-                  </h6>
-                  <h6 className="text-slate-300 italic font-sm flex items-center gap-2">
-                    <CalendarDays className="w-4 h-4 text-purple-500" />
-                    Next in {daysUntilNextFriday()} days
-                  </h6>
+                  <div>
+                    <h2 className="text-lg mb-2 flex items-center gap-2">
+                      <Gamepad2 className="w-6 h-6 text-green-500" />
+                      Weekly Quiz Trivia
+                    </h2>
+                  </div>
+                  <div className="flex justify-between mt-4">
+                    <div className="flex flex-col items-center  w-1/2">
+                      <div className="flex items-center gap-2 text-gray-700">
+                        <TrendingUp className="h-5 w-5 text-blue-500" />
+                        <span className="text-lg font-semibold">
+                          {details?.multiplier}
+                        </span>
+                      </div>
+                      <span className="text-sm text-gray-500">Multiplier</span>
+                    </div>
+                    <div className="flex flex-col items-center  w-1/2">
+                      <div className="flex items-center gap-2 text-gray-700">
+                        <Coins className="h-5 w-5 text-green-500" />
+                        <span className="text-lg font-semibold">
+                          {details?.employee?.points}
+                        </span>
+                      </div>
+                      <span className="text-sm text-gray-500">Points</span>
+                    </div>
+                  </div>
+                  <div className="flex gap-2 w-full justify-end mt-8">
+                    <span className="text-sm italic text-gray-500">
+                      Next Quiz in {daysUntilNextFriday()} Days
+                    </span>
+                  </div>
                 </div>
               )}
             </div>

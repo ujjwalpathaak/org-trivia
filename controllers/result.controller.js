@@ -19,14 +19,16 @@ class ResultController {
         return res.status(400).json({ message: 'All fields are required' });
       }
 
-      await resultService.submitWeeklyQuizAnswers(
+      const data = await resultService.submitWeeklyQuizAnswers(
         answers,
         employeeId,
         orgId,
         quizId,
       );
 
-      res.status(200).json({ message: 'Submitted weekly quiz answers' });
+      res
+        .status(200)
+        .json({ message: 'Submitted weekly quiz answers', data: data });
     } catch (err) {
       next(err);
     }

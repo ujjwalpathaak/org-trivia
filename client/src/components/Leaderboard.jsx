@@ -13,7 +13,7 @@ const Leaderboard = ({ last3Leaderboards }) => {
       if (!orgId) return;
       try {
         const leaderboard = await getLeaderboardByOrgId(orgId);
-        // setLeaderboard(leaderboard);
+        setLeaderboard(leaderboard);
       } catch (error) {
         console.error('Error fetching leaderboard:', error);
       }

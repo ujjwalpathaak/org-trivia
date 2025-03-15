@@ -36,6 +36,14 @@ const resultSchema = new mongoose.Schema(
       ref: 'Quiz',
       required: true,
     },
+    rawScore: {
+      type: Number,
+      required: true,
+    },
+    multiplier: {
+      type: Number,
+      required: true,
+    },
     score: {
       type: Number,
       required: true,

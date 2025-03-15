@@ -38,22 +38,13 @@ const employeeSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    currentStreak: {
+    streak: {
       type: Number,
       default: 0,
     },
-    lastQuizScore: {
+    points: {
       type: Number,
       default: 0,
-    },
-    lastQuizGiven: {
-      type: Boolean,
-      default: false,
-    },
-    idLastGivenQuiz: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Quiz',
-      default: null,
     },
     role: {
       type: String,
@@ -75,7 +66,7 @@ const employeeSchema = new mongoose.Schema(
       immutable: true,
       required: true,
     },
-    isQuizGiven: {
+    quizGiven: {
       type: Boolean,
       default: false,
     },

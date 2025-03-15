@@ -1,5 +1,5 @@
 import React from 'react';
-import { ListChecks, Calendar, Timer, Trophy } from 'lucide-react';
+import { ListChecks, Calendar, Timer, Trophy, TrendingUp, Coins } from 'lucide-react';
 
 const PastQuizViewer = ({ pastQuizzes, setIsPastQuizViewerOpen }) => {
   return (
@@ -41,19 +41,27 @@ const PastQuizViewer = ({ pastQuizzes, setIsPastQuizViewerOpen }) => {
                     {new Date(quiz.createdAt).toLocaleString()}
                   </p>
                 </div>
+                <div>
 
-                {/* Right Side: Score */}
-                <div className="flex items-center gap-2 text-blue-600 font-medium">
-                  <Trophy size={20} className="text-yellow-500" />
-                  {quiz.score} Points
+                  {/* Right Side: Score */}
+                  <div className="flex items-center text-blue-600 font-medium">
+                    <Coins size={20} className="text-green-500 mr-2" />
+                    {quiz.rawScore} Points
+                  </div>
+                  <div className="flex items-center text-blue-600 font-medium">
+                    <TrendingUp size={20} className="text-blue-500 mr-2" />
+                    {quiz.multiplier} Multiplier
+                  </div>
+                  <div className="flex items-center text-blue-600 font-medium">
+                    <Trophy size={20} className="text-yellow-500 mr-2" />
+                    {quiz.score} Score
+                  </div>
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          <p className="text-gray-500 text-sm">
-            No past quizzes available.
-          </p>
+          <p className="text-gray-500 text-sm">No past quizzes available.</p>
         )}
       </div>
     </div>

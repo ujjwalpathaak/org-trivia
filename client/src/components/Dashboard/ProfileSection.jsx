@@ -1,7 +1,21 @@
 import React from 'react';
-import { Award, CalendarCheck, Book, CirclePlus, Bookmark, AwardIcon } from 'lucide-react';
+import {
+  Award,
+  CalendarCheck,
+  Book,
+  CirclePlus,
+  Bookmark,
+  AwardIcon,
+} from 'lucide-react';
 
-const ProfileSection = ({ data, details, setIsQuestionMakerOpen, setIsBadgeViewerOpen, setIsPastQuizViewerOpen, fetchPastQuizzes }) => {
+const ProfileSection = ({
+  data,
+  details,
+  setIsQuestionMakerOpen,
+  setIsBadgeViewerOpen,
+  setIsPastQuizViewerOpen,
+  fetchPastQuizzes,
+}) => {
   return (
     <div className="col-span-2 col-start-2">
       <div className="bg-white rounded-2xl p-6 floating-div">
@@ -26,7 +40,7 @@ const ProfileSection = ({ data, details, setIsQuestionMakerOpen, setIsBadgeViewe
               <div className="flex items-center gap-2 text-gray-700">
                 <CalendarCheck className="h-5 w-5 text-green-500" />
                 <span className="text-lg font-semibold">
-                  {details?.employee?.currentStreak}
+                  {details?.employee?.streak}
                 </span>
               </div>
               <span className="text-sm text-gray-500">Streak</span>
@@ -38,7 +52,7 @@ const ProfileSection = ({ data, details, setIsQuestionMakerOpen, setIsBadgeViewe
                   {details?.employee?.submittedQuestions.length}
                 </span>
               </div>
-              <span className="text-sm text-gray-500">Submissions</span>
+              <span className="text-sm text-gray-500">Questions</span>
             </div>
           </div>
           <div className="w-full text-center">
@@ -66,6 +80,7 @@ const ProfileSection = ({ data, details, setIsQuestionMakerOpen, setIsBadgeViewe
               ))}
             </div>
           </div>
+          <hr></hr>
           <nav className="w-full mt-6 space-y-3">
             <button
               onClick={() => {
