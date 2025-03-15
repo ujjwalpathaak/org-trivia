@@ -43,7 +43,6 @@ class LeaderboardRepository {
   }
 
   async getEmployeePastRecords(orgId) {
-    console.log(orgId);
     return Leaderboard.aggregate([
       { $match: { orgId: new ObjectId(orgId) } },
       {

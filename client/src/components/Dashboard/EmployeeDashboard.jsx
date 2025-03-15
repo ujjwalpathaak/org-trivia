@@ -45,7 +45,6 @@ const EmployeeDashboard = () => {
       if (!employeeId) return;
       try {
         const data = await getEmployeeDetails(employeeId);
-        console.log('Employee details:', data);
         setDetails(data);
       } catch (error) {
         console.error('Error fetching employee details:', error);
@@ -72,7 +71,6 @@ const EmployeeDashboard = () => {
   const fetchPastQuizzes = async () => {
     try {
       const pastQuizzes = await getPastQuizResults(employeeId);
-      console.log(pastQuizzes)
       setPastQuizzes(pastQuizzes);
     } catch (error) {
       console.error('Error fetching past quizzes:', error);

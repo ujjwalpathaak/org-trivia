@@ -101,7 +101,6 @@ const Quiz = ({ setIsQuizOpen, setIsQuizLive }) => {
           userId,
           quizId,
         );
-        console.log(data);
         setPoints(data.score);
         localStorage.removeItem('state');
       }

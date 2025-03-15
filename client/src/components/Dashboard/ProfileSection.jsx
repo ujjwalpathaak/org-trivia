@@ -63,9 +63,9 @@ const ProfileSection = ({
                   No badges. Participate More!
                 </span>
               )}
-              {details?.badges?.slice(0, 3).map((badge) => (
+              {details?.badges?.slice(0, 3).map((badge, idx) => (
                 <div
-                  key={badge.id || badge.badgeDetails.url}
+                  key={idx}
                   className="flex items-center gap-2 bg-gray-100 py-2 px-3 rounded-lg shadow-sm"
                 >
                   <img

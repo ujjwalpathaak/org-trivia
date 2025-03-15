@@ -51,8 +51,6 @@ class ResultService {
       correctAnswers,
     );
 
-    console.log(rawScore);
-
     const data = await this.employeeRepository.updateWeeklyQuizScore(
       quizId,
       employeeId,

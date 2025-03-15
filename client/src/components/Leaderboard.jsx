@@ -44,7 +44,7 @@ const Leaderboard = ({ last3Leaderboards }) => {
                 <tbody>
                   {leaderboard?.map((player, index) => (
                     <tr
-                      key={player.employeeId}
+                      key={index}
                       className="border-t bg-gray-100"
                     >
                       <td className="p-3 font-semibold">#{index + 1}</td>
