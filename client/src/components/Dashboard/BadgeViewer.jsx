@@ -19,9 +19,9 @@ const BadgeViewer = ({ details, setIsBadgeViewerOpen }) => {
 
             {details?.badges?.length > 0 ? (
               <div className="space-y-4">
-                {details?.badges?.map((badge) => (
+                {details?.badges?.map((badge, idx) => (
                   <div
-                    key={badge._id}
+                    key={idx}
                     className="border border-gray-200 rounded-lg p-4 shadow-sm flex items-center justify-start"
                   >
                     <img className="w-8" src={badge.badgeDetails.url} />

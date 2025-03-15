@@ -1,5 +1,7 @@
 import Result from '../models/result.model.js';
 
+import { ObjectId } from 'mongodb'
+
 class ResultRepository {
   async submitWeeklyQuizAnswers(
     employeeId,
@@ -39,7 +41,7 @@ class ResultRepository {
 
   async getEmployeePastResults(employeeId) {
     return Result.aggregate([
-      { $match: { employeeId: new ObjectId(employeeId) } }, // ✅ Required for matching
+      { $match: { employeeId: new ObjectId(employeeId) } },
       { $sort: { date: -1 } },
     ]);
   }
