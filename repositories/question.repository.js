@@ -4,63 +4,61 @@ import WeeklyQuestion from '../models/weeklyQuestion.model.js';
 import QuizRepository from './quiz.repository.js';
 import OrgRepository from './org.repository.js';
 
-import { ObjectId } from 'mongodb';
-
 const quizRepository = new QuizRepository();
 const orgRepository = new OrgRepository();
 
 class QuestionRepository {
   async saveQuestion(newQuestion) {
-    return new Question(newQuestion).save();
+    return await new Question(newQuestion).save();
   }
 
   async addQuestions(newQuestions) {
-    return Question.insertMany(newQuestions);
+    return await Question.insertMany(newQuestions);
   }
 
   async getApprovedWeeklyQuizQuestion(orgId) {
-    return WeeklyQuestion.find({
-      orgId: new ObjectId(orgId),
-      isApproved: true,
-    })
-      .select({ 'question.answer': 0 })
+    return await WeeklyQuestion.find({ orgId, isApproved: true })
+      .select('-question.answer')
       .lean();
   }
 
   async dropWeeklyQuestionCollection() {
-    return WeeklyQuestion.deleteMany({});
+    return await WeeklyQuestion.deleteMany();
   }
 
-  async updateWeeklyQuestionsStatusToApproved(idsOfQuestionsToApprove) {
-    return WeeklyQuestion.updateMany(
-      { 'question._id': { $in: idsOfQuestionsToApprove } },
+  async updateWeeklyQuestionsStatusToApproved(ids) {
+    return await WeeklyQuestion.updateMany(
+      { 'question._id': { $in: ids } },
       { $set: { isApproved: true } },
+      { multi: true },
     );
   }
 
   async getCorrectWeeklyQuizAnswers(orgId) {
-    return WeeklyQuestion.find({
-      orgId: new ObjectId(orgId),
-    })
+    return await WeeklyQuestion.find({ orgId })
       .select('question._id question.answer')
       .lean();
   }
 
   async saveWeeklyQuizQuestions(quizId, newQuestions) {
     await quizRepository.updateQuizStatus(quizId, 'unapproved');
-    return WeeklyQuestion.insertMany(newQuestions);
+    return await WeeklyQuestion.insertMany(newQuestions);
   }
 
   async getExtraEmployeeQuestions(orgId, quizId, genre) {
-    return orgRepository.fetchExtraEmployeeQuestions(orgId, quizId, genre);
+    return await orgRepository.fetchExtraEmployeeQuestions(
+      orgId,
+      quizId,
+      genre,
+    );
   }
 
   async getWeeklyUnapprovedQuestions(quizId) {
-    return WeeklyQuestion.find({ quizId: quizId });
+    return await WeeklyQuestion.find({ quizId });
   }
 
   async fetchHRDQuestions(orgId) {
-    return orgRepository.fetchHRDQuestions(orgId);
+    return await orgRepository.fetchHRDQuestions(orgId);
   }
 }
 

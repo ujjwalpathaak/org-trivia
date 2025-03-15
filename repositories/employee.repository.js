@@ -6,10 +6,7 @@ import { calculateMultiplier } from '../middleware/utils.js';
 
 class EmployeeRepository {
   async isWeeklyQuizGiven(employeeId) {
-    return Employee.findOne(
-      { _id: new ObjectId(employeeId) },
-      { quizGiven: 1 },
-    );
+    return Employee.findById(employeeId, 'quizGiven');
   }
 
   async updateEmployeeStreaksAndMarkAllEmployeesAsQuizNotGiven() {
@@ -26,58 +23,38 @@ class EmployeeRepository {
           update: { $set: { streak: 0 } },
         },
       },
-      {
-        updateMany: {
-          filter: {},
-          update: { $set: { quizGiven: false } },
-        },
-      },
+      { updateMany: { filter: {}, update: { $set: { quizGiven: false } } } },
     ]);
-  }
-
-  async getAllOrgEmployeesByOrgId(orgId) {
-    return Employee.find({ orgId: new ObjectId(orgId) });
   }
 
   async addSubmittedQuestion(questionId, employeeId) {
     return Employee.updateOne(
-      { _id: new ObjectId(employeeId) },
-      { $push: { submittedQuestions: new ObjectId(questionId) } },
+      { _id: employeeId },
+      { $push: { submittedQuestions: questionId } },
     );
   }
 
   async updateWeeklyQuizScore(employeeId, points) {
-    const employee = await Employee.findOne(
-      { _id: new ObjectId(employeeId) },
-      { streak: 1, score: 1 },
-    );
+    const employee = await Employee.findById(employeeId, 'streak score');
+    if (!employee) return null;
 
     const multiplier = calculateMultiplier(employee.streak);
-
     const updatedScore = points * multiplier;
 
     await Employee.updateOne(
-      { _id: new ObjectId(employeeId) },
-      {
-        $set: {
-          quizGiven: true,
-          score: employee.score + updatedScore,
-        },
-      },
+      { _id: employeeId },
+      { $set: { quizGiven: true }, $inc: { score: updatedScore } },
     );
 
-    return { multiplier: multiplier, score: updatedScore };
+    return { multiplier, score: updatedScore };
   }
 
   async addBadgesToEmployees(employeeId, badgeId, month, year) {
     return Employee.updateOne(
-      { _id: new ObjectId(employeeId) },
+      { _id: employeeId },
       {
         $push: {
-          badges: {
-            badgeId: new ObjectId(badgeId),
-            description: `${getMonth(month)} ${year}`,
-          },
+          badges: { badgeId, description: `${getMonth(month)} ${year}` },
         },
       },
     );
@@ -88,12 +65,13 @@ class EmployeeRepository {
   }
 
   async getEmployeeDetails(employeeId) {
-    const objectId = new ObjectId(employeeId);
+    const employee = await Employee.findById(employeeId).lean();
+    if (!employee) return null;
 
     const badges = await Employee.aggregate([
-      { $match: { _id: objectId } },
+      { $match: { _id: new ObjectId(employeeId) } },
       { $unwind: '$badges' },
-      { $sort: { 'badges.earnedAt': -1 } }, // Sort before grouping
+      { $sort: { 'badges.earnedAt': -1 } },
       {
         $lookup: {
           from: 'badges',
@@ -118,13 +96,10 @@ class EmployeeRepository {
       },
     ]);
 
-    const employee = await Employee.findOne({ _id: objectId });
-    const multiplier = calculateMultiplier(employee.streak);
-
     return {
       employee,
       badges: badges[0]?.badges || [],
-      multiplier,
+      multiplier: calculateMultiplier(employee.streak),
     };
   }
 }

@@ -6,11 +6,6 @@ const employeeController = new EmployeeController();
 const employeeRouter = express.Router();
 
 employeeRouter.get(
-  '/org/:orgId',
-  checkRole('Admin'),
-  employeeController.getAllOrgEmployeesByOrgId,
-);
-employeeRouter.get(
   '/score/:employeeId',
   checkRole('Employee'),
   employeeController.fetchEmployeeScore,

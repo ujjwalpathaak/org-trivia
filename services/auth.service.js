@@ -16,7 +16,7 @@ class AuthService {
       return { status: 400, data: { message: `This email already exists` } };
     }
 
-    await this.authRepository.createUser(
+    await this.authRepository.createNewUser(
       UserModel,
       email,
       password,
@@ -37,7 +37,7 @@ class AuthService {
       return { status: 404, data: { message: 'User not found!' } };
     }
 
-    const isMatch = await this.authRepository.passwordsMatch(
+    const isMatch = await this.authRepository.isPasswordsMatch(
       password,
       user.password,
     );

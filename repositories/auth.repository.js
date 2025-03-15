@@ -18,7 +18,7 @@ class AuthRepository {
     return admin || employee || null;
   }
 
-  async createUser(UserModel, email, password, name, orgId, isAdmin) {
+  async createNewUser(UserModel, email, password, name, orgId, isAdmin) {
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = await new UserModel({
       email,
@@ -32,10 +32,8 @@ class AuthRepository {
     return newUser;
   }
 
-  async passwordsMatch(password, hashedPassword) {
-    const isMatch = await bcrypt.compare(password, hashedPassword);
-
-    return isMatch;
+  async isPasswordsMatch(password, hashedPassword) {
+    return await bcrypt.compare(password, hashedPassword);
   }
 
   generateToken(user) {

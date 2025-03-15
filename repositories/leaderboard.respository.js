@@ -14,8 +14,8 @@ class LeaderboardRepository {
       {
         orgId: new ObjectId(orgId),
         employeeId: new ObjectId(employeeId),
-        month: month,
-        year: year,
+        month,
+        year,
       },
       { $inc: { totalScore: score } },
       { upsert: true },
@@ -27,9 +27,9 @@ class LeaderboardRepository {
       {
         $match: {
           orgId: new ObjectId(orgId),
-          month: month,
-          year: year,
-          totalScore: { $ne: 0 },
+          month,
+          year,
+          totalScore: { $gt: 0 },
         },
       },
       { $sort: { totalScore: -1 } },
@@ -43,7 +43,7 @@ class LeaderboardRepository {
         },
       },
       { $unwind: '$employee' },
-      { $project: { employee: 1, totalScore: 1 } },
+      { $project: { 'employee.name': 1, totalScore: 1 } },
     ]);
   }
 
@@ -59,7 +59,7 @@ class LeaderboardRepository {
         },
       },
       { $unwind: '$employee' },
-      { $project: { employee: 1, totalScore: 1 } },
+      { $project: { 'employee.name': 1, totalScore: 1 } },
     ]);
   }
 
@@ -98,7 +98,6 @@ class LeaderboardRepository {
           },
         },
       },
-
       {
         $project: {
           _id: 0,
@@ -112,49 +111,40 @@ class LeaderboardRepository {
 
   async resetLeaderboard(month, year, pMonth, pYear) {
     const topThreePerOrg = await Leaderboard.aggregate([
-      { $match: { month: pMonth, year: pYear, totalScore: { $ne: 0 } } },
+      { $match: { month: pMonth, year: pYear, totalScore: { $gt: 0 } } },
       { $sort: { orgId: 1, totalScore: -1 } },
       {
         $group: {
-          _id: { orgId: '$orgId' },
+          _id: '$orgId',
           topEmployees: { $push: '$$ROOT' },
         },
       },
       {
         $project: {
-          _id: 0,
-          orgId: '$_id.orgId',
+          orgId: '$_id',
           topEmployees: { $slice: ['$topEmployees', 3] },
         },
       },
     ]);
 
-    const goldBadge = await badgeRepository.findBadgeByRank('Gold');
-    const silverBadge = await badgeRepository.findBadgeByRank('Silver');
-    const bronzeBadge = await badgeRepository.findBadgeByRank('Bronze');
+    const badges = {
+      Gold: await badgeRepository.findBadgeByRank('Gold'),
+      Silver: await badgeRepository.findBadgeByRank('Silver'),
+      Bronze: await badgeRepository.findBadgeByRank('Bronze'),
+    };
 
+    const ranks = ['Gold', 'Silver', 'Bronze'];
     for (const { orgId, topEmployees } of topThreePerOrg) {
-      if (topEmployees[0])
-        await employeeRepository.addBadgesToEmployees(
-          topEmployees[0].employeeId,
-          goldBadge._id,
-          pMonth,
-          pYear,
-        );
-      if (topEmployees[1])
-        await employeeRepository.addBadgesToEmployees(
-          topEmployees[1].employeeId,
-          silverBadge._id,
-          pMonth,
-          pYear,
-        );
-      if (topEmployees[2])
-        await employeeRepository.addBadgesToEmployees(
-          topEmployees[2].employeeId,
-          bronzeBadge._id,
-          pMonth,
-          pYear,
-        );
+      topEmployees.forEach(async (employee, index) => {
+        if (badges[ranks[index]]) {
+          await employeeRepository.addBadgesToEmployees(
+            employee.employeeId,
+            badges[ranks[index]]._id,
+            pMonth,
+            pYear,
+          );
+        }
+      });
     }
 
     await employeeRepository.resetAllEmployeesScores();
@@ -167,19 +157,16 @@ class LeaderboardRepository {
       },
       {
         $project: {
-          _id: 0,
           orgId: '$_id.orgId',
           employeeId: '$_id.employeeId',
-          month: { $literal: month },
-          year: { $literal: year },
-          totalScore: { $literal: 0 },
+          month,
+          year,
+          totalScore: 0,
         },
       },
     ]);
 
-    return;
-
-    // return Leaderboard.insertMany(uniqueCombinations);
+    return Leaderboard.insertMany(uniqueCombinations);
   }
 }
 

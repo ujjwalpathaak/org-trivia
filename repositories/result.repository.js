@@ -1,6 +1,5 @@
 import Result from '../models/result.model.js';
 
-import { ObjectId } from 'mongodb';
 class ResultRepository {
   async submitWeeklyQuizAnswers(
     employeeId,
@@ -11,23 +10,23 @@ class ResultRepository {
     points,
     date,
     genre,
-    mergedUserAnswersAndCorrectAnswers,
+    answers,
   ) {
-    return Result.create({
-      employeeId: employeeId,
-      orgId: orgId,
-      quizId: quizId,
-      score: score,
-      points: points,
-      multiplier: multiplier,
-      date: date,
-      genre: genre,
-      answers: mergedUserAnswersAndCorrectAnswers,
+    return await Result.create({
+      employeeId,
+      orgId,
+      quizId,
+      score,
+      points,
+      multiplier,
+      date,
+      genre,
+      answers,
     });
   }
 
   async getParticipationByGenre(orgId) {
-    return Result.aggregate([
+    return await Result.aggregate([
       { $match: { orgId: new ObjectId(orgId) } },
       {
         $group: {
@@ -40,7 +39,7 @@ class ResultRepository {
 
   async getEmployeePastResults(employeeId) {
     return Result.aggregate([
-      { $match: { employeeId: new ObjectId(employeeId) } },
+      { $match: { employeeId: new ObjectId(employeeId) } }, // ✅ Required for matching
       { $sort: { date: -1 } },
     ]);
   }

@@ -9,83 +9,49 @@ const resultRepository = new ResultRepository();
 const leaderboardRepository = new LeaderboardRepository();
 
 class OrgRepository {
-  async updateQuestionsStatusInOrgToUsed(
-    orgId,
-    category,
-    idsOfQuestionsToApprove,
-  ) {
-    const categoryMap = {
+  constructor() {
+    this.categoryMap = {
       PnA: 'questionsPnA',
       CAnIT: 'questionsCAnIT',
       HRD: 'questionsHRD',
     };
+  }
 
-    const questionField = categoryMap[category];
-    if (!questionField) {
-      throw new Error('Invalid category');
-    }
+  async updateQuestionsStatusInOrgToUsed(orgId, category, questionIds) {
+    const questionField = this.categoryMap[category];
+    if (!questionField) throw new Error('Invalid category');
 
-    return await Org.updateMany(
+    return Org.updateMany(
       { _id: new ObjectId(orgId) },
-      {
-        $set: { [`${questionField}.$[elem].isUsed`]: true },
-      },
-      {
-        arrayFilters: [
-          {
-            'elem.questionId': {
-              $in: idsOfQuestionsToApprove,
-            },
-          },
-        ],
-      },
+      { $set: { [`${questionField}.$[elem].isUsed`]: true } },
+      { arrayFilters: [{ 'elem.questionId': { $in: questionIds } }] },
     );
   }
 
   async addQuestionToOrg(question, orgId) {
-    const questionId = question._id;
-    const questionCategory = question.category;
-    let query = '';
-
-    switch (questionCategory) {
-      case 'PnA':
-        query = 'questionsPnA';
-        break;
-      case 'HRD':
-        query = 'questionsHRD';
-        break;
-      case 'CAnIT':
-        query = 'questionsCAnIT';
-        break;
-      default:
-        throw new Error('Invalid question category');
-    }
+    const questionField = this.categoryMap[question.category];
+    if (!questionField) throw new Error('Invalid question category');
 
     const result = await Org.updateOne(
       { _id: new ObjectId(orgId) },
       {
         $push: {
-          [query]: {
-            questionId,
+          [questionField]: {
+            questionId: question._id,
             isUsed: false,
-            category: questionCategory,
+            category: question.category,
             source: question.source,
           },
         },
       },
     );
 
-    if (result.matchedCount === 0) {
-      throw new Error('Organization not found');
-    }
-
+    if (!result.matchedCount) throw new Error('Organization not found');
     return true;
   }
 
   async getTriviaEnabledOrgs() {
-    return Org.find({
-      'settings.isTriviaEnabled': true,
-    });
+    return Org.find({ 'settings.isTriviaEnabled': true });
   }
 
   async setNextQuestionGenre(orgId, currentGenreIndex) {
@@ -93,7 +59,7 @@ class OrgRepository {
     if (!org) throw new Error('Organization not found');
 
     const totalGenres = org.settings.selectedGenre.length;
-    if (totalGenres === 0) throw new Error('No genres available');
+    if (!totalGenres) throw new Error('No genres available');
 
     const nextIndex = (currentGenreIndex + 1) % totalGenres;
     await Org.updateOne(
@@ -105,10 +71,9 @@ class OrgRepository {
   }
 
   async updateNewUserInOrg(orgId, isAdmin, newUser) {
-    const fieldName = isAdmin ? 'admins' : 'employees';
     return Org.updateOne(
       { _id: new ObjectId(orgId) },
-      { $push: { [fieldName]: newUser._id } },
+      { $push: { [isAdmin ? 'admins' : 'employees']: newUser._id } },
     );
   }
 
@@ -124,11 +89,11 @@ class OrgRepository {
   }
 
   async getAllOrgNames() {
-    return Org.find({}).select('id name');
+    return Org.find({}, 'id name');
   }
 
   async getAllOrgIds() {
-    return Org.find({}).select('id');
+    return Org.find({}, 'id');
   }
 
   async getOrgById(orgId) {
@@ -148,30 +113,17 @@ class OrgRepository {
 
   async fetchHRDQuestions(orgId) {
     return Org.aggregate([
-      {
-        $match: { _id: new ObjectId(orgId) },
-      },
-      {
-        $unwind: '$questionsHRD',
-      },
-      {
-        $match: { 'questionsHRD.isUsed': false },
-      },
+      { $match: { _id: new ObjectId(orgId) } },
+      { $unwind: '$questionsHRD' },
+      { $match: { 'questionsHRD.isUsed': false } },
       {
         $group: {
           _id: '$questionsHRD.file',
           questions: { $push: '$questionsHRD' },
         },
       },
-      {
-        $project: {
-          _id: 1,
-          questions: { $slice: ['$questions', 2] },
-        },
-      },
-      {
-        $unwind: '$questions',
-      },
+      { $project: { _id: 1, questions: { $slice: ['$questions', 2] } } },
+      { $unwind: '$questions' },
       {
         $lookup: {
           from: 'questions',
@@ -180,23 +132,15 @@ class OrgRepository {
           as: 'questionDetails',
         },
       },
-      {
-        $unwind: '$questionDetails',
-      },
-      {
-        $replaceRoot: { newRoot: '$questionDetails' },
-      },
+      { $unwind: '$questionDetails' },
+      { $replaceRoot: { newRoot: '$questionDetails' } },
     ]);
   }
 
-  async fetchExtraEmployeeQuestions(orgId, quizId, genre) {
+  async fetchExtraEmployeeQuestions(orgId) {
     return Org.aggregate([
-      {
-        $match: { _id: new ObjectId(orgId) },
-      },
-      {
-        $unwind: '$questionsPnA',
-      },
+      { $match: { _id: new ObjectId(orgId) } },
+      { $unwind: '$questionsPnA' },
       {
         $match: {
           'questionsPnA.isUsed': false,
@@ -211,42 +155,25 @@ class OrgRepository {
           as: 'questionDetails',
         },
       },
-      {
-        $unwind: '$questionDetails',
-      },
-      {
-        $replaceRoot: {
-          newRoot: '$questionDetails',
-        },
-      },
+      { $unwind: '$questionDetails' },
+      { $replaceRoot: { newRoot: '$questionDetails' } },
     ]);
   }
 
-  async pushQuestionsInOrg(finalFormatedRefactoredQuestions, genre, orgId) {
-    const fieldName = `questions${genre}`;
-
+  async pushQuestionsInOrg(questions, genre, orgId) {
     return Org.updateMany(
       { _id: new ObjectId(orgId) },
-      {
-        $push: {
-          [fieldName]: {
-            $each: finalFormatedRefactoredQuestions,
-          },
-        },
-      },
+      { $push: { [`questions${genre}`]: { $each: questions } } },
     );
   }
 
   async getAnalytics(orgId) {
-    const participationByGenre = resultRepository.getParticipationByGenre(orgId);
+    const [participationByGenre, last3Leaderboards] = await Promise.all([
+      resultRepository.getParticipationByGenre(orgId),
+      leaderboardRepository.getLast3Leaderboards(orgId),
+    ]);
 
-    const last3Leaderboards =
-      await leaderboardRepository.getLast3Leaderboards(orgId);
-
-    return {
-      participationByGenre,
-      last3Leaderboards,
-    };
+    return { participationByGenre, last3Leaderboards };
   }
 }
 
