@@ -43,7 +43,7 @@ const RegistrationForm = () => {
         toast.success(
           `Successfully registered you as an ${
             formData.isAdmin ? 'Admin' : 'Employee'
-          }. Login again to get access to the dashboard!`,
+          }. Login again to get access to the dashboard!`
         );
         window.location.href = '/';
       } else {

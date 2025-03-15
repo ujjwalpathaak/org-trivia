@@ -37,8 +37,8 @@ const OrgSearch = ({ setFormData }) => {
     if (value) {
       setFilteredOrgs(
         orgList.filter((org) =>
-          org.name.toLowerCase().includes(value.toLowerCase()),
-        ),
+          org.name.toLowerCase().includes(value.toLowerCase())
+        )
       );
     } else {
       setFilteredOrgs([]);

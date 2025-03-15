@@ -75,11 +75,11 @@ export const validateQuestionMakerForm = (question) => {
 
 export const mergeUserAnswersAndCorrectAnswers = (
   correctAnswers,
-  myAnswers,
+  myAnswers
 ) => {
   return correctAnswers.map(({ _id, answer }) => {
     const myAnswerObj = myAnswers.find(
-      ({ questionId }) => questionId === _id.toString(),
+      ({ questionId }) => questionId === _id.toString()
     );
     return {
       questionId: _id,
@@ -154,7 +154,7 @@ export const getNextWeek = () => {
     ((today - new Date(year, 0, 1)) / 86400000 +
       new Date(year, 0, 1).getDay() +
       1) /
-      7,
+      7
   );
   return `${year}-W${week.toString().padStart(2, '0')}`;
 };

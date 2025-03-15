@@ -99,7 +99,7 @@ const Quiz = ({ setIsQuizOpen, setIsQuizLive }) => {
           optionsSelected.answers,
           orgId,
           userId,
-          quizId,
+          quizId
         );
         setPoints(data.score);
         localStorage.removeItem('state');

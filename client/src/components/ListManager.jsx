@@ -21,13 +21,13 @@ export default function ListManager({ orgId, selectedGenre }) {
     selectedGenre.map((genre) => ({
       key: getGenreFullName(genre),
       value: genre,
-    })),
+    }))
   );
 
   const [availableItems, setAvailableItems] = useState(() =>
     allItems.filter(
-      (item) => !selectedItems.some((i) => i.value === item.value),
-    ),
+      (item) => !selectedItems.some((i) => i.value === item.value)
+    )
   );
 
   const [isSaved, setIsSaved] = useState(true);
@@ -35,7 +35,7 @@ export default function ListManager({ orgId, selectedGenre }) {
   const handleSaveChanges = async () => {
     await saveGenreSettings(
       selectedItems.map((genre) => genre.value), // Preserve order
-      orgId,
+      orgId
     );
     toast.success('New settings saved');
     setIsSaved(true);
