@@ -1,12 +1,14 @@
 import EmployeeRepository from '../repositories/employee.repository.js';
 import OrgRepository from '../repositories/org.repository.js';
 import QuestionRepository from '../repositories/question.repository.js';
+import QuizRepository from '../repositories/quiz.repository.js';
 import QuestionService from '../services/question.service.js';
 
 const questionService = new QuestionService(
   new QuestionRepository(),
   new OrgRepository(),
   new EmployeeRepository(),
+  new QuizRepository(),
 );
 
 class QuestionController {
@@ -44,7 +46,7 @@ class QuestionController {
         await questionService.getUpcomingWeeklyQuizByOrgId(orgId);
       if (!upcomingQuiz)
         return res
-          .status(404)
+          .status(400)
           .json({ message: 'No questions scheduled till now' });
 
       const weeklyUnapprovedQuestions =
@@ -61,7 +63,7 @@ class QuestionController {
 
       if (!weeklyUnapprovedQuestions)
         return res
-          .status(404)
+          .status(400)
           .json({ message: 'No questions scheduled till now' });
 
       res

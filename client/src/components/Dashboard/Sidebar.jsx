@@ -100,7 +100,7 @@ const Sidebar = ({
                       <div className="flex items-center gap-2 text-gray-700">
                         <TrendingUp className="h-5 w-5 text-blue-500" />
                         <span className="text-lg font-semibold">
-                          {details?.multiplier}
+                          {details?.multiplier || 0}
                         </span>
                       </div>
                       <span className="text-sm text-gray-500">Multiplier</span>
@@ -109,7 +109,7 @@ const Sidebar = ({
                       <div className="flex items-center gap-2 text-gray-700">
                         <Coins className="h-5 w-5 text-green-500" />
                         <span className="text-lg font-semibold">
-                          {details?.employee?.score}
+                          {details?.employee?.score || 0}
                         </span>
                       </div>
                       <span className="text-sm text-gray-500">Score</span>

@@ -31,7 +31,7 @@ const ProfileSection = ({
               <div className="flex items-center gap-2 text-gray-700">
                 <Award className="h-5 w-5 text-blue-600" />
                 <span className="text-lg font-semibold">
-                  {details?.badges?.length}
+                  {details?.badges?.length || 0}
                 </span>
               </div>
               <span className="text-sm text-gray-500">Badges</span>
@@ -40,7 +40,7 @@ const ProfileSection = ({
               <div className="flex items-center gap-2 text-gray-700">
                 <CalendarCheck className="h-5 w-5 text-green-500" />
                 <span className="text-lg font-semibold">
-                  {details?.employee?.streak}
+                  {details?.employee?.streak || 0}
                 </span>
               </div>
               <span className="text-sm text-gray-500">Streak</span>
@@ -49,7 +49,7 @@ const ProfileSection = ({
               <div className="flex items-center gap-2 text-gray-700">
                 <Book className="h-5 w-5 text-red-500" />
                 <span className="text-lg font-semibold">
-                  {details?.employee?.submittedQuestions.length}
+                  {details?.employee?.submittedQuestions?.length || 0}
                 </span>
               </div>
               <span className="text-sm text-gray-500">Questions</span>

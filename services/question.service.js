@@ -236,7 +236,7 @@ class QuestionService {
       idsOfQuestionsToApprove,
     );
     await this.quizRepository.updateQuizStatusToApproved(quizId);
-    await this.quizRepository.updateWeeklyQuestionsStatusToApproved(
+    await this.questionRepository.updateWeeklyQuestionsStatusToApproved(
       idsOfQuestionsToApprove,
     );
 
@@ -278,7 +278,7 @@ class QuestionService {
 
   async startHRDWorkflow(orgId, quizId) {
     const questions = await this.questionRepository.fetchHRDQuestions(orgId);
-
+    console.log(quizId);
     await this.pushQuestionsForApprovals(questions, orgId, quizId);
   }
 }

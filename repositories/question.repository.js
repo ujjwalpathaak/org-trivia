@@ -13,7 +13,7 @@ class QuestionRepository {
   }
 
   async addQuestions(newQuestions) {
-    return await Question.insertMany(newQuestions);
+    return await Question.insertMany(newQuestions, { ordered: false });
   }
 
   async getApprovedWeeklyQuizQuestion(orgId) {

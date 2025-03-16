@@ -11,7 +11,8 @@ const orgService = new OrgService(new OrgRepository());
 const quizService = new QuizService(
   new QuizRepository(),
   new EmployeeRepository(),
-  new OrgRepository(),
+  new QuestionRepository(),
+  new OrgRepository()
 );
 
 class CronTestController {

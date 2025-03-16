@@ -4,7 +4,7 @@ import { convertToReadableFormat } from '../../utils';
 const BadgeViewer = ({ details, setIsBadgeViewerOpen }) => {
   return (
     <div>
-      {details?.badges?.length > 0 ? (
+      {setIsBadgeViewerOpen && (
         <div className="col-span-5">
           <div className="bg-white rounded-lg p-6 shadow-md">
             <div className="flex w-full justify-between">
@@ -17,7 +17,7 @@ const BadgeViewer = ({ details, setIsBadgeViewerOpen }) => {
               </button>
             </div>
 
-            {details?.badges?.length > 0 ? (
+            {setIsBadgeViewerOpen > 0 ? (
               <div className="space-y-4">
                 {details?.badges?.map((badge, idx) => (
                   <div
@@ -34,13 +34,11 @@ const BadgeViewer = ({ details, setIsBadgeViewerOpen }) => {
               </div>
             ) : (
               <p className="text-gray-500 text-sm">
-                No past quizzes available.
+                No badges available.
               </p>
             )}
           </div>
         </div>
-      ) : (
-        <div>No Badges</div>
       )}
     </div>
   );

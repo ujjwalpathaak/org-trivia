@@ -52,15 +52,15 @@ const PastQuizViewer = ({ pastQuizzes, setIsPastQuizViewerOpen }) => {
                   {/* Right Side: Score */}
                   <div className="flex items-center text-blue-600 font-medium">
                     <Coins size={20} className="text-green-500 mr-2" />
-                    {quiz.points} Points
+                    {quiz.points || 0} Points
                   </div>
                   <div className="flex items-center text-blue-600 font-medium">
                     <TrendingUp size={20} className="text-blue-500 mr-2" />
-                    {quiz.multiplier} Multiplier
+                    {quiz.multiplier || 0} Multiplier
                   </div>
                   <div className="flex items-center text-blue-600 font-medium">
                     <Trophy size={20} className="text-yellow-500 mr-2" />
-                    {quiz.score} Score
+                    {quiz.score || 0} Score
                   </div>
                 </div>
               </div>

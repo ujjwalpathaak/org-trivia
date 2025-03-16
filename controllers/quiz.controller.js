@@ -11,7 +11,13 @@ const quizService = new QuizService(
   new OrgRepository(),
   new QuestionRepository(),
 );
-const questionService = new QuestionService(new QuestionRepository());
+
+const questionService = new QuestionService(
+  new QuestionRepository(),
+  new OrgRepository(),
+  new EmployeeRepository(),
+  new QuizRepository(),
+);
 
 class QuizController {
   async isWeeklyQuizLiveAndNotGiven(req, res, next) {

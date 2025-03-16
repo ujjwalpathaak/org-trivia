@@ -25,13 +25,12 @@ export default function ScheduleQuestions() {
   useEffect(() => {
     const getQuestionsToApproveFunc = async () => {
       const response = await getQuestionsToApprove(orgId);
-      if (response.status === 404) {
+      if (response.status === 400) {
         noQuestionFound();
         navigate('/dashboard');
         return;
       }
       setQuestions(response.data.weeklyUnapprovedQuestions);
-      // setAiQuestions(response.data.
       setEmpQuestions(response.data.extraEmployeeQuestions);
     };
 

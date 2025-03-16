@@ -70,8 +70,7 @@ const employeeSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-  },
-  { timestamps: true },
+  }
 );
 
 const Employee = mongoose.model('Employee', employeeSchema);

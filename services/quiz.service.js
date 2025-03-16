@@ -46,7 +46,7 @@ class QuizService {
 
     if (!newWeeklyQuiz) return false;
 
-    return { message: 'New Quiz Scheduled' };
+    return newWeeklyQuiz;
   }
 
   async makeWeeklyQuizLive() {
@@ -61,10 +61,6 @@ class QuizService {
     await this.quizRepository.makeQuizLiveTest();
 
     return { message: 'All weekly quiz are live' };
-  }
-
-  async getUpcomingWeeklyQuizByOrgId(orgId) {
-    return this.quizRepository.getUpcomingWeeklyQuiz(orgId);
   }
 
   async cleanUpWeeklyQuiz() {
