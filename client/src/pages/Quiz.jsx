@@ -140,15 +140,9 @@ const Quiz = ({ setIsQuizOpen, setIsQuizLive }) => {
             {result?.score !== -1 ? (
               <div className="flex flex-col items-center">
                 <Coins className="w-12 h-12 text-blue-500" />
-                <span className="text-xl mt-2">
-                  Your Points: {result.points || 0}
-                </span>
-                <span className="text-xl mt-2">
-                  Your Multiplier: x{result.multiplier || 0}
-                </span>
-                <span className="text-xl mt-2">
-                  Your Score: {result.score || 0}
-                </span>
+                <span className="text-xl mt-2">Your Points: {result.points || 0}</span>
+                <span className="text-xl mt-2">Your Multiplier: x{result.multiplier || 0}</span>
+                <span className="text-xl mt-2">Your Score: {result.score || 0}</span>
                 <button
                   onClick={() => setIsQuizOpen(false)}
                   className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all"
@@ -170,9 +164,7 @@ const Quiz = ({ setIsQuizOpen, setIsQuizLive }) => {
           </>
         ) : questions.length > 0 ? (
           <>
-            <h3 className="text-lg font-semibold mb-2">
-              {questions[currentQuestion]?.question}
-            </h3>
+            <h3 className="text-lg font-semibold mb-2">{questions[currentQuestion]?.question}</h3>
             {questions[currentQuestion]?.image && (
               <img
                 className="w-2/3 max-w-xs mx-auto mt-4 rounded-md shadow-sm"

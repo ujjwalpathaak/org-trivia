@@ -7,9 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
-    "format": "prettier --write ."
+    "format": "prettier --write . && eslint . --fix"
   },
   "dependencies": {
     "jwt-decode": "^4.0.0",

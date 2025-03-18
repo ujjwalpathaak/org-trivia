@@ -52,11 +52,11 @@ export const getPreviousMonthAndYear = () => {
 
 export const mergeUserAnswersAndCorrectAnswers = (
   correctAnswers,
-  myAnswers
+  myAnswers,
 ) => {
   return correctAnswers.map(({ _id, answer }) => {
     const myAnswerObj = myAnswers.find(
-      ({ questionId }) => questionId === _id.toString()
+      ({ questionId }) => questionId === _id.toString(),
     );
     return {
       questionId: _id,

@@ -32,10 +32,7 @@ const MainContent = ({
   return (
     <div className="col-span-5">
       {isBadgeViewerOpen ? (
-        <BadgeViewer
-          details={details}
-          setIsBadgeViewerOpen={setIsBadgeViewerOpen}
-        />
+        <BadgeViewer details={details} setIsBadgeViewerOpen={setIsBadgeViewerOpen} />
       ) : isQuestionMakerOpen ? (
         <QuestionMaker setIsQuestionMakerOpen={setIsQuestionMakerOpen} />
       ) : isQuizOpen ? (
@@ -67,15 +64,11 @@ const MainContent = ({
               <div className="grid grid-cols-3 gap-4">
                 <div className="bg-gray-50 p-4 rounded-lg text-center">
                   <Image className="h-8 w-8 mx-auto mb-2" />
-                  <p className="text-sm">
-                    Express in pictures! From latest reads to travels
-                  </p>
+                  <p className="text-sm">Express in pictures! From latest reads to travels</p>
                 </div>
                 <div className="bg-gray-50 p-4 rounded-lg text-center">
                   <Zap className="h-8 w-8 mx-auto mb-2" />
-                  <p className="text-sm">
-                    Ignite Learning Sparks! Discuss to expand...
-                  </p>
+                  <p className="text-sm">Ignite Learning Sparks! Discuss to expand...</p>
                 </div>
                 <div className="bg-gray-50 p-4 rounded-lg text-center">
                   <MessageSquare className="h-8 w-8 mx-auto mb-2" />
@@ -98,8 +91,7 @@ const MainContent = ({
                 </div>
               </div>
               <p className="flex-1">
-                4 people in your organization are celebrating their Birthdays
-                today!
+                4 people in your organization are celebrating their Birthdays today!
               </p>
             </div>
           </div>

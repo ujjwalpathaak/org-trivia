@@ -46,8 +46,7 @@ const QuestionMaker = ({ setIsQuestionMakerOpen }) => {
       config: {
         ...prev.config,
         puzzleType: newPuzzleType,
-        refactor:
-          newPuzzleType === 'BloodRelation' || newPuzzleType === 'Direction',
+        refactor: newPuzzleType === 'BloodRelation' || newPuzzleType === 'Direction',
       },
     }));
   };
@@ -94,9 +93,7 @@ const QuestionMaker = ({ setIsQuestionMakerOpen }) => {
       </div>
       <div className="">
         <div className="mb-4">
-          <label className="block font-semibold text-lg text-gray-700">
-            Question
-          </label>
+          <label className="block font-semibold text-lg text-gray-700">Question</label>
           <textarea
             name="question"
             value={question.question}
@@ -104,15 +101,11 @@ const QuestionMaker = ({ setIsQuestionMakerOpen }) => {
             className="mt-2 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
             placeholder="Enter the question here"
           />
-          {errors.question && (
-            <p className="text-red-500 text-sm">{errors.question}</p>
-          )}
+          {errors.question && <p className="text-red-500 text-sm">{errors.question}</p>}
         </div>
 
         <div className="mb-4">
-          <label className="block font-semibold text-lg font-medium text-gray-700">
-            Category
-          </label>
+          <label className="block font-semibold text-lg font-medium text-gray-700">Category</label>
           <select
             name="category"
             value={question.category}
@@ -120,22 +113,16 @@ const QuestionMaker = ({ setIsQuestionMakerOpen }) => {
             className="mt-2 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
           >
             <option value="">Select Category</option>
-            <option value="CAnIT">
-              Company Achievements and Industry Trends
-            </option>
+            <option value="CAnIT">Company Achievements and Industry Trends</option>
             <option value="HRD">HR Docs</option>
             <option value="PnA">Puzzles and Aptitude</option>
           </select>
-          {errors.category && (
-            <p className="text-red-500 text-sm">{errors.category}</p>
-          )}
+          {errors.category && <p className="text-red-500 text-sm">{errors.category}</p>}
         </div>
 
         {question.category === 'PnA' && (
           <div className="mb-4">
-            <label className="block font-semibold text-lg text-gray-700">
-              Puzzle Type
-            </label>
+            <label className="block font-semibold text-lg text-gray-700">Puzzle Type</label>
             <select
               name="puzzleType"
               value={question?.config?.puzzleType || ''}
@@ -148,16 +135,12 @@ const QuestionMaker = ({ setIsQuestionMakerOpen }) => {
               <option value="Arithmetic">Arithmetic</option>
               <option value="Direction">Direction</option>
             </select>
-            {errors.puzzleType && (
-              <p className="text-red-500 text-sm">{errors.puzzleType}</p>
-            )}
+            {errors.puzzleType && <p className="text-red-500 text-sm">{errors.puzzleType}</p>}
           </div>
         )}
 
         <div className="mb-4">
-          <label className="block font-semibold text-lg text-gray-700">
-            Options
-          </label>
+          <label className="block font-semibold text-lg text-gray-700">Options</label>
           {question.options.map((option, index) => (
             <div key={index} className="mb-2">
               <input
@@ -169,15 +152,11 @@ const QuestionMaker = ({ setIsQuestionMakerOpen }) => {
               />
             </div>
           ))}
-          {errors.options && (
-            <p className="text-red-500 text-sm">{errors.options}</p>
-          )}
+          {errors.options && <p className="text-red-500 text-sm">{errors.options}</p>}
         </div>
 
         <div className="mb-4">
-          <label className="block font-semibold text-lg text-gray-700">
-            Correct Answer
-          </label>
+          <label className="block font-semibold text-lg text-gray-700">Correct Answer</label>
           <select
             name="answer"
             value={question.answer}
@@ -187,14 +166,11 @@ const QuestionMaker = ({ setIsQuestionMakerOpen }) => {
             <option value="">Select Correct Answer</option>
             {question.options.map((option, index) => (
               <option key={index} value={index}>
-                Option {index + 1}:{' '}
-                {option.length > 15 ? option.substring(0, 15) + '...' : option}
+                Option {index + 1}: {option.length > 15 ? option.substring(0, 15) + '...' : option}
               </option>
             ))}
           </select>
-          {errors.answer && (
-            <p className="text-red-500 text-sm">{errors.answer}</p>
-          )}
+          {errors.answer && <p className="text-red-500 text-sm">{errors.answer}</p>}
         </div>
 
         {/* <div className="mb-4">
@@ -207,10 +183,7 @@ const QuestionMaker = ({ setIsQuestionMakerOpen }) => {
           )}
         </div> */}
         <div className="w-full mt-6 flex justify-end">
-          <button
-            onClick={handleSubmit}
-            className="bg-blue-500 text-white px-4 py-2 rounded-md"
-          >
+          <button onClick={handleSubmit} className="bg-blue-500 text-white px-4 py-2 rounded-md">
             Submit Question
           </button>
         </div>

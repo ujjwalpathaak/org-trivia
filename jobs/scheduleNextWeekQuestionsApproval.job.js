@@ -12,7 +12,7 @@ const quizService = new QuizService(
   new QuizRepository(),
   new EmployeeRepository(),
   new QuestionRepository(),
-  new OrgRepository()
+  new OrgRepository(),
 );
 const questionService = new QuestionService(new QuestionRepository());
 const leaderboardService = new LeaderboardService(

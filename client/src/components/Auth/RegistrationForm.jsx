@@ -21,12 +21,7 @@ const RegistrationForm = () => {
     const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]:
-        type === 'checkbox'
-          ? checked
-          : type === 'radio'
-            ? value === 'true'
-            : value,
+      [name]: type === 'checkbox' ? checked : type === 'radio' ? value === 'true' : value,
     }));
   };
 
@@ -62,9 +57,7 @@ const RegistrationForm = () => {
       <div className="flex items-start">
         <div className="px-12">
           <div className="mb-5">
-            <label className="block mb-2 text-sm font-medium text-gray-900">
-              New account for
-            </label>
+            <label className="block mb-2 text-sm font-medium text-gray-900">New account for</label>
             <div className="flex gap-4">
               <label className="flex items-center">
                 <input
@@ -89,18 +82,13 @@ const RegistrationForm = () => {
                 Admin
               </label>
             </div>
-            {errors.isAdmin && (
-              <p className="text-red-500 text-xs mt-1">{errors.isAdmin}</p>
-            )}
+            {errors.isAdmin && <p className="text-red-500 text-xs mt-1">{errors.isAdmin}</p>}
           </div>
           <OrgSearch setFormData={setFormData} />
         </div>
         <div className="px-12">
           <div className="mb-5">
-            <label
-              htmlFor="name"
-              className="block mb-2 text-sm font-medium text-gray-900"
-            >
+            <label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-900">
               Your Name
             </label>
             <input
@@ -114,15 +102,10 @@ const RegistrationForm = () => {
               placeholder="John Doe"
               required
             />
-            {errors.name && (
-              <p className="text-red-500 text-xs mt-1">{errors.name}</p>
-            )}
+            {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
           </div>
           <div className="mb-5">
-            <label
-              htmlFor="email"
-              className="block mb-2 text-sm font-medium text-gray-900"
-            >
+            <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900">
               Your email
             </label>
             <input
@@ -136,15 +119,10 @@ const RegistrationForm = () => {
               placeholder="name@example.com"
               required
             />
-            {errors.email && (
-              <p className="text-red-500 text-xs mt-1">{errors.email}</p>
-            )}
+            {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
           </div>
           <div className="mb-5">
-            <label
-              htmlFor="password"
-              className="block mb-2 text-sm font-medium text-gray-900"
-            >
+            <label htmlFor="password" className="block mb-2 text-sm font-medium text-gray-900">
               Your password
             </label>
             <input
@@ -158,9 +136,7 @@ const RegistrationForm = () => {
               placeholder="********"
               required
             />
-            {errors.password && (
-              <p className="text-red-500 text-xs mt-1">{errors.password}</p>
-            )}
+            {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
           </div>
         </div>
       </div>
@@ -171,9 +147,7 @@ const RegistrationForm = () => {
         >
           Register
         </button>
-        {errors.serverError && (
-          <p className="text-red-500 text-xs mt-1">{errors.serverError}</p>
-        )}
+        {errors.serverError && <p className="text-red-500 text-xs mt-1">{errors.serverError}</p>}
       </div>
     </form>
   );

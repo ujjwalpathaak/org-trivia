@@ -14,8 +14,7 @@ export default function ListManager({ orgId, selectedGenre }) {
     { key: 'HR Docs', value: 'HRD' },
   ];
 
-  const getGenreFullName = (value) =>
-    allItems.find((item) => item.value === value)?.key || '';
+  const getGenreFullName = (value) => allItems.find((item) => item.value === value)?.key || '';
 
   const [selectedItems, setSelectedItems] = useState(
     selectedGenre.map((genre) => ({
@@ -25,9 +24,7 @@ export default function ListManager({ orgId, selectedGenre }) {
   );
 
   const [availableItems, setAvailableItems] = useState(() =>
-    allItems.filter(
-      (item) => !selectedItems.some((i) => i.value === item.value)
-    )
+    allItems.filter((item) => !selectedItems.some((i) => i.value === item.value))
   );
 
   const [isSaved, setIsSaved] = useState(true);
@@ -94,9 +91,7 @@ export default function ListManager({ orgId, selectedGenre }) {
 
         <div>
           <h3 className="font-semibold mr-2 text-gray-800">Selected Genres</h3>
-          <span className="text-sm italic text-gray-400">
-            {`(Drag and Drop to Reorder)`}
-          </span>
+          <span className="text-sm italic text-gray-400">{`(Drag and Drop to Reorder)`}</span>
           <ul className="space-y-3 mt-4">
             {selectedItems.length === 0 && (
               <li className="bg-gray-50 rounded-lg p-4 text-gray-500 text-center">
@@ -158,9 +153,7 @@ function DraggableGenre({ item, index, moveItem, removeItem }) {
   return (
     <li
       ref={ref}
-      className={`bg-blue-50 rounded-lg p-4 transition-colors ${
-        isDragging ? 'opacity-50' : ''
-      }`}
+      className={`bg-blue-50 rounded-lg p-4 transition-colors ${isDragging ? 'opacity-50' : ''}`}
     >
       <div className="flex justify-between items-center">
         <div className="flex">

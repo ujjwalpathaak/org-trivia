@@ -16,12 +16,7 @@ const LoginForm = () => {
 
     setFormData((prev) => ({
       ...prev,
-      [name]:
-        type === 'checkbox'
-          ? checked
-          : type === 'radio'
-            ? value === 'true'
-            : value,
+      [name]: type === 'checkbox' ? checked : type === 'radio' ? value === 'true' : value,
     }));
   };
 
@@ -50,10 +45,7 @@ const LoginForm = () => {
       <h1 className="text-lg font-bold mb-4">Welcome Back!</h1>
 
       <div className="mb-5">
-        <label
-          htmlFor="email"
-          className="block mb-2 text-sm font-medium text-gray-900"
-        >
+        <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900">
           Your email
         </label>
         <input
@@ -67,15 +59,10 @@ const LoginForm = () => {
           placeholder="name@example.com"
           required
         />
-        {errors.email && (
-          <p className="text-red-500 text-xs mt-1">{errors.email}</p>
-        )}
+        {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
       </div>
       <div className="mb-5">
-        <label
-          htmlFor="password"
-          className="block mb-2 text-sm font-medium text-gray-900"
-        >
+        <label htmlFor="password" className="block mb-2 text-sm font-medium text-gray-900">
           Your password
         </label>
         <input
@@ -89,9 +76,7 @@ const LoginForm = () => {
           placeholder="********"
           required
         />
-        {errors.password && (
-          <p className="text-red-500 text-xs mt-1">{errors.password}</p>
-        )}
+        {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
       </div>
 
       <button
@@ -100,9 +85,7 @@ const LoginForm = () => {
       >
         Login
       </button>
-      {errors.serverError && (
-        <p className="text-red-500 text-xs mt-1">{errors.serverError}</p>
-      )}
+      {errors.serverError && <p className="text-red-500 text-xs mt-1">{errors.serverError}</p>}
     </form>
   );
 };

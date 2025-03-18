@@ -1,5 +1,18 @@
+# Ignore build files and dependencies
 node_modules/
 dist/
 build/
-public/
+.next/
+out/
+
+# Ignore config & env files
 package-lock.json
+pnpm-lock.yaml
+yarn.lock
+*.log
+.env
+.env.local
+
+# Ignore generated files
+coverage/
+public/

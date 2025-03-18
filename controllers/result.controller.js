@@ -26,10 +26,11 @@ class ResultController {
         quizId,
       );
 
-      if(!data.success) res.status(400).json({
-        message: data.message,
-        data: null
-      })
+      if (!data.success)
+        res.status(400).json({
+          message: data.message,
+          data: null,
+        });
 
       res
         .status(200)
@@ -47,8 +48,11 @@ class ResultController {
         return res.status(400).json({ message: 'Missing required fields' });
       }
 
-      const pastRecords =
-        await resultService.getEmployeePastResults(employeeId, page, size);
+      const pastRecords = await resultService.getEmployeePastResults(
+        employeeId,
+        page,
+        size,
+      );
 
       res.status(200).json(pastRecords);
     } catch (err) {

@@ -43,11 +43,7 @@ const BadgeViewer = ({ details, setIsBadgeViewerOpen }) => {
                     key={idx}
                     className="border border-gray-200 rounded-lg p-4 shadow-sm flex items-center justify-start"
                   >
-                    <img
-                      className="w-8"
-                      src={badge.badgeDetails.url}
-                      alt="Badge"
-                    />
+                    <img className="w-8" src={badge.badgeDetails.url} alt="Badge" />
                     <div className="flex flex-col">
                       <span className="text-base text-slate-900 ml-2">
                         <span
@@ -58,9 +54,7 @@ const BadgeViewer = ({ details, setIsBadgeViewerOpen }) => {
                         {badge.description}
                       </span>
                       <span className="text-sm text-slate-400 ml-2">
-                        Earned At{' '}
-                        {badge.earnedAt &&
-                          convertToReadableFormat(badge.earnedAt)}
+                        Earned At {badge.earnedAt && convertToReadableFormat(badge.earnedAt)}
                       </span>
                     </div>
                   </div>
@@ -79,8 +73,7 @@ const BadgeViewer = ({ details, setIsBadgeViewerOpen }) => {
                   </button>
 
                   <span className="text-gray-700 font-semibold">
-                    Page <span className="text-blue-600">{pageNumber + 1}</span>{' '}
-                    of {totalPages}
+                    Page <span className="text-blue-600">{pageNumber + 1}</span> of {totalPages}
                   </span>
 
                   <button

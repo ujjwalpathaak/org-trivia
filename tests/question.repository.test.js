@@ -14,7 +14,10 @@ describe('QuestionRepository (Integration Tests)', () => {
     mongoServer = await MongoMemoryServer.create();
     const uri = mongoServer.getUri();
 
-    await mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+    await mongoose.connect(uri, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
 
     questionRepository = new QuestionRepository();
   });
@@ -33,11 +36,11 @@ describe('QuestionRepository (Integration Tests)', () => {
   test('saveQuestion should save a new question', async () => {
     const newQuestion = {
       source: 'AI',
-      category: 'CCnHnFF',  // Ensure this matches the schema enum
+      category: 'CCnHnFF', // Ensure this matches the schema enum
       question: 'What is 2 + 2?',
       answer: 1,
       options: ['1', '4', '3', '5'],
-      status: 'extra',  // Ensure this matches the schema enum
+      status: 'extra', // Ensure this matches the schema enum
     };
 
     const savedQuestion = await questionRepository.saveQuestion(newQuestion);
@@ -49,8 +52,22 @@ describe('QuestionRepository (Integration Tests)', () => {
 
   test('addQuestions should insert multiple questions', async () => {
     const questions = [
-      { source: 'AI', category: 'CCnHnFF', question: 'What is AI?', answer: 2, options: ['ML', 'DL', 'AI', 'NLP'], status: 'extra' },
-      { source: 'Employee', category: 'HRD', question: 'What is HR?', answer: 1, options: ['IT', 'HR', 'Finance', 'Admin'], status: 'live' }
+      {
+        source: 'AI',
+        category: 'CCnHnFF',
+        question: 'What is AI?',
+        answer: 2,
+        options: ['ML', 'DL', 'AI', 'NLP'],
+        status: 'extra',
+      },
+      {
+        source: 'Employee',
+        category: 'HRD',
+        question: 'What is HR?',
+        answer: 1,
+        options: ['IT', 'HR', 'Finance', 'Admin'],
+        status: 'live',
+      },
     ];
 
     await questionRepository.addQuestions(questions);
@@ -79,7 +96,8 @@ describe('QuestionRepository (Integration Tests)', () => {
       },
     });
 
-    const result = await questionRepository.getApprovedWeeklyQuizQuestion(orgId);
+    const result =
+      await questionRepository.getApprovedWeeklyQuizQuestion(orgId);
 
     expect(result).toHaveLength(1);
     expect(result[0].question.question).toBe('Who handles employee benefits?');
@@ -126,9 +144,13 @@ describe('QuestionRepository (Integration Tests)', () => {
       },
     });
 
-    await questionRepository.updateWeeklyQuestionsStatusToApproved([questionId]);
+    await questionRepository.updateWeeklyQuestionsStatusToApproved([
+      questionId,
+    ]);
 
-    const updatedQuestion = await WeeklyQuestion.findOne({ 'question._id': questionId });
+    const updatedQuestion = await WeeklyQuestion.findOne({
+      'question._id': questionId,
+    });
 
     expect(updatedQuestion.isApproved).toBe(true);
   });

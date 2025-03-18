@@ -24,10 +24,7 @@ const AdminDashboard = () => {
   return (
     <div className="min-h-[93vh] flex justify-center bg-[#f0f2f5]">
       <div className="pt-4 px-4 grid grid-cols-11 gap-4">
-        <AdminProfile
-          data={data}
-          last3Leaderboards={analytics.last3Leaderboards}
-        />
+        <AdminProfile data={data} last3Leaderboards={analytics.last3Leaderboards} />
         <AdminMainContent
           isQuestionMakerOpen={isQuestionMakerOpen}
           setIsQuestionMakerOpen={setIsQuestionMakerOpen}

@@ -19,7 +19,10 @@ describe('AuthRepository (Integration Tests)', () => {
   beforeAll(async () => {
     mongoServer = await MongoMemoryServer.create();
     const uri = mongoServer.getUri();
-    await mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+    await mongoose.connect(uri, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
   });
 
   afterAll(async () => {
@@ -66,7 +69,14 @@ describe('AuthRepository (Integration Tests)', () => {
     const name = 'New User';
     const isAdmin = false;
 
-    const newUser = await authRepository.createNewUser(Employee, email, password, name, orgId, isAdmin);
+    const newUser = await authRepository.createNewUser(
+      Employee,
+      email,
+      password,
+      name,
+      orgId,
+      isAdmin,
+    );
 
     expect(newUser).toBeDefined();
     expect(newUser.email).toBe(email);
@@ -77,8 +87,10 @@ describe('AuthRepository (Integration Tests)', () => {
   test('isPasswordsMatch should return true for correct passwords', async () => {
     const password = 'password123';
     const hashedPassword = await bcrypt.hash(password, 10);
-    const result = await authRepository.isPasswordsMatch(password, hashedPassword);
+    const result = await authRepository.isPasswordsMatch(
+      password,
+      hashedPassword,
+    );
     expect(result).toBe(true);
   });
-
 });

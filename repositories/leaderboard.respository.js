@@ -69,21 +69,21 @@ class LeaderboardRepository {
 
     const lastThreeMonths = [];
     for (let i = 1; i <= 3; i++) {
-        let month = currentMonth - i;
-        let year = currentYear;
-        if (month < 0) {
-            month += 12;
-            year -= 1;
-        }
-        lastThreeMonths.push({ month, year });
+      let month = currentMonth - i;
+      let year = currentYear;
+      if (month < 0) {
+        month += 12;
+        year -= 1;
+      }
+      lastThreeMonths.push({ month, year });
     }
 
     return Leaderboard.aggregate([
-      { 
-        $match: { 
+      {
+        $match: {
           orgId: new ObjectId(orgId),
-          $or: lastThreeMonths.map(({ month, year }) => ({ month, year }))
-        } 
+          $or: lastThreeMonths.map(({ month, year }) => ({ month, year })),
+        },
       },
       {
         $group: {
@@ -124,8 +124,7 @@ class LeaderboardRepository {
         },
       },
     ]);
-}
-
+  }
 
   async resetLeaderboard(month, year, pMonth, pYear) {
     const topThreePerOrg = await Leaderboard.aggregate([
@@ -169,7 +168,7 @@ class LeaderboardRepository {
 
     return {
       message: 'Leaderboard reset successfully',
-    }
+    };
   }
 }
 

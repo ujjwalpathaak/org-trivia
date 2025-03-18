@@ -28,19 +28,22 @@ class EmployeeRepository {
   }
 
   async addSubmittedQuestion(questionId, employeeId) {
-   return Employee.updateOne(
+    return Employee.updateOne(
       { _id: employeeId },
       { $push: { submittedQuestions: questionId } },
     );
   }
 
   async updateWeeklyQuizScore(employeeId, points) {
-    const employee = await Employee.findById(employeeId, 'streak score quizGiven');
-    if(employee.quizGiven) return false;
-    
+    const employee = await Employee.findById(
+      employeeId,
+      'streak score quizGiven',
+    );
+    if (employee.quizGiven) return false;
+
     const multiplier = calculateMultiplier(employee.streak);
     const updatedScore = points * multiplier;
-    
+
     await Employee.updateOne(
       { _id: employeeId },
       { $set: { quizGiven: true }, $inc: { score: updatedScore } },

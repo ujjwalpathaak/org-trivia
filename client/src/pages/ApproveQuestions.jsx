@@ -86,19 +86,13 @@ export default function ScheduleQuestions() {
       <div className="flex gap-6 h-full">
         {addQuestion && (
           <div className="w-1/3 bg-white rounded-xl shadow-lg p-6 flex-1">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6">
-              Extra Questions
-            </h2>
+            <h2 className="text-2xl font-bold text-gray-800 mb-6">Extra Questions</h2>
             <div className="space-y-6">
               <div className="bg-gray-50 rounded-lg p-6 shadow-sm">
-                <h3 className="text-lg font-semibold text-gray-700 mb-4">
-                  AI Questions
-                </h3>
+                <h3 className="text-lg font-semibold text-gray-700 mb-4">AI Questions</h3>
                 <div className="space-y-2">
                   {aiQuestions?.length === 0 && (
-                    <span className="italic text-slate-400">
-                      No extra questions found
-                    </span>
+                    <span className="italic text-slate-400">No extra questions found</span>
                   )}
                   {aiQuestions?.map((q, idx) => (
                     <button
@@ -113,14 +107,10 @@ export default function ScheduleQuestions() {
               </div>
 
               <div className="bg-gray-50 rounded-lg p-6 shadow-sm">
-                <h3 className="text-lg font-semibold text-gray-700 mb-4">
-                  Employee Questions
-                </h3>
+                <h3 className="text-lg font-semibold text-gray-700 mb-4">Employee Questions</h3>
                 <div className="space-y-2">
                   {empQuestions.length === 0 && (
-                    <span className="italic text-slate-400">
-                      No extra questions found
-                    </span>
+                    <span className="italic text-slate-400">No extra questions found</span>
                   )}
                   {empQuestions?.map((q, idx) => (
                     <button
@@ -137,13 +127,9 @@ export default function ScheduleQuestions() {
           </div>
         )}
 
-        <div
-          className={`bg-white rounded-xl shadow-lg p-6 ${addQuestion ? 'flex-1' : 'w-full'}`}
-        >
+        <div className={`bg-white rounded-xl shadow-lg p-6 ${addQuestion ? 'flex-1' : 'w-full'}`}>
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-800">
-              Questions for {selectedWeek}
-            </h2>
+            <h2 className="text-2xl font-bold text-gray-800">Questions for {selectedWeek}</h2>
             <button
               onClick={handleApproveQuiz}
               className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition duration-200 font-medium"
@@ -156,14 +142,9 @@ export default function ScheduleQuestions() {
             {questions?.map((q, idx) => {
               if (q.question) {
                 return (
-                  <div
-                    key={idx}
-                    className="bg-gray-50 rounded-lg p-6 shadow-sm relative"
-                  >
+                  <div key={idx} className="bg-gray-50 rounded-lg p-6 shadow-sm relative">
                     <div className="flex justify-between items-center mb-4">
-                      <h3 className="text-lg font-semibold text-gray-700">
-                        Question {idx + 1}
-                      </h3>
+                      <h3 className="text-lg font-semibold text-gray-700">Question {idx + 1}</h3>
                       {!addQuestion && (
                         <button
                           onClick={() => handleQuestionRemove(idx)}
@@ -175,9 +156,7 @@ export default function ScheduleQuestions() {
                     </div>
                     <textarea
                       value={q.question?.question}
-                      onChange={(e) =>
-                        handleQuestionChangeType(idx, e.target.value)
-                      }
+                      onChange={(e) => handleQuestionChangeType(idx, e.target.value)}
                       className="w-full p-4 border border-gray-200 rounded-lg mb-4 focus:ring-2 focus:ring-blue-500 focus:border-transparent min-h-[100px]"
                     />
                     {q.question?.image && (
@@ -194,9 +173,7 @@ export default function ScheduleQuestions() {
                           key={i}
                           type="text"
                           value={option}
-                          onChange={(e) =>
-                            handleOptionChange(idx, i, e.target.value)
-                          }
+                          onChange={(e) => handleOptionChange(idx, i, e.target.value)}
                           className={`w-full p-3 border rounded-lg transition duration-200 ${
                             i === q.question.answer
                               ? 'bg-green-50 border-green-200'
@@ -206,14 +183,10 @@ export default function ScheduleQuestions() {
                       ))}
                     </div>
                     <div className="mt-4">
-                      <p className="font-medium text-gray-700 mb-2">
-                        Correct Answer:
-                      </p>
+                      <p className="font-medium text-gray-700 mb-2">Correct Answer:</p>
                       <select
                         value={q.question?.answer || ''}
-                        onChange={(e) =>
-                          handleCorrectAnswerChange(idx, e.target.value)
-                        }
+                        onChange={(e) => handleCorrectAnswerChange(idx, e.target.value)}
                         className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       >
                         {q?.question?.options?.map((option, i) => (
@@ -227,17 +200,10 @@ export default function ScheduleQuestions() {
                 );
               } else {
                 return (
-                  <div
-                    key={idx}
-                    className="bg-gray-100 rounded-lg p-6 animate-pulse"
-                  >
-                    <h3 className="text-lg font-semibold text-gray-700 mb-2">
-                      Question {idx + 1}
-                    </h3>
+                  <div key={idx} className="bg-gray-100 rounded-lg p-6 animate-pulse">
+                    <h3 className="text-lg font-semibold text-gray-700 mb-2">Question {idx + 1}</h3>
                     <div className="h-32 bg-gray-200 rounded-lg mb-4"></div>
-                    <p className="text-gray-600 font-medium">
-                      Adding new question...
-                    </p>
+                    <p className="text-gray-600 font-medium">Adding new question...</p>
                   </div>
                 );
               }

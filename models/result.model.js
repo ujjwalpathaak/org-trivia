@@ -19,43 +19,46 @@ const answerSchema = new mongoose.Schema(
   { _id: false },
 );
 
-const resultSchema = new mongoose.Schema({
-  employeeId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Employee',
-    required: true,
+const resultSchema = new mongoose.Schema(
+  {
+    employeeId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Employee',
+      required: true,
+    },
+    orgId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Org',
+      required: true,
+    },
+    quizId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Quiz',
+      required: true,
+    },
+    points: {
+      type: Number,
+      required: true,
+    },
+    multiplier: {
+      type: Number,
+      required: true,
+    },
+    score: {
+      type: Number,
+      required: true,
+    },
+    genre: {
+      type: String,
+      enum: ['PnA', 'CAnIT', 'HRD'],
+    },
+    answers: {
+      type: [answerSchema],
+      default: [],
+    },
   },
-  orgId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Org',
-    required: true,
-  },
-  quizId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Quiz',
-    required: true,
-  },
-  points: {
-    type: Number,
-    required: true,
-  },
-  multiplier: {
-    type: Number,
-    required: true,
-  },
-  score: {
-    type: Number,
-    required: true,
-  },
-  genre: {
-    type: String,
-    enum: ['PnA', 'CAnIT', 'HRD'],
-  },
-  answers: {
-    type: [answerSchema],
-    default: [],
-  },
-}, { timestamps: true, updatedAt: false });
+  { timestamps: true, updatedAt: false },
+);
 
 const Result = mongoose.model('Result', resultSchema);
 

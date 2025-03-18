@@ -12,7 +12,7 @@ const quizService = new QuizService(
   new QuizRepository(),
   new EmployeeRepository(),
   new QuestionRepository(),
-  new OrgRepository()
+  new OrgRepository(),
 );
 
 class CronTestController {

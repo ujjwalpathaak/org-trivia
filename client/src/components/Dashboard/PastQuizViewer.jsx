@@ -17,11 +17,7 @@ const PastQuizViewer = ({ setIsPastQuizViewerOpen }) => {
       try {
         setLoading(true);
         setError(null);
-        const response = await getPastQuizResults(
-          employeeId,
-          pageNumber,
-          pageSize
-        );
+        const response = await getPastQuizResults(employeeId, pageNumber, pageSize);
 
         if (response && response.data) {
           setPastQuizzes(response.data);
@@ -127,8 +123,7 @@ const PastQuizViewer = ({ setIsPastQuizViewerOpen }) => {
           </button>
 
           <span className="text-gray-700 font-semibold">
-            Page <span className="text-blue-600">{pageNumber + 1}</span> of{' '}
-            {totalPages}
+            Page <span className="text-blue-600">{pageNumber + 1}</span> of {totalPages}
           </span>
 
           <button

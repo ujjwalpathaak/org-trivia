@@ -1,12 +1,5 @@
 import React from 'react';
-import {
-  Award,
-  CalendarCheck,
-  Book,
-  CirclePlus,
-  Bookmark,
-  AwardIcon,
-} from 'lucide-react';
+import { Award, CalendarCheck, Book, CirclePlus, Bookmark, AwardIcon } from 'lucide-react';
 
 const ProfileSection = ({
   data,
@@ -29,18 +22,14 @@ const ProfileSection = ({
             <div className="text-center">
               <div className="flex items-center gap-2 text-gray-700">
                 <Award className="h-5 w-5 text-blue-600" />
-                <span className="text-lg font-semibold">
-                  {details?.badges?.length || 0}
-                </span>
+                <span className="text-lg font-semibold">{details?.badges?.length || 0}</span>
               </div>
               <span className="text-sm text-gray-500">Badges</span>
             </div>
             <div className="text-center">
               <div className="flex items-center gap-2 text-gray-700">
                 <CalendarCheck className="h-5 w-5 text-green-500" />
-                <span className="text-lg font-semibold">
-                  {details?.employee?.streak || 0}
-                </span>
+                <span className="text-lg font-semibold">{details?.employee?.streak || 0}</span>
               </div>
               <span className="text-sm text-gray-500">Streak</span>
             </div>
@@ -58,9 +47,7 @@ const ProfileSection = ({
             <h2 className="text-lg font-semibold mb-3">My Badges</h2>
             <div className="flex flex-col gap-2">
               {details?.badges?.length === 0 && (
-                <span className="text-slate-400 font-semibold">
-                  No badges. Participate More!
-                </span>
+                <span className="text-slate-400 font-semibold">No badges. Participate More!</span>
               )}
               {details?.badges?.slice(0, 3).map((badge, idx) => (
                 <div

@@ -46,9 +46,7 @@ const Leaderboard = ({ last3Leaderboards }) => {
                     <tr key={index} className="border-t bg-gray-100">
                       <td className="p-3 font-semibold">#{index + 1}</td>
                       <td className="p-3">{player.employee.name}</td>
-                      <td className="p-3 text-left font-bold">
-                        {player.totalScore}
-                      </td>
+                      <td className="p-3 text-left font-bold">{player.totalScore}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -79,15 +77,10 @@ const Leaderboard = ({ last3Leaderboards }) => {
                   </thead>
                   <tbody>
                     {leaderboard?.employees?.map((player, index) => (
-                      <tr
-                        key={player.employeeId}
-                        className="border-t bg-gray-100"
-                      >
+                      <tr key={player.employeeId} className="border-t bg-gray-100">
                         <td className="p-3 font-semibold">#{index + 1}</td>
                         <td className="p-3">{player.name}</td>
-                        <td className="p-3 text-left font-bold">
-                          {player.totalScore}
-                        </td>
+                        <td className="p-3 text-left font-bold">{player.totalScore}</td>
                       </tr>
                     ))}
                   </tbody>

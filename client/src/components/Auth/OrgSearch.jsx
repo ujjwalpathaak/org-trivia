@@ -36,9 +36,7 @@ const OrgSearch = ({ setFormData }) => {
     setSearchTerm(value);
     if (value) {
       setFilteredOrgs(
-        orgList.filter((org) =>
-          org.name.toLowerCase().includes(value.toLowerCase())
-        )
+        orgList.filter((org) => org.name.toLowerCase().includes(value.toLowerCase()))
       );
     } else {
       setFilteredOrgs([]);
@@ -53,9 +51,7 @@ const OrgSearch = ({ setFormData }) => {
 
   return (
     <div className="mb-5 relative">
-      <label className="block mb-2 text-sm font-medium text-gray-900">
-        Organisation
-      </label>
+      <label className="block mb-2 text-sm font-medium text-gray-900">Organisation</label>
       <input
         type="text"
         value={searchTerm}

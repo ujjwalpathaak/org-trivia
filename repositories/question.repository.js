@@ -41,7 +41,7 @@ class QuestionRepository {
   }
 
   async saveWeeklyQuizQuestions(quizId, newQuestions) {
-    if(newQuestions.length > 0){
+    if (newQuestions.length > 0) {
       await quizRepository.updateQuizStatus(quizId, 'unapproved');
       return await WeeklyQuestion.insertMany(newQuestions);
     }

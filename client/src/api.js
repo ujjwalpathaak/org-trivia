@@ -119,16 +119,13 @@ export const saveGenreSettings = async (newGenres, orgId) => {
 
 export const getQuestionsToApprove = async (orgId) => {
   try {
-    const response = await fetch(
-      `${BACKEND_URL}/question/weekly/unapproved/${orgId}`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const response = await fetch(`${BACKEND_URL}/question/weekly/unapproved/${orgId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
     return { status: response.status, data: await response.json() };
   } catch (error) {
@@ -180,16 +177,13 @@ export const getSettings = async (orgId) => {
 
 export const toggleTrivia = async (orgId) => {
   try {
-    const response = await fetch(
-      `${BACKEND_URL}/org/settings/toggleTrivia/${orgId}`,
-      {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const response = await fetch(`${BACKEND_URL}/org/settings/toggleTrivia/${orgId}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
     if (!response.ok) {
       const errorData = await response.json();
@@ -224,12 +218,7 @@ export const handleApproveWeeklyQuiz = async (questions, orgId) => {
   }
 };
 
-export const submitWeeklyQuizAnswers = async (
-  weeklyQuizAnswers,
-  orgId,
-  employeeId,
-  quizId
-) => {
+export const submitWeeklyQuizAnswers = async (weeklyQuizAnswers, orgId, employeeId, quizId) => {
   try {
     const data = {
       answers: weeklyQuizAnswers,
@@ -237,17 +226,14 @@ export const submitWeeklyQuizAnswers = async (
       employeeId: employeeId,
       quizId: quizId,
     };
-    const response = await fetch(
-      `${BACKEND_URL}/result/submitWeeklyQuizAnswers`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(data),
-      }
-    );
+    const response = await fetch(`${BACKEND_URL}/result/submitWeeklyQuizAnswers`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(data),
+    });
 
     if (!response.ok) {
       const errorData = await response.json();
@@ -283,16 +269,13 @@ export const getLeaderboardByOrgId = async (orgId) => {
 
 export const isWeeklyQuizLive = async (orgId, employeeId) => {
   try {
-    const response = await fetch(
-      `${BACKEND_URL}/quiz/status/${orgId}/${employeeId}`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const response = await fetch(`${BACKEND_URL}/quiz/status/${orgId}/${employeeId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
     if (!response.ok) {
       const errorData = await response.json();
@@ -307,16 +290,13 @@ export const isWeeklyQuizLive = async (orgId, employeeId) => {
 
 export const fetchEmployeeScore = async (employeeId) => {
   try {
-    const response = await fetch(
-      `${BACKEND_URL}/employee/score/${employeeId}`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const response = await fetch(`${BACKEND_URL}/employee/score/${employeeId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
     if (!response.ok) {
       const errorData = await response.json();

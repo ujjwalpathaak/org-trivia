@@ -5,11 +5,8 @@ export const validateForm = (formData, setErrors, isLogin = false) => {
     newErrors.email = 'Email is required';
   } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
     newErrors.email = 'Invalid email format';
-  } else if (
-    !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(formData.email)
-  ) {
-    newErrors.email =
-      'Email must be in a valid format (e.g., user@example.com)';
+  } else if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(formData.email)) {
+    newErrors.email = 'Email must be in a valid format (e.g., user@example.com)';
   } else if (formData.email.length > 100) {
     newErrors.email = 'Email must be less than 100 characters';
   } else if (/\s/.test(formData.email)) {
@@ -98,14 +95,14 @@ export const getPreviousMonthAndYear = () => {
   let pMonth = today.getMonth() - 1; // Move to the previous month
   let pYear = today.getFullYear();
 
-  if (pMonth < 0) { // If January, move to December of previous year
+  if (pMonth < 0) {
+    // If January, move to December of previous year
     pMonth = 11;
     pYear -= 1;
   }
 
   return [pMonth, pYear];
 };
-
 
 export const daysUntilNextFriday = () => {
   const today = new Date();
@@ -138,10 +135,7 @@ export const getNextWeek = () => {
   today.setDate(today.getDate() + 7);
   const year = today.getFullYear();
   const week = Math.ceil(
-    ((today - new Date(year, 0, 1)) / 86400000 +
-      new Date(year, 0, 1).getDay() +
-      1) /
-      7
+    ((today - new Date(year, 0, 1)) / 86400000 + new Date(year, 0, 1).getDay() + 1) / 7
   );
   return `${year}-W${week.toString().padStart(2, '0')}`;
 };

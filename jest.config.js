@@ -5,5 +5,4 @@ export default {
     '^(\\.{1,2}/.*)\\.js$': '$1',
   },
   moduleFileExtensions: ['js', 'mjs', 'cjs', 'json', 'node'],
-
 };
