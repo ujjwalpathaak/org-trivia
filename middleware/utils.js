@@ -32,9 +32,22 @@ export const getNextFridayDate = () => {
 
 export const getMonthAndYear = () => {
   const today = new Date();
-  const month = today.getMonth() + 1;
+  const month = today.getMonth();
   const year = today.getFullYear();
   return [month, year];
+};
+
+export const getPreviousMonthAndYear = () => {
+  const today = new Date();
+  let pMonth = today.getMonth() - 1;
+  let pYear = today.getFullYear();
+
+  if (pMonth < 0) {
+    pMonth = 11;
+    pYear -= 1;
+  }
+
+  return [pMonth, pYear];
 };
 
 export const mergeUserAnswersAndCorrectAnswers = (

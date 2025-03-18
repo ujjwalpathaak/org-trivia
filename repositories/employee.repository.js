@@ -2,7 +2,7 @@ import Employee from '../models/employee.model.js';
 
 import { ObjectId } from 'mongodb';
 
-import { calculateMultiplier } from '../middleware/utils.js';
+import { calculateMultiplier, getMonth } from '../middleware/utils.js';
 
 class EmployeeRepository {
   async isWeeklyQuizGiven(employeeId) {
@@ -28,7 +28,7 @@ class EmployeeRepository {
   }
 
   async addSubmittedQuestion(questionId, employeeId) {
-    return Employee.updateOne(
+   return Employee.updateOne(
       { _id: employeeId },
       { $push: { submittedQuestions: questionId } },
     );
@@ -61,7 +61,7 @@ class EmployeeRepository {
   }
 
   async resetAllEmployeesScores() {
-    return Employee.updateMany({}, { $set: { score: 0 } });
+    return Employee.updateMany({}, { $set: { score: 0, streak: 0 } });
   }
 
   async getEmployeeDetails(employeeId) {

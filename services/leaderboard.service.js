@@ -1,7 +1,7 @@
 import {
   getMonthAndYear,
   getPreviousMonthAndYear,
-} from '../client/src/utils.js';
+} from '../middleware/utils.js';
 
 class LeaderboardService {
   constructor(leaderboardRespository, orgRepository) {

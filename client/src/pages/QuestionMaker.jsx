@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { createNewQuestion } from '../api';
-import { useOrgId } from '../context/auth.context';
+import { useOrgId, useUserId } from '../context/auth.context';
 import { toast } from 'react-toastify';
 import { validateQuestionMakerForm } from '../utils';
 
-const QuestionMaker = ({ setIsQuestionMakerOpen, employeeId }) => {
+const QuestionMaker = ({ setIsQuestionMakerOpen }) => {
   const orgId = useOrgId();
+  const employeeId = useUserId();
 
   const [question, setQuestion] = useState({
     question: '',

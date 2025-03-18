@@ -4,6 +4,7 @@ import { ObjectId } from 'mongodb';
 
 import EmployeeRepository from './employee.repository.js';
 import BadgeRepository from './badge.repository.js';
+import { getMonthAndYear } from '../middleware/utils.js';
 
 const employeeRepository = new EmployeeRepository();
 const badgeRepository = new BadgeRepository();
@@ -64,8 +65,26 @@ class LeaderboardRepository {
   }
 
   async getLast3Leaderboards(orgId) {
+    const [currentMonth, currentYear] = getMonthAndYear();
+
+    const lastThreeMonths = [];
+    for (let i = 1; i <= 3; i++) {
+        let month = currentMonth - i;
+        let year = currentYear;
+        if (month < 0) {
+            month += 12;
+            year -= 1;
+        }
+        lastThreeMonths.push({ month, year });
+    }
+
     return Leaderboard.aggregate([
-      { $match: { orgId: new ObjectId(orgId) } },
+      { 
+        $match: { 
+          orgId: new ObjectId(orgId),
+          $or: lastThreeMonths.map(({ month, year }) => ({ month, year }))
+        } 
+      },
       {
         $group: {
           _id: { month: '$month', year: '$year' },
@@ -73,8 +92,6 @@ class LeaderboardRepository {
         },
       },
       { $sort: { '_id.year': -1, '_id.month': -1 } },
-      { $limit: 3 },
-      { $skip: 1 },
       { $unwind: '$leaderboard' },
       {
         $lookup: {
@@ -103,11 +120,12 @@ class LeaderboardRepository {
           _id: 0,
           month: '$_id.month',
           year: '$_id.year',
-          employees: { $slice: ['$employees', 3] },
+          employees: { $slice: ['$employees', 3] }, // Top 3 employees
         },
       },
     ]);
-  }
+}
+
 
   async resetLeaderboard(month, year, pMonth, pYear) {
     const topThreePerOrg = await Leaderboard.aggregate([
@@ -149,24 +167,9 @@ class LeaderboardRepository {
 
     await employeeRepository.resetAllEmployeesScores();
 
-    const uniqueCombinations = await Leaderboard.aggregate([
-      {
-        $group: {
-          _id: { orgId: '$orgId', employeeId: '$employeeId' },
-        },
-      },
-      {
-        $project: {
-          orgId: '$_id.orgId',
-          employeeId: '$_id.employeeId',
-          month,
-          year,
-          totalScore: 0,
-        },
-      },
-    ]);
-
-    return Leaderboard.insertMany(uniqueCombinations);
+    return {
+      message: 'Leaderboard reset successfully',
+    }
   }
 }
 

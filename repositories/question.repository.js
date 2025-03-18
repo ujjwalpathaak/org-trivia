@@ -41,8 +41,12 @@ class QuestionRepository {
   }
 
   async saveWeeklyQuizQuestions(quizId, newQuestions) {
-    await quizRepository.updateQuizStatus(quizId, 'unapproved');
-    return await WeeklyQuestion.insertMany(newQuestions);
+    if(newQuestions.length > 0){
+      await quizRepository.updateQuizStatus(quizId, 'unapproved');
+      return await WeeklyQuestion.insertMany(newQuestions);
+    }
+
+    return [];
   }
 
   async getExtraEmployeeQuestions(orgId, quizId, genre) {
