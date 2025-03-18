@@ -27,3 +27,4 @@ testing
 *.sln
 *.sw?
 
+coverage/
