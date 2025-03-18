@@ -14,6 +14,10 @@ class EmployeeService {
   async getPastQuizResults(employeeId) {
     return await this.employeeRepository.getPastQuizResults(employeeId);
   }
+
+  async getSubmittedQuestions(employeeId, page, size) {
+    return await this.employeeRepository.getSubmittedQuestions(employeeId, page, size);
+  }
 }
 
 export default EmployeeService;

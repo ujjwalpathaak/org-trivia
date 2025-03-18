@@ -55,34 +55,6 @@ export default function QuizAnalytics({ analytics }) {
           )}
         </div>
       </div>
-      {/* 
-      <div className="bg-white rounded-lg p-6 pb-0 h-fit shadow">
-        <div className="flex gap-4">
-          <Activity className="h-10 w-10 text-green-500" />
-          <h2 className="text-lg font-semibold">Performance Breakdown</h2>
-        </div>
-
-        <ResponsiveContainer width="100%" height={300}>
-          <PieChart>
-            <Pie
-              data={performanceData}
-              dataKey="value"
-              nameKey="name"
-              cx="50%"
-              cy="50%"
-              outerRadius={100}
-            >
-              {performanceData.map((entry, index) => (
-                <Cell
-                  key={`cell-${index}`}
-                  fill={COLORS[index % COLORS.length]}
-                />
-              ))}
-            </Pie>
-            <Tooltip />
-          </PieChart>
-        </ResponsiveContainer>
-      </div> */}
     </div>
   );
 }

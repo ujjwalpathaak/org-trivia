@@ -12,6 +12,7 @@ import {
   TrendingUp,
   CalendarDays,
 } from 'lucide-react';
+import SubmittedQuestions from './SubmittedQuestions';
 
 const MainContent = ({
   isBadgeViewerOpen,
@@ -22,6 +23,7 @@ const MainContent = ({
   setIsQuizOpen,
   isPastQuizViewerOpen,
   setIsPastQuizViewerOpen,
+  isSubmittedQuestionOpen,
   details,
   isQuizLive,
   resumeQuiz,
@@ -37,6 +39,8 @@ const MainContent = ({
         <QuestionMaker setIsQuestionMakerOpen={setIsQuestionMakerOpen} />
       ) : isQuizOpen ? (
         <Quiz setIsQuizLive={setIsQuizLive} setIsQuizOpen={setIsQuizOpen} />
+      ) : isSubmittedQuestionOpen ? (
+        <SubmittedQuestions />
       ) : isPastQuizViewerOpen ? (
         <PastQuizViewer setIsPastQuizViewerOpen={setIsPastQuizViewerOpen} />
       ) : (

@@ -21,6 +21,25 @@ export const registerRequest = async (formData) => {
   return response;
 };
 
+export const getPastSubmittedQuestions = async (employeeId, pageNumber = 0, pageSize = 10) => {
+  const response = await fetch(
+    `${BACKEND_URL}/employee/submitted-questions/${employeeId}?page=${pageNumber}&size=${pageSize}`,
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error('Network response was not ok');
+  }
+
+  return await response.json();
+};
+
 export const getPastQuizResults = async (employeeId, pageNumber = 0, pageSize = 10) => {
   const response = await fetch(
     `${BACKEND_URL}/result/employee/${employeeId}?page=${pageNumber}&size=${pageSize}`,

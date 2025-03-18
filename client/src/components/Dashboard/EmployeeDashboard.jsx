@@ -20,6 +20,7 @@ const EmployeeDashboard = () => {
   const [resumeQuiz, setResumeQuiz] = useState(false);
   const [isQuestionMakerOpen, setIsQuestionMakerOpen] = useState(false);
   const [isPastQuizViewerOpen, setIsPastQuizViewerOpen] = useState(false);
+  const [isSubmittedQuestionOpen, setIsSubmittedQuestionOpen] = useState(false);
   const [isBadgeViewerOpen, setIsBadgeViewerOpen] = useState(false);
   const [details, setDetails] = useState({});
   const [isQuizOpen, setIsQuizOpen] = useState(false);
@@ -76,6 +77,7 @@ const EmployeeDashboard = () => {
           setIsQuestionMakerOpen={setIsQuestionMakerOpen}
           setIsBadgeViewerOpen={setIsBadgeViewerOpen}
           setIsPastQuizViewerOpen={setIsPastQuizViewerOpen}
+          setIsSubmittedQuestionOpen={setIsSubmittedQuestionOpen}
         />
         <MainContent
           isBadgeViewerOpen={isBadgeViewerOpen}
@@ -84,7 +86,9 @@ const EmployeeDashboard = () => {
           setIsQuestionMakerOpen={setIsQuestionMakerOpen}
           isQuizOpen={isQuizOpen}
           setIsQuizLive={setIsQuizLive}
+          setIsSubmittedQuestionOpen={setIsSubmittedQuestionOpen}
           setIsQuizOpen={setIsQuizOpen}
+          isSubmittedQuestionOpen={isSubmittedQuestionOpen}
           isPastQuizViewerOpen={isPastQuizViewerOpen}
           setIsPastQuizViewerOpen={setIsPastQuizViewerOpen}
           details={details}

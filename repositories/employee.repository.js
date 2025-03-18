@@ -3,6 +3,7 @@ import Employee from '../models/employee.model.js';
 import { ObjectId } from 'mongodb';
 
 import { calculateMultiplier, getMonth } from '../middleware/utils.js';
+import Question from '../models/question.model.js';
 
 class EmployeeRepository {
   async isWeeklyQuizGiven(employeeId) {
@@ -29,8 +30,8 @@ class EmployeeRepository {
 
   async addSubmittedQuestion(questionId, employeeId) {
     return Employee.updateOne(
-      { _id: employeeId },
-      { $push: { submittedQuestions: questionId } },
+      { _id: new Object(employeeId) },
+      { $push: { submittedQuestions: new Object(questionId) } },
     );
   }
 
@@ -65,6 +66,16 @@ class EmployeeRepository {
 
   async resetAllEmployeesScores() {
     return Employee.updateMany({}, { $set: { score: 0, streak: 0 } });
+  }
+
+  async getSubmittedQuestions(employeeId, page, size) {
+    const questionsIds = await Employee.findById(employeeId, 'submittedQuestions')
+    console.log(questionsIds)
+    const questions = await Question.find({ _id: { $in: questionsIds.submittedQuestions } })
+      .skip(parseInt(page) * parseInt(size))
+      .limit(parseInt(size))
+      .lean();
+    return {data: questions, total: questions.length};
   }
 
   async getEmployeeDetails(employeeId) {

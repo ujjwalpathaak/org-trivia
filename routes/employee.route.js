@@ -20,5 +20,10 @@ employeeRouter.get(
   checkRole('Employee'),
   employeeController.getPastQuizResults,
 );
+employeeRouter.get(
+  '/submitted-questions/:employeeId',
+  checkRole('Employee'),
+  employeeController.getSubmittedQuestions,
+);
 
 export default employeeRouter;

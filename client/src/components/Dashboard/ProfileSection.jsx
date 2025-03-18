@@ -1,5 +1,13 @@
 import React from 'react';
-import { Award, CalendarCheck, Book, CirclePlus, Bookmark, AwardIcon } from 'lucide-react';
+import {
+  Award,
+  CalendarCheck,
+  Book,
+  CirclePlus,
+  Bookmark,
+  AwardIcon,
+  BookText,
+} from 'lucide-react';
 
 const ProfileSection = ({
   data,
@@ -7,6 +15,7 @@ const ProfileSection = ({
   setIsQuestionMakerOpen,
   setIsBadgeViewerOpen,
   setIsPastQuizViewerOpen,
+  setIsSubmittedQuestionOpen,
 }) => {
   return (
     <div className="col-span-2 col-start-2">
@@ -73,6 +82,7 @@ const ProfileSection = ({
                 setIsQuestionMakerOpen(true);
                 setIsBadgeViewerOpen(false);
                 setIsPastQuizViewerOpen(false);
+                setIsSubmittedQuestionOpen(false);
               }}
               className="w-full text-left px-5 py-3 rounded-lg bg-gray-50 hover:bg-gray-100 flex items-center gap-3 transition"
             >
@@ -85,6 +95,7 @@ const ProfileSection = ({
                 setIsBadgeViewerOpen(false);
                 setIsQuestionMakerOpen(false);
                 setIsPastQuizViewerOpen(true);
+                setIsSubmittedQuestionOpen(false);
               }}
               className="w-full text-left px-5 py-3 rounded-lg bg-gray-50 hover:bg-gray-100 flex items-center gap-3 transition"
             >
@@ -97,11 +108,25 @@ const ProfileSection = ({
                 setIsQuestionMakerOpen(false);
                 setIsPastQuizViewerOpen(false);
                 setIsBadgeViewerOpen(true);
+                setIsSubmittedQuestionOpen(false);
               }}
               className="w-full text-left px-5 py-3 rounded-lg bg-gray-50 hover:bg-gray-100 flex items-center gap-3 transition"
             >
               <AwardIcon className="h-5 w-5 text-yellow-500" />
               <span className="font-medium">See all badges</span>
+            </button>
+
+            <button
+              onClick={async () => {
+                setIsQuestionMakerOpen(false);
+                setIsPastQuizViewerOpen(false);
+                setIsBadgeViewerOpen(false);
+                setIsSubmittedQuestionOpen(true);
+              }}
+              className="w-full text-left px-5 py-3 rounded-lg bg-gray-50 hover:bg-gray-100 flex items-center gap-3 transition"
+            >
+              <BookText className="h-5 w-5 text-blue-500" />
+              <span className="font-medium">See all submitted questions</span>
             </button>
           </nav>
         </div>
