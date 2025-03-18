@@ -1,7 +1,7 @@
 import {
   getMonthAndYear,
   mergeUserAnswersAndCorrectAnswers,
-} from '../client/src/utils.js';
+} from '../middleware/utils.js';
 import QuestionRepository from '../repositories/question.repository.js';
 import QuestionService from './question.service.js';
 
@@ -36,60 +36,40 @@ class ResultService {
     return weeklyQuizScore;
   }
 
-  async getEmployeePastResults(employeeId) {
-    return await this.resultRepository.getEmployeePastResults(employeeId);
+  async getEmployeePastResults(employeeId, page, size) {
+    return await this.resultRepository.getEmployeePastResults(employeeId, page, size);
   }
 
   async submitWeeklyQuizAnswers(userAnswers, employeeId, orgId, quizId) {
-    const correctAnswers = await questionService.getWeeklyQuizCorrectAnswers(
-      orgId,
-      quizId,
-    );
+    const correctAnswers = await questionService.getWeeklyQuizCorrectAnswers(orgId, quizId);
+    const points = await this.calculateWeeklyQuizScore(userAnswers, correctAnswers);
+    
+    const data = await this.employeeRepository.updateWeeklyQuizScore(employeeId, points);
 
-    const points = await this.calculateWeeklyQuizScore(
-      userAnswers,
-      correctAnswers,
-    );
-
-    const data = await this.employeeRepository.updateWeeklyQuizScore(
-      quizId,
-      employeeId,
-      points,
-    );
+    if(!data) return {
+      success: false,
+      message: 'Error updating employee score - quiz already given',
+    }
 
     const [month, year] = getMonthAndYear();
 
-    await this.leaderboardRespository.updateLeaderboard(
-      orgId,
-      employeeId,
-      data.score,
-      month,
-      year,
-    );
-
-    const mergedUserAnswersAndCorrectAnswers =
-      mergeUserAnswersAndCorrectAnswers(correctAnswers, userAnswers);
-
+    await this.leaderboardRespository.updateLeaderboard(orgId, employeeId, data.score, month, year);
+    
+    const mergedUserAnswersAndCorrectAnswers = mergeUserAnswersAndCorrectAnswers(correctAnswers, userAnswers);
+  
     const quiz = await this.quizRepository.findLiveQuizByOrgId(orgId);
 
     await this.resultRepository.submitWeeklyQuizAnswers(
-      employeeId,
-      orgId,
-      quizId,
-      data.multiplier,
-      data.score,
-      points,
-      quiz.scheduledDate,
-      quiz.genre,
-      mergedUserAnswersAndCorrectAnswers,
+      employeeId, orgId, quizId, data.multiplier, data.score, points, quiz.genre, mergedUserAnswersAndCorrectAnswers
     );
 
     return {
+      success: true,
       multiplier: data.multiplier,
       score: data.score,
       points: points,
     };
-  }
+}
 
   async fetchEmployeeScore(employeeId) {
     const quiz = await this.quizRepository.getLiveQuizByEmployeeId(employeeId);

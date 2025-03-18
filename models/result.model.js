@@ -47,10 +47,6 @@ const resultSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-  date: {
-    type: Date,
-    required: true,
-  },
   genre: {
     type: String,
     enum: ['PnA', 'CAnIT', 'HRD'],
@@ -59,7 +55,7 @@ const resultSchema = new mongoose.Schema({
     type: [answerSchema],
     default: [],
   },
-});
+}, { timestamps: true, updatedAt: false });
 
 const Result = mongoose.model('Result', resultSchema);
 

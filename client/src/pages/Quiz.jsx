@@ -10,7 +10,11 @@ const Quiz = ({ setIsQuizOpen, setIsQuizLive }) => {
 
   const [answers, setAnswers] = useState([]);
   const [questions, setQuestions] = useState([]);
-  const [score, setScore] = useState(-1);
+  const [result, setResult] = useState({
+    multiplier: -1,
+    score: -1,
+    points: -1,
+  });
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [quizId, setQuizId] = useState(null);
   const [isQuizFinished, setIsQuizFinished] = useState(false);
@@ -91,17 +95,19 @@ const Quiz = ({ setIsQuizOpen, setIsQuizLive }) => {
   };
 
   const handleSubmitAnswers = async () => {
+    const state = localStorage.getItem('state');
+    const optionsSelected = JSON.parse(state);
     if (currentQuestion >= questions.length - 1) {
-      const state = localStorage.getItem('state');
-      const optionsSelected = JSON.parse(state);
       if (optionsSelected.answers) {
-        const data = await submitWeeklyQuizAnswers(
+        const response = await submitWeeklyQuizAnswers(
           optionsSelected.answers,
           orgId,
           userId,
           quizId
         );
-        setPoints(data.score);
+        setResult({
+          ...response.data,
+        });
         localStorage.removeItem('state');
       }
       notifyAnswersSubmitted();
@@ -131,10 +137,18 @@ const Quiz = ({ setIsQuizOpen, setIsQuizLive }) => {
       <div className="w-full p-4 rounded-lg text-center">
         {isQuizFinished ? (
           <>
-            {score !== -1 ? (
+            {result?.score !== -1 ? (
               <div className="flex flex-col items-center">
                 <Coins className="w-12 h-12 text-blue-500" />
-                <span className="text-xl mt-2">Your Score: {score}</span>
+                <span className="text-xl mt-2">
+                  Your Points: {result.points || 0}
+                </span>
+                <span className="text-xl mt-2">
+                  Your Multiplier: x{result.multiplier || 0}
+                </span>
+                <span className="text-xl mt-2">
+                  Your Score: {result.score || 0}
+                </span>
                 <button
                   onClick={() => setIsQuizOpen(false)}
                   className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all"

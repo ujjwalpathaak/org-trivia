@@ -18,7 +18,6 @@ const EmployeeDashboard = () => {
 
   const [isQuizLive, setIsQuizLive] = useState(false);
   const [resumeQuiz, setResumeQuiz] = useState(false);
-  const [pastQuizzes, setPastQuizzes] = useState([]);
   const [isQuestionMakerOpen, setIsQuestionMakerOpen] = useState(false);
   const [isPastQuizViewerOpen, setIsPastQuizViewerOpen] = useState(false);
   const [isBadgeViewerOpen, setIsBadgeViewerOpen] = useState(false);
@@ -68,15 +67,6 @@ const EmployeeDashboard = () => {
     fetchIsWeeklyQuizLive();
   }, [orgId, employeeId]);
 
-  const fetchPastQuizzes = async () => {
-    try {
-      const pastQuizzes = await getPastQuizResults(employeeId);
-      setPastQuizzes(pastQuizzes);
-    } catch (error) {
-      console.error('Error fetching past quizzes:', error);
-    }
-  };
-
   return (
     <div className="min-h-[93vh] flex justify-center bg-[#f0f2f5]">
       <div className="pt-4 px-4 grid grid-cols-11 gap-4">
@@ -86,7 +76,6 @@ const EmployeeDashboard = () => {
           setIsQuestionMakerOpen={setIsQuestionMakerOpen}
           setIsBadgeViewerOpen={setIsBadgeViewerOpen}
           setIsPastQuizViewerOpen={setIsPastQuizViewerOpen}
-          fetchPastQuizzes={fetchPastQuizzes}
         />
         <MainContent
           isBadgeViewerOpen={isBadgeViewerOpen}
@@ -99,8 +88,6 @@ const EmployeeDashboard = () => {
           isPastQuizViewerOpen={isPastQuizViewerOpen}
           setIsPastQuizViewerOpen={setIsPastQuizViewerOpen}
           details={details}
-          pastQuizzes={pastQuizzes}
-          fetchPastQuizzes={fetchPastQuizzes}
           isQuizLive={isQuizLive}
           resumeQuiz={resumeQuiz}
           daysUntilNextFriday={daysUntilNextFriday}

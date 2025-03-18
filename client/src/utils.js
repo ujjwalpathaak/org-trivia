@@ -73,22 +73,6 @@ export const validateQuestionMakerForm = (question) => {
   return { errors: errors, error: Object.keys(errors).length === 0 };
 };
 
-export const mergeUserAnswersAndCorrectAnswers = (
-  correctAnswers,
-  myAnswers
-) => {
-  return correctAnswers.map(({ _id, answer }) => {
-    const myAnswerObj = myAnswers.find(
-      ({ questionId }) => questionId === _id.toString()
-    );
-    return {
-      questionId: _id,
-      correctAnswer: answer,
-      employeeAnswer: myAnswerObj ? myAnswerObj.answer : null,
-    };
-  });
-};
-
 export const convertToReadableFormat = (utcTimestamp) => {
   const date = new Date(utcTimestamp);
   const options = {

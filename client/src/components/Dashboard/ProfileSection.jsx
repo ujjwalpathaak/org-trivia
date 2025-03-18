@@ -14,7 +14,6 @@ const ProfileSection = ({
   setIsQuestionMakerOpen,
   setIsBadgeViewerOpen,
   setIsPastQuizViewerOpen,
-  fetchPastQuizzes,
 }) => {
   return (
     <div className="col-span-2 col-start-2">
@@ -96,7 +95,6 @@ const ProfileSection = ({
 
             <button
               onClick={async () => {
-                await fetchPastQuizzes();
                 setIsBadgeViewerOpen(false);
                 setIsQuestionMakerOpen(false);
                 setIsPastQuizViewerOpen(true);
@@ -109,7 +107,6 @@ const ProfileSection = ({
 
             <button
               onClick={async () => {
-                await fetchPastQuizzes();
                 setIsQuestionMakerOpen(false);
                 setIsPastQuizViewerOpen(false);
                 setIsBadgeViewerOpen(true);

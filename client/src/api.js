@@ -21,14 +21,21 @@ export const registerRequest = async (formData) => {
   return response;
 };
 
-export const getPastQuizResults = async (employeeId) => {
-  const response = await fetch(`${BACKEND_URL}/result/employee/${employeeId}`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-  });
+export const getPastQuizResults = async (employeeId, pageNumber = 0, pageSize = 10) => {
+  const response = await fetch(
+    `${BACKEND_URL}/result/employee/${employeeId}?page=${pageNumber}&size=${pageSize}`,
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error('Network response was not ok');
+  }
 
   return await response.json();
 };

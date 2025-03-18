@@ -23,8 +23,6 @@ const MainContent = ({
   isPastQuizViewerOpen,
   setIsPastQuizViewerOpen,
   details,
-  pastQuizzes,
-  fetchPastQuizzes,
   isQuizLive,
   resumeQuiz,
   setIsQuizLive,
@@ -43,10 +41,7 @@ const MainContent = ({
       ) : isQuizOpen ? (
         <Quiz setIsQuizLive={setIsQuizLive} setIsQuizOpen={setIsQuizOpen} />
       ) : isPastQuizViewerOpen ? (
-        <PastQuizViewer
-          pastQuizzes={pastQuizzes}
-          setIsPastQuizViewerOpen={setIsPastQuizViewerOpen}
-        />
+        <PastQuizViewer setIsPastQuizViewerOpen={setIsPastQuizViewerOpen} />
       ) : (
         <div className="col-span-5">
           <div className="bg-white rounded-lg p-6 shadow mb-4">

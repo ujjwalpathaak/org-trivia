@@ -30,6 +30,29 @@ export const getNextFridayDate = () => {
   return nextFriday;
 };
 
+export const getMonthAndYear = () => {
+  const today = new Date();
+  const month = today.getMonth() + 1;
+  const year = today.getFullYear();
+  return [month, year];
+};
+
+export const mergeUserAnswersAndCorrectAnswers = (
+  correctAnswers,
+  myAnswers
+) => {
+  return correctAnswers.map(({ _id, answer }) => {
+    const myAnswerObj = myAnswers.find(
+      ({ questionId }) => questionId === _id.toString()
+    );
+    return {
+      questionId: _id,
+      correctAnswer: answer,
+      employeeAnswer: myAnswerObj ? myAnswerObj.answer : null,
+    };
+  });
+};
+
 export const getMonth = (month) => {
   const months = [
     'Jan',
