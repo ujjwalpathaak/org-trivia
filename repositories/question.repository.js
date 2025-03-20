@@ -12,9 +12,23 @@ class QuestionRepository {
     return await new Question(newQuestion).save();
   }
 
-  async addQuestions(newQuestions) {
-    return await Question.insertMany(newQuestions, { ordered: false });
+async addQuestions(newQuestions) {
+  const existingQuestions = await Question.find(
+    { question: { $in: newQuestions.map(q => q.question) } },
+    { question: 1, _id: 0 }
+  );
+
+  const existingQuestionSet = new Set(existingQuestions.map(q => q.question));
+
+  const filteredQuestions = newQuestions.filter(q => !existingQuestionSet.has(q.question));
+
+  if (filteredQuestions.length === 0) {
+    return [];
   }
+
+  const insertedQuestions = await Question.insertMany(filteredQuestions, { ordered: false });
+  return insertedQuestions;
+}
 
   async getApprovedWeeklyQuizQuestion(orgId) {
     return await WeeklyQuestion.find({ orgId, isApproved: true })
@@ -26,7 +40,9 @@ class QuestionRepository {
     return await WeeklyQuestion.deleteMany();
   }
 
-  async updateWeeklyQuestionsStatusToApproved(ids) {
+  async updateWeeklyQuestionsStatusToApproved(ids, employeeQuestionsToAdd, idsOfQuestionsToDelete) {
+    await WeeklyQuestion.deleteMany({ 'question._id': { $in: idsOfQuestionsToDelete } });
+    await WeeklyQuestion.insertMany(employeeQuestionsToAdd)
     return await WeeklyQuestion.updateMany(
       { 'question._id': { $in: ids } },
       { $set: { isApproved: true } },

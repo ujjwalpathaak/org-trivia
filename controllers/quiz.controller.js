@@ -58,12 +58,12 @@ class QuizController {
   async approveWeeklyQuizQuestions(req, res, next) {
     try {
       const { orgId } = req.params;
-      const questions = req.body;
+      const {questions, questionsToDelete} = req.body;
       if (!orgId || !questions) {
         return res.status(400).json({ message: 'Missing required fields' });
       }
 
-      await questionService.approveWeeklyQuizQuestions(questions, orgId);
+      await questionService.approveWeeklyQuizQuestions(questions, questionsToDelete, orgId);
 
       res.status(200).json({ message: 'Questions marked as approved' });
     } catch (error) {

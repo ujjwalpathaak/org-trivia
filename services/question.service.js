@@ -228,18 +228,23 @@ class QuestionService {
   }
 
   async getExtraEmployeeQuestions(orgId, quizId, quizGenre) {
-    return (
-      (await this.questionRepository.getExtraEmployeeQuestions(
-        orgId,
-        quizId,
-        quizGenre,
-      )) || []
+    const employeeQuestions = await this.questionRepository.getExtraEmployeeQuestions(
+      orgId,
+      quizId,
+      quizGenre,
+    )
+    return this.formatQuestionsWeeklyFormat(
+      employeeQuestions,
+      orgId,
+      quizId,
     );
   }
 
-  async approveWeeklyQuizQuestions(unapprovedQuestions, orgId) {
-    console.log(unapprovedQuestions);
+  async approveWeeklyQuizQuestions(unapprovedQuestions, questionsToDelete, orgId) {
     const idsOfQuestionsToApprove = unapprovedQuestions.map(
+      (q) => new ObjectId(q.question._id),
+    );
+    const idsOfQuestionsToDelete = questionsToDelete.map(
       (q) => new ObjectId(q.question._id),
     );
 
@@ -250,12 +255,18 @@ class QuestionService {
       orgId,
       category,
       idsOfQuestionsToApprove,
+      idsOfQuestionsToDelete
     );
 
+    const employeeQuestionsToAdd = unapprovedQuestions.filter(
+      (q) => q.question.source === 'Employee'
+    )
+    
     await this.quizRepository.updateQuizStatusToApproved(quizId);
-
     await this.questionRepository.updateWeeklyQuestionsStatusToApproved(
       idsOfQuestionsToApprove,
+      employeeQuestionsToAdd,
+      idsOfQuestionsToDelete
     );
 
     return {

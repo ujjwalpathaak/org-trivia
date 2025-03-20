@@ -4,6 +4,7 @@ import { ObjectId } from 'mongodb';
 
 import LeaderboardRepository from './leaderboard.respository.js';
 import ResultRepository from './result.repository.js';
+import Question from '../models/question.model.js';
 
 const resultRepository = new ResultRepository();
 const leaderboardRepository = new LeaderboardRepository();
@@ -17,10 +18,16 @@ class OrgRepository {
     };
   }
 
-  async updateQuestionsStatusInOrgToUsed(orgId, category, questionIds) {
+  async updateQuestionsStatusInOrgToUsed(orgId, category, questionIds, idsOfQuestionsToDelete) {
     const questionField = this.categoryMap[category];
     if (!questionField) throw new Error('Invalid category');
 
+    await Question.deleteMany({ _id: { $in: idsOfQuestionsToDelete } });
+    await Org.updateMany(
+      { _id: new ObjectId(orgId) },
+      { $pull: { [questionField]: { questionId: { $in: idsOfQuestionsToDelete } } } }
+    );
+    
     return Org.updateMany(
       { _id: new ObjectId(orgId) },
       { $set: { [`${questionField}.$[elem].isUsed`]: true } },
@@ -131,7 +138,7 @@ class OrgRepository {
     return Org.aggregate([
       { $match: { _id: new ObjectId(orgId) } },
       { $unwind: '$questionsHRD' },
-      { $match: { 'questionsHRD.isUsed': false } },
+      { $match: { 'questionsHRD.isUsed': false, 'questionsHRD.source': 'AI' } },
       {
         $group: {
           _id: '$questionsHRD.file',

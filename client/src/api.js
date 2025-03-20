@@ -215,7 +215,7 @@ export const toggleTrivia = async (orgId) => {
   }
 };
 
-export const handleApproveWeeklyQuiz = async (questions, orgId) => {
+export const handleApproveWeeklyQuiz = async (questions, questionsToDelete, orgId) => {
   try {
     const response = await fetch(`${BACKEND_URL}/quiz/approve/${orgId}`, {
       method: "POST",
@@ -223,7 +223,7 @@ export const handleApproveWeeklyQuiz = async (questions, orgId) => {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify(questions),
+      body: JSON.stringify({questions, questionsToDelete}),
     });
 
     if (!response.ok) {

@@ -14,6 +14,7 @@ export default function ScheduleQuestions() {
   const [addQuestion, setAddQuestion] = useState(false);
   const [removedQuestionIndex, setRemovedQuestionIndex] = useState(-1);
   const [questions, setQuestions] = useState([]);
+  const [questionsToDelete, setQuestionsToDelete] = useState([]);
 
   const orgId = useOrgId();
 
@@ -47,7 +48,6 @@ export default function ScheduleQuestions() {
   useEffect(() => {
     const getQuestionsToApproveFunc = async () => {
       const response = await getQuestionsToApprove(orgId);
-      console.log(response.data);
       if (response.status === 400) {
         noQuestionFound();
         navigate('/dashboard');
@@ -65,22 +65,28 @@ export default function ScheduleQuestions() {
     if (addQuestion) {
       toast.error(`Not all questions are selected`);
     } else {
-      await handleApproveWeeklyQuiz(questions, orgId);
+      await handleApproveWeeklyQuiz(questions, [...questionsToDelete, ...aiQuestions], orgId);
       toast.success('Quiz approved successfully');
       navigate('/dashboard');
     }
   };
 
   const selectQuestion = (question) => {
+    if (!addQuestion) return;
     const isDuplicate = questions.some((q) => q.question === question);
     if (isDuplicate) {
       toast.error('This question is already selected!');
       return;
     }
-
+    if (question.question.source === 'AI') {
+      setAiQuestions(aiQuestions.filter((q) => q.question !== question.question));
+    } else if (question.question.source === 'Employee') {
+      setEmpQuestions(empQuestions.filter((q) => q.question !== question.question));
+    }
     const updatedQuestions = [...questions];
-    updatedQuestions[removedQuestionIndex].question = question;
+    updatedQuestions[removedQuestionIndex] = question;
     setAddQuestion(false);
+    setQuestionsToDelete([...questionsToDelete, tempRemovedQuestion.question]);
     setRemovedQuestionIndex(-1);
     setQuestions(updatedQuestions);
   };
@@ -126,7 +132,7 @@ export default function ScheduleQuestions() {
                 {aiQuestions?.map((q, idx) => (
                   <button
                     key={idx}
-                    onClick={() => selectQuestion(q.question)}
+                    onClick={() => selectQuestion(q)}
                     className="w-full text-left p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition duration-200 border border-gray-200"
                   >
                     {q.question.question}
@@ -147,7 +153,7 @@ export default function ScheduleQuestions() {
                     onClick={() => selectQuestion(q)}
                     className="w-full text-left p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition duration-200 border border-gray-200"
                   >
-                    {q.question}
+                    {q.question.question}
                   </button>
                 ))}
               </div>

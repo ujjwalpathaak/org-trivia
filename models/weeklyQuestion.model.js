@@ -44,12 +44,6 @@ const questionSchema = new mongoose.Schema({
       message: 'Options array must have exactly 4 items.',
     },
   },
-  status: {
-    type: String,
-    enum: ['done', 'extra', 'live'],
-    required: true,
-    default: 'extra',
-  },
   config: {
     type: Object,
     default: {},
