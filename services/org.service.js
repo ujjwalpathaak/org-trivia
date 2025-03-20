@@ -1,39 +1,39 @@
-class OrgService {
-  constructor(orgRepository) {
-    this.orgRepository = orgRepository;
-  }
+import orgRepository from '../repositories/org.repository.js';
 
-  async changeGenreSettings(genre, orgId) {
-    return await this.orgRepository.changeGenreSettings(genre, orgId);
-  }
+const changeGenreSettings = async (genre, orgId) => {
+  return await orgRepository.changeGenreSettings(genre, orgId);
+};
 
-  async getSettings(orgId) {
-    const org = await this.orgRepository.getSettings(orgId);
+const getSettings = async (orgId) => {
+  const org = await orgRepository.getSettings(orgId);
+  return org?.settings;
+};
 
-    return org.settings;
-  }
+const getAllOrgNames = async () => {
+  return await orgRepository.getAllOrgNames();
+};
 
-  async getAllOrgNames() {
-    return await this.orgRepository.getAllOrgNames();
-  }
+const getOrgById = async (orgId) => {
+  return await orgRepository.getOrgById(orgId);
+};
 
-  async getOrgById(orgId) {
-    return await this.orgRepository.getOrgById(orgId);
-  }
+const toggleTrivia = async (orgId) => {
+  const org = await orgRepository.isTriviaEnabled(orgId);
+  if (!org) return false;
 
-  async toggleTrivia(orgId) {
-    const org = await this.orgRepository.isTriviaEnabled(orgId);
+  const newStatus = !org.settings.isTriviaEnabled;
+  return await orgRepository.updateTriviaSettings(orgId, newStatus);
+};
 
-    if (!org) return false;
+const getAnalytics = async (orgId) => {
+  return await orgRepository.getAnalytics(orgId);
+};
 
-    const newStatus = !org.settings.isTriviaEnabled;
-
-    return await this.orgRepository.updateTriviaSettings(orgId, newStatus);
-  }
-
-  async getAnalytics(orgId) {
-    return await this.orgRepository.getAnalytics(orgId);
-  }
-}
-
-export default OrgService;
+export default {
+  changeGenreSettings,
+  getSettings,
+  getAllOrgNames,
+  getOrgById,
+  toggleTrivia,
+  getAnalytics,
+};

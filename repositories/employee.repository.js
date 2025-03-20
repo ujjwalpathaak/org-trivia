@@ -4,122 +4,130 @@ import { calculateMultiplier, getMonth } from '../middleware/utils.js';
 import Employee from '../models/employee.model.js';
 import Question from '../models/question.model.js';
 
-class EmployeeRepository {
-  async isWeeklyQuizGiven(employeeId) {
-    return Employee.findById(employeeId, 'quizGiven');
-  }
+const isWeeklyQuizGiven = async (employeeId) => {
+  return Employee.findById(employeeId, 'quizGiven');
+};
 
-  async updateEmployeeStreaksAndMarkAllEmployeesAsQuizNotGiven() {
-    await Employee.bulkWrite([
-      {
-        updateMany: {
-          filter: { quizGiven: true },
-          update: { $inc: { streak: 1 } },
-        },
+const updateEmployeeStreaksAndMarkAllEmployeesAsQuizNotGiven = async () => {
+  await Employee.bulkWrite([
+    {
+      updateMany: {
+        filter: { quizGiven: true },
+        update: { $inc: { streak: 1 } },
       },
-      {
-        updateMany: {
-          filter: { quizGiven: false },
-          update: { $set: { streak: 0 } },
-        },
+    },
+    {
+      updateMany: {
+        filter: { quizGiven: false },
+        update: { $set: { streak: 0 } },
       },
-      { updateMany: { filter: {}, update: { $set: { quizGiven: false } } } },
-    ]);
-  }
+    },
+    { updateMany: { filter: {}, update: { $set: { quizGiven: false } } } },
+  ]);
+};
 
-  async addSubmittedQuestion(questionId, employeeId) {
-    return Employee.updateOne(
-      { _id: new Object(employeeId) },
-      { $push: { submittedQuestions: new Object(questionId) } },
-    );
-  }
+const addSubmittedQuestion = async (questionId, employeeId) => {
+  return Employee.updateOne(
+    { _id: new ObjectId(employeeId) },
+    { $push: { submittedQuestions: new ObjectId(questionId) } },
+  );
+};
 
-  async updateWeeklyQuizScore(employeeId, points) {
-    const employee = await Employee.findById(
-      employeeId,
-      'streak score quizGiven',
-    );
-    if (employee.quizGiven) return false;
+const updateWeeklyQuizScore = async (employeeId, points) => {
+  const employee = await Employee.findById(
+    employeeId,
+    'streak score quizGiven',
+  );
+  if (employee.quizGiven) return false;
 
-    const multiplier = calculateMultiplier(employee.streak);
-    const updatedScore = points * multiplier;
+  const multiplier = calculateMultiplier(employee.streak);
+  const updatedScore = points * multiplier;
 
-    await Employee.updateOne(
-      { _id: employeeId },
-      { $set: { quizGiven: true }, $inc: { score: updatedScore } },
-    );
+  console.log(employee)
 
-    return { multiplier, score: updatedScore };
-  }
+  await Employee.updateOne(
+    { _id: employeeId },
+    { $set: { quizGiven: true }, $inc: { score: updatedScore } },
+  );
 
-  async addBadgesToEmployees(employeeId, badgeId, month, year) {
-    return Employee.updateOne(
-      { _id: employeeId },
-      {
-        $push: {
-          badges: { badgeId, description: `${getMonth(month)} ${year}` },
-        },
+  return { multiplier, score: updatedScore };
+};
+
+const addBadgesToEmployees = async (employeeId, badgeId, month, year) => {
+  return Employee.updateOne(
+    { _id: employeeId },
+    {
+      $push: {
+        badges: { badgeId, description: `${getMonth(month)} ${year}` },
       },
-    );
-  }
+    },
+  );
+};
 
-  async resetAllEmployeesScores() {
-    return Employee.updateMany({}, { $set: { score: 0, streak: 0 } });
-  }
+const resetAllEmployeesScores = async () => {
+  return Employee.updateMany({}, { $set: { score: 0, streak: 0 } });
+};
 
-  async getSubmittedQuestions(employeeId, page, size) {
-    const questionsIds = await Employee.findById(
-      employeeId,
-      'submittedQuestions',
-    );
-    console.log(questionsIds);
-    const questions = await Question.find({
-      _id: { $in: questionsIds.submittedQuestions },
-    })
-      .skip(parseInt(page) * parseInt(size))
-      .limit(parseInt(size))
-      .lean();
-    return { data: questions, total: questions.length };
-  }
+const getSubmittedQuestions = async (employeeId, page, size) => {
+  const questionsIds = await Employee.findById(
+    employeeId,
+    'submittedQuestions',
+  );
+  const questions = await Question.find({
+    _id: { $in: questionsIds.submittedQuestions },
+  })
+    .skip(parseInt(page) * parseInt(size))
+    .limit(parseInt(size))
+    .lean();
+  return { data: questions, total: questionsIds.length };
+};
 
-  async getEmployeeDetails(employeeId) {
-    const employee = await Employee.findById(employeeId).lean();
-    if (!employee) return null;
+const getEmployeeDetails = async (employeeId) => {
+  const employee = await Employee.findById(employeeId).lean();
+  if (!employee) return null;
 
-    const badges = await Employee.aggregate([
-      { $match: { _id: new ObjectId(employeeId) } },
-      { $unwind: '$badges' },
-      { $sort: { 'badges.earnedAt': -1 } },
-      {
-        $lookup: {
-          from: 'badges',
-          localField: 'badges.badgeId',
-          foreignField: '_id',
-          as: 'badgeDetails',
-        },
+  const badges = await Employee.aggregate([
+    { $match: { _id: new ObjectId(employeeId) } },
+    { $unwind: '$badges' },
+    { $sort: { 'badges.earnedAt': -1 } },
+    {
+      $lookup: {
+        from: 'badges',
+        localField: 'badges.badgeId',
+        foreignField: '_id',
+        as: 'badgeDetails',
       },
-      { $unwind: '$badgeDetails' },
-      {
-        $group: {
-          _id: '$_id',
-          badges: {
-            $push: {
-              badgeDetails: '$badgeDetails',
-              description: '$badges.description',
-              rank: '$badges.rank',
-              earnedAt: '$badges.earnedAt',
-            },
+    },
+    { $unwind: '$badgeDetails' },
+    {
+      $group: {
+        _id: '$_id',
+        badges: {
+          $push: {
+            badgeDetails: '$badgeDetails',
+            description: '$badges.description',
+            rank: '$badges.rank',
+            earnedAt: '$badges.earnedAt',
           },
         },
       },
-    ]);
+    },
+  ]);
 
-    return {
-      employee,
-      badges: badges[0]?.badges || [],
-      multiplier: calculateMultiplier(employee.streak),
-    };
-  }
-}
+  return {
+    employee,
+    badges: badges[0]?.badges || [],
+    multiplier: calculateMultiplier(employee.streak),
+  };
+};
 
-export default EmployeeRepository;
+export default {
+  isWeeklyQuizGiven,
+  updateEmployeeStreaksAndMarkAllEmployeesAsQuizNotGiven,
+  addSubmittedQuestion,
+  updateWeeklyQuizScore,
+  addBadgesToEmployees,
+  resetAllEmployeesScores,
+  getSubmittedQuestions,
+  getEmployeeDetails,
+};

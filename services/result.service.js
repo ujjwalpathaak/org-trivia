@@ -2,25 +2,13 @@ import {
   getMonthAndYear,
   mergeUserAnswersAndCorrectAnswers,
 } from '../middleware/utils.js';
-import QuestionRepository from '../repositories/question.repository.js';
-import QuestionService from './question.service.js';
+import employeeRepository from '../repositories/employee.repository.js';
+import leaderboardRepository from '../repositories/leaderboard.respository.js';
+import quizRepository from '../repositories/quiz.repository.js';
+import resultRepository from '../repositories/result.repository.js';
+import questionService from './question.service.js';
 
-const questionService = new QuestionService(new QuestionRepository());
-
-class ResultService {
-  constructor(
-    resultRepository,
-    employeeRepository,
-    quizRepository,
-    leaderboardRespository,
-  ) {
-    this.resultRepository = resultRepository;
-    this.employeeRepository = employeeRepository;
-    this.quizRepository = quizRepository;
-    this.leaderboardRespository = leaderboardRespository;
-  }
-
-  async calculateWeeklyQuizScore(userAnswers, correctAnswers) {
+  const calculateWeeklyQuizScore = async (userAnswers, correctAnswers) => {
     let weeklyQuizScore = 0;
 
     userAnswers.forEach(({ questionId, answer }) => {
@@ -34,40 +22,43 @@ class ResultService {
     });
 
     return weeklyQuizScore;
-  }
+  };
 
-  async getEmployeePastResults(employeeId, page, size) {
-    return await this.resultRepository.getEmployeePastResults(
+  const getEmployeePastResults = async (employeeId, page, size) => {
+    return await resultRepository.getEmployeePastResults(
       employeeId,
       page,
       size,
     );
-  }
+  };
 
-  async submitWeeklyQuizAnswers(userAnswers, employeeId, orgId, quizId) {
+  const submitWeeklyQuizAnswers = async (
+    userAnswers,
+    employeeId,
+    orgId,
+    quizId,
+  ) => {
     const correctAnswers = await questionService.getWeeklyQuizCorrectAnswers(
       orgId,
       quizId,
     );
-    const points = await this.calculateWeeklyQuizScore(
-      userAnswers,
-      correctAnswers,
-    );
+    const points = await calculateWeeklyQuizScore(userAnswers, correctAnswers);
 
-    const data = await this.employeeRepository.updateWeeklyQuizScore(
+    const data = await employeeRepository.updateWeeklyQuizScore(
       employeeId,
       points,
     );
 
-    if (!data)
+    if (!data) {
       return {
         success: false,
         message: 'Error updating employee score - quiz already given',
       };
+    }
 
     const [month, year] = getMonthAndYear();
 
-    await this.leaderboardRespository.updateLeaderboard(
+    await leaderboardRepository.updateLeaderboard(
       orgId,
       employeeId,
       data.score,
@@ -77,10 +68,9 @@ class ResultService {
 
     const mergedUserAnswersAndCorrectAnswers =
       mergeUserAnswersAndCorrectAnswers(correctAnswers, userAnswers);
+    const quiz = await quizRepository.findLiveQuizByOrgId(orgId);
 
-    const quiz = await this.quizRepository.findLiveQuizByOrgId(orgId);
-
-    await this.resultRepository.submitWeeklyQuizAnswers(
+    await resultRepository.submitWeeklyQuizAnswers(
       employeeId,
       orgId,
       quizId,
@@ -95,14 +85,18 @@ class ResultService {
       success: true,
       multiplier: data.multiplier,
       score: data.score,
-      points: points,
+      points,
     };
-  }
+  };
 
-  async fetchEmployeeScore(employeeId) {
-    const quiz = await this.quizRepository.getLiveQuizByEmployeeId(employeeId);
-    return await this.resultRepository.getEmployeeScore(employeeId, quiz);
-  }
-}
+  const fetchEmployeeScore = async (employeeId) => {
+    const quiz = await quizRepository.getLiveQuizByEmployeeId(employeeId);
+    return await resultRepository.getEmployeeScore(employeeId, quiz);
+  };
 
-export default ResultService;
+  export default {
+    calculateWeeklyQuizScore,
+    getEmployeePastResults,
+    submitWeeklyQuizAnswers,
+    fetchEmployeeScore,
+  };

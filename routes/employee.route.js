@@ -1,15 +1,14 @@
 import express from 'express';
 
-import EmployeeController from '../controllers/employee.controller.js';
+import employeeController from '../controllers/employee.controller.js';
 import { checkRole } from '../middleware/auth.middleware.js';
 
-const employeeController = new EmployeeController();
 const employeeRouter = express.Router();
 
 employeeRouter.get(
   '/score/:employeeId',
   checkRole('Employee'),
-  employeeController.fetchEmployeeScore,
+  employeeController.fetchEmployeeScoreController,
 );
 employeeRouter.get(
   '/:employeeId',
@@ -19,12 +18,12 @@ employeeRouter.get(
 employeeRouter.get(
   '/quizzes/results/:employeeId',
   checkRole('Employee'),
-  employeeController.getPastQuizResults,
+  employeeController.getPastQuizResultsController,
 );
 employeeRouter.get(
   '/submitted-questions/:employeeId',
   checkRole('Employee'),
-  employeeController.getSubmittedQuestions,
+  employeeController.getSubmittedQuestionsController,
 );
 
 export default employeeRouter;

@@ -1,10 +1,7 @@
 import express from 'express';
-
-import QuestionController from '../controllers/question.controller.js';
-import { checkRole, protectRoute } from '../middleware/auth.middleware.js';
-
-const questionController = new QuestionController();
 const questionRouter = express.Router();
+import questionController from '../controllers/question.controller.js';
+import { checkRole, protectRoute } from '../middleware/auth.middleware.js';
 
 questionRouter.post(
   '/',
@@ -19,8 +16,6 @@ questionRouter.get(
   checkRole('Admin'),
   questionController.getWeeklyUnapprovedQuestions,
 );
-
-// questionRouter.post('/new/HRdocs', questionController.saveHRdocQuestions);
 
 questionRouter.get(
   '/test/scheduleNextWeekQuestionsApproval',

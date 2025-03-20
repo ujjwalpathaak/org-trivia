@@ -1,8 +1,7 @@
 import express from 'express';
 
-import CronTestController from '../controllers/cron.test.controller.js';
+import cronTestController from '../controllers/cron.test.controller.js';
 
-const cronTestController = new CronTestController();
 const cronTestRouter = express.Router();
 
 cronTestRouter.post(

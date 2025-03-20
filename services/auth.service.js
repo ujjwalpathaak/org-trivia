@@ -1,58 +1,41 @@
-import Admin from '../models/admin.model.js';
-import Employee from '../models/employee.model.js';
+import authRepository from '../repositories/auth.repository.js';
 
-class AuthService {
-  constructor(authRepository) {
-    this.authRepository = authRepository;
+const registerUser = async (isAdmin, email, password, name, orgId) => {
+  const user = await authRepository.getUserByEmail(email);
+  if (user) {
+    return { status: 400, data: { message: `This email already exists` } };
   }
 
-  async registerUser(isAdmin, email, password, name, orgId) {
-    const [UserModel, userType] = isAdmin
-      ? [Admin, 'Admin']
-      : [Employee, 'Employee'];
+  await authRepository.createNewUser(email, password, name, orgId, isAdmin);
 
-    const user = await this.authRepository.getUserByEmail(email);
-    if (user) {
-      return { status: 400, data: { message: `This email already exists` } };
-    }
+  return {
+    status: 201,
+    data: {
+      message: `New ${isAdmin ? 'Admin' : 'Employee'} registered successfully`,
+    },
+  };
+};
 
-    await this.authRepository.createNewUser(
-      UserModel,
-      email,
-      password,
-      name,
-      orgId,
-      isAdmin,
-    );
-
-    return {
-      status: 201,
-      data: { message: `New ${userType} registered successfully` },
-    };
+const loginUser = async (email, password) => {
+  const user = await authRepository.getUserByEmail(email);
+  if (!user) {
+    return { status: 404, data: { message: 'User not found!' } };
   }
 
-  async loginUser(email, password) {
-    const user = await this.authRepository.getUserByEmail(email);
-    if (!user) {
-      return { status: 404, data: { message: 'User not found!' } };
-    }
-
-    const isMatch = await this.authRepository.isPasswordsMatch(
-      password,
-      user.password,
-    );
-
-    if (!isMatch) {
-      return { status: 401, data: { message: 'Invalid password' } };
-    }
-
-    const token = this.authRepository.generateToken(user);
-
-    return {
-      status: 200,
-      data: { message: 'User logged in successfully', token },
-    };
+  const isMatch = await authRepository.isPasswordsMatch(
+    password,
+    user.password,
+  );
+  if (!isMatch) {
+    return { status: 401, data: { message: 'Invalid password' } };
   }
-}
 
-export default AuthService;
+  const token = authRepository.generateToken(user);
+
+  return {
+    status: 200,
+    data: { message: 'User logged in successfully', token },
+  };
+};
+
+export default { registerUser, loginUser };
