@@ -9,7 +9,6 @@ import cronTestRouter from './cron.test.route.js';
 import resultRouter from './result.route.js';
 import quizRouter from './quiz.route.js';
 import leaderboardRouter from './leaderboard.route.js';
-// import badgeRouter from './badge.route.js';
 
 const router = express.Router();
 

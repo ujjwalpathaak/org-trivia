@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {
-  isWeeklyQuizLive,
+  getWeeklyQuizStatus,
   fetchEmployeeScore,
   getEmployeeDetails,
   getPastQuizResults,
@@ -16,7 +16,7 @@ const EmployeeDashboard = () => {
   const employeeId = useUserId();
   const { data } = useAuth();
 
-  const [isQuizLive, setIsQuizLive] = useState(false);
+  const [quizStatus, setQuizStatus] = useState({});
   const [resumeQuiz, setResumeQuiz] = useState(false);
   const [isQuestionMakerOpen, setIsQuestionMakerOpen] = useState(false);
   const [isPastQuizViewerOpen, setIsPastQuizViewerOpen] = useState(false);
@@ -55,17 +55,18 @@ const EmployeeDashboard = () => {
   }, [employeeId]);
 
   useEffect(() => {
-    const fetchIsWeeklyQuizLive = async () => {
+    const fetchWeeklyQuizStatus = async () => {
       try {
-        const live = await isWeeklyQuizLive(orgId, employeeId);
-        setIsQuizLive(live);
+        const status = await getWeeklyQuizStatus(orgId, employeeId);
+        console.log(status);
+        setQuizStatus(status);
       } catch (error) {
         console.error('Error checking quiz status:', error);
-        setIsQuizLive(false);
+        setQuizStatus(false);
       }
     };
 
-    fetchIsWeeklyQuizLive();
+    fetchWeeklyQuizStatus();
   }, [orgId, employeeId]);
 
   return (
@@ -85,21 +86,21 @@ const EmployeeDashboard = () => {
           isQuestionMakerOpen={isQuestionMakerOpen}
           setIsQuestionMakerOpen={setIsQuestionMakerOpen}
           isQuizOpen={isQuizOpen}
-          setIsQuizLive={setIsQuizLive}
+          setQuizStatus={setQuizStatus}
           setIsSubmittedQuestionOpen={setIsSubmittedQuestionOpen}
           setIsQuizOpen={setIsQuizOpen}
           isSubmittedQuestionOpen={isSubmittedQuestionOpen}
           isPastQuizViewerOpen={isPastQuizViewerOpen}
           setIsPastQuizViewerOpen={setIsPastQuizViewerOpen}
           details={details}
-          isQuizLive={isQuizLive}
+          quizStatus={quizStatus}
           resumeQuiz={resumeQuiz}
           daysUntilNextFriday={daysUntilNextFriday}
         />
         <Sidebar
           isQuizOpen={isQuizOpen}
           setIsQuizOpen={setIsQuizOpen}
-          isQuizLive={isQuizLive}
+          quizStatus={quizStatus}
           resumeQuiz={resumeQuiz}
           details={details}
           daysUntilNextFriday={daysUntilNextFriday}

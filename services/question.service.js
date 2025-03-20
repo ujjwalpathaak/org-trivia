@@ -95,11 +95,26 @@ class QuestionService {
   }
 
   formatQuestionsWeeklyFormat(questions, orgId, quizId) {
-    return questions.map((curr) => ({
+    let extra = 7;
+
+    if (questions.length > 0 && questions[0].category) {
+      const category = questions[0].category;
+
+      const categoryLimits = {
+        CAnIT: 7,
+        PnA: 4,
+        HRD: 10,
+      };
+
+      extra = categoryLimits[category] ?? extra;
+    }
+
+    return questions.map((curr, index) => ({
       isApproved: false,
       quizId: quizId,
       question: curr,
       orgId: orgId,
+      type: index >= extra ? 'extra' : 'main',
     }));
   }
 
@@ -223,6 +238,7 @@ class QuestionService {
   }
 
   async approveWeeklyQuizQuestions(unapprovedQuestions, orgId) {
+    console.log(unapprovedQuestions);
     const idsOfQuestionsToApprove = unapprovedQuestions.map(
       (q) => new ObjectId(q.question._id),
     );
@@ -235,7 +251,9 @@ class QuestionService {
       category,
       idsOfQuestionsToApprove,
     );
+
     await this.quizRepository.updateQuizStatusToApproved(quizId);
+
     await this.questionRepository.updateWeeklyQuestionsStatusToApproved(
       idsOfQuestionsToApprove,
     );
@@ -278,7 +296,6 @@ class QuestionService {
 
   async startHRDWorkflow(orgId, quizId) {
     const questions = await this.questionRepository.fetchHRDQuestions(orgId);
-    console.log(quizId);
     await this.pushQuestionsForApprovals(questions, orgId, quizId);
   }
 }

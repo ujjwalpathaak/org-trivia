@@ -50,8 +50,11 @@ class EmployeeController {
     try {
       const { employeeId } = req.params;
       const { page = 0, size = 10 } = req.query;
-      const pastQuizResults =
-        await employeeService.getSubmittedQuestions(employeeId, page, size);
+      const pastQuizResults = await employeeService.getSubmittedQuestions(
+        employeeId,
+        page,
+        size,
+      );
 
       res.status(200).json(pastQuizResults);
     } catch (error) {

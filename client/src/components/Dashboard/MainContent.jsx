@@ -25,9 +25,9 @@ const MainContent = ({
   setIsPastQuizViewerOpen,
   isSubmittedQuestionOpen,
   details,
-  isQuizLive,
+  quizStatus,
   resumeQuiz,
-  setIsQuizLive,
+  setQuizStatus,
   score,
   daysUntilNextFriday,
 }) => {
@@ -38,7 +38,7 @@ const MainContent = ({
       ) : isQuestionMakerOpen ? (
         <QuestionMaker setIsQuestionMakerOpen={setIsQuestionMakerOpen} />
       ) : isQuizOpen ? (
-        <Quiz setIsQuizLive={setIsQuizLive} setIsQuizOpen={setIsQuizOpen} />
+        <Quiz setQuizStatus={setQuizStatus} setIsQuizOpen={setIsQuizOpen} />
       ) : isSubmittedQuestionOpen ? (
         <SubmittedQuestions />
       ) : isPastQuizViewerOpen ? (

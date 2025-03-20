@@ -112,6 +112,22 @@ class OrgRepository {
   }
 
   async fetchHRDQuestions(orgId) {
+    const files = await Org.aggregate([
+      { $match: { _id: new ObjectId(orgId) } },
+      { $unwind: '$questionsHRD' },
+      { $match: { 'questionsHRD.isUsed': false } },
+      {
+        $group: {
+          _id: '$questionsHRD.file',
+          questions: { $push: '$questionsHRD' },
+        },
+      },
+    ]);
+
+    if (files.length === 0) return [];
+
+    const questionsPerFile = Math.max(1, Math.floor(15 / files.length));
+
     return Org.aggregate([
       { $match: { _id: new ObjectId(orgId) } },
       { $unwind: '$questionsHRD' },
@@ -122,7 +138,12 @@ class OrgRepository {
           questions: { $push: '$questionsHRD' },
         },
       },
-      { $project: { _id: 1, questions: { $slice: ['$questions', 2] } } },
+      {
+        $project: {
+          _id: 1,
+          questions: { $slice: ['$questions', questionsPerFile] },
+        },
+      },
       { $unwind: '$questions' },
       {
         $lookup: {
@@ -137,20 +158,22 @@ class OrgRepository {
     ]);
   }
 
-  async fetchExtraEmployeeQuestions(orgId) {
+  async fetchExtraEmployeeQuestions(orgId, quizId, genre) {
+    const genreField = this.categoryMap[genre];
+
     return Org.aggregate([
       { $match: { _id: new ObjectId(orgId) } },
-      { $unwind: '$questionsPnA' },
+      { $unwind: `$${genreField}` },
       {
         $match: {
-          'questionsPnA.isUsed': false,
-          'questionsPnA.source': 'Employee',
+          [`${genreField}.isUsed`]: false,
+          [`${genreField}.source`]: 'Employee',
         },
       },
       {
         $lookup: {
           from: 'questions',
-          localField: 'questionsPnA.questionId',
+          localField: `${genreField}.questionId`,
           foreignField: '_id',
           as: 'questionDetails',
         },

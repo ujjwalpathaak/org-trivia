@@ -20,16 +20,18 @@ const questionService = new QuestionService(
 );
 
 class QuizController {
-  async isWeeklyQuizLiveAndNotGiven(req, res, next) {
+  async getWeeklyQuizStatus(req, res, next) {
     try {
       const { orgId, employeeId } = req.params;
       if (!orgId || !employeeId)
         return res.status(404).json({ message: 'Missing organizationId' });
 
-      const isWeeklyQuizLiveAndNotGiven =
-        await quizService.isWeeklyQuizLiveAndNotGiven(orgId, employeeId);
+      const weeklyQuizStatus = await quizService.getWeeklyQuizStatus(
+        orgId,
+        employeeId,
+      );
 
-      res.status(200).json(isWeeklyQuizLiveAndNotGiven);
+      res.status(200).json(weeklyQuizStatus);
     } catch (error) {
       next(error);
     }

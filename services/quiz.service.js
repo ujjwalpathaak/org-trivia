@@ -15,15 +15,39 @@ class QuizService {
     this.orgRepository = orgRepository;
   }
 
-  async isWeeklyQuizLiveAndNotGiven(orgId, employeeId) {
-    const [isWeeklyQuizLive, employee] = await Promise.all([
-      this.quizRepository.findLiveQuizByOrgId(orgId),
-      this.employeeRepository.isWeeklyQuizGiven(employeeId),
-    ]);
+  async getWeeklyQuizStatus(orgId, employeeId) {
+    const [isWeeklyQuizLive, isWeeklyQuizCancelled, employee] =
+      await Promise.all([
+        this.quizRepository.findLiveQuizByOrgId(orgId),
+        this.quizRepository.isWeeklyQuizCancelled(orgId),
+        this.employeeRepository.isWeeklyQuizGiven(employeeId),
+      ]);
 
-    if (isWeeklyQuizLive && !employee.quizGiven) return true;
-
-    return false;
+    if (isWeeklyQuizCancelled) {
+      return {
+        status: 'cancelled',
+        state: 0,
+        message: 'Weekly quiz has been cancelled',
+      };
+    } else if (isWeeklyQuizLive && !employee.quizGiven) {
+      return {
+        status: 'live',
+        state: 1,
+        message: 'Weekly quiz is live',
+      };
+    } else if (isWeeklyQuizLive && employee.quizGiven) {
+      return {
+        status: 'given',
+        state: 2,
+        message: 'Weekly quiz has been given',
+      };
+    } else {
+      return {
+        status: 'not live',
+        state: 3,
+        message: 'Weekly quiz is not live',
+      };
+    }
   }
 
   async scheduleNewWeeklyQuiz(orgId, genre) {

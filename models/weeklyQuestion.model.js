@@ -67,6 +67,11 @@ const weeklyQuestionSchema = new mongoose.Schema({
     ref: 'Quiz',
     required: true,
   },
+  type: {
+    type: String,
+    enum: ['main', 'extra'],
+    required: true,
+  },
   question: questionSchema,
   orgId: {
     type: mongoose.Schema.Types.ObjectId,

@@ -22,15 +22,39 @@ export default function ScheduleQuestions() {
 
   const noQuestionFound = () => toast.info('No pending questions found');
 
+  const [tempRemovedQuestion, setTempRemovedQuestion] = useState(null);
+
+  const handleQuestionRemove = (idx) => {
+    setTempRemovedQuestion({ index: idx, question: questions[idx] });
+    const updatedQuestions = [...questions];
+    updatedQuestions[idx] = { question: null };
+    setAddQuestion(true);
+    setRemovedQuestionIndex(idx);
+    setQuestions(updatedQuestions);
+  };
+
+  const cancelRemoval = () => {
+    if (tempRemovedQuestion) {
+      const updatedQuestions = [...questions];
+      updatedQuestions[tempRemovedQuestion.index] = tempRemovedQuestion.question;
+      setQuestions(updatedQuestions);
+      setAddQuestion(false);
+      setRemovedQuestionIndex(-1);
+      setTempRemovedQuestion(null);
+    }
+  };
+
   useEffect(() => {
     const getQuestionsToApproveFunc = async () => {
       const response = await getQuestionsToApprove(orgId);
+      console.log(response.data);
       if (response.status === 400) {
         noQuestionFound();
         navigate('/dashboard');
         return;
       }
-      setQuestions(response.data.weeklyUnapprovedQuestions);
+      setAiQuestions(response.data.weeklyUnapprovedQuestions.filter((q) => q.type === 'extra'));
+      setQuestions(response.data.weeklyUnapprovedQuestions.filter((q) => q.type === 'main'));
       setEmpQuestions(response.data.extraEmployeeQuestions);
     };
 
@@ -48,6 +72,12 @@ export default function ScheduleQuestions() {
   };
 
   const selectQuestion = (question) => {
+    const isDuplicate = questions.some((q) => q.question === question);
+    if (isDuplicate) {
+      toast.error('This question is already selected!');
+      return;
+    }
+
     const updatedQuestions = [...questions];
     updatedQuestions[removedQuestionIndex].question = question;
     setAddQuestion(false);
@@ -73,69 +103,74 @@ export default function ScheduleQuestions() {
     setQuestions(updatedQuestions);
   };
 
-  const handleQuestionRemove = (idx) => {
-    const updatedQuestions = [...questions];
-    updatedQuestions[idx].question = null;
-    setAddQuestion(true);
-    setRemovedQuestionIndex(idx);
-    setQuestions(updatedQuestions);
-  };
+  // const handleQuestionRemove = (idx) => {
+  //   const updatedQuestions = [...questions];
+  //   updatedQuestions[idx].question = null;
+  //   setAddQuestion(true);
+  //   setRemovedQuestionIndex(idx);
+  //   setQuestions(updatedQuestions);
+  // };
 
   return (
     <div className="h-[93vh] bg-gradient-to-br from-blue-50 to-indigo-50 p-6">
       <div className="flex gap-6 h-full">
-        {addQuestion && (
-          <div className="w-1/3 bg-white rounded-xl shadow-lg p-6 flex-1">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6">Extra Questions</h2>
-            <div className="space-y-6">
-              <div className="bg-gray-50 rounded-lg p-6 shadow-sm">
-                <h3 className="text-lg font-semibold text-gray-700 mb-4">AI Questions</h3>
-                <div className="space-y-2">
-                  {aiQuestions?.length === 0 && (
-                    <span className="italic text-slate-400">No extra questions found</span>
-                  )}
-                  {aiQuestions?.map((q, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => selectQuestion(q)}
-                      className="w-full text-left p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition duration-200 border border-gray-200"
-                    >
-                      {q.question}
-                    </button>
-                  ))}
-                </div>
+        <div className="w-1/3 bg-white rounded-xl shadow-lg p-6 flex-1">
+          <h2 className="text-2xl font-bold text-gray-800 mb-6">Extra Questions</h2>
+          <div className="space-y-6">
+            <div className="bg-gray-50 rounded-lg shadow-sm">
+              <h3 className="text-lg font-semibold text-gray-700 mb-4">AI Questions</h3>
+              <div className="space-y-2 overflow-auto max-h-[19rem]">
+                {aiQuestions?.length === 0 && (
+                  <span className="italic text-slate-400">No extra questions found</span>
+                )}
+                {aiQuestions?.map((q, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => selectQuestion(q.question)}
+                    className="w-full text-left p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition duration-200 border border-gray-200"
+                  >
+                    {q.question.question}
+                  </button>
+                ))}
               </div>
+            </div>
 
-              <div className="bg-gray-50 rounded-lg p-6 shadow-sm">
-                <h3 className="text-lg font-semibold text-gray-700 mb-4">Employee Questions</h3>
-                <div className="space-y-2">
-                  {empQuestions.length === 0 && (
-                    <span className="italic text-slate-400">No extra questions found</span>
-                  )}
-                  {empQuestions?.map((q, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => selectQuestion(q)}
-                      className="w-full text-left p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition duration-200 border border-gray-200"
-                    >
-                      {q.question}
-                    </button>
-                  ))}
-                </div>
+            <div className="bg-gray-50 rounded-lg shadow-sm">
+              <h3 className="text-lg font-semibold text-gray-700 mb-4">Employee Questions</h3>
+              <div className="space-y-2 overflow-auto max-h-[19rem]">
+                {empQuestions.length === 0 && (
+                  <span className="italic text-slate-400">No extra questions found</span>
+                )}
+                {empQuestions?.map((q, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => selectQuestion(q)}
+                    className="w-full text-left p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition duration-200 border border-gray-200"
+                  >
+                    {q.question}
+                  </button>
+                ))}
               </div>
             </div>
           </div>
-        )}
-
-        <div className={`bg-white rounded-xl shadow-lg p-6 ${addQuestion ? 'flex-1' : 'w-full'}`}>
+        </div>
+        <div className="bg-white rounded-xl shadow-lg p-6 flex-1">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-bold text-gray-800">Questions for {selectedWeek}</h2>
-            <button
-              onClick={handleApproveQuiz}
-              className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition duration-200 font-medium"
-            >
-              Schedule Quiz
-            </button>
+            <div>
+              <button
+                onClick={() => navigate('/dashboard')}
+                className="px-6 py-2 bg-slate-400 text-white rounded-md hover:bg-red-500 transition duration-200 font-medium"
+              >
+                Close
+              </button>
+              <button
+                onClick={handleApproveQuiz}
+                className="px-6 py-2 ml-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition duration-200 font-medium"
+              >
+                Schedule Quiz
+              </button>
+            </div>
           </div>
 
           <div className="space-y-6 overflow-auto max-h-[calc(100vh-14rem)]">
@@ -201,7 +236,19 @@ export default function ScheduleQuestions() {
               } else {
                 return (
                   <div key={idx} className="bg-gray-100 rounded-lg p-6 animate-pulse">
-                    <h3 className="text-lg font-semibold text-gray-700 mb-2">Question {idx + 1}</h3>
+                    <div className="flex justify-between items-center">
+                      <h3 className="text-lg font-semibold text-gray-700 mb-2">
+                        Question {idx + 1}
+                      </h3>
+                      {tempRemovedQuestion && (
+                        <button
+                          onClick={cancelRemoval}
+                          className="w-fit mb-2 p-3 h-8 flex items-center justify-center rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition duration-200"
+                        >
+                          Cancel
+                        </button>
+                      )}
+                    </div>
                     <div className="h-32 bg-gray-200 rounded-lg mb-4"></div>
                     <p className="text-gray-600 font-medium">Adding new question...</p>
                   </div>

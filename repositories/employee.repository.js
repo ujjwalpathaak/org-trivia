@@ -69,13 +69,18 @@ class EmployeeRepository {
   }
 
   async getSubmittedQuestions(employeeId, page, size) {
-    const questionsIds = await Employee.findById(employeeId, 'submittedQuestions')
-    console.log(questionsIds)
-    const questions = await Question.find({ _id: { $in: questionsIds.submittedQuestions } })
+    const questionsIds = await Employee.findById(
+      employeeId,
+      'submittedQuestions',
+    );
+    console.log(questionsIds);
+    const questions = await Question.find({
+      _id: { $in: questionsIds.submittedQuestions },
+    })
       .skip(parseInt(page) * parseInt(size))
       .limit(parseInt(size))
       .lean();
-    return {data: questions, total: questions.length};
+    return { data: questions, total: questions.length };
   }
 
   async getEmployeeDetails(employeeId) {

@@ -2,31 +2,31 @@ export const validateForm = (formData, setErrors, isLogin = false) => {
   let newErrors = {};
 
   if (!formData.email.trim()) {
-    newErrors.email = 'Email is required';
+    newErrors.email = "Email is required";
   } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-    newErrors.email = 'Invalid email format';
+    newErrors.email = "Invalid email format";
   } else if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(formData.email)) {
-    newErrors.email = 'Email must be in a valid format (e.g., user@example.com)';
+    newErrors.email = "Email must be in a valid format (e.g., user@example.com)";
   } else if (formData.email.length > 100) {
-    newErrors.email = 'Email must be less than 100 characters';
+    newErrors.email = "Email must be less than 100 characters";
   } else if (/\s/.test(formData.email)) {
-    newErrors.email = 'Email cannot contain spaces';
+    newErrors.email = "Email cannot contain spaces";
   }
 
   if (!formData.password.trim()) {
-    newErrors.password = 'Password is required';
+    newErrors.password = "Password is required";
   } else if (!isLogin && formData.password.length < 6) {
-    newErrors.password = 'Password must be at least 6 characters';
+    newErrors.password = "Password must be at least 6 characters";
   } else if (!isLogin && !/[A-Z]/.test(formData.password)) {
-    newErrors.password = 'Password must contain at least one uppercase letter';
+    newErrors.password = "Password must contain at least one uppercase letter";
   } else if (!isLogin && !/[a-z]/.test(formData.password)) {
-    newErrors.password = 'Password must contain at least one lowercase letter';
+    newErrors.password = "Password must contain at least one lowercase letter";
   } else if (!isLogin && !/[0-9]/.test(formData.password)) {
-    newErrors.password = 'Password must contain at least one number';
+    newErrors.password = "Password must contain at least one number";
   } else if (!isLogin && !/[!@#$%^&*(),.?":{}|<>]/.test(formData.password)) {
-    newErrors.password = 'Password must contain at least one special character';
+    newErrors.password = "Password must contain at least one special character";
   } else if (!isLogin && /\s/.test(formData.password)) {
-    newErrors.password = 'Password cannot contain spaces';
+    newErrors.password = "Password cannot contain spaces";
   }
 
   setErrors(newErrors);
@@ -37,33 +37,33 @@ export const validateQuestionMakerForm = (question) => {
   let errors = {};
 
   if (!question.question.trim()) {
-    errors.question = 'Question is required.';
+    errors.question = "Question is required.";
   }
 
   if (!question.category) {
-    errors.category = 'Category is required.';
+    errors.category = "Category is required.";
   }
 
-  if (question.category === 'PnA' && !question.config.puzzleType) {
-    errors.puzzleType = 'Puzzle type is required for PnA.';
+  if (question.category === "PnA" && !question.config.puzzleType) {
+    errors.puzzleType = "Puzzle type is required for PnA.";
   }
 
-  const nonEmptyOptions = question.options.filter((opt) => opt.trim() !== '');
+  const nonEmptyOptions = question.options.filter((opt) => opt.trim() !== "");
   if (nonEmptyOptions.length !== 4) {
-    errors.options = 'Four options are required.';
+    errors.options = "Four options are required.";
   }
 
-  if (question.answer === '') {
-    errors.answer = 'Correct answer must be selected.';
+  if (question.answer === "") {
+    errors.answer = "Correct answer must be selected.";
   }
 
   if (question.image) {
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+    const allowedTypes = ["image/jpeg", "image/png", "image/gif"];
     if (!allowedTypes.includes(question.image.type)) {
-      errors.image = 'Only JPG, PNG, and GIF images are allowed.';
+      errors.image = "Only JPG, PNG, and GIF images are allowed.";
     }
     if (question.image.size > 5 * 1024 * 1024) {
-      errors.image = 'Image size must be less than 5MB.';
+      errors.image = "Image size must be less than 5MB.";
     }
   }
 
@@ -73,14 +73,14 @@ export const validateQuestionMakerForm = (question) => {
 export const convertToReadableFormat = (utcTimestamp) => {
   const date = new Date(utcTimestamp);
   const options = {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
     hour12: true,
   };
-  return date.toLocaleString('en-US', options);
+  return date.toLocaleString("en-US", options);
 };
 
 export const getMonthAndYear = () => {
@@ -114,18 +114,18 @@ export const daysUntilNextFriday = () => {
 
 export const getMonth = (month) => {
   const months = [
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
-    'May',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec',
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
   ];
   return months[month];
 };
@@ -137,5 +137,5 @@ export const getNextWeek = () => {
   const week = Math.ceil(
     ((today - new Date(year, 0, 1)) / 86400000 + new Date(year, 0, 1).getDay() + 1) / 7
   );
-  return `${year}-W${week.toString().padStart(2, '0')}`;
+  return `${year}-W${week.toString().padStart(2, "0")}`;
 };

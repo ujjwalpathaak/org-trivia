@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth, useOrgId, useUserId } from '../context/auth.context.jsx';
-import { isWeeklyQuizLive } from '../api.js';
+import { getWeeklyQuizStatus } from '../api.js';
 import { toast } from 'react-toastify';
 
 export const ProtectedRoute = ({ children, route }) => {
@@ -12,9 +12,9 @@ export const ProtectedRoute = ({ children, route }) => {
 
   useEffect(() => {
     if (route === 'quiz' && orgId && employeeId) {
-      const checkIsWeeklyQuizLive = async () => {
+      const fetchWeeklyQuizStatus = async () => {
         try {
-          const live = await isWeeklyQuizLive(orgId, employeeId);
+          const live = await getWeeklyQuizStatus(orgId, employeeId);
           setIsQuizLive(live);
         } catch (error) {
           console.error('Error checking quiz status:', error);
@@ -22,7 +22,7 @@ export const ProtectedRoute = ({ children, route }) => {
         }
       };
 
-      checkIsWeeklyQuizLive();
+      fetchWeeklyQuizStatus();
     }
   }, [route, orgId, employeeId]);
 

@@ -27,6 +27,13 @@ export default [
       'no-console': 'off', // Allow `console` statements
       'no-unused-vars': 'warn', // Warn on unused variables
       'no-undef': 'error', // Error on undefined variables
+      'sort-imports': [
+        'error',
+        {
+          ignoreCase: true,
+          ignoreDeclarationSort: true,
+        },
+      ],
     },
   },
 ];

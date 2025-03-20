@@ -16,7 +16,11 @@ class EmployeeService {
   }
 
   async getSubmittedQuestions(employeeId, page, size) {
-    return await this.employeeRepository.getSubmittedQuestions(employeeId, page, size);
+    return await this.employeeRepository.getSubmittedQuestions(
+      employeeId,
+      page,
+      size,
+    );
   }
 }
 

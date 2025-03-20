@@ -7,6 +7,10 @@ class QuizRepository {
     return Quiz.findOne({ orgId: new ObjectId(orgId), status: 'live' });
   }
 
+  async isWeeklyQuizCancelled(orgId) {
+    return Quiz.findOne({ orgId: new ObjectId(orgId), status: 'cancelled' });
+  }
+
   async doesWeeklyQuizExist(orgId, dateNextFriday) {
     return Quiz.findOne({
       orgId: new ObjectId(orgId),
@@ -32,10 +36,13 @@ class QuizRepository {
   }
 
   async makeQuizLiveTest() {
-    return Quiz.updateMany(
-      { status: 'approved' },
-      { $set: { status: 'live' } },
-    );
+    return Promise.all([
+      Quiz.updateMany(
+        { status: { $in: ['unapproved', 'upcoming'] } },
+        { $set: { status: 'cancelled' } },
+      ),
+      Quiz.updateMany({ status: 'approved' }, { $set: { status: 'live' } }),
+    ]);
   }
 
   async markAllQuizAsExpired() {

@@ -2,12 +2,12 @@
 
 ## ⏳ Cron Jobs
 
-| Task                                             | Frequency                 | Name                              |
-| ------------------------------------------------ | ------------------------- | --------------------------------- |
-| **Approve Next Week Questions Request to Admin** | Every sunday at 00:01 | scheduleNextWeekQuestionsApproval |
-| **Make all quizzes live which have approved questions** | Every friday at 05:30   | makeQuizLiveTest |
-| **Clear weeklyQuestions database & Reset all DB values for next week** | Every friday at 12:01am   | cleanWeeklyQuiz |
-| **Resets leaderboards, streaks and multipliers** | Every 1st of each month at 00:01   | leaderboardReset |
+| Task                                                                   | Frequency                        | Name                              |
+| ---------------------------------------------------------------------- | -------------------------------- | --------------------------------- |
+| **Approve Next Week Questions Request to Admin**                       | Every sunday at 00:01            | scheduleNextWeekQuestionsApproval |
+| **Make all quizzes live which have approved questions**                | Every friday at 05:30            | makeQuizLiveTest                  |
+| **Clear weeklyQuestions database & Reset all DB values for next week** | Every friday at 12:01am          | cleanWeeklyQuiz                   |
+| **Resets leaderboards, streaks and multipliers**                       | Every 1st of each month at 00:01 | leaderboardReset                  |
 
 ## 🔌 API Endpoints
 
