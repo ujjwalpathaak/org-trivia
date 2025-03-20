@@ -1,4 +1,5 @@
 import express from 'express';
+
 import EmployeeController from '../controllers/employee.controller.js';
 import { checkRole } from '../middleware/auth.middleware.js';
 

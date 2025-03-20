@@ -1,5 +1,5 @@
-import EmployeeService from '../services/employee.service.js';
 import EmployeeRepository from '../repositories/employee.repository.js';
+import EmployeeService from '../services/employee.service.js';
 
 const employeeService = new EmployeeService(new EmployeeRepository());
 

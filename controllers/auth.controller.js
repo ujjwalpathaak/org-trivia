@@ -1,5 +1,5 @@
-import AuthService from '../services/auth.service.js';
 import AuthRepository from '../repositories/auth.repository.js';
+import AuthService from '../services/auth.service.js';
 
 const authService = new AuthService(new AuthRepository());
 

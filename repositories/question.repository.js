@@ -1,8 +1,7 @@
 import Question from '../models/question.model.js';
 import WeeklyQuestion from '../models/weeklyQuestion.model.js';
-
-import QuizRepository from './quiz.repository.js';
 import OrgRepository from './org.repository.js';
+import QuizRepository from './quiz.repository.js';
 
 const quizRepository = new QuizRepository();
 const orgRepository = new OrgRepository();
@@ -12,23 +11,29 @@ class QuestionRepository {
     return await new Question(newQuestion).save();
   }
 
-async addQuestions(newQuestions) {
-  const existingQuestions = await Question.find(
-    { question: { $in: newQuestions.map(q => q.question) } },
-    { question: 1, _id: 0 }
-  );
+  async addQuestions(newQuestions) {
+    const existingQuestions = await Question.find(
+      { question: { $in: newQuestions.map((q) => q.question) } },
+      { question: 1, _id: 0 },
+    );
 
-  const existingQuestionSet = new Set(existingQuestions.map(q => q.question));
+    const existingQuestionSet = new Set(
+      existingQuestions.map((q) => q.question),
+    );
 
-  const filteredQuestions = newQuestions.filter(q => !existingQuestionSet.has(q.question));
+    const filteredQuestions = newQuestions.filter(
+      (q) => !existingQuestionSet.has(q.question),
+    );
 
-  if (filteredQuestions.length === 0) {
-    return [];
+    if (filteredQuestions.length === 0) {
+      return [];
+    }
+
+    const insertedQuestions = await Question.insertMany(filteredQuestions, {
+      ordered: false,
+    });
+    return insertedQuestions;
   }
-
-  const insertedQuestions = await Question.insertMany(filteredQuestions, { ordered: false });
-  return insertedQuestions;
-}
 
   async getApprovedWeeklyQuizQuestion(orgId) {
     return await WeeklyQuestion.find({ orgId, isApproved: true })
@@ -40,9 +45,15 @@ async addQuestions(newQuestions) {
     return await WeeklyQuestion.deleteMany();
   }
 
-  async updateWeeklyQuestionsStatusToApproved(ids, employeeQuestionsToAdd, idsOfQuestionsToDelete) {
-    await WeeklyQuestion.deleteMany({ 'question._id': { $in: idsOfQuestionsToDelete } });
-    await WeeklyQuestion.insertMany(employeeQuestionsToAdd)
+  async updateWeeklyQuestionsStatusToApproved(
+    ids,
+    employeeQuestionsToAdd,
+    idsOfQuestionsToDelete,
+  ) {
+    await WeeklyQuestion.deleteMany({
+      'question._id': { $in: idsOfQuestionsToDelete },
+    });
+    await WeeklyQuestion.insertMany(employeeQuestionsToAdd);
     return await WeeklyQuestion.updateMany(
       { 'question._id': { $in: ids } },
       { $set: { isApproved: true } },

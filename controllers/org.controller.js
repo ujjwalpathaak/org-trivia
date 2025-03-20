@@ -1,5 +1,5 @@
-import OrgService from '../services/org.service.js';
 import OrgRepository from '../repositories/org.repository.js';
+import OrgService from '../services/org.service.js';
 
 const orgService = new OrgService(new OrgRepository());
 

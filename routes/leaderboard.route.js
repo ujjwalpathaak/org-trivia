@@ -1,6 +1,7 @@
 import express from 'express';
+
 import LeaderboardController from '../controllers/leaderboard.controller.js';
-import { checkRole, protectRoute } from '../middleware/auth.middleware.js';
+import { protectRoute } from '../middleware/auth.middleware.js';
 
 const leaderboardController = new LeaderboardController();
 

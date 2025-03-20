@@ -1,11 +1,11 @@
+import { ObjectId } from 'mongodb';
+
 import {
   fetchNewCAnITQuestions,
   fetchNewPnAQuestions,
 } from '../api/lambda.api.js';
-import QuizService from './quiz.service.js';
 import QuizRepository from '../repositories/quiz.repository.js';
-
-import { ObjectId } from 'mongodb';
+import QuizService from './quiz.service.js';
 
 const quizService = new QuizService(new QuizRepository());
 
@@ -228,19 +228,20 @@ class QuestionService {
   }
 
   async getExtraEmployeeQuestions(orgId, quizId, quizGenre) {
-    const employeeQuestions = await this.questionRepository.getExtraEmployeeQuestions(
-      orgId,
-      quizId,
-      quizGenre,
-    )
-    return this.formatQuestionsWeeklyFormat(
-      employeeQuestions,
-      orgId,
-      quizId,
-    );
+    const employeeQuestions =
+      await this.questionRepository.getExtraEmployeeQuestions(
+        orgId,
+        quizId,
+        quizGenre,
+      );
+    return this.formatQuestionsWeeklyFormat(employeeQuestions, orgId, quizId);
   }
 
-  async approveWeeklyQuizQuestions(unapprovedQuestions, questionsToDelete, orgId) {
+  async approveWeeklyQuizQuestions(
+    unapprovedQuestions,
+    questionsToDelete,
+    orgId,
+  ) {
     const idsOfQuestionsToApprove = unapprovedQuestions.map(
       (q) => new ObjectId(q.question._id),
     );
@@ -255,18 +256,18 @@ class QuestionService {
       orgId,
       category,
       idsOfQuestionsToApprove,
-      idsOfQuestionsToDelete
+      idsOfQuestionsToDelete,
     );
 
     const employeeQuestionsToAdd = unapprovedQuestions.filter(
-      (q) => q.question.source === 'Employee'
-    )
-    
+      (q) => q.question.source === 'Employee',
+    );
+
     await this.quizRepository.updateQuizStatusToApproved(quizId);
     await this.questionRepository.updateWeeklyQuestionsStatusToApproved(
       idsOfQuestionsToApprove,
       employeeQuestionsToAdd,
-      idsOfQuestionsToDelete
+      idsOfQuestionsToDelete,
     );
 
     return {

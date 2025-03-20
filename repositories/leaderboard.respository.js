@@ -1,10 +1,9 @@
-import Leaderboard from '../models/leaderboard.model.js';
-
 import { ObjectId } from 'mongodb';
 
-import EmployeeRepository from './employee.repository.js';
-import BadgeRepository from './badge.repository.js';
 import { getMonthAndYear } from '../middleware/utils.js';
+import Leaderboard from '../models/leaderboard.model.js';
+import BadgeRepository from './badge.repository.js';
+import EmployeeRepository from './employee.repository.js';
 
 const employeeRepository = new EmployeeRepository();
 const badgeRepository = new BadgeRepository();
@@ -151,7 +150,7 @@ class LeaderboardRepository {
     };
 
     const ranks = ['Gold', 'Silver', 'Bronze'];
-    for (const { orgId, topEmployees } of topThreePerOrg) {
+    for (const { topEmployees } of topThreePerOrg) {
       topEmployees.forEach(async (employee, index) => {
         if (badges[ranks[index]]) {
           await employeeRepository.addBadgesToEmployees(

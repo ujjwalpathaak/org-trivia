@@ -1,6 +1,6 @@
-import Result from '../models/result.model.js';
-
 import { ObjectId } from 'mongodb';
+
+import Result from '../models/result.model.js';
 
 class ResultRepository {
   async submitWeeklyQuizAnswers(

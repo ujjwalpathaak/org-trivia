@@ -1,5 +1,5 @@
-import LeaderboardService from '../services/leaderboard.service.js';
 import LeaderboardRepository from '../repositories/leaderboard.respository.js';
+import LeaderboardService from '../services/leaderboard.service.js';
 
 const leaderboardService = new LeaderboardService(new LeaderboardRepository());
 

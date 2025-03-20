@@ -1,6 +1,6 @@
-import Quiz from '../models/quiz.model.js';
-
 import { ObjectId } from 'mongodb';
+
+import Quiz from '../models/quiz.model.js';
 
 class QuizRepository {
   async findLiveQuizByOrgId(orgId) {

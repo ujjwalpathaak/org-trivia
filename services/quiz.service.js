@@ -1,7 +1,5 @@
 import { getNextFridayDate, getTodayDate } from '../middleware/utils.js';
 
-import { ObjectId } from 'mongodb';
-
 class QuizService {
   constructor(
     quizRepository,

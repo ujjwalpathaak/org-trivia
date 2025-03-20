@@ -1,7 +1,7 @@
 import express from 'express';
-import OrgController from '../controllers/org.controller.js';
 
-import { protectRoute, checkRole } from '../middleware/auth.middleware.js';
+import OrgController from '../controllers/org.controller.js';
+import { checkRole, protectRoute } from '../middleware/auth.middleware.js';
 
 const orgController = new OrgController();
 

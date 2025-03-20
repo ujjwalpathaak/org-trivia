@@ -1,38 +1,54 @@
-import eslintPluginNode from 'eslint-plugin-node';
+import js from '@eslint/js'; // ✅ Ensure this import exists
+import prettierConfig from 'eslint-config-prettier';
+import jsxA11y from 'eslint-plugin-jsx-a11y';
+import prettier from 'eslint-plugin-prettier';
+import react from 'eslint-plugin-react';
+import reactHooks from 'eslint-plugin-react-hooks';
+import simpleImportSort from 'eslint-plugin-simple-import-sort';
+import unusedImports from 'eslint-plugin-unused-imports';
 
 export default [
+  js.configs.recommended, // ✅ Ensure `js` is used correctly
+  prettierConfig,
   {
-    ignores: ['node_modules/', 'dist/', 'build/'], // Ignore common directories
-  },
-  {
+    ignores: ['node_modules', 'dist', 'build', 'tests'],
     languageOptions: {
-      ecmaVersion: 'latest', // Use the latest ECMAScript version
-      sourceType: 'module', // Enable ES Modules (import/export)
+      ecmaVersion: 'latest',
+      sourceType: 'module',
       globals: {
-        __dirname: 'readonly',
-        module: 'readonly',
-        require: 'readonly',
+        window: 'readonly',
+        document: 'readonly',
+        fetch: 'readonly',
+        localStorage: 'readonly',
         process: 'readonly',
+        console: 'readonly',
+        // ✅ Add Jest globals
+        jest: 'readonly',
+        describe: 'readonly',
+        test: 'readonly',
+        expect: 'readonly',
+        beforeAll: 'readonly',
+        afterAll: 'readonly',
+        afterEach: 'readonly',
       },
     },
     plugins: {
-      node: eslintPluginNode, // Node.js plugin for best practices
+      prettier,
+      react,
+      'react-hooks': reactHooks,
+      'jsx-a11y': jsxA11y,
+      'simple-import-sort': simpleImportSort,
+      'unused-imports': unusedImports,
     },
     rules: {
-      'node/no-unsupported-features/es-syntax': [
+      'prettier/prettier': 'error',
+      'react/prop-types': 'off',
+      'simple-import-sort/imports': 'error',
+      'simple-import-sort/exports': 'error',
+      'unused-imports/no-unused-imports': 'error',
+      'no-unused-vars': [
         'error',
-        { version: '>=14.0.0' },
-      ],
-      'node/no-bigint': 'off', // Disable the rule causing the error
-      'no-console': 'off', // Allow `console` statements
-      'no-unused-vars': 'warn', // Warn on unused variables
-      'no-undef': 'error', // Error on undefined variables
-      'sort-imports': [
-        'error',
-        {
-          ignoreCase: true,
-          ignoreDeclarationSort: true,
-        },
+        { vars: 'all', args: 'after-used', ignoreRestSiblings: true },
       ],
     },
   },

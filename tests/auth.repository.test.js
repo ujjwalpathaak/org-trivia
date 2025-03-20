@@ -1,13 +1,11 @@
 import { jest } from '@jest/globals';
-
-import mongoose from 'mongoose';
-import { MongoMemoryServer } from 'mongodb-memory-server';
 import bcrypt from 'bcrypt';
+import { MongoMemoryServer } from 'mongodb-memory-server';
+import mongoose from 'mongoose';
 
 import Admin from '../models/admin.model.js';
 import Employee from '../models/employee.model.js';
 import AuthRepository from '../repositories/auth.repository.js';
-import OrgRepository from '../repositories/org.repository.js';
 
 jest.mock('../repositories/org.repository.js');
 

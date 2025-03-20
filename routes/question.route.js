@@ -1,6 +1,7 @@
 import express from 'express';
-import { checkRole, protectRoute } from '../middleware/auth.middleware.js';
+
 import QuestionController from '../controllers/question.controller.js';
+import { checkRole, protectRoute } from '../middleware/auth.middleware.js';
 
 const questionController = new QuestionController();
 const questionRouter = express.Router();

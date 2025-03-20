@@ -1,12 +1,13 @@
 import cron from 'node-cron';
-import QuestionRepository from '../repositories/question.repository.js';
-import QuestionService from '../services/question.service.js';
-import QuizService from '../services/quiz.service.js';
-import QuizRepository from '../repositories/quiz.repository.js';
-import LeaderboardService from '../services/leaderboard.service.js';
+
+import EmployeeRepository from '../repositories/employee.repository.js';
 import LeaderboardRepository from '../repositories/leaderboard.respository.js';
 import OrgRepository from '../repositories/org.repository.js';
-import EmployeeRepository from '../repositories/employee.repository.js';
+import QuestionRepository from '../repositories/question.repository.js';
+import QuizRepository from '../repositories/quiz.repository.js';
+import LeaderboardService from '../services/leaderboard.service.js';
+import QuestionService from '../services/question.service.js';
+import QuizService from '../services/quiz.service.js';
 
 const quizService = new QuizService(
   new QuizRepository(),

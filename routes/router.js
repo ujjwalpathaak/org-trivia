@@ -1,14 +1,14 @@
 import express from 'express';
 
-import authRouter from './auth.route.js';
-import employeeRouter from './employee.route.js';
 import { checkRole, protectRoute } from '../middleware/auth.middleware.js';
+import authRouter from './auth.route.js';
+import cronTestRouter from './cron.test.route.js';
+import employeeRouter from './employee.route.js';
+import leaderboardRouter from './leaderboard.route.js';
 import orgRouter from './org.route.js';
 import questionRouter from './question.route.js';
-import cronTestRouter from './cron.test.route.js';
-import resultRouter from './result.route.js';
 import quizRouter from './quiz.route.js';
-import leaderboardRouter from './leaderboard.route.js';
+import resultRouter from './result.route.js';
 
 const router = express.Router();
 

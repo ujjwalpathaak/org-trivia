@@ -1,9 +1,9 @@
-import QuizService from '../services/quiz.service.js';
-import QuizRepository from '../repositories/quiz.repository.js';
-import QuestionRepository from '../repositories/question.repository.js';
-import QuestionService from '../services/question.service.js';
 import EmployeeRepository from '../repositories/employee.repository.js';
 import OrgRepository from '../repositories/org.repository.js';
+import QuestionRepository from '../repositories/question.repository.js';
+import QuizRepository from '../repositories/quiz.repository.js';
+import QuestionService from '../services/question.service.js';
+import QuizService from '../services/quiz.service.js';
 
 const quizService = new QuizService(
   new QuizRepository(),
@@ -58,12 +58,16 @@ class QuizController {
   async approveWeeklyQuizQuestions(req, res, next) {
     try {
       const { orgId } = req.params;
-      const {questions, questionsToDelete} = req.body;
+      const { questions, questionsToDelete } = req.body;
       if (!orgId || !questions) {
         return res.status(400).json({ message: 'Missing required fields' });
       }
 
-      await questionService.approveWeeklyQuizQuestions(questions, questionsToDelete, orgId);
+      await questionService.approveWeeklyQuizQuestions(
+        questions,
+        questionsToDelete,
+        orgId,
+      );
 
       res.status(200).json({ message: 'Questions marked as approved' });
     } catch (error) {

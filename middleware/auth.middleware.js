@@ -30,6 +30,6 @@ export const protectRoute = async (request, response, next) => {
     request.data = decoded;
     next();
   } catch (error) {
-    response.status(401).json({ message: 'Invalid or Expired Token' });
+    response.status(401).json({ message: 'Invalid or Expired Token', error });
   }
 };

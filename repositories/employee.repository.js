@@ -1,8 +1,7 @@
-import Employee from '../models/employee.model.js';
-
 import { ObjectId } from 'mongodb';
 
 import { calculateMultiplier, getMonth } from '../middleware/utils.js';
+import Employee from '../models/employee.model.js';
 import Question from '../models/question.model.js';
 
 class EmployeeRepository {

@@ -3,7 +3,6 @@ import jwt from 'jsonwebtoken';
 
 import Admin from '../models/admin.model.js';
 import Employee from '../models/employee.model.js';
-
 import OrgRepository from './org.repository.js';
 
 const orgRepository = new OrgRepository();

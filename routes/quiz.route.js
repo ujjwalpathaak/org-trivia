@@ -1,7 +1,7 @@
 import express from 'express';
-import { checkRole, protectRoute } from '../middleware/auth.middleware.js';
 
 import QuizController from '../controllers/quiz.controller.js';
+import { checkRole, protectRoute } from '../middleware/auth.middleware.js';
 
 const quizController = new QuizController();
 const quizRouter = express.Router();
