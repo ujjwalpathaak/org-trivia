@@ -43,8 +43,6 @@ const updateWeeklyQuizScore = async (employeeId, points) => {
   const multiplier = calculateMultiplier(employee.streak);
   const updatedScore = points * multiplier;
 
-  console.log(employee)
-
   await Employee.updateOne(
     { _id: employeeId },
     { $set: { quizGiven: true }, $inc: { score: updatedScore } },
@@ -79,7 +77,7 @@ const getSubmittedQuestions = async (employeeId, page, size) => {
     .skip(parseInt(page) * parseInt(size))
     .limit(parseInt(size))
     .lean();
-  return { data: questions, total: questionsIds.length };
+  return { data: questions, total: questionsIds.submittedQuestions.length };
 };
 
 const getEmployeeDetails = async (employeeId) => {

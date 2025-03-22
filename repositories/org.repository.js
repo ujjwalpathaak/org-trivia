@@ -60,7 +60,14 @@ const addQuestionToOrg = async (question, orgId) => {
 };
 
 const getTriviaEnabledOrgs = async () =>
-  Org.find({ 'settings.isTriviaEnabled': true });
+  Org.find(
+    { 'settings.isTriviaEnabled': true },
+    {
+      questionsCAnIT: 0,
+      questionsHRD: 0,
+      questionsPnA: 0,
+    },
+  );
 
 const setNextQuestionGenre = async (orgId, currentGenreIndex) => {
   const org = await Org.findById(orgId).select('settings.selectedGenre');
@@ -136,7 +143,7 @@ const fetchHRDQuestions = async (orgId) => {
     { $unwind: '$questionDetails' },
     { $replaceRoot: { newRoot: '$questionDetails' } },
   ]);
-}
+};
 
 const getSettings = async (orgId) => Org.findById(orgId).select('settings');
 const getAllOrgNames = async () => Org.find({}, 'id name');
@@ -163,8 +170,7 @@ const pushQuestionsInOrg = (questions, genre, orgId) => {
     { _id: new ObjectId(orgId) },
     { $push: { [`questions${genre}`]: { $each: questions } } },
   );
-}
-
+};
 
 const fetchExtraEmployeeQuestions = async (orgId, quizId, genre) => {
   const genreField = categoryMap[genre];
@@ -189,7 +195,7 @@ const fetchExtraEmployeeQuestions = async (orgId, quizId, genre) => {
     { $unwind: '$questionDetails' },
     { $replaceRoot: { newRoot: '$questionDetails' } },
   ]);
-}
+};
 
 export default {
   updateQuestionsStatusInOrgToUsed,

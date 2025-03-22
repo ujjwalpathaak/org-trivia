@@ -1,10 +1,11 @@
-import mongoose from 'mongoose';
 import { MongoMemoryServer } from 'mongodb-memory-server';
+import mongoose from 'mongoose';
+
 import Question from '../../models/question.model.js';
 import WeeklyQuestion from '../../models/weeklyQuestion.model.js';
 import orgRepository from '../../repositories/org.repository.js';
-import quizRepository from '../../repositories/quiz.repository.js';
 import questionRepository from '../../repositories/question.repository.js';
+import quizRepository from '../../repositories/quiz.repository.js';
 
 jest.mock('../../repositories/org.repository.js');
 jest.mock('../../repositories/quiz.repository.js');
@@ -21,14 +22,12 @@ afterAll(async () => {
   await mongoServer.stop();
 });
 
-
 afterEach(async () => {
   await Question.deleteMany({});
   await WeeklyQuestion.deleteMany({});
   jest.clearAllMocks();
   jest.clearAllTimers(); // Clear active timers
 });
-
 
 describe('questionRepository', () => {
   test('saveQuestion should save a valid question', async () => {
@@ -74,7 +73,8 @@ describe('questionRepository', () => {
       }, // New
     ];
 
-    const insertedQuestions = await questionRepository.addQuestions(newQuestions);
+    const insertedQuestions =
+      await questionRepository.addQuestions(newQuestions);
 
     expect(insertedQuestions.length).toBe(1);
     expect(insertedQuestions[0].question).toBe('What is Express.js?');
@@ -96,7 +96,8 @@ describe('questionRepository', () => {
       isApproved: true,
     });
 
-    const result = await questionRepository.getApprovedWeeklyQuizQuestion(orgId);
+    const result =
+      await questionRepository.getApprovedWeeklyQuizQuestion(orgId);
 
     expect(result.length).toBe(1);
     expect(result[0].isApproved).toBe(true);
@@ -148,18 +149,22 @@ describe('questionRepository', () => {
         quizId: new mongoose.Types.ObjectId(),
         type: 'extra',
         question: {
-            source: 'Admin',
-            category: 'CAnIT',
-            question: 'Sample?',
-            answer: 1,
-            options: ['Opt1', 'Opt2', 'Opt3', 'Opt4'],
-          },
+          source: 'Admin',
+          category: 'CAnIT',
+          question: 'Sample?',
+          answer: 1,
+          options: ['Opt1', 'Opt2', 'Opt3', 'Opt4'],
+        },
         isApproved: false,
       },
     ];
     const idsOfQuestionsToDelete = [];
 
-    await questionRepository.updateWeeklyQuestionsStatusToApproved(ids, employeeQuestionsToAdd, idsOfQuestionsToDelete);
+    await questionRepository.updateWeeklyQuestionsStatusToApproved(
+      ids,
+      employeeQuestionsToAdd,
+      idsOfQuestionsToDelete,
+    );
 
     const updatedQuestion = await WeeklyQuestion.findOne({});
     expect(updatedQuestion.isApproved).toBe(true);
@@ -206,11 +211,17 @@ describe('questionRepository', () => {
       },
     ];
 
-    const result = await questionRepository.saveWeeklyQuizQuestions(quizId, newQuestions);
+    const result = await questionRepository.saveWeeklyQuizQuestions(
+      quizId,
+      newQuestions,
+    );
 
     expect(result.length).toBe(1);
     expect(result[0].question.question).toBe('New Weekly Question?');
-    expect(quizRepository.updateQuizStatus).toHaveBeenCalledWith(quizId, 'unapproved');
+    expect(quizRepository.updateQuizStatus).toHaveBeenCalledWith(
+      quizId,
+      'unapproved',
+    );
   });
 
   test('getExtraEmployeeQuestions should fetch extra employee questions', async () => {
@@ -222,7 +233,11 @@ describe('questionRepository', () => {
     const quizId = new mongoose.Types.ObjectId();
     const genre = 'HRD';
 
-    const result = await questionRepository.getExtraEmployeeQuestions(orgId, quizId, genre);
+    const result = await questionRepository.getExtraEmployeeQuestions(
+      orgId,
+      quizId,
+      genre,
+    );
 
     expect(result.length).toBe(1);
     expect(result[0].question).toBe('Extra Question');
@@ -244,7 +259,8 @@ describe('questionRepository', () => {
       isApproved: false,
     });
 
-    const result = await questionRepository.getWeeklyUnapprovedQuestions(quizId);
+    const result =
+      await questionRepository.getWeeklyUnapprovedQuestions(quizId);
 
     expect(result.length).toBe(1);
     expect(result[0].question.question).toBe('Unapproved?');

@@ -4,7 +4,7 @@ import { useOrgId, useUserId } from '../context/auth.context';
 import { toast } from 'react-toastify';
 import { Loader, Clock, CheckCircle, Coins } from 'lucide-react';
 
-const Quiz = ({ setIsQuizOpen, setIsQuizLive }) => {
+const Quiz = ({ setQuizStatus, setIsQuizOpen }) => {
   const orgId = useOrgId();
   const userId = useUserId();
 
@@ -111,7 +111,6 @@ const Quiz = ({ setIsQuizOpen, setIsQuizLive }) => {
         localStorage.removeItem('state');
       }
       notifyAnswersSubmitted();
-      setIsQuizLive(false);
     }
   };
 
@@ -144,7 +143,10 @@ const Quiz = ({ setIsQuizOpen, setIsQuizLive }) => {
                 <span className="text-xl mt-2">Your Multiplier: x{result.multiplier || 0}</span>
                 <span className="text-xl mt-2">Your Score: {result.score || 0}</span>
                 <button
-                  onClick={() => setIsQuizOpen(false)}
+                  onClick={() => {
+                    setIsQuizOpen(false);
+                    setQuizStatus({ state: 2 });
+                  }}
                   className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all"
                 >
                   Close Quiz

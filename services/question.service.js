@@ -21,7 +21,8 @@ async function saveQuestion(newQuestionData, employeeId) {
 async function scheduleNextWeekQuestionsApproval() {
   const triviaEnabledOrgs = await orgRepository.getTriviaEnabledOrgs();
   for (const element of triviaEnabledOrgs) {
-    await scheduleQuizForOrg(element);
+    const plainElement = element.toObject();
+    await scheduleQuizForOrg(plainElement);
   }
 }
 
@@ -46,15 +47,15 @@ async function scheduleQuizForOrg(element) {
 async function startQuestionGenerationWorkflow(genre, element, quizId) {
   switch (genre) {
     case 'PnA':
-      console.log('starting PnA');
+      // console.log('starting PnA');
       fetchNewPnAQuestions(element.name, element._id, quizId);
       break;
     case 'HRD':
-      console.log('starting HRD');
+      // console.log('starting HRD');
       await startHRDWorkflow(element._id, quizId);
       break;
     case 'CAnIT':
-      console.log('starting CAnIT');
+      // console.log('starting CAnIT');
       fetchNewCAnITQuestions(
         element.name,
         element.orgIndustry,
@@ -236,7 +237,6 @@ async function getWeeklyQuizCorrectAnswers(orgId) {
     await questionRepository.getCorrectWeeklyQuizAnswers(orgId);
   return correctWeeklyQuizAnswers.map((curr) => curr.question);
 }
-
 
 async function fetchHRDQuestions(orgId) {
   return await orgRepository.fetchHRDQuestions(orgId);

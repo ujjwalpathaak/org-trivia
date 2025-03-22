@@ -42,7 +42,6 @@ const getSubmittedQuestionsController = async (req, res, next) => {
   try {
     const { employeeId } = req.params;
     const { page = 0, size = 10 } = req.query;
-    console.log(employeeId, page, size);
     const submittedQuestions = await employeeService.fetchSubmittedQuestions(
       employeeId,
       page,

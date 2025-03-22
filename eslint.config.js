@@ -11,7 +11,7 @@ export default [
   js.configs.recommended, // ✅ Ensure `js` is used correctly
   prettierConfig,
   {
-    ignores: ['node_modules', 'dist', 'build', 'tests'],
+    ignores: ['node_modules', 'dist', 'build', 'tests', 'temp'],
     languageOptions: {
       ecmaVersion: 'latest',
       sourceType: 'module',

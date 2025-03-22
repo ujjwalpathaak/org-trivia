@@ -13,7 +13,6 @@ const fetchPastQuizResults = async (employeeId) => {
 };
 
 const fetchSubmittedQuestions = async (employeeId, page, size) => {
-  console.log(employeeId, page, size)
   return await employeeRepository.getSubmittedQuestions(employeeId, page, size);
 };
 

@@ -28,3 +28,5 @@ testing
 *.sw?
 
 coverage/
+
+temp

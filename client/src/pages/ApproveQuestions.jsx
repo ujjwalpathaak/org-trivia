@@ -15,6 +15,9 @@ export default function ScheduleQuestions() {
   const [removedQuestionIndex, setRemovedQuestionIndex] = useState(-1);
   const [questions, setQuestions] = useState([]);
   const [questionsToDelete, setQuestionsToDelete] = useState([]);
+  // const [usingAI, setUsingAI] = useState(false);
+
+  // const [prompt, setPrompt] = useState('');
 
   const orgId = useOrgId();
 
@@ -26,6 +29,7 @@ export default function ScheduleQuestions() {
   const [tempRemovedQuestion, setTempRemovedQuestion] = useState(null);
 
   const handleQuestionRemove = (idx) => {
+    // if (isAI) setUsingAI(true);
     setTempRemovedQuestion({ index: idx, question: questions[idx] });
     const updatedQuestions = [...questions];
     updatedQuestions[idx] = { question: null };
@@ -120,7 +124,11 @@ export default function ScheduleQuestions() {
   return (
     <div className="h-[93vh] bg-gradient-to-br from-blue-50 to-indigo-50 p-6">
       <div className="flex gap-6 h-full">
-        <div className="w-1/3 bg-white rounded-xl shadow-lg p-6 flex-1">
+        <div
+          className={`w-1/3 bg-white rounded-xl shadow-lg p-6 flex-1 ${
+            !addQuestion ? 'opacity-50 pointer-events-none' : ''
+          }`}
+        >
           <h2 className="text-2xl font-bold text-gray-800 mb-6">Extra Questions</h2>
           <div className="space-y-6">
             <div className="bg-gray-50 rounded-lg shadow-sm">
@@ -132,7 +140,7 @@ export default function ScheduleQuestions() {
                 {aiQuestions?.map((q, idx) => (
                   <button
                     key={idx}
-                    onClick={() => selectQuestion(q)}
+                    onClick={() => addQuestion && selectQuestion(q)}
                     className="w-full text-left p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition duration-200 border border-gray-200"
                   >
                     {q.question.question}
@@ -150,7 +158,7 @@ export default function ScheduleQuestions() {
                 {empQuestions?.map((q, idx) => (
                   <button
                     key={idx}
-                    onClick={() => selectQuestion(q)}
+                    onClick={() => !isDisabled && selectQuestion(q)}
                     className="w-full text-left p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition duration-200 border border-gray-200"
                   >
                     {q.question.question}
@@ -160,7 +168,7 @@ export default function ScheduleQuestions() {
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-xl shadow-lg p-6 flex-1">
+        <div className="bg-white rounded-xl shadow-lg p-6 flex-1/2">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-bold text-gray-800">Questions for {selectedWeek}</h2>
             <div>
@@ -186,6 +194,7 @@ export default function ScheduleQuestions() {
                   <div key={idx} className="bg-gray-50 rounded-lg p-6 shadow-sm relative">
                     <div className="flex justify-between items-center mb-4">
                       <h3 className="text-lg font-semibold text-gray-700">Question {idx + 1}</h3>
+                      {/* <div className="flex gap-2"> */}
                       {!addQuestion && (
                         <button
                           onClick={() => handleQuestionRemove(idx)}
@@ -194,6 +203,13 @@ export default function ScheduleQuestions() {
                           Replace
                         </button>
                       )}
+                      {/* <button
+                          onClick={() => handleQuestionRemove(idx, true)}
+                          className="w-fit p-3 h-8 flex items-center justify-center rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition duration-200"
+                        >
+                          Write using AI
+                        </button>
+                      </div> */}
                     </div>
                     <textarea
                       value={q.question?.question}
@@ -255,6 +271,23 @@ export default function ScheduleQuestions() {
                         </button>
                       )}
                     </div>
+                    {/* {usingAI && (
+                      <div className="w-full mb-4 p-4 bg-gray-100 rounded-lg shadow-md">
+                        <textarea
+                          className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                          rows="3"
+                          placeholder="Enter a prompt for AI..."
+                          value={prompt}
+                          onChange={(e) => setPrompt(e.target.value)}
+                        />
+                        <button
+                          onClick={handleGenerate}
+                          className="mt-2 px-4 py-2 bg-blue-500 text-white font-medium rounded-md hover:bg-blue-600 transition duration-200"
+                        >
+                          Generate
+                        </button>
+                      </div>
+                    )} */}
                     <div className="h-32 bg-gray-200 rounded-lg mb-4"></div>
                     <p className="text-gray-600 font-medium">Adding new question...</p>
                   </div>
