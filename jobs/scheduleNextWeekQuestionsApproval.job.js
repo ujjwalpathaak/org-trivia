@@ -1,24 +1,8 @@
 import cron from 'node-cron';
-import QuestionRepository from '../repositories/question.repository.js';
-import QuestionService from '../services/question.service.js';
-import QuizService from '../services/quiz.service.js';
-import QuizRepository from '../repositories/quiz.repository.js';
-import LeaderboardService from '../services/leaderboard.service.js';
-import LeaderboardRepository from '../repositories/leaderboard.respository.js';
-import OrgRepository from '../repositories/org.repository.js';
-import EmployeeRepository from '../repositories/employee.repository.js';
 
-const quizService = new QuizService(
-  new QuizRepository(),
-  new EmployeeRepository(),
-  new QuestionRepository(),
-  new OrgRepository(),
-);
-const questionService = new QuestionService(new QuestionRepository());
-const leaderboardService = new LeaderboardService(
-  new LeaderboardRepository(),
-  new OrgRepository(),
-);
+import leaderboardService from '../services/leaderboard.service.js';
+import questionService from '../services/question.service.js';
+import quizService from '../services/quiz.service.js';
 
 export const scheduleNextWeekQuestionsApproval = cron.schedule(
   '5 0 * * 6',

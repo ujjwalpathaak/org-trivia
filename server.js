@@ -3,11 +3,11 @@ dotenv.config();
 import cors from 'cors';
 import dotenv from 'dotenv';
 import express from 'express';
-import router from './routes/router.js';
 
 import { connectDatabase } from './Database.js';
-import { isProduction, logService } from './middleware/utils.js';
 import { startJobs } from './jobs/index.js';
+import { isProduction, logService } from './middleware/utils.js';
+import router from './routes/router.js';
 
 const app = express();
 const isProductionServer = isProduction();
@@ -30,7 +30,7 @@ app.use('/', router);
 
 app.use(logService);
 
-app.use((error, req, res, next) => {
+app.use((error, req, res) => {
   error.status = error.status || 500;
   error.message = error.message || 'Server Error';
 

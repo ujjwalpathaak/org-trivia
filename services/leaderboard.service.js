@@ -2,32 +2,17 @@ import {
   getMonthAndYear,
   getPreviousMonthAndYear,
 } from '../middleware/utils.js';
+import leaderboardRespository from '../repositories/leaderboard.respository.js';
 
-class LeaderboardService {
-  constructor(leaderboardRespository, orgRepository) {
-    this.leaderboardRespository = leaderboardRespository;
-    this.orgRepository = orgRepository;
-  }
+const getLeaderboardByOrg = async (orgId) => {
+  const [month, year] = getMonthAndYear();
+  return leaderboardRespository.getLeaderboardByOrg(orgId, month, year);
+};
 
-  async getLeaderboardByOrg(orgId) {
-    const [month, year] = getMonthAndYear();
-    return await this.leaderboardRespository.getLeaderboardByOrg(
-      orgId,
-      month,
-      year,
-    );
-  }
+const resetLeaderboard = async () => {
+  const [month, year] = getMonthAndYear();
+  const [pMonth, pYear] = getPreviousMonthAndYear();
+  return leaderboardRespository.resetLeaderboard(month, year, pMonth, pYear);
+};
 
-  async resetLeaderboard() {
-    const [month, year] = getMonthAndYear();
-    const [pMonth, pYear] = getPreviousMonthAndYear();
-    return await this.leaderboardRespository.resetLeaderboard(
-      month,
-      year,
-      pMonth,
-      pYear,
-    );
-  }
-}
-
-export default LeaderboardService;
+export default { getLeaderboardByOrg, resetLeaderboard };

@@ -1,27 +1,24 @@
-class EmployeeService {
-  constructor(employeeRepository) {
-    this.employeeRepository = employeeRepository;
-  }
+import employeeRepository from '../repositories/employee.repository.js';
 
-  async fetchEmployeeScore(employeeId) {
-    return await this.employeeRepository.getEmployeeScore(employeeId);
-  }
+const fetchEmployeeScore = async (employeeId) => {
+  return await employeeRepository.getEmployeeScore(employeeId);
+};
 
-  async getEmployeeDetails(employeeId) {
-    return await this.employeeRepository.getEmployeeDetails(employeeId);
-  }
+const fetchEmployeeDetails = async (employeeId) => {
+  return await employeeRepository.getEmployeeDetails(employeeId);
+};
 
-  async getPastQuizResults(employeeId) {
-    return await this.employeeRepository.getPastQuizResults(employeeId);
-  }
+const fetchPastQuizResults = async (employeeId) => {
+  return await employeeRepository.getPastQuizResults(employeeId);
+};
 
-  async getSubmittedQuestions(employeeId, page, size) {
-    return await this.employeeRepository.getSubmittedQuestions(
-      employeeId,
-      page,
-      size,
-    );
-  }
-}
+const fetchSubmittedQuestions = async (employeeId, page, size) => {
+  return await employeeRepository.getSubmittedQuestions(employeeId, page, size);
+};
 
-export default EmployeeService;
+export default {
+  fetchEmployeeScore,
+  fetchEmployeeDetails,
+  fetchPastQuizResults,
+  fetchSubmittedQuestions,
+};

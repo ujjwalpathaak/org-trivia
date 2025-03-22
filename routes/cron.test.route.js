@@ -1,18 +1,8 @@
 import express from 'express';
-import CronTestController from '../controllers/cron.test.controller.js';
 
-const cronTestController = new CronTestController();
+import cronTestController from '../controllers/cron.test.controller.js';
+
 const cronTestRouter = express.Router();
-
-cronTestRouter.post(
-  '/test/startPnAWorkflow/:orgId',
-  cronTestController.startPnAWorkflow,
-);
-
-cronTestRouter.post(
-  '/test/startCAnITWorkflow/:orgId',
-  cronTestController.startCAnITWorkflow,
-);
 
 cronTestRouter.post(
   '/test/cleanWeeklyQuiz',
