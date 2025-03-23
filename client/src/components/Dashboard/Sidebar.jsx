@@ -33,7 +33,7 @@ const Sidebar = ({
   daysUntilNextFriday,
 }) => {
   const renderQuizStatus = () => {
-    switch (quizStatus.state) {
+    switch (quizStatus) {
       case 0:
         return (
           <div className="rounded-xl">

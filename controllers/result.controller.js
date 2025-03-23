@@ -1,13 +1,14 @@
 import resultService from '../services/result.service.js';
 
-const submitWeeklyQuizAnswers = async (req, res, next) => {
+const submitWeeklyQuizAnswersController = async (req, res, next) => {
   try {
-    const { answers, employeeId, orgId, quizId } = req.body;
+    const { answers, quizId } = req.body;
+    const { employeeId, orgId } = req.data;
     if (!answers || !employeeId || !orgId || !quizId) {
       return res.status(400).json({ message: 'All fields are required' });
     }
 
-    const data = await resultService.submitWeeklyQuizAnswers(
+    const data = await resultService.submitWeeklyQuizAnswersService(
       answers,
       employeeId,
       orgId,
@@ -32,7 +33,7 @@ const submitWeeklyQuizAnswers = async (req, res, next) => {
 
 const getEmployeePastResults = async (req, res, next) => {
   try {
-    const { employeeId } = req.params;
+    const { employeeId } = req.data;
     const { page = 0, size = 10 } = req.query;
 
     if (!employeeId) {
@@ -52,6 +53,6 @@ const getEmployeePastResults = async (req, res, next) => {
 };
 
 export default {
-  submitWeeklyQuizAnswers,
+  submitWeeklyQuizAnswersController,
   getEmployeePastResults,
 };

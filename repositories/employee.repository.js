@@ -2,7 +2,6 @@ import { ObjectId } from 'mongodb';
 
 import { calculateMultiplier, getMonth } from '../middleware/utils.js';
 import Employee from '../models/employee.model.js';
-import Question from '../models/question.model.js';
 
 const isWeeklyQuizGiven = async (employeeId) => {
   return Employee.findById(employeeId, 'quizGiven');
@@ -34,10 +33,7 @@ const addSubmittedQuestion = async (questionId, employeeId) => {
 };
 
 const updateWeeklyQuizScore = async (employeeId, points) => {
-  const employee = await Employee.findById(
-    employeeId,
-    'streak score quizGiven',
-  );
+  const employee = await Employee.findById(employeeId, 'streak quizGiven');
   if (employee.quizGiven) return false;
 
   const multiplier = calculateMultiplier(employee.streak);
@@ -67,26 +63,45 @@ const resetAllEmployeesScores = async () => {
 };
 
 const getSubmittedQuestions = async (employeeId, page, size) => {
-  const questionsIds = await Employee.findById(
-    employeeId,
-    'submittedQuestions',
-  );
-  const questions = await Question.find({
-    _id: { $in: questionsIds.submittedQuestions },
-  })
-    .skip(parseInt(page) * parseInt(size))
-    .limit(parseInt(size))
-    .lean();
-  return { data: questions, total: questionsIds.submittedQuestions.length };
+  const result = await Employee.aggregate([
+    {
+      $match: {
+        _id: new ObjectId(employeeId),
+      },
+    },
+    {
+      $lookup: {
+        from: 'questions',
+        localField: 'submittedQuestions',
+        foreignField: '_id',
+        as: 'employee_questions',
+      },
+    },
+    {
+      $project: {
+        data: {
+          $slice: [
+            '$employee_questions',
+            parseInt(page) * parseInt(size),
+            parseInt(size),
+          ],
+        },
+        total: { $size: '$submittedQuestions' },
+        _id: 0,
+      },
+    },
+  ]);
+
+  return result[0] || {};
 };
 
 const getEmployeeDetails = async (employeeId) => {
-  const employee = await Employee.findById(employeeId).lean();
+  const employee = await Employee.findById(employeeId, '-password').lean();
   if (!employee) return null;
 
   const badges = await Employee.aggregate([
     { $match: { _id: new ObjectId(employeeId) } },
-    { $unwind: '$badges' },
+    { $unwind: { path: '$badges', preserveNullAndEmptyArrays: true } },
     { $sort: { 'badges.earnedAt': -1 } },
     {
       $lookup: {
@@ -96,7 +111,7 @@ const getEmployeeDetails = async (employeeId) => {
         as: 'badgeDetails',
       },
     },
-    { $unwind: '$badgeDetails' },
+    { $unwind: { path: '$badgeDetails', preserveNullAndEmptyArrays: true } },
     {
       $group: {
         _id: '$_id',
@@ -104,7 +119,6 @@ const getEmployeeDetails = async (employeeId) => {
           $push: {
             badgeDetails: '$badgeDetails',
             description: '$badges.description',
-            rank: '$badges.rank',
             earnedAt: '$badges.earnedAt',
           },
         },

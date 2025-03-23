@@ -1,22 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { useUserId } from '../../context/auth.context';
-import { getPastSubmittedQuestions } from '../../api'; // Update this with the correct API import
+import { getPastSubmittedQuestionsAPI } from '../../api'; // Update this with the correct API import
 
 const SubmittedQuestions = ({ setIsSubmittedQuestionsOpen }) => {
   const [pageNumber, setPageNumber] = useState(0);
   const [submittedQuestions, setSubmittedQuestions] = useState([]);
   const [totalPages, setTotalPages] = useState(0);
+  const [cachedPages, setCachedPages] = useState({}); // Cache object to store previously fetched pages
   const [error, setError] = useState(null);
-  const employeeId = useUserId();
   const pageSize = 3;
 
   useEffect(() => {
+    if (cachedPages[pageNumber]) {
+      setSubmittedQuestions(cachedPages[pageNumber]); // Use cached data if available
+      return;
+    }
+
     const fetchSubmittedQuestions = async () => {
       try {
-        const response = await getPastSubmittedQuestions(employeeId, pageNumber, pageSize);
+        const response = await getPastSubmittedQuestionsAPI(pageNumber, pageSize);
         if (response && response.data) {
           setSubmittedQuestions(response.data);
           setTotalPages(Math.max(1, Math.ceil(response.total / pageSize)));
+          setCachedPages((prevCache) => ({
+            ...prevCache,
+            [pageNumber]: response.data, // Cache the response for this page
+          }));
         } else {
           throw new Error('Invalid response format');
         }
@@ -26,10 +34,8 @@ const SubmittedQuestions = ({ setIsSubmittedQuestionsOpen }) => {
       }
     };
 
-    if (employeeId) {
-      fetchSubmittedQuestions();
-    }
-  }, [employeeId, pageNumber]);
+    fetchSubmittedQuestions();
+  }, [pageNumber, cachedPages]);
 
   const handlePrevPage = () => {
     setPageNumber((prev) => Math.max(prev - 1, 0));
@@ -63,10 +69,10 @@ const SubmittedQuestions = ({ setIsSubmittedQuestionsOpen }) => {
                   <div className="flex flex-col">
                     <span className="text-sm text-slate-400 ml-2 mb-1">Question {idx + 1}</span>
                     <span className="text-base text-slate-900 ml-2 mb-2">{question.question}</span>
-                    {['A', 'B', 'C', 'D'].map((option, idx) => (
+                    {['A', 'B', 'C', 'D'].map((option, optionIdx) => (
                       <span
-                        key={idx}
-                        className={`${question.answer === idx ? 'text-green-600' : 'text-red-400'} text-sm ml-2`}
+                        key={optionIdx}
+                        className={`${question.answer === optionIdx ? 'text-green-600' : 'text-red-400'} text-sm ml-2`}
                       >
                         {`${option}: ${question[option]}`}
                       </span>

@@ -6,23 +6,23 @@ import { checkRole, protectRoute } from '../middleware/auth.middleware.js';
 const quizRouter = express.Router();
 
 quizRouter.get(
-  '/status/:orgId/:employeeId',
+  '/status',
   protectRoute,
   checkRole('Employee'),
-  QuizController.getWeeklyQuizStatus,
+  QuizController.getWeeklyQuizStatusController,
 );
 
 quizRouter.post('/weekly/lambda/callback', QuizController.handleLambdaCallback);
 
 quizRouter.post(
-  '/approve/:orgId',
+  '/approve',
   protectRoute,
   checkRole('Admin'),
   QuizController.approveWeeklyQuizQuestions,
 );
 
 quizRouter.get(
-  '/questions/:orgId',
+  '/questions',
   protectRoute,
   checkRole('Employee'),
   QuizController.getWeeklyQuizQuestions,

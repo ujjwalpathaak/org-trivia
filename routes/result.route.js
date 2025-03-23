@@ -6,11 +6,8 @@ const resultRouter = express.Router();
 
 resultRouter.post(
   '/submitWeeklyQuizAnswers',
-  ResultController.submitWeeklyQuizAnswers,
+  ResultController.submitWeeklyQuizAnswersController,
 );
-resultRouter.get(
-  '/employee/:employeeId',
-  ResultController.getEmployeePastResults,
-);
+resultRouter.get('/employee', ResultController.getEmployeePastResults);
 
 export default resultRouter;

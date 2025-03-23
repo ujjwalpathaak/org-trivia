@@ -28,7 +28,7 @@ const getEmployeePastResults = async (employeeId, page, size) => {
   return await resultRepository.getEmployeePastResults(employeeId, page, size);
 };
 
-const submitWeeklyQuizAnswers = async (
+const submitWeeklyQuizAnswersService = async (
   userAnswers,
   employeeId,
   orgId,
@@ -87,14 +87,8 @@ const submitWeeklyQuizAnswers = async (
   };
 };
 
-const fetchEmployeeScore = async (employeeId) => {
-  const quiz = await quizRepository.getLiveQuizByEmployeeId(employeeId);
-  return await resultRepository.getEmployeeScore(employeeId, quiz);
-};
-
 export default {
   calculateWeeklyQuizScore,
   getEmployeePastResults,
-  submitWeeklyQuizAnswers,
-  fetchEmployeeScore,
+  submitWeeklyQuizAnswersService,
 };

@@ -6,22 +6,17 @@ import { checkRole } from '../middleware/auth.middleware.js';
 const employeeRouter = express.Router();
 
 employeeRouter.get(
-  '/score/:employeeId',
-  checkRole('Employee'),
-  employeeController.fetchEmployeeScoreController,
-);
-employeeRouter.get(
-  '/:employeeId',
+  '/',
   checkRole('Employee'),
   employeeController.getEmployeeDetails,
 );
 employeeRouter.get(
-  '/quizzes/results/:employeeId',
+  '/quizzes/results',
   checkRole('Employee'),
   employeeController.getPastQuizResultsController,
 );
 employeeRouter.get(
-  '/submitted-questions/:employeeId',
+  '/submitted-questions',
   checkRole('Employee'),
   employeeController.getSubmittedQuestionsController,
 );

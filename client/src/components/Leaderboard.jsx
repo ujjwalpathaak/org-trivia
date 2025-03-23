@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { getLeaderboardByOrgId } from '../api';
+import { getLeaderboardAPI } from '../api';
 import { useOrgId } from '../context/auth.context';
 import { getMonth } from '../utils';
 import { CalendarDays } from 'lucide-react';
@@ -12,7 +12,7 @@ const Leaderboard = ({ last3Leaderboards }) => {
     const fetchLeaderboardByOrgId = async () => {
       if (!orgId) return;
       try {
-        const leaderboard = await getLeaderboardByOrgId(orgId);
+        const leaderboard = await getLeaderboardAPI(orgId);
         setLeaderboard(leaderboard);
       } catch (error) {
         console.error('Error fetching leaderboard:', error);

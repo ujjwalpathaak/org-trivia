@@ -8,7 +8,7 @@ const Dashboard = () => {
 
   return (
     <div className="font-black flex flex-col justify-center items-center">
-      {data?.user?.role === 'Employee' ? <EmployeeDashboard /> : <AdminDashboard />}
+      {data?.role === 'Employee' ? <EmployeeDashboard /> : <AdminDashboard />}
     </div>
   );
 };

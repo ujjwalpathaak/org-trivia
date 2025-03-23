@@ -1,9 +1,5 @@
 import employeeRepository from '../repositories/employee.repository.js';
 
-const fetchEmployeeScore = async (employeeId) => {
-  return await employeeRepository.getEmployeeScore(employeeId);
-};
-
 const fetchEmployeeDetails = async (employeeId) => {
   return await employeeRepository.getEmployeeDetails(employeeId);
 };
@@ -17,7 +13,6 @@ const fetchSubmittedQuestions = async (employeeId, page, size) => {
 };
 
 export default {
-  fetchEmployeeScore,
   fetchEmployeeDetails,
   fetchPastQuizResults,
   fetchSubmittedQuestions,

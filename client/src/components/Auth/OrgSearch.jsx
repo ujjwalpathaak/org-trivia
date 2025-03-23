@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getAllOrgs } from '../../api';
+import { getAllOrgsAPI } from '../../api';
 
 const OrgSearch = ({ setFormData }) => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -12,7 +12,7 @@ const OrgSearch = ({ setFormData }) => {
 
     const fetchAllOrgs = async () => {
       try {
-        const response = await getAllOrgs();
+        const response = await getAllOrgsAPI();
         const data = await response.json();
 
         // const newCache = { ...cachedData, orgs: data };

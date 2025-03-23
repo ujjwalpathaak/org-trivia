@@ -8,28 +8,28 @@ const orgRouter = express.Router();
 orgRouter.get('/', OrgController.getAllOrgNames);
 
 orgRouter.patch(
-  '/settings/toggleTrivia/:orgId',
+  '/settings/toggleTrivia',
   protectRoute,
   checkRole('Admin'),
   OrgController.toggleTrivia,
 );
 
 orgRouter.get(
-  '/settings/:orgId',
+  '/settings',
   protectRoute,
   checkRole('Admin'),
   OrgController.getSettings,
 );
 
 orgRouter.post(
-  '/settings/genre/:orgId',
+  '/settings/genre',
   protectRoute,
   checkRole('Admin'),
   OrgController.changeGenreSettings,
 );
 
 orgRouter.get(
-  '/analytics/:orgId',
+  '/analytics',
   protectRoute,
   checkRole('Admin'),
   OrgController.getAnalytics,

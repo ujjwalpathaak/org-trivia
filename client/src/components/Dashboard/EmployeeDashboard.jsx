@@ -1,22 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import {
-  getWeeklyQuizStatus,
-  fetchEmployeeScore,
-  getEmployeeDetails,
-  getPastQuizResults,
-} from '../../api';
-import { useAuth, useOrgId, useUserId } from '../../context/auth.context';
+import { getWeeklyQuizStatusAPI, getEmployeeDetailsAPI } from '../../api';
 import ProfileSection from './ProfileSection';
 import MainContent from './MainContent';
 import Sidebar from './Sidebar';
 import { daysUntilNextFriday } from '../../utils';
+import { useAuth } from '../../context/auth.context';
 
 const EmployeeDashboard = () => {
-  const orgId = useOrgId();
-  const employeeId = useUserId();
   const { data } = useAuth();
-
-  const [quizStatus, setQuizStatus] = useState({});
+  const [quizStatus, setQuizStatus] = useState(3);
   const [resumeQuiz, setResumeQuiz] = useState(false);
   const [isQuestionMakerOpen, setIsQuestionMakerOpen] = useState(false);
   const [isPastQuizViewerOpen, setIsPastQuizViewerOpen] = useState(false);
@@ -42,9 +34,8 @@ const EmployeeDashboard = () => {
 
   useEffect(() => {
     const fetchEmployeeDetails = async () => {
-      if (!employeeId) return;
       try {
-        const data = await getEmployeeDetails(employeeId);
+        const data = await getEmployeeDetailsAPI();
         setDetails(data);
       } catch (error) {
         console.error('Error fetching employee details:', error);
@@ -52,21 +43,21 @@ const EmployeeDashboard = () => {
     };
 
     fetchEmployeeDetails();
-  }, [employeeId]);
+  }, []);
 
   useEffect(() => {
     const fetchWeeklyQuizStatus = async () => {
       try {
-        const status = await getWeeklyQuizStatus(orgId, employeeId);
+        const status = await getWeeklyQuizStatusAPI();
         setQuizStatus(status);
       } catch (error) {
         console.error('Error checking quiz status:', error);
-        setQuizStatus(false);
+        setQuizStatus(3);
       }
     };
 
     fetchWeeklyQuizStatus();
-  }, [orgId, employeeId]);
+  }, []);
 
   return (
     <div className="min-h-[93vh] flex justify-center bg-[#f0f2f5]">

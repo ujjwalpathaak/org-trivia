@@ -1,6 +1,6 @@
-import { scheduleNextWeekQuestionsApproval } from './scheduleNextWeekQuestionsApproval.job.js';
+import { scheduleNextWeekQuestionsApprovalJob } from './scheduleNextWeekQuestionsApproval.job.js';
 
 export const startJobs = () => {
   console.log('Starting cron jobs...');
-  scheduleNextWeekQuestionsApproval.start();
+  scheduleNextWeekQuestionsApprovalJob.start();
 };

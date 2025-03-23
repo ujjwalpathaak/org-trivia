@@ -21,9 +21,9 @@ export const registerRequest = async (formData) => {
   return response;
 };
 
-export const getPastSubmittedQuestions = async (employeeId, pageNumber = 0, pageSize = 10) => {
+export const getPastSubmittedQuestionsAPI = async (pageNumber = 0, pageSize = 10) => {
   const response = await fetch(
-    `${BACKEND_URL}/employee/submitted-questions/${employeeId}?page=${pageNumber}&size=${pageSize}`,
+    `${BACKEND_URL}/employee/submitted-questions?page=${pageNumber}&size=${pageSize}`,
     {
       method: 'GET',
       headers: {
@@ -40,9 +40,9 @@ export const getPastSubmittedQuestions = async (employeeId, pageNumber = 0, page
   return await response.json();
 };
 
-export const getPastQuizResults = async (employeeId, pageNumber = 0, pageSize = 10) => {
+export const getPastQuizResultsAPI = async (pageNumber = 0, pageSize = 10) => {
   const response = await fetch(
-    `${BACKEND_URL}/result/employee/${employeeId}?page=${pageNumber}&size=${pageSize}`,
+    `${BACKEND_URL}/result/employee?page=${pageNumber}&size=${pageSize}`,
     {
       method: 'GET',
       headers: {
@@ -59,8 +59,8 @@ export const getPastQuizResults = async (employeeId, pageNumber = 0, pageSize = 
   return await response.json();
 };
 
-export const getAnalytics = async (orgId) => {
-  const response = await fetch(`${BACKEND_URL}/org/analytics/${orgId}`, {
+export const getAnalyticsAPI = async () => {
+  const response = await fetch(`${BACKEND_URL}/org/analytics`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -71,8 +71,8 @@ export const getAnalytics = async (orgId) => {
   return await response.json();
 };
 
-export const getEmployeeDetails = async (employeeId) => {
-  const response = await fetch(BACKEND_URL + `/employee/${employeeId}`, {
+export const getEmployeeDetailsAPI = async () => {
+  const response = await fetch(BACKEND_URL + `/employee`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -83,7 +83,7 @@ export const getEmployeeDetails = async (employeeId) => {
   return await response.json();
 };
 
-export const getAllOrgs = async () => {
+export const getAllOrgsAPI = async () => {
   const response = await fetch(BACKEND_URL + '/org', {
     method: 'GET',
     headers: { 'Content-Type': 'application/json' },
@@ -92,7 +92,7 @@ export const getAllOrgs = async () => {
   return response;
 };
 
-export const createNewQuestion = async (formData, employeeId) => {
+export const createNewQuestionAPI = async (formData) => {
   try {
     const response = await fetch(`${BACKEND_URL}/question`, {
       method: 'POST',
@@ -100,7 +100,7 @@ export const createNewQuestion = async (formData, employeeId) => {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ question: formData, employeeId: employeeId }),
+      body: JSON.stringify({ question: formData }),
     });
 
     if (!response.ok) {
@@ -114,9 +114,9 @@ export const createNewQuestion = async (formData, employeeId) => {
   }
 };
 
-export const saveGenreSettings = async (newGenres, orgId) => {
+export const saveGenreSettingsAPI = async (newGenres) => {
   try {
-    const response = await fetch(`${BACKEND_URL}/org/settings/genre/${orgId}`, {
+    const response = await fetch(`${BACKEND_URL}/org/settings/genre`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -136,9 +136,9 @@ export const saveGenreSettings = async (newGenres, orgId) => {
   }
 };
 
-export const getQuestionsToApprove = async (orgId) => {
+export const getQuestionsToApproveAPI = async () => {
   try {
-    const response = await fetch(`${BACKEND_URL}/question/weekly/unapproved/${orgId}`, {
+    const response = await fetch(`${BACKEND_URL}/question/weekly/unapproved`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -152,9 +152,9 @@ export const getQuestionsToApprove = async (orgId) => {
   }
 };
 
-export const getWeeklyQuizQuestions = async (orgId) => {
+export const getWeeklyQuizQuestionsAPI = async () => {
   try {
-    const response = await fetch(`${BACKEND_URL}/quiz/questions/${orgId}`, {
+    const response = await fetch(`${BACKEND_URL}/quiz/questions`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -173,9 +173,9 @@ export const getWeeklyQuizQuestions = async (orgId) => {
   }
 };
 
-export const getSettings = async (orgId) => {
+export const getSettingsAPI = async () => {
   try {
-    const response = await fetch(`${BACKEND_URL}/org/settings/${orgId}`, {
+    const response = await fetch(`${BACKEND_URL}/org/settings`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -194,9 +194,9 @@ export const getSettings = async (orgId) => {
   }
 };
 
-export const toggleTrivia = async (orgId) => {
+export const toggleTriviaAPI = async () => {
   try {
-    const response = await fetch(`${BACKEND_URL}/org/settings/toggleTrivia/${orgId}`, {
+    const response = await fetch(`${BACKEND_URL}/org/settings/toggleTrivia`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -215,9 +215,9 @@ export const toggleTrivia = async (orgId) => {
   }
 };
 
-export const handleApproveWeeklyQuiz = async (questions, questionsToDelete, orgId) => {
+export const handleApproveWeeklyQuizAPI = async (questions, questionsToDelete) => {
   try {
-    const response = await fetch(`${BACKEND_URL}/quiz/approve/${orgId}`, {
+    const response = await fetch(`${BACKEND_URL}/quiz/approve`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -237,12 +237,10 @@ export const handleApproveWeeklyQuiz = async (questions, questionsToDelete, orgI
   }
 };
 
-export const submitWeeklyQuizAnswers = async (weeklyQuizAnswers, orgId, employeeId, quizId) => {
+export const submitWeeklyQuizAnswersAPI = async (weeklyQuizAnswers, quizId) => {
   try {
     const data = {
       answers: weeklyQuizAnswers,
-      orgId: orgId,
-      employeeId: employeeId,
       quizId: quizId,
     };
     const response = await fetch(`${BACKEND_URL}/result/submitWeeklyQuizAnswers`, {
@@ -265,9 +263,9 @@ export const submitWeeklyQuizAnswers = async (weeklyQuizAnswers, orgId, employee
   }
 };
 
-export const getLeaderboardByOrgId = async (orgId) => {
+export const getLeaderboardAPI = async () => {
   try {
-    const response = await fetch(`${BACKEND_URL}/leaderboard/${orgId}`, {
+    const response = await fetch(`${BACKEND_URL}/leaderboard`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -286,30 +284,9 @@ export const getLeaderboardByOrgId = async (orgId) => {
   }
 };
 
-export const getWeeklyQuizStatus = async (orgId, employeeId) => {
+export const getWeeklyQuizStatusAPI = async () => {
   try {
-    const response = await fetch(`${BACKEND_URL}/quiz/status/${orgId}/${employeeId}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Failed to create question');
-    }
-
-    return await response.json();
-  } catch (error) {
-    return { success: false, error: error.message };
-  }
-};
-
-export const fetchEmployeeScore = async (employeeId) => {
-  try {
-    const response = await fetch(`${BACKEND_URL}/employee/score/${employeeId}`, {
+    const response = await fetch(`${BACKEND_URL}/quiz/status`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

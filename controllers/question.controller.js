@@ -2,7 +2,8 @@ import questionService from '../services/question.service.js';
 
 const addQuestion = async (req, res, next) => {
   try {
-    const { question, employeeId } = req.body;
+    const { question } = req.body;
+    const { employeeId } = req.data;
     const errors =
       await questionService.validateEmployeeQuestionSubmission(question);
     if (errors) {
@@ -25,7 +26,7 @@ const addQuestion = async (req, res, next) => {
 
 const getWeeklyUnapprovedQuestions = async (req, res, next) => {
   try {
-    const { orgId } = req.params;
+    const { orgId } = req.data;
     if (!orgId) {
       return res.status(400).json({ message: 'Missing required fields' });
     }

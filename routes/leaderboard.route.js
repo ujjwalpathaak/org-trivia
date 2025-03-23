@@ -6,7 +6,7 @@ import { protectRoute } from '../middleware/auth.middleware.js';
 const leaderboardRouter = express.Router();
 
 leaderboardRouter.get(
-  '/:orgId',
+  '/',
   protectRoute,
   leaderboardController.getLeaderboardByOrgHandler,
 );

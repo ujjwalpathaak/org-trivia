@@ -1,27 +1,36 @@
 import React, { useState, useEffect } from 'react';
 import { ListChecks, Calendar, Trophy, TrendingUp, Coins } from 'lucide-react';
-import { getPastQuizResults } from '../../api';
-import { useUserId } from '../../context/auth.context';
+import { getPastQuizResultsAPI } from '../../api';
 
 const PastQuizViewer = ({ setIsPastQuizViewerOpen }) => {
+  const [quizCache, setQuizCache] = useState({}); // Store fetched pages
   const [pastQuizzes, setPastQuizzes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [pageNumber, setPageNumber] = useState(0);
   const [pageSize] = useState(5);
   const [totalPages, setTotalPages] = useState(1);
-  const employeeId = useUserId();
 
   useEffect(() => {
     const fetchPastQuizzes = async () => {
+      if (quizCache[pageNumber]) {
+        setPastQuizzes(quizCache[pageNumber]);
+        setLoading(false);
+        return;
+      }
+
       try {
         setLoading(true);
         setError(null);
-        const response = await getPastQuizResults(employeeId, pageNumber, pageSize);
+        const response = await getPastQuizResultsAPI(pageNumber, pageSize);
 
         if (response && response.data) {
           setPastQuizzes(response.data);
-          setTotalPages(Math.max(1, Math.ceil(response.total / pageSize))); // Ensure at least 1 page
+          setQuizCache((prevCache) => ({
+            ...prevCache,
+            [pageNumber]: response.data, // Cache fetched data
+          }));
+          setTotalPages(Math.max(1, Math.ceil(response.total / pageSize)));
         } else {
           throw new Error('Invalid response format');
         }
@@ -34,7 +43,7 @@ const PastQuizViewer = ({ setIsPastQuizViewerOpen }) => {
     };
 
     fetchPastQuizzes();
-  }, [employeeId, pageNumber, pageSize]); // Removed `setIsPastQuizViewerOpen` from dependencies
+  }, [pageNumber]); // Keep dependencies minimal
 
   const handleNextPage = () => {
     setPageNumber((prevPage) => Math.min(prevPage + 1, totalPages - 1));
