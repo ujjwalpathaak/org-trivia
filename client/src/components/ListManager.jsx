@@ -3,11 +3,11 @@ import { useDrag, useDrop, DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { GripHorizontal } from 'lucide-react';
 import { toast } from 'react-toastify';
-import { saveGenreSettings } from '../api';
+import { saveGenreSettingsAPI } from '../api';
 
 const ItemType = 'GENRE';
 
-export default function ListManager({ orgId, selectedGenre }) {
+export default function ListManager({ selectedGenre }) {
   const allItems = [
     { key: 'Puzzles and Aptitude', value: 'PnA' },
     { key: 'Company Achievements', value: 'CAnIT' },
@@ -30,10 +30,7 @@ export default function ListManager({ orgId, selectedGenre }) {
   const [isSaved, setIsSaved] = useState(true);
 
   const handleSaveChanges = async () => {
-    await saveGenreSettings(
-      selectedItems.map((genre) => genre.value), // Preserve order
-      orgId
-    );
+    await saveGenreSettingsAPI(selectedItems.map((genre) => genre.value));
     toast.success('New settings saved');
     setIsSaved(true);
   };
@@ -128,7 +125,7 @@ export default function ListManager({ orgId, selectedGenre }) {
   );
 }
 function DraggableGenre({ item, index, moveItem, removeItem }) {
-  const ref = useRef(null); // Use useRef instead of useState
+  const ref = useRef(null);
 
   const [, drop] = useDrop({
     accept: ItemType,
@@ -148,7 +145,7 @@ function DraggableGenre({ item, index, moveItem, removeItem }) {
     }),
   });
 
-  drag(drop(ref)); // Apply both drag and drop refs correctly
+  drag(drop(ref));
 
   return (
     <li

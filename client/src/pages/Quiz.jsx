@@ -1,14 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { getWeeklyQuizQuestions, submitWeeklyQuizAnswers } from '../api';
-import { useOrgId, useUserId } from '../context/auth.context';
+import { getWeeklyQuizQuestionsAPI, submitWeeklyQuizAnswersAPI } from '../api';
 import { toast } from 'react-toastify';
 import { Loader, Clock, CheckCircle, Coins } from 'lucide-react';
 
 const Quiz = ({ setQuizStatus, setIsQuizOpen }) => {
-  const orgId = useOrgId();
-  const userId = useUserId();
-
-  const [answers, setAnswers] = useState([]);
   const [questions, setQuestions] = useState([]);
   const [result, setResult] = useState({
     multiplier: -1,
@@ -29,7 +24,6 @@ const Quiz = ({ setQuizStatus, setIsQuizOpen }) => {
           if (quizStateJSON.quizId !== quizId) {
             localStorage.removeItem('state');
           } else {
-            setAnswers(quizStateJSON.answers);
             setIsQuizFinished(quizStateJSON.isQuizFinished);
             setCurrentQuestion(quizStateJSON.currentQuestion);
           }
@@ -40,15 +34,14 @@ const Quiz = ({ setQuizStatus, setIsQuizOpen }) => {
     };
 
     const fetchWeeklyQuizQuestions = async () => {
-      if (!orgId || !userId) return;
-      let response = await getWeeklyQuizQuestions(orgId);
+      let response = await getWeeklyQuizQuestionsAPI();
       setQuizId(response.quizId);
       getLiveQuizState(response.quizId);
       setQuestions(response.weeklyQuizQuestions);
     };
 
     fetchWeeklyQuizQuestions();
-  }, [orgId, userId]);
+  }, []);
 
   useEffect(() => {
     if (isQuizFinished || questions.length === 0) return;
@@ -81,8 +74,6 @@ const Quiz = ({ setQuizStatus, setIsQuizOpen }) => {
     };
     quizState.answers.push(newAnswer);
 
-    setAnswers(quizState.answers);
-
     const state = {
       quizId: quizId,
       answers: quizState.answers,
@@ -99,12 +90,7 @@ const Quiz = ({ setQuizStatus, setIsQuizOpen }) => {
     const optionsSelected = JSON.parse(state);
     if (currentQuestion >= questions.length - 1) {
       if (optionsSelected.answers) {
-        const response = await submitWeeklyQuizAnswers(
-          optionsSelected.answers,
-          orgId,
-          userId,
-          quizId
-        );
+        const response = await submitWeeklyQuizAnswersAPI(optionsSelected.answers, quizId);
         setResult({
           ...response.data,
         });
@@ -145,7 +131,7 @@ const Quiz = ({ setQuizStatus, setIsQuizOpen }) => {
                 <button
                   onClick={() => {
                     setIsQuizOpen(false);
-                    setQuizStatus({ state: 2 });
+                    setQuizStatus(2);
                   }}
                   className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all"
                 >

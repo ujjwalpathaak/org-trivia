@@ -1,21 +1,16 @@
 import React, { useEffect, useState } from 'react';
 
-import { getSettings, toggleTrivia } from '../api';
-
-import { useOrgId } from '../context/auth.context';
+import { getSettingsAPI } from '../api';
 import ListManager from '../components/ListManager';
 
 const Settings = () => {
   const [isTriviaEnabled, setIsTriviaEnabled] = useState(false);
   const [settings, setSettings] = useState(null);
 
-  const orgId = useOrgId();
-
   useEffect(() => {
     const fetchSettings = async () => {
-      if (!orgId) return;
       try {
-        const response = await getSettings(orgId);
+        const response = await getSettingsAPI();
 
         setSettings(response);
         setIsTriviaEnabled(response.isTriviaEnabled);
@@ -25,11 +20,11 @@ const Settings = () => {
     };
 
     fetchSettings();
-  }, [orgId]);
+  }, []);
 
   const toggleIsTriviaEnabled = async () => {
     setIsTriviaEnabled(!isTriviaEnabled);
-    await toggleTrivia(orgId);
+    await getSettingsAPI();
   };
 
   return (
@@ -57,7 +52,7 @@ const Settings = () => {
           </div>
           <hr></hr>
 
-          {settings && <ListManager orgId={orgId} selectedGenre={settings.selectedGenre} />}
+          {settings && <ListManager selectedGenre={settings.selectedGenre} />}
         </div>
       </div>
     </div>

@@ -2,9 +2,8 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
-import { getQuestionsToApprove, handleApproveWeeklyQuiz } from '../api.js';
+import { getQuestionsToApproveAPI, handleApproveWeeklyQuizAPI } from '../api.js';
 import { getNextWeek } from '../utils.js';
-import { useOrgId } from '../context/auth.context.jsx';
 
 export default function ScheduleQuestions() {
   const [aiQuestions, setAiQuestions] = useState([]);
@@ -15,11 +14,6 @@ export default function ScheduleQuestions() {
   const [removedQuestionIndex, setRemovedQuestionIndex] = useState(-1);
   const [questions, setQuestions] = useState([]);
   const [questionsToDelete, setQuestionsToDelete] = useState([]);
-  // const [usingAI, setUsingAI] = useState(false);
-
-  // const [prompt, setPrompt] = useState('');
-
-  const orgId = useOrgId();
 
   const navigate = useNavigate();
   const selectedWeek = getNextWeek();
@@ -51,7 +45,7 @@ export default function ScheduleQuestions() {
 
   useEffect(() => {
     const getQuestionsToApproveFunc = async () => {
-      const response = await getQuestionsToApprove(orgId);
+      const response = await getQuestionsToApproveAPI();
       if (response.status === 400) {
         noQuestionFound();
         navigate('/dashboard');
@@ -69,7 +63,7 @@ export default function ScheduleQuestions() {
     if (addQuestion) {
       toast.error(`Not all questions are selected`);
     } else {
-      await handleApproveWeeklyQuiz(questions, [...questionsToDelete, ...aiQuestions], orgId);
+      await handleApproveWeeklyQuizAPI(questions, [...questionsToDelete, ...aiQuestions]);
       toast.success('Quiz approved successfully');
       navigate('/dashboard');
     }

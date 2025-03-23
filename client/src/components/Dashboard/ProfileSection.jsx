@@ -26,7 +26,7 @@ const ProfileSection = ({
             alt="Profile"
             className="w-24 h-24 rounded-full mb-4 border-4 border-gray-200"
           />
-          {data?.user?.name && `${data.user.name}`}
+          {data?.name && `${data.name}`}
           <div className="flex justify-between w-full mt-2 px-8 mb-6">
             <div className="text-center">
               <div className="flex items-center gap-2 text-gray-700">

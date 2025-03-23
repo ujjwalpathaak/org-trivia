@@ -41,21 +41,6 @@ const getLeaderboardByOrg = async (orgId, month, year) =>
     { $project: { 'employee.name': 1, totalScore: 1 } },
   ]);
 
-const getEmployeePastResults = async (orgId) =>
-  Leaderboard.aggregate([
-    { $match: { orgId: new ObjectId(orgId) } },
-    {
-      $lookup: {
-        from: 'employees',
-        localField: 'employeeId',
-        foreignField: '_id',
-        as: 'employee',
-      },
-    },
-    { $unwind: '$employee' },
-    { $project: { 'employee.name': 1, totalScore: 1 } },
-  ]);
-
 const getLast3Leaderboards = async (orgId) => {
   const [currentMonth, currentYear] = getMonthAndYear();
 
@@ -168,7 +153,6 @@ const resetLeaderboard = async (month, year, pMonth, pYear) => {
 export default {
   updateLeaderboard,
   getLeaderboardByOrg,
-  getEmployeePastResults,
   getLast3Leaderboards,
   resetLeaderboard,
 };

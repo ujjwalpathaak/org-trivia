@@ -34,10 +34,7 @@ const addSubmittedQuestion = async (questionId, employeeId) => {
 };
 
 const updateWeeklyQuizScore = async (employeeId, points) => {
-  const employee = await Employee.findById(
-    employeeId,
-    'streak score quizGiven',
-  );
+  const employee = await Employee.findById(employeeId, 'streak quizGiven');
   if (employee.quizGiven) return false;
 
   const multiplier = calculateMultiplier(employee.streak);
@@ -81,12 +78,12 @@ const getSubmittedQuestions = async (employeeId, page, size) => {
 };
 
 const getEmployeeDetails = async (employeeId) => {
-  const employee = await Employee.findById(employeeId).lean();
+  const employee = await Employee.findById(employeeId, '-password').lean();
   if (!employee) return null;
 
   const badges = await Employee.aggregate([
     { $match: { _id: new ObjectId(employeeId) } },
-    { $unwind: '$badges' },
+    { $unwind: { path: '$badges', preserveNullAndEmptyArrays: true } },
     { $sort: { 'badges.earnedAt': -1 } },
     {
       $lookup: {
@@ -96,7 +93,7 @@ const getEmployeeDetails = async (employeeId) => {
         as: 'badgeDetails',
       },
     },
-    { $unwind: '$badgeDetails' },
+    { $unwind: { path: '$badgeDetails', preserveNullAndEmptyArrays: true } },
     {
       $group: {
         _id: '$_id',
@@ -104,7 +101,6 @@ const getEmployeeDetails = async (employeeId) => {
           $push: {
             badgeDetails: '$badgeDetails',
             description: '$badges.description',
-            rank: '$badges.rank',
             earnedAt: '$badges.earnedAt',
           },
         },

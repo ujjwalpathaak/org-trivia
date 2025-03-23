@@ -39,9 +39,18 @@ const isPasswordsMatch = async (password, hashedPassword) => {
 };
 
 const generateToken = (user) => {
-  return jwt.sign({ id: user._id, user: user }, process.env.JWT_SECRET, {
-    expiresIn: '7d',
-  });
+  return jwt.sign(
+    {
+      employeeId: user._id,
+      role: user.role,
+      name: user.name,
+      orgId: user.orgId,
+    },
+    process.env.JWT_SECRET,
+    {
+      expiresIn: '7d',
+    },
+  );
 };
 
 export default {

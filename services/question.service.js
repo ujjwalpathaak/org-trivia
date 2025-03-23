@@ -8,7 +8,6 @@ import employeeRepository from '../repositories/employee.repository.js';
 import orgRepository from '../repositories/org.repository.js';
 import questionRepository from '../repositories/question.repository.js';
 import quizRepository from '../repositories/quiz.repository.js';
-import quizService from '../services/quiz.service.js';
 
 async function saveQuestion(newQuestionData, employeeId) {
   const orgId = newQuestionData.orgId;
@@ -22,13 +21,13 @@ async function scheduleNextWeekQuestionsApproval() {
   const triviaEnabledOrgs = await orgRepository.getTriviaEnabledOrgs();
   for (const element of triviaEnabledOrgs) {
     const plainElement = element.toObject();
-    await scheduleQuizForOrg(plainElement);
+    await scheduleQuizForOrgService(plainElement);
   }
 }
 
-async function scheduleQuizForOrg(element) {
+async function scheduleQuizForOrgService(element) {
   const genre = element.settings.selectedGenre[element.settings.currentGenre];
-  const newWeeklyQuiz = await quizService.scheduleNewWeeklyQuiz(
+  const newWeeklyQuiz = await quizRepository.scheduleNewWeeklyQuiz(
     element._id,
     genre,
   );
@@ -271,6 +270,7 @@ export default {
   addLambdaCallbackQuestions,
   validateEmployeeQuestionSubmission,
   getExtraEmployeeQuestions,
+  scheduleQuizForOrgService,
   approveWeeklyQuizQuestions,
   getUpcomingWeeklyQuizByOrgId,
   getWeeklyUnapprovedQuestions,

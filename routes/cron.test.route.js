@@ -6,12 +6,12 @@ const cronTestRouter = express.Router();
 
 cronTestRouter.post(
   '/test/cleanWeeklyQuiz',
-  cronTestController.cleanWeeklyQuiz,
+  cronTestController.cleanUpWeeklyQuizController,
 );
 
 cronTestRouter.post(
   '/test/makeQuizLiveTest',
-  cronTestController.makeQuizLiveTest,
+  cronTestController.makeWeeklyQuizLiveConroller,
 );
 
 export default cronTestRouter;

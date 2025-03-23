@@ -3,15 +3,7 @@ import QuestionMaker from '../../pages/QuestionMaker';
 import Quiz from '../../pages/Quiz';
 import BadgeViewer from './BadgeViewer';
 import PastQuizViewer from './PastQuizViewer';
-import {
-  Share2,
-  Image,
-  Zap,
-  MessageSquare,
-  Gamepad2,
-  TrendingUp,
-  CalendarDays,
-} from 'lucide-react';
+import { Share2, Image, Zap, MessageSquare } from 'lucide-react';
 import SubmittedQuestions from './SubmittedQuestions';
 
 const MainContent = ({
@@ -25,11 +17,7 @@ const MainContent = ({
   setIsPastQuizViewerOpen,
   isSubmittedQuestionOpen,
   details,
-  quizStatus,
-  resumeQuiz,
   setQuizStatus,
-  score,
-  daysUntilNextFriday,
 }) => {
   return (
     <div className="col-span-5">

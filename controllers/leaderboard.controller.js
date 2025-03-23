@@ -4,7 +4,7 @@ import leaderboardService from '../services/leaderboard.service.js';
 
 const getLeaderboardByOrgHandler = async (req, res, next) => {
   try {
-    const { orgId } = req.params;
+    const { orgId } = req.data;
     if (!orgId || !ObjectId.isValid(orgId)) {
       return res.status(400).json({ message: 'Invalid or missing orgId' });
     }

@@ -1,13 +1,13 @@
 import questionService from '../services/question.service.js';
 import quizService from '../services/quiz.service.js';
 
-const getWeeklyQuizStatus = async (req, res, next) => {
+const getWeeklyQuizStatusController = async (req, res, next) => {
   try {
-    const { orgId, employeeId } = req.params;
+    const { orgId, employeeId } = req.data;
     if (!orgId || !employeeId)
       return res.status(404).json({ message: 'Missing organizationId' });
 
-    const weeklyQuizStatus = await quizService.getWeeklyQuizStatus(
+    const weeklyQuizStatus = await quizService.getWeeklyQuizStatusService(
       orgId,
       employeeId,
     );
@@ -20,7 +20,7 @@ const getWeeklyQuizStatus = async (req, res, next) => {
 
 const getWeeklyQuizQuestions = async (req, res, next) => {
   try {
-    const { orgId } = req.params;
+    const { orgId } = req.data;
     if (!orgId) {
       return res.status(400).json({ message: 'Missing required fields' });
     }
@@ -36,7 +36,7 @@ const getWeeklyQuizQuestions = async (req, res, next) => {
 
 const approveWeeklyQuizQuestions = async (req, res, next) => {
   try {
-    const { orgId } = req.params;
+    const { orgId } = req.data;
     const { questions, questionsToDelete } = req.body;
     if (!orgId || !questions) {
       return res.status(400).json({ message: 'Missing required fields' });
@@ -56,7 +56,8 @@ const approveWeeklyQuizQuestions = async (req, res, next) => {
 
 const handleLambdaCallback = async (req, res, next) => {
   try {
-    const { questions, orgId, category, quizId, file } = req.body;
+    const { category, quizId, file } = req.body;
+    const { questions, orgId } = req.data;
     if (!questions || !orgId || !category) {
       next(new Error('Invalid request body'));
       return;
@@ -77,7 +78,7 @@ const handleLambdaCallback = async (req, res, next) => {
 };
 
 export default {
-  getWeeklyQuizStatus,
+  getWeeklyQuizStatusController,
   getWeeklyQuizQuestions,
   approveWeeklyQuizQuestions,
   handleLambdaCallback,

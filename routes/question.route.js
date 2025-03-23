@@ -11,7 +11,7 @@ questionRouter.post(
 );
 
 questionRouter.get(
-  '/weekly/unapproved/:orgId',
+  '/weekly/unapproved',
   protectRoute,
   checkRole('Admin'),
   questionController.getWeeklyUnapprovedQuestions,

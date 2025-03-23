@@ -6,16 +6,14 @@ const findLiveQuizByOrgId = (orgId) => {
   return Quiz.findOne({ orgId: new ObjectId(orgId), status: 'live' });
 };
 
-const isWeeklyQuizCancelled = (orgId) => {
-  return Quiz.findOne({ orgId: new ObjectId(orgId), status: 'cancelled' });
-};
-
-const doesWeeklyQuizExist = (orgId, dateNextFriday) => {
-  return Quiz.findOne({
-    orgId: new ObjectId(orgId),
-    scheduledDate: dateNextFriday,
-    status: { $ne: 'expired' },
-  });
+const getQuizStatus = (orgId) => {
+  return Quiz.findOne(
+    {
+      orgId: new ObjectId(orgId),
+      $or: [{ status: 'live' }, { status: 'cancelled' }],
+    },
+    { status: 1, _id: 0 },
+  );
 };
 
 const scheduleNewWeeklyQuiz = (orgId, dateNextFriday, genre) => {
@@ -27,20 +25,20 @@ const scheduleNewWeeklyQuiz = (orgId, dateNextFriday, genre) => {
   });
 };
 
-const makeWeeklyQuizLive = (today) => {
-  return Quiz.updateMany(
-    { scheduledDate: today, status: 'approved' },
-    { $set: { status: 'live' } },
-  );
-};
-
-const makeQuizLiveTest = () => {
-  return Promise.all([
-    Quiz.updateMany(
-      { status: { $in: ['unapproved', 'upcoming'] } },
-      { $set: { status: 'cancelled' } },
-    ),
-    Quiz.updateMany({ status: 'approved' }, { $set: { status: 'live' } }),
+const makeWeeklyQuizLive = () => {
+  return Quiz.bulkWrite([
+    {
+      updateMany: {
+        filter: { status: { $in: ['unapproved', 'upcoming'] } },
+        update: { $set: { status: 'cancelled' } },
+      },
+    },
+    {
+      updateMany: {
+        filter: { status: 'approved' },
+        update: { $set: { status: 'live' } },
+      },
+    },
   ]);
 };
 
@@ -82,11 +80,9 @@ const getLiveQuizByEmployeeId = (employeeId) => {
 
 export default {
   findLiveQuizByOrgId,
-  isWeeklyQuizCancelled,
-  doesWeeklyQuizExist,
   scheduleNewWeeklyQuiz,
+  getQuizStatus,
   makeWeeklyQuizLive,
-  makeQuizLiveTest,
   markAllQuizAsExpired,
   updateQuizStatusToApproved,
   getUpcomingWeeklyQuiz,

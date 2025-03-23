@@ -2,7 +2,7 @@ import OrgService from '../services/org.service.js';
 
 const changeGenreSettings = async (req, res, next) => {
   try {
-    const { orgId } = req.params;
+    const { orgId } = req.data;
     const genre = req.body;
     if (!genre) {
       return res.status(400).json({ message: 'Missing required fields' });
@@ -17,7 +17,7 @@ const changeGenreSettings = async (req, res, next) => {
 
 const getSettings = async (req, res, next) => {
   try {
-    const { orgId } = req.params;
+    const { orgId } = req.data;
     if (!orgId) {
       return res.status(400).json({ message: 'Missing required fields' });
     }
@@ -31,7 +31,7 @@ const getSettings = async (req, res, next) => {
 
 const toggleTrivia = async (req, res, next) => {
   try {
-    const { orgId } = req.params;
+    const { orgId } = req.data;
     if (!orgId) {
       return res.status(400).json({ message: 'Missing required fields' });
     }
@@ -54,7 +54,7 @@ const getAllOrgNames = async (req, res, next) => {
 
 const getAnalytics = async (req, res, next) => {
   try {
-    const { orgId } = req.params;
+    const { orgId } = req.data;
     if (!orgId) {
       return res.status(400).json({ message: 'Missing required fields' });
     }
