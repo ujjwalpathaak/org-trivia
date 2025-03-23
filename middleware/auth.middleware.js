@@ -36,7 +36,6 @@ export const protectRoute = async (request, response, next) => {
     request.data = decoded;
     next();
   } catch (error) {
-    console.error('JWT Verification Error:', error);
     response.status(401).json({ message: 'Invalid or Expired Token', error });
   }
 };

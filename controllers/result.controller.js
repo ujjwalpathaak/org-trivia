@@ -31,7 +31,7 @@ const submitWeeklyQuizAnswersController = async (req, res, next) => {
   }
 };
 
-const getEmployeePastResults = async (req, res, next) => {
+const getEmployeePastResultsController = async (req, res, next) => {
   try {
     const { employeeId } = req.data;
     const { page = 0, size = 10 } = req.query;
@@ -40,7 +40,7 @@ const getEmployeePastResults = async (req, res, next) => {
       return res.status(400).json({ message: 'Missing required fields' });
     }
 
-    const pastRecords = await resultService.getEmployeePastResults(
+    const pastRecords = await resultService.getEmployeePastResultsService(
       employeeId,
       page,
       size,
@@ -54,5 +54,5 @@ const getEmployeePastResults = async (req, res, next) => {
 
 export default {
   submitWeeklyQuizAnswersController,
-  getEmployeePastResults,
+  getEmployeePastResultsController,
 };

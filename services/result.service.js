@@ -24,7 +24,7 @@ const calculateWeeklyQuizScore = async (userAnswers, correctAnswers) => {
   return weeklyQuizScore;
 };
 
-const getEmployeePastResults = async (employeeId, page, size) => {
+const getEmployeePastResultsService = async (employeeId, page, size) => {
   return await resultRepository.getEmployeePastResults(employeeId, page, size);
 };
 
@@ -89,6 +89,6 @@ const submitWeeklyQuizAnswersService = async (
 
 export default {
   calculateWeeklyQuizScore,
-  getEmployeePastResults,
+  getEmployeePastResultsService,
   submitWeeklyQuizAnswersService,
 };

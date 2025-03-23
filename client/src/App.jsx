@@ -32,26 +32,10 @@ function App() {
                 }
               />
               <Route
-                path="quiz"
-                element={
-                  <ProtectedRoute route="quiz">
-                    <Quiz />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
                 path="approve-questions"
                 element={
                   <ProtectedRoute route="approve-questions">
                     <ApproveQuestions />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="settings"
-                element={
-                  <ProtectedRoute route="settings">
-                    <Settings />
                   </ProtectedRoute>
                 }
               />

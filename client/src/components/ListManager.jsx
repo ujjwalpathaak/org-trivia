@@ -125,7 +125,7 @@ export default function ListManager({ selectedGenre }) {
   );
 }
 function DraggableGenre({ item, index, moveItem, removeItem }) {
-  const ref = useRef(null); // Use useRef instead of useState
+  const ref = useRef(null);
 
   const [, drop] = useDrop({
     accept: ItemType,
@@ -145,7 +145,7 @@ function DraggableGenre({ item, index, moveItem, removeItem }) {
     }),
   });
 
-  drag(drop(ref)); // Apply both drag and drop refs correctly
+  drag(drop(ref));
 
   return (
     <li

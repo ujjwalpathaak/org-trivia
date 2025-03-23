@@ -8,6 +8,9 @@ resultRouter.post(
   '/submitWeeklyQuizAnswers',
   ResultController.submitWeeklyQuizAnswersController,
 );
-resultRouter.get('/employee', ResultController.getEmployeePastResults);
+resultRouter.get(
+  '/employee',
+  ResultController.getEmployeePastResultsController,
+);
 
 export default resultRouter;

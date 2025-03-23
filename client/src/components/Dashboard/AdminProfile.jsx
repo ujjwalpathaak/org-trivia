@@ -11,7 +11,7 @@ const AdminProfile = ({ data, last3Leaderboards }) => {
             alt="Profile"
             className="w-24 h-24 rounded-full mb-4 border-4 border-gray-200"
           />
-          {data?.user?.name && `${data.user.name}`}
+          {data?.name && `${data.name}`}
         </div>
       </div>
       <Leaderboard last3Leaderboards={last3Leaderboards} />

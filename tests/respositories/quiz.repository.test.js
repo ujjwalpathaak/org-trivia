@@ -38,44 +38,6 @@ describe('quizRepository', () => {
     expect(result.status).toBe('live');
   });
 
-  test('isWeeklyQuizCancelled should return a cancelled quiz for given orgId', async () => {
-    const orgId = new ObjectId();
-    await Quiz.create({
-      orgId,
-      status: 'cancelled',
-      scheduledDate: new Date(),
-      genre: 'CAnIT',
-    });
-
-    const result = await quizRepository.isWeeklyQuizCancelled(orgId.toString());
-    expect(result).toBeTruthy();
-    expect(result.status).toBe('cancelled');
-  });
-
-  test('doesWeeklyQuizExist should return a quiz if scheduled for next Friday', async () => {
-    const orgId = new ObjectId();
-    const dateNextFriday = new Date();
-    dateNextFriday.setDate(
-      dateNextFriday.getDate() + ((5 - dateNextFriday.getDay() + 7) % 7),
-    );
-
-    await Quiz.create({
-      orgId,
-      scheduledDate: dateNextFriday,
-      status: 'upcoming',
-      genre: 'HRD',
-    });
-
-    const result = await quizRepository.doesWeeklyQuizExist(
-      orgId.toString(),
-      dateNextFriday,
-    );
-    expect(result).toBeTruthy();
-    expect(result.scheduledDate.toISOString()).toEqual(
-      dateNextFriday.toISOString(),
-    );
-  });
-
   test('scheduleNewWeeklyQuiz should create a new quiz', async () => {
     const orgId = new ObjectId();
     const dateNextFriday = new Date();

@@ -1,3 +1,5 @@
+import { fetchWithAuth } from './utils';
+
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 const token = localStorage.getItem('token');
 
@@ -60,27 +62,15 @@ export const getPastQuizResultsAPI = async (pageNumber = 0, pageSize = 10) => {
 };
 
 export const getAnalyticsAPI = async () => {
-  const response = await fetch(`${BACKEND_URL}/org/analytics`, {
+  return await fetchWithAuth(`${BACKEND_URL}/org/analytics`, {
     method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
   });
-
-  return await response.json();
 };
 
 export const getEmployeeDetailsAPI = async () => {
-  const response = await fetch(BACKEND_URL + `/employee`, {
+  return await fetchWithAuth(`${BACKEND_URL}/employee`, {
     method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
   });
-
-  return await response.json();
 };
 
 export const getAllOrgsAPI = async () => {

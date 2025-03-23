@@ -1,3 +1,5 @@
+import { toast } from 'react-toastify';
+
 export const validateForm = (formData, setErrors, isLogin = false) => {
   let newErrors = {};
 
@@ -138,4 +140,30 @@ export const getNextWeek = () => {
     ((today - new Date(year, 0, 1)) / 86400000 + new Date(year, 0, 1).getDay() + 1) / 7
   );
   return `${year}-W${week.toString().padStart(2, '0')}`;
+};
+
+export const fetchWithAuth = async (url, options = {}) => {
+  const token = localStorage.getItem('token');
+
+  if (!token) {
+    window.location.href = '/'; // Redirect if token doesn't exist
+    return;
+  }
+
+  const headers = {
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${token}`,
+    ...options.headers,
+  };
+
+  const response = await fetch(url, { ...options, headers });
+
+  if (response.status === 401) {
+    toast.warn('Token expired. Redirecting to login...');
+    localStorage.removeItem('token'); // Remove invalid token
+    window.location.href = '/'; // Redirect to login
+    return;
+  }
+
+  return response.json();
 };

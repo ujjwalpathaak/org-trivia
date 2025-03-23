@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
-import { getQuestionsToApproveAPI, getSettingsAPI } from '../api.js';
+import { getQuestionsToApproveAPI, handleApproveWeeklyQuizAPI } from '../api.js';
 import { getNextWeek } from '../utils.js';
 
 export default function ScheduleQuestions() {
@@ -63,7 +63,7 @@ export default function ScheduleQuestions() {
     if (addQuestion) {
       toast.error(`Not all questions are selected`);
     } else {
-      await getSettingsAPI(questions, [...questionsToDelete, ...aiQuestions]);
+      await handleApproveWeeklyQuizAPI(questions, [...questionsToDelete, ...aiQuestions]);
       toast.success('Quiz approved successfully');
       navigate('/dashboard');
     }

@@ -52,7 +52,7 @@ const Settings = () => {
           </div>
           <hr></hr>
 
-          {settings && <ListManager orgId={orgId} selectedGenre={settings.selectedGenre} />}
+          {settings && <ListManager selectedGenre={settings.selectedGenre} />}
         </div>
       </div>
     </div>
