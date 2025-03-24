@@ -9,7 +9,7 @@ const getWeeklyQuizStatusController = async (req, res, next) => {
 
     const weeklyQuizStatus = await quizService.getWeeklyQuizStatusService(
       orgId,
-      employeeId,
+      employeeId
     );
 
     res.status(200).json(weeklyQuizStatus);
@@ -17,6 +17,7 @@ const getWeeklyQuizStatusController = async (req, res, next) => {
     next(error);
   }
 };
+
 
 const getWeeklyQuizQuestions = async (req, res, next) => {
   try {
@@ -56,8 +57,7 @@ const approveWeeklyQuizQuestions = async (req, res, next) => {
 
 const handleLambdaCallback = async (req, res, next) => {
   try {
-    const { category, quizId, file } = req.body;
-    const { questions, orgId } = req.data;
+    const { orgId, questions, category, quizId, file } = req.body;
     if (!questions || !orgId || !category) {
       next(new Error('Invalid request body'));
       return;

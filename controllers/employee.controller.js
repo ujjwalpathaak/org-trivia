@@ -14,17 +14,6 @@ const getEmployeeDetails = async (req, res, next) => {
   }
 };
 
-const getPastQuizResultsController = async (req, res, next) => {
-  try {
-    const { employeeId } = req.data;
-    const pastQuizResults =
-      await employeeService.fetchPastQuizResults(employeeId);
-    res.status(200).json(pastQuizResults);
-  } catch (error) {
-    next(error);
-  }
-};
-
 const getSubmittedQuestionsController = async (req, res, next) => {
   try {
     const { employeeId } = req.data;
@@ -42,6 +31,5 @@ const getSubmittedQuestionsController = async (req, res, next) => {
 
 export default {
   getEmployeeDetails,
-  getPastQuizResultsController,
   getSubmittedQuestionsController,
 };

@@ -7,7 +7,6 @@ import { CalendarDays } from 'lucide-react';
 const Leaderboard = ({ last3Leaderboards }) => {
   const orgId = useOrgId();
   const [leaderboard, setLeaderboard] = useState([]);
-
   useEffect(() => {
     const fetchLeaderboardByOrgId = async () => {
       if (!orgId) return;

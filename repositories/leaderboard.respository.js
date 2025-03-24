@@ -43,11 +43,10 @@ const getLeaderboardByOrg = async (orgId, month, year) =>
 
 const getLast3Leaderboards = async (orgId) => {
   const [currentMonth, currentYear] = getMonthAndYear();
-
   const lastThreeMonths = Array.from({ length: 3 }, (_, i) => {
     let month = currentMonth - (i + 1);
     let year = currentYear;
-    if (month < 1) {
+    if (month < 0) {
       month += 12;
       year -= 1;
     }
@@ -58,6 +57,7 @@ const getLast3Leaderboards = async (orgId) => {
     {
       $match: {
         orgId: new ObjectId(orgId),
+        totalScore: { $ne: 0 },
         $or: lastThreeMonths.map(({ month, year }) => ({ month, year })),
       },
     },
