@@ -1,4 +1,7 @@
-import { fetchNewCAnITQuestions, fetchNewPnAQuestions } from '../api/lambda.api.js';
+import {
+  fetchNewCAnITQuestions,
+  fetchNewPnAQuestions,
+} from '../api/lambda.api.js';
 
 global.fetch = jest.fn(() => Promise.resolve());
 

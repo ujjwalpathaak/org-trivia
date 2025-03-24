@@ -75,11 +75,13 @@ describe('questionService', () => {
       ];
 
       const mockFormattedQuestions = [
-        { category: "genre1", question: "Question 1" },
-        { category: "genre1", question: "Question 2" }
+        { category: 'genre1', question: 'Question 1' },
+        { category: 'genre1', question: 'Question 2' },
       ];
 
-      jest.spyOn(questionService, 'formatQuestionsWeeklyFormat').mockReturnValue(mockFormattedQuestions);
+      jest
+        .spyOn(questionService, 'formatQuestionsWeeklyFormat')
+        .mockReturnValue(mockFormattedQuestions);
 
       questionRepository.getExtraEmployeeQuestions.mockResolvedValue(
         employeeQuestions,
@@ -266,8 +268,9 @@ describe('questionService', () => {
       ];
 
       questionRepository.fetchHRDQuestions.mockResolvedValue(hrdQuestions);
-      questionService.pushQuestionsForApprovals = jest.fn().mockResolvedValue(true);
-
+      questionService.pushQuestionsForApprovals = jest
+        .fn()
+        .mockResolvedValue(true);
 
       await questionService.startHRDWorkflow(orgId, quizId);
 

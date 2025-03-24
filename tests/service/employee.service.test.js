@@ -1,5 +1,5 @@
-import employeeService from '../../services/employee.service.js';
 import employeeRepository from '../../repositories/employee.repository.js';
+import employeeService from '../../services/employee.service.js';
 
 jest.mock('../../repositories/employee.repository.js');
 
@@ -31,7 +31,11 @@ describe('Employee Service', () => {
       const result = await employeeService.fetchSubmittedQuestions(1, 1, 10);
 
       expect(result).toEqual(mockQuestions);
-      expect(employeeRepository.getSubmittedQuestions).toHaveBeenCalledWith(1, 1, 10);
+      expect(employeeRepository.getSubmittedQuestions).toHaveBeenCalledWith(
+        1,
+        1,
+        10,
+      );
     });
   });
 });

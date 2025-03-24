@@ -25,7 +25,10 @@ describe('Quiz Controller', () => {
 
       await quizController.getWeeklyQuizStatusController(req, res, next);
 
-      expect(quizService.getWeeklyQuizStatusService).toHaveBeenCalledWith('org123', 'emp456');
+      expect(quizService.getWeeklyQuizStatusService).toHaveBeenCalledWith(
+        'org123',
+        'emp456',
+      );
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith(mockStatus);
     });
@@ -36,13 +39,15 @@ describe('Quiz Controller', () => {
       await quizController.getWeeklyQuizStatusController(req, res, next);
 
       expect(res.status).toHaveBeenCalledWith(404);
-      expect(res.json).toHaveBeenCalledWith({ message: 'Missing organizationId' });
+      expect(res.json).toHaveBeenCalledWith({
+        message: 'Missing organizationId',
+      });
     });
 
     it('should call next with an error on failure', async () => {
       const error = new Error('Service failure');
       quizService.getWeeklyQuizStatusService.mockRejectedValue(error);
-    
+
       req.data = { orgId: 'test-org', employeeId: 'test-emp' };
       await quizController.getWeeklyQuizStatusController(req, res, next);
       expect(next).toHaveBeenCalledTimes(1); // Ensures next is actually called
@@ -58,7 +63,9 @@ describe('Quiz Controller', () => {
 
       await quizController.getWeeklyQuizQuestions(req, res, next);
 
-      expect(questionService.getWeeklyQuizQuestions).toHaveBeenCalledWith('org123');
+      expect(questionService.getWeeklyQuizQuestions).toHaveBeenCalledWith(
+        'org123',
+      );
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith(mockQuestions);
     });
@@ -69,7 +76,9 @@ describe('Quiz Controller', () => {
       await quizController.getWeeklyQuizQuestions(req, res, next);
 
       expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.json).toHaveBeenCalledWith({ message: 'Missing required fields' });
+      expect(res.json).toHaveBeenCalledWith({
+        message: 'Missing required fields',
+      });
     });
   });
 
@@ -81,9 +90,15 @@ describe('Quiz Controller', () => {
 
       await quizController.approveWeeklyQuizQuestions(req, res, next);
 
-      expect(questionService.approveWeeklyQuizQuestions).toHaveBeenCalledWith(['q1'], ['q2'], 'org123');
+      expect(questionService.approveWeeklyQuizQuestions).toHaveBeenCalledWith(
+        ['q1'],
+        ['q2'],
+        'org123',
+      );
       expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith({ message: 'Questions marked as approved' });
+      expect(res.json).toHaveBeenCalledWith({
+        message: 'Questions marked as approved',
+      });
     });
 
     it('should return 400 if required fields are missing', async () => {
@@ -92,20 +107,36 @@ describe('Quiz Controller', () => {
       await quizController.approveWeeklyQuizQuestions(req, res, next);
 
       expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.json).toHaveBeenCalledWith({ message: 'Missing required fields' });
+      expect(res.json).toHaveBeenCalledWith({
+        message: 'Missing required fields',
+      });
     });
   });
 
   describe('handleLambdaCallback', () => {
     it('should handle Lambda callback and schedule new questions', async () => {
-      req.body = { orgId: 'org123', questions: ['q1'], category: 'Tech', quizId: 'quiz456', file: 'file.txt' };
+      req.body = {
+        orgId: 'org123',
+        questions: ['q1'],
+        category: 'Tech',
+        quizId: 'quiz456',
+        file: 'file.txt',
+      };
       questionService.addLambdaCallbackQuestions.mockResolvedValue();
 
       await quizController.handleLambdaCallback(req, res, next);
 
-      expect(questionService.addLambdaCallbackQuestions).toHaveBeenCalledWith(['q1'], 'Tech', 'org123', 'quiz456', 'file.txt');
+      expect(questionService.addLambdaCallbackQuestions).toHaveBeenCalledWith(
+        ['q1'],
+        'Tech',
+        'org123',
+        'quiz456',
+        'file.txt',
+      );
       expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith({ message: 'Scheduled new questions' });
+      expect(res.json).toHaveBeenCalledWith({
+        message: 'Scheduled new questions',
+      });
     });
 
     it('should call next with an error if request body is invalid', async () => {

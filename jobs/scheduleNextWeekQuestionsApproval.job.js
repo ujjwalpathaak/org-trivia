@@ -10,7 +10,7 @@ export const scheduleNextWeekQuestionsApprovalJob = cron.schedule(
     console.log('Running Scheduled Task: Approve Next Week Questions...');
     await questionService.scheduleNextWeekQuestionsApproval();
   },
-  { scheduled: true, timezone: 'UTC' }
+  { scheduled: true, timezone: 'UTC' },
 );
 
 export const makeQuizLiveTestJob = cron.schedule(
@@ -19,7 +19,7 @@ export const makeQuizLiveTestJob = cron.schedule(
     console.log('Running Scheduled Task: Make Quiz Live...');
     await quizService.makeQuizLiveTest();
   },
-  { scheduled: true, timezone: 'UTC' }
+  { scheduled: true, timezone: 'UTC' },
 );
 
 export const cleanWeeklyQuizJob = cron.schedule(
@@ -28,7 +28,7 @@ export const cleanWeeklyQuizJob = cron.schedule(
     console.log('Running Scheduled Task: Clean Weekly Quiz...');
     await quizService.cleanWeeklyQuiz();
   },
-  { scheduled: true, timezone: 'UTC' }
+  { scheduled: true, timezone: 'UTC' },
 );
 
 export const leaderboardResetJob = cron.schedule(
@@ -37,5 +37,5 @@ export const leaderboardResetJob = cron.schedule(
     console.log('Running Scheduled Task: Reset Leaderboard...');
     await leaderboardService.leaderboardReset();
   },
-  { scheduled: true, timezone: 'UTC' }
+  { scheduled: true, timezone: 'UTC' },
 );

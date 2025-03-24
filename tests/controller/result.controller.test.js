@@ -21,7 +21,9 @@ describe('Result Controller', () => {
       req.data = { employeeId: 'emp123', orgId: 'org456' };
 
       const mockResponse = { success: true, data: { score: 90 } };
-      resultService.submitWeeklyQuizAnswersService.mockResolvedValue(mockResponse);
+      resultService.submitWeeklyQuizAnswersService.mockResolvedValue(
+        mockResponse,
+      );
 
       await resultController.submitWeeklyQuizAnswersController(req, res, next);
 
@@ -29,7 +31,7 @@ describe('Result Controller', () => {
         req.body.answers,
         req.data.employeeId,
         req.data.orgId,
-        req.body.quizId
+        req.body.quizId,
       );
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith({
@@ -45,7 +47,9 @@ describe('Result Controller', () => {
       await resultController.submitWeeklyQuizAnswersController(req, res, next);
 
       expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.json).toHaveBeenCalledWith({ message: 'All fields are required' });
+      expect(res.json).toHaveBeenCalledWith({
+        message: 'All fields are required',
+      });
     });
 
     it('should return 400 if service returns failure', async () => {
@@ -53,12 +57,17 @@ describe('Result Controller', () => {
       req.data = { employeeId: 'emp123', orgId: 'org456' };
 
       const mockResponse = { success: false, message: 'Invalid answers' };
-      resultService.submitWeeklyQuizAnswersService.mockResolvedValue(mockResponse);
+      resultService.submitWeeklyQuizAnswersService.mockResolvedValue(
+        mockResponse,
+      );
 
       await resultController.submitWeeklyQuizAnswersController(req, res, next);
 
       expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.json).toHaveBeenCalledWith({ message: 'Invalid answers', data: null });
+      expect(res.json).toHaveBeenCalledWith({
+        message: 'Invalid answers',
+        data: null,
+      });
     });
 
     it('should call next with error on failure', async () => {
@@ -85,13 +94,19 @@ describe('Result Controller', () => {
     it('should return past quiz results', async () => {
       req.data = { employeeId: 'emp123' };
       req.query = { page: '1', size: '5' };
-      
+
       const mockResults = [{ quizId: 'quiz1', score: 85 }];
-      resultService.getEmployeePastResultsService.mockResolvedValue(mockResults);
+      resultService.getEmployeePastResultsService.mockResolvedValue(
+        mockResults,
+      );
 
       await resultController.getEmployeePastResultsController(req, res, next);
 
-      expect(resultService.getEmployeePastResultsService).toHaveBeenCalledWith('emp123', '1', '5');
+      expect(resultService.getEmployeePastResultsService).toHaveBeenCalledWith(
+        'emp123',
+        '1',
+        '5',
+      );
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith(mockResults);
     });
@@ -102,7 +117,9 @@ describe('Result Controller', () => {
       await resultController.getEmployeePastResultsController(req, res, next);
 
       expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.json).toHaveBeenCalledWith({ message: 'Missing required fields' });
+      expect(res.json).toHaveBeenCalledWith({
+        message: 'Missing required fields',
+      });
     });
   });
 });

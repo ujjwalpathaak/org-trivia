@@ -1,5 +1,5 @@
-import orgService from '../../services/org.service.js';
 import orgRepository from '../../repositories/org.repository.js';
+import orgService from '../../services/org.service.js';
 
 jest.mock('../../repositories/org.repository.js');
 
@@ -15,7 +15,10 @@ describe('Organization Service', () => {
       const result = await orgService.changeGenreSettings('Rock', 'org123');
 
       expect(result).toBe('Success');
-      expect(orgRepository.changeGenreSettings).toHaveBeenCalledWith('Rock', 'org123');
+      expect(orgRepository.changeGenreSettings).toHaveBeenCalledWith(
+        'Rock',
+        'org123',
+      );
     });
   });
 
@@ -65,23 +68,33 @@ describe('Organization Service', () => {
 
   describe('toggleTrivia', () => {
     it('should enable trivia if it is currently disabled', async () => {
-      orgRepository.isTriviaEnabled.mockResolvedValue({ settings: { isTriviaEnabled: false } });
+      orgRepository.isTriviaEnabled.mockResolvedValue({
+        settings: { isTriviaEnabled: false },
+      });
       orgRepository.updateTriviaSettings.mockResolvedValue(true);
 
       const result = await orgService.toggleTrivia('org123');
 
       expect(result).toBe(true);
-      expect(orgRepository.updateTriviaSettings).toHaveBeenCalledWith('org123', true);
+      expect(orgRepository.updateTriviaSettings).toHaveBeenCalledWith(
+        'org123',
+        true,
+      );
     });
 
     it('should disable trivia if it is currently enabled', async () => {
-      orgRepository.isTriviaEnabled.mockResolvedValue({ settings: { isTriviaEnabled: true } });
+      orgRepository.isTriviaEnabled.mockResolvedValue({
+        settings: { isTriviaEnabled: true },
+      });
       orgRepository.updateTriviaSettings.mockResolvedValue(false);
 
       const result = await orgService.toggleTrivia('org123');
 
       expect(result).toBe(false);
-      expect(orgRepository.updateTriviaSettings).toHaveBeenCalledWith('org123', false);
+      expect(orgRepository.updateTriviaSettings).toHaveBeenCalledWith(
+        'org123',
+        false,
+      );
     });
 
     it('should return false if the organization is not found', async () => {

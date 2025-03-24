@@ -18,11 +18,15 @@ describe('Employee Controller', () => {
   describe('getEmployeeDetails', () => {
     it('should return employee details if employeeId is provided', async () => {
       const mockEmployeeDetails = { id: 'emp123', name: 'John Doe' };
-      employeeService.fetchEmployeeDetails.mockResolvedValue(mockEmployeeDetails);
+      employeeService.fetchEmployeeDetails.mockResolvedValue(
+        mockEmployeeDetails,
+      );
 
       await employeeController.getEmployeeDetails(req, res, next);
 
-      expect(employeeService.fetchEmployeeDetails).toHaveBeenCalledWith('emp123');
+      expect(employeeService.fetchEmployeeDetails).toHaveBeenCalledWith(
+        'emp123',
+      );
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith(mockEmployeeDetails);
     });
@@ -33,7 +37,9 @@ describe('Employee Controller', () => {
       await employeeController.getEmployeeDetails(req, res, next);
 
       expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.json).toHaveBeenCalledWith({ message: 'Missing required fields' });
+      expect(res.json).toHaveBeenCalledWith({
+        message: 'Missing required fields',
+      });
     });
 
     it('should call next with error on failure', async () => {
@@ -53,7 +59,11 @@ describe('Employee Controller', () => {
 
       await employeeController.getSubmittedQuestionsController(req, res, next);
 
-      expect(employeeService.fetchSubmittedQuestions).toHaveBeenCalledWith('emp123', 0, 10);
+      expect(employeeService.fetchSubmittedQuestions).toHaveBeenCalledWith(
+        'emp123',
+        0,
+        10,
+      );
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith(mockQuestions);
     });
@@ -65,7 +75,11 @@ describe('Employee Controller', () => {
 
       await employeeController.getSubmittedQuestionsController(req, res, next);
 
-      expect(employeeService.fetchSubmittedQuestions).toHaveBeenCalledWith('emp123', '2', '5');
+      expect(employeeService.fetchSubmittedQuestions).toHaveBeenCalledWith(
+        'emp123',
+        '2',
+        '5',
+      );
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith(mockQuestions);
     });

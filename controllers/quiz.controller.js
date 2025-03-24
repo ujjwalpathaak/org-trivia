@@ -9,7 +9,7 @@ const getWeeklyQuizStatusController = async (req, res, next) => {
 
     const weeklyQuizStatus = await quizService.getWeeklyQuizStatusService(
       orgId,
-      employeeId
+      employeeId,
     );
 
     res.status(200).json(weeklyQuizStatus);
@@ -17,7 +17,6 @@ const getWeeklyQuizStatusController = async (req, res, next) => {
     next(error);
   }
 };
-
 
 const getWeeklyQuizQuestions = async (req, res, next) => {
   try {

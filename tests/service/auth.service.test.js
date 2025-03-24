@@ -1,5 +1,5 @@
-import authService from '../../services/auth.service.js';
 import authRepository from '../../repositories/auth.repository.js';
+import authService from '../../services/auth.service.js';
 
 jest.mock('../../repositories/auth.repository.js');
 
@@ -10,9 +10,18 @@ describe('Auth Service', () => {
 
   describe('registerUser', () => {
     it('should return 400 if email already exists', async () => {
-      authRepository.getUserByEmail.mockResolvedValue({ id: 1, email: 'test@example.com' });
+      authRepository.getUserByEmail.mockResolvedValue({
+        id: 1,
+        email: 'test@example.com',
+      });
 
-      const response = await authService.registerUser(false, 'test@example.com', 'password', 'John Doe', 'org123');
+      const response = await authService.registerUser(
+        false,
+        'test@example.com',
+        'password',
+        'John Doe',
+        'org123',
+      );
 
       expect(response).toEqual({
         status: 400,
@@ -25,14 +34,24 @@ describe('Auth Service', () => {
       authRepository.getUserByEmail.mockResolvedValue(null);
       authRepository.createNewUser.mockResolvedValue();
 
-      const response = await authService.registerUser(true, 'admin@example.com', 'securepass', 'Admin User', 'org456');
+      const response = await authService.registerUser(
+        true,
+        'admin@example.com',
+        'securepass',
+        'Admin User',
+        'org456',
+      );
 
       expect(response).toEqual({
         status: 201,
         data: { message: 'New Admin registered successfully' },
       });
       expect(authRepository.createNewUser).toHaveBeenCalledWith(
-        'admin@example.com', 'securepass', 'Admin User', 'org456', true
+        'admin@example.com',
+        'securepass',
+        'Admin User',
+        'org456',
+        true,
       );
     });
   });
@@ -41,32 +60,59 @@ describe('Auth Service', () => {
     it('should return 404 if user is not found', async () => {
       authRepository.getUserByEmail.mockResolvedValue(null);
 
-      const response = await authService.loginUser('missing@example.com', 'password');
+      const response = await authService.loginUser(
+        'missing@example.com',
+        'password',
+      );
 
-      expect(response).toEqual({ status: 404, data: { message: 'User not found!' } });
+      expect(response).toEqual({
+        status: 404,
+        data: { message: 'User not found!' },
+      });
     });
 
     it('should return 401 if password is incorrect', async () => {
-      authRepository.getUserByEmail.mockResolvedValue({ id: 1, email: 'user@example.com', password: 'hashedpass' });
+      authRepository.getUserByEmail.mockResolvedValue({
+        id: 1,
+        email: 'user@example.com',
+        password: 'hashedpass',
+      });
       authRepository.isPasswordsMatch.mockResolvedValue(false);
 
-      const response = await authService.loginUser('user@example.com', 'wrongpass');
+      const response = await authService.loginUser(
+        'user@example.com',
+        'wrongpass',
+      );
 
-      expect(response).toEqual({ status: 401, data: { message: 'Invalid password' } });
+      expect(response).toEqual({
+        status: 401,
+        data: { message: 'Invalid password' },
+      });
     });
 
     it('should return 200 and a token if login is successful', async () => {
-      authRepository.getUserByEmail.mockResolvedValue({ id: 1, email: 'user@example.com', password: 'hashedpass' });
+      authRepository.getUserByEmail.mockResolvedValue({
+        id: 1,
+        email: 'user@example.com',
+        password: 'hashedpass',
+      });
       authRepository.isPasswordsMatch.mockResolvedValue(true);
       authRepository.generateToken.mockReturnValue('mocked-token');
 
-      const response = await authService.loginUser('user@example.com', 'correctpass');
+      const response = await authService.loginUser(
+        'user@example.com',
+        'correctpass',
+      );
 
       expect(response).toEqual({
         status: 200,
         data: { message: 'User logged in successfully', token: 'mocked-token' },
       });
-      expect(authRepository.generateToken).toHaveBeenCalledWith({ id: 1, email: 'user@example.com', password: 'hashedpass' });
+      expect(authRepository.generateToken).toHaveBeenCalledWith({
+        id: 1,
+        email: 'user@example.com',
+        password: 'hashedpass',
+      });
     });
   });
 });

@@ -1,5 +1,5 @@
-import OrgService from '../../services/org.service.js';
 import orgController from '../../controllers/org.controller.js';
+import OrgService from '../../services/org.service.js';
 
 jest.mock('../../services/org.service.js');
 
@@ -21,8 +21,13 @@ describe('Org Controller', () => {
 
       await orgController.changeGenreSettings(req, res, next);
 
-      expect(OrgService.changeGenreSettings).toHaveBeenCalledWith(req.body, req.data.orgId);
-      expect(res.json).toHaveBeenCalledWith({ message: 'Genre settings updated successfully' });
+      expect(OrgService.changeGenreSettings).toHaveBeenCalledWith(
+        req.body,
+        req.data.orgId,
+      );
+      expect(res.json).toHaveBeenCalledWith({
+        message: 'Genre settings updated successfully',
+      });
     });
 
     it('should return 400 if genre is missing', async () => {
@@ -30,7 +35,9 @@ describe('Org Controller', () => {
       await orgController.changeGenreSettings(req, res, next);
 
       expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.json).toHaveBeenCalledWith({ message: 'Missing required fields' });
+      expect(res.json).toHaveBeenCalledWith({
+        message: 'Missing required fields',
+      });
     });
 
     it('should call next with error on failure', async () => {
@@ -61,7 +68,9 @@ describe('Org Controller', () => {
       await orgController.getSettings(req, res, next);
 
       expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.json).toHaveBeenCalledWith({ message: 'Missing required fields' });
+      expect(res.json).toHaveBeenCalledWith({
+        message: 'Missing required fields',
+      });
     });
 
     it('should call next with error on failure', async () => {
@@ -92,7 +101,9 @@ describe('Org Controller', () => {
       await orgController.toggleTrivia(req, res, next);
 
       expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.json).toHaveBeenCalledWith({ message: 'Missing required fields' });
+      expect(res.json).toHaveBeenCalledWith({
+        message: 'Missing required fields',
+      });
     });
 
     it('should call next with error on failure', async () => {
@@ -107,7 +118,10 @@ describe('Org Controller', () => {
 
   describe('getAllOrgNames', () => {
     it('should return all organization names', async () => {
-      const orgNames = [{ id: '1', name: 'Org1' }, { id: '2', name: 'Org2' }];
+      const orgNames = [
+        { id: '1', name: 'Org1' },
+        { id: '2', name: 'Org2' },
+      ];
       OrgService.getAllOrgNames.mockResolvedValue(orgNames);
 
       await orgController.getAllOrgNames(req, res, next);
@@ -145,7 +159,9 @@ describe('Org Controller', () => {
       await orgController.getAnalytics(req, res, next);
 
       expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.json).toHaveBeenCalledWith({ message: 'Missing required fields' });
+      expect(res.json).toHaveBeenCalledWith({
+        message: 'Missing required fields',
+      });
     });
 
     it('should call next with error on failure', async () => {
