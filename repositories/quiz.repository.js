@@ -1,6 +1,7 @@
 import { ObjectId } from 'mongodb';
 
 import Quiz from '../models/quiz.model.js';
+import { getNextFridayDate } from '../middleware/utils.js';
 
 const findLiveQuizByOrgId = (orgId) => {
   return Quiz.findOne({ orgId: new ObjectId(orgId), status: 'live' });
@@ -16,7 +17,8 @@ const getQuizStatus = (orgId) => {
   );
 };
 
-const scheduleNewWeeklyQuiz = (orgId, dateNextFriday, genre) => {
+const scheduleNewWeeklyQuiz = (orgId, genre) => {
+  const dateNextFriday = getNextFridayDate();
   return Quiz.create({
     orgId,
     status: 'upcoming',
