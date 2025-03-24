@@ -6,7 +6,6 @@ import { Loader, Clock, CheckCircle, Coins } from 'lucide-react';
 const Quiz = ({ setQuizStatus, setIsQuizOpen }) => {
   const [questions, setQuestions] = useState([]);
   const [result, setResult] = useState({
-    multiplier: -1,
     score: -1,
     points: -1,
   });
@@ -126,7 +125,6 @@ const Quiz = ({ setQuizStatus, setIsQuizOpen }) => {
               <div className="flex flex-col items-center">
                 <Coins className="w-12 h-12 text-blue-500" />
                 <span className="text-xl mt-2">Your Points: {result.points || 0}</span>
-                <span className="text-xl mt-2">Your Multiplier: x{result.multiplier || 0}</span>
                 <span className="text-xl mt-2">Your Score: {result.score || 0}</span>
                 <button
                   onClick={() => {

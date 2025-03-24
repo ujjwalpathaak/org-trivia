@@ -1,6 +1,5 @@
 import { ObjectId } from 'mongodb';
 
-import { getMonthAndYear } from '../middleware/utils.js';
 import Leaderboard from '../models/leaderboard.model.js';
 import badgeRepository from './badge.repository.js';
 import employeeRepository from './employee.repository.js';
@@ -17,13 +16,39 @@ const updateLeaderboard = async (orgId, employeeId, score, month, year) =>
     { upsert: true },
   );
 
-const getLeaderboardByOrg = async (orgId, month, year) =>
-  Leaderboard.aggregate([
+const getLeaderboardYearBoundary = async (orgId) => {
+  return Leaderboard.aggregate([
+    {
+      $match: {
+        orgId: new ObjectId(
+          "67c69382f8c3ce19ef544cad"
+        )
+      }
+    },
+    {
+      $group: {
+        _id: "$orgId",
+        years: {
+          $min: '$year'
+        }
+      }
+    },
+    {
+      $project: {
+        _id: 0,
+        years: 1
+      }
+    }
+  ])
+}
+
+const getLeaderboardByOrg = async (orgId, month, year) => {
+  return Leaderboard.aggregate([
     {
       $match: {
         orgId: new ObjectId(orgId),
-        month,
-        year,
+        month: parseInt(month),
+        year: parseInt(year),
         totalScore: { $gt: 0 },
       },
     },
@@ -40,67 +65,7 @@ const getLeaderboardByOrg = async (orgId, month, year) =>
     { $unwind: '$employee' },
     { $project: { 'employee.name': 1, totalScore: 1 } },
   ]);
-
-const getLast3Leaderboards = async (orgId) => {
-  const [currentMonth, currentYear] = getMonthAndYear();
-
-  const lastThreeMonths = Array.from({ length: 3 }, (_, i) => {
-    let month = currentMonth - (i + 1);
-    let year = currentYear;
-    if (month < 1) {
-      month += 12;
-      year -= 1;
-    }
-    return { month, year };
-  });
-
-  return Leaderboard.aggregate([
-    {
-      $match: {
-        orgId: new ObjectId(orgId),
-        $or: lastThreeMonths.map(({ month, year }) => ({ month, year })),
-      },
-    },
-    {
-      $group: {
-        _id: { month: '$month', year: '$year' },
-        leaderboard: { $push: '$$ROOT' },
-      },
-    },
-    { $sort: { '_id.year': -1, '_id.month': -1 } },
-    { $unwind: '$leaderboard' },
-    {
-      $lookup: {
-        from: 'employees',
-        localField: 'leaderboard.employeeId',
-        foreignField: '_id',
-        as: 'employeeDetails',
-      },
-    },
-    { $unwind: '$employeeDetails' },
-    { $sort: { 'leaderboard.totalScore': -1 } },
-    {
-      $group: {
-        _id: { month: '$_id.month', year: '$_id.year' },
-        employees: {
-          $push: {
-            employeeId: '$leaderboard.employeeId',
-            name: '$employeeDetails.name',
-            totalScore: '$leaderboard.totalScore',
-          },
-        },
-      },
-    },
-    {
-      $project: {
-        _id: 0,
-        month: '$_id.month',
-        year: '$_id.year',
-        employees: { $slice: ['$employees', 3] }, // Top 3 employees
-      },
-    },
-  ]);
-};
+}
 
 const resetLeaderboard = async (month, year, pMonth, pYear) => {
   const topThreePerOrg = await Leaderboard.aggregate([
@@ -153,6 +118,6 @@ const resetLeaderboard = async (month, year, pMonth, pYear) => {
 export default {
   updateLeaderboard,
   getLeaderboardByOrg,
-  getLast3Leaderboards,
+  getLeaderboardYearBoundary,
   resetLeaderboard,
 };

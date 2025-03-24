@@ -40,10 +40,6 @@ const resultSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    multiplier: {
-      type: Number,
-      required: true,
-    },
     score: {
       type: Number,
       required: true,

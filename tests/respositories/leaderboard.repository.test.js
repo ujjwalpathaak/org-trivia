@@ -237,28 +237,4 @@ describe('Leaderboard Repository', () => {
     expect(leaderboard.length).toBe(2);
     expect(leaderboard[0].totalScore).toBe(30); // Highest score first
   });
-
-  test('should retrieve last 3 months leaderboards', async () => {
-    const currentMonth = 3;
-    const currentYear = 2025;
-
-    await leaderboardRepository.updateLeaderboard(
-      orgId,
-      employee1._id,
-      10,
-      currentMonth - 1,
-      currentYear,
-    );
-    await leaderboardRepository.updateLeaderboard(
-      orgId,
-      employee2._id,
-      20,
-      currentMonth - 2,
-      currentYear,
-    );
-
-    const lastThreeLeaderboards =
-      await leaderboardRepository.getLast3Leaderboards(orgId);
-    expect(lastThreeLeaderboards.length).toBeGreaterThanOrEqual(1);
-  });
 });

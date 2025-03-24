@@ -1,7 +1,7 @@
 import React from 'react';
 import Leaderboard from '../Leaderboard';
 
-const AdminProfile = ({ data, last3Leaderboards }) => {
+const AdminProfile = ({ data }) => {
   return (
     <div className="col-span-2 col-start-2 mb-4">
       <div className="bg-white rounded-lg p-6 shadow mb-4">
@@ -14,7 +14,7 @@ const AdminProfile = ({ data, last3Leaderboards }) => {
           {data?.name && `${data.name}`}
         </div>
       </div>
-      <Leaderboard last3Leaderboards={last3Leaderboards} />
+      <Leaderboard />
     </div>
   );
 };

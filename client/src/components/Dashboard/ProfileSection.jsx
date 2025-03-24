@@ -27,20 +27,13 @@ const ProfileSection = ({
             className="w-24 h-24 rounded-full mb-4 border-4 border-gray-200"
           />
           {data?.name && `${data.name}`}
-          <div className="flex justify-between w-full mt-2 px-8 mb-6">
+          <div className="flex justify-evenly w-full mt-2 px-8 mb-6">
             <div className="text-center">
               <div className="flex items-center gap-2 text-gray-700">
                 <Award className="h-5 w-5 text-blue-600" />
                 <span className="text-lg font-semibold">{details?.badges?.length || 0}</span>
               </div>
               <span className="text-sm text-gray-500">Badges</span>
-            </div>
-            <div className="text-center">
-              <div className="flex items-center gap-2 text-gray-700">
-                <CalendarCheck className="h-5 w-5 text-green-500" />
-                <span className="text-lg font-semibold">{details?.employee?.streak || 0}</span>
-              </div>
-              <span className="text-sm text-gray-500">Streak</span>
             </div>
             <div className="text-center">
               <div className="flex items-center gap-2 text-gray-700">

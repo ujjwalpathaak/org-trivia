@@ -72,7 +72,6 @@ const submitWeeklyQuizAnswersService = async (
     employeeId,
     orgId,
     quizId,
-    data.multiplier,
     data.score,
     points,
     quiz.genre,
@@ -81,7 +80,6 @@ const submitWeeklyQuizAnswersService = async (
 
   return {
     success: true,
-    multiplier: data.multiplier,
     score: data.score,
     points,
   };

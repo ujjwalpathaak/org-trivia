@@ -1,6 +1,6 @@
 import React from 'react';
 import Leaderboard from '../Leaderboard';
-import { Gamepad2, TrendingUp, Coins, Info } from 'lucide-react';
+import { Gamepad2, TrendingUp, Coins, Info, CalendarCheck } from 'lucide-react';
 
 const QuizTooltip = () => (
   <div className="relative group">
@@ -132,10 +132,10 @@ const Sidebar = ({
             <div className="flex justify-between mt-4">
               <div className="flex flex-col items-center w-1/2">
                 <div className="flex items-center gap-2 text-gray-700">
-                  <TrendingUp className="h-5 w-5 text-blue-500" />
-                  <span className="text-lg font-semibold">{details?.multiplier || 0}</span>
+                  <CalendarCheck className="h-5 w-5 text-green-500" />
+                  <span className="text-lg font-semibold">{details?.employee?.streak || 0}</span>
                 </div>
-                <span className="text-sm text-gray-500">Multiplier</span>
+                <span className="text-sm text-gray-500">Streak</span>
               </div>
               <div className="flex flex-col items-center w-1/2">
                 <div className="flex items-center gap-2 text-gray-700">

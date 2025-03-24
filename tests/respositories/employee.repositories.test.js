@@ -103,7 +103,6 @@ describe('Employee Repository Tests', () => {
     );
     const updatedEmployee = await Employee.findById(employee._id);
 
-    expect(result).toHaveProperty('multiplier');
     expect(result).toHaveProperty('score');
     expect(updatedEmployee.quizGiven).toBe(true);
     expect(updatedEmployee.score).toBeGreaterThan(0);
@@ -185,6 +184,5 @@ describe('Employee Repository Tests', () => {
 
     expect(result).toHaveProperty('employee');
     expect(result).toHaveProperty('badges');
-    expect(result).toHaveProperty('multiplier');
   });
 });

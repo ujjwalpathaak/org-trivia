@@ -59,7 +59,6 @@ describe('Quiz Service', () => {
         { _id: '1', answer: 'A' },
       ]);
       employeeRepository.updateWeeklyQuizScore.mockResolvedValue({
-        multiplier: 2,
         score: 20,
       });
       leaderboardRepository.updateLeaderboard.mockResolvedValue(true);
@@ -79,7 +78,6 @@ describe('Quiz Service', () => {
 
       expect(result).toEqual({
         success: true,
-        multiplier: 2,
         score: 20,
         points: 10,
       });

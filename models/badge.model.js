@@ -9,7 +9,11 @@ const badgeSchema = new mongoose.Schema({
   rank: {
     type: String,
     enum: ['Silver', 'Gold', 'Bronze'],
-    required: true,
+    trim: true,
+  },
+  streak: {
+    type: String,
+    enum: ['3 Months', '6 Months', '1 Year'],
     trim: true,
   },
 });

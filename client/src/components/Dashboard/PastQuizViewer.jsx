@@ -103,10 +103,6 @@ const PastQuizViewer = ({ setIsPastQuizViewerOpen }) => {
                     {quiz.points || 0} Points
                   </div>
                   <div className="flex items-center text-blue-600 font-medium">
-                    <TrendingUp size={20} className="text-blue-500 mr-2" />
-                    {quiz.multiplier || 0} Multiplier
-                  </div>
-                  <div className="flex items-center text-blue-600 font-medium">
                     <Trophy size={20} className="text-yellow-500 mr-2" />
                     {quiz.score || 0} Score
                   </div>

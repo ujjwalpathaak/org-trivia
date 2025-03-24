@@ -45,14 +45,26 @@ const BadgeViewer = ({ details, setIsBadgeViewerOpen }) => {
                   >
                     <img className="w-8" src={badge.badgeDetails.url} alt="Badge" />
                     <div className="flex flex-col">
-                      <span className="text-base text-slate-900 ml-2">
-                        <span
-                          className={`${badge.badgeDetails.rank === 'Gold' ? 'text-amber-700' : badge.badgeDetails.rank === 'Silver' ? 'text-zinc-400' : 'text-yellow-950'} mr-2`}
-                        >
-                          {badge.badgeDetails.rank}
+                      {badge.badgeDetails.rank && (
+                        <span className="text-base text-slate-900 ml-2">
+                          <span
+                            className={`${badge.badgeDetails.rank === 'Gold' ? 'text-amber-700' : badge.badgeDetails.rank === 'Silver' ? 'text-zinc-400' : 'text-yellow-950'} mr-2`}
+                          >
+                            {badge.badgeDetails.rank}
+                          </span>
+                          {badge.description}
                         </span>
-                        {badge.description}
-                      </span>
+                      )}
+                      {badge.badgeDetails.streak && (
+                        <span className="text-base text-slate-900 ml-2">
+                          <span
+                          // className={`${badge.badgeDetails.rank === 'Gold' ? 'text-amber-700' : badge.badgeDetails.rank === 'Silver' ? 'text-zinc-400' : 'text-yellow-950'} mr-2`}
+                          >
+                            {badge.badgeDetails.streak}
+                          </span>
+                          {badge.description}
+                        </span>
+                      )}
                       <span className="text-sm text-slate-400 ml-2">
                         Earned At {badge.earnedAt && convertToReadableFormat(badge.earnedAt)}
                       </span>

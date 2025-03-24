@@ -114,6 +114,25 @@ export const daysUntilNextFriday = () => {
   return daysUntilFriday;
 };
 
+export const getNextThreeFridays = () => {
+  const fridays = [];
+  let date = new Date();
+
+  while (date.getDay() !== 5) {
+    date.setDate(date.getDate() + 1);
+  }
+
+  const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+  for (let i = 0; i < 3; i++) {
+    fridays.push(`${date.getDate()} ${monthNames[date.getMonth()]}`); // Format: DD MMM
+    date.setDate(date.getDate() + 7);
+  }
+
+  return fridays;
+};
+
+
 export const getMonth = (month) => {
   const months = [
     'Jan',

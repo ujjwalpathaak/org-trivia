@@ -253,9 +253,9 @@ export const submitWeeklyQuizAnswersAPI = async (weeklyQuizAnswers, quizId) => {
   }
 };
 
-export const getLeaderboardAPI = async () => {
+export const getLeaderboardAPI = async (month, year) => {
   try {
-    const response = await fetch(`${BACKEND_URL}/leaderboard`, {
+    const response = await fetch(`${BACKEND_URL}/leaderboard?month=${month}&year=${year}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

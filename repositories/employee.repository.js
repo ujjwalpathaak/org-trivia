@@ -1,12 +1,45 @@
 import { ObjectId } from 'mongodb';
 
-import { calculateMultiplier, getMonth } from '../middleware/utils.js';
+import { getMonth } from '../middleware/utils.js';
 import Employee from '../models/employee.model.js';
 import Question from '../models/question.model.js';
 
 const isWeeklyQuizGiven = async (employeeId) => {
   return Employee.findById(employeeId, 'quizGiven');
 };
+
+const awardStreakBadges = async () => {
+  const [quater_year_streak_employees, half_year_streak_employees, yearly_streak_employees] = await Promise.all([
+    Employee.find({ streak: 13 }),
+    Employee.find({ streak: 26 }),
+    Employee.find({ streak: 52 }),
+  ]);
+
+  const streaks = await Promise.all([
+    badgeRepository.findBadgeByStreak('3 Months'),
+    badgeRepository.findBadgeByStreak('6 Months'),
+    badgeRepository.findBadgeByStreak('1 Year'),
+  ]);
+
+  const badges = {
+    '3 Months': streaks[0]._id,
+    '6 Months': streaks[1]._id,
+    '1 Year': streaks[2]._id,
+  };
+
+  await Promise.all([
+    ...quater_year_streak_employees.map((employee) =>
+      addBadgesToEmployees(employee._id, badges['3 Months'], new Date().getMonth(), new Date().getFullYear())
+    ),
+    ...half_year_streak_employees.map((employee) =>
+      addBadgesToEmployees(employee._id, badges['6 Months'], new Date().getMonth(), new Date().getFullYear())
+    ),
+    ...yearly_streak_employees.map((employee) =>
+      addBadgesToEmployees(employee._id, badges['1 Year'], new Date().getMonth(), new Date().getFullYear())
+    ),
+  ]);
+};
+
 
 const updateEmployeeStreaksAndMarkAllEmployeesAsQuizNotGiven = async () => {
   await Employee.bulkWrite([
@@ -37,15 +70,12 @@ const updateWeeklyQuizScore = async (employeeId, points) => {
   const employee = await Employee.findById(employeeId, 'streak quizGiven');
   if (employee.quizGiven) return false;
 
-  const multiplier = calculateMultiplier(employee.streak);
-  const updatedScore = points * multiplier;
-
   await Employee.updateOne(
     { _id: employeeId },
-    { $set: { quizGiven: true }, $inc: { score: updatedScore } },
+    { $set: { quizGiven: true }, $inc: { score: points } },
   );
 
-  return { multiplier, score: updatedScore };
+  return { score: points };
 };
 
 const addBadgesToEmployees = async (employeeId, badgeId, month, year) => {
@@ -58,6 +88,32 @@ const addBadgesToEmployees = async (employeeId, badgeId, month, year) => {
     },
   );
 };
+
+// const addBadgesToEmployees = async (employeeId, badgeId, type, month, year) => {
+//   switch(type){
+//     case 'streak':
+//       return Employee.updateOne(
+//         { _id: employeeId },
+//         {
+//           $push: {
+//             badges: { badgeId, description: `${getMonth(month)} ${year}` },
+//           },
+//         },
+//       );
+//       break;
+//     case 'leaderboard':
+//       return Employee.updateOne(
+//         { _id: employeeId },
+//         {
+//           $push: {
+//             badges: { badgeId, description: `${getMonth(month)} ${year}` },
+//           },
+//         },
+//       );
+//     default:
+//       break;
+//   }
+// };
 
 const resetAllEmployeesScores = async () => {
   return Employee.updateMany({}, { $set: { score: 0, streak: 0 } });
@@ -110,8 +166,7 @@ const getEmployeeDetails = async (employeeId) => {
 
   return {
     employee,
-    badges: badges[0]?.badges || [],
-    multiplier: calculateMultiplier(employee.streak),
+    badges: badges[0]?.badges || []
   };
 };
 
@@ -122,6 +177,7 @@ export default {
   updateWeeklyQuizScore,
   addBadgesToEmployees,
   resetAllEmployeesScores,
+  awardStreakBadges,
   getSubmittedQuestions,
   getEmployeeDetails,
 };

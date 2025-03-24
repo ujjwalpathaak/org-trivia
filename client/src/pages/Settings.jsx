@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-import { getSettingsAPI } from '../api';
+import { getSettingsAPI, toggleTriviaAPI } from '../api';
 import ListManager from '../components/ListManager';
 
 const Settings = () => {
@@ -24,6 +24,7 @@ const Settings = () => {
 
   const toggleIsTriviaEnabled = async () => {
     setIsTriviaEnabled(!isTriviaEnabled);
+    await toggleTriviaAPI();
     await getSettingsAPI();
   };
 
@@ -36,7 +37,7 @@ const Settings = () => {
         <hr></hr>
         <div className="mt-4 space-y-4">
           <div className="flex items-center justify-between">
-            <label className="font-medium text-gray-700">Weekly Trivia</label>
+            <label className="font-medium text-gray-700">Weekly Quiz</label>
             <button
               onClick={toggleIsTriviaEnabled}
               className={`relative w-12 h-6 flex items-center bg-gray-300 rounded-full transition-all duration-300 ${
@@ -52,7 +53,7 @@ const Settings = () => {
           </div>
           <hr></hr>
 
-          {settings && <ListManager selectedGenre={settings.selectedGenre} />}
+          {isTriviaEnabled && settings && <ListManager selectedGenre={settings.selectedGenre} />}
         </div>
       </div>
     </div>
