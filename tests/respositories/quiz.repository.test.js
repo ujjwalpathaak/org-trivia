@@ -40,15 +40,10 @@ describe('quizRepository', () => {
 
   test('scheduleNewWeeklyQuiz should create a new quiz', async () => {
     const orgId = new ObjectId();
-    const dateNextFriday = new Date();
-    dateNextFriday.setDate(
-      dateNextFriday.getDate() + ((5 - dateNextFriday.getDay() + 7) % 7),
-    );
     const genre = 'PnA';
 
     const result = await quizRepository.scheduleNewWeeklyQuiz(
       orgId.toString(),
-      dateNextFriday,
       genre,
     );
     expect(result).toBeTruthy();
