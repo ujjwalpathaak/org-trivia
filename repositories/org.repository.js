@@ -159,8 +159,7 @@ const updateTriviaSettings = async (orgId, newStatus) =>
 
 const getAnalytics = async (orgId) => {
   const [participationByGenre, last3Leaderboards] = await Promise.all([
-    resultRepository.getParticipationByGenre(orgId),
-    leaderboardRepository.getLast3Leaderboards(orgId),
+    resultRepository.getParticipationByGenre(orgId)
   ]);
   return { participationByGenre, last3Leaderboards };
 };

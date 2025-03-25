@@ -56,7 +56,7 @@ const approveWeeklyQuizQuestions = async (req, res, next) => {
 
 const handleLambdaCallback = async (req, res, next) => {
   try {
-    const { orgId, questions, category, quizId, file } = req.body;
+    const { category, quizId, file, questions, orgId } = req.body;
     if (!questions || !orgId || !category) {
       next(new Error('Invalid request body'));
       return;

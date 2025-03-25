@@ -8,7 +8,7 @@ const AdminSidebar = () => {
 
   return (
     <div className="col-span-2">
-      <div className="bg-white w-fit h-fit p-4 rounded-2xl shadow-lg">
+      {/* <div className="bg-white w-fit h-fit p-4 rounded-2xl shadow-lg">
         <h2 className="text-lg font-semibold mb-2">Approve Questions</h2>
         <p className="text-gray-600">Review and approve pending questions.</p>
         <button
@@ -17,8 +17,8 @@ const AdminSidebar = () => {
         >
           View Pending Questions
         </button>
-      </div>
-      <div className="bg-white rounded-lg p-6 mt-4 shadow mb-4">
+      </div> */}
+      <div className="bg-white rounded-lg p-6 shadow mb-4">
         <Settings />
       </div>
     </div>

@@ -4,15 +4,20 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import { GripHorizontal } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { saveGenreSettingsAPI } from '../api';
+import { getMonth, getNextThreeFridays } from '../utils';
 
 const ItemType = 'GENRE';
 
 export default function ListManager({ selectedGenre }) {
+  const currentMonth = new Date().getMonth();
+  const currentYear = new Date().getFullYear();
+
   const allItems = [
     { key: 'Puzzles and Aptitude', value: 'PnA' },
     { key: 'Company Achievements', value: 'CAnIT' },
     { key: 'HR Docs', value: 'HRD' },
   ];
+  const nextFridayDates = getNextThreeFridays();
 
   const getGenreFullName = (value) => allItems.find((item) => item.value === value)?.key || '';
 
@@ -61,7 +66,7 @@ export default function ListManager({ selectedGenre }) {
     <DndProvider backend={HTML5Backend}>
       <div className="max-w-2xl mx-auto bg-white rounded-xl">
         <div className="mb-8">
-          <h3 className="font-semibold text-gray-800 mb-4">Available Genres</h3>
+          <h3 className="font-semibold text-gray-800 mb-4">Available Quizzes</h3>
           <ul className="space-y-3">
             {availableItems.length === 0 && (
               <li className="bg-gray-50 rounded-lg p-4 text-gray-500 text-center">
@@ -87,7 +92,9 @@ export default function ListManager({ selectedGenre }) {
         </div>
 
         <div>
-          <h3 className="font-semibold mr-2 text-gray-800">Selected Genres</h3>
+          <h3 className="font-semibold mr-2 text-gray-800">
+            Upcoming Quizzes for {getMonth(currentMonth)} {currentYear}
+          </h3>
           <span className="text-sm italic text-gray-400">{`(Drag and Drop to Reorder)`}</span>
           <ul className="space-y-3 mt-4">
             {selectedItems.length === 0 && (
@@ -95,15 +102,25 @@ export default function ListManager({ selectedGenre }) {
                 No genres selected
               </li>
             )}
-            {selectedItems.map((item, index) => (
-              <DraggableGenre
-                key={item.value}
-                item={item}
-                index={index}
-                moveItem={moveItem}
-                removeItem={removeItem}
-              />
-            ))}
+            <div className="flex">
+              <div className="w-1/3 text-slate-500 text-sm">Date</div>
+              <div className="w-2/3 text-slate-500 text-sm">Quiz</div>
+            </div>
+            <div className="flex flex-col space-y-3">
+              {selectedItems.map((item, index) => (
+                <div key={item.value} className="flex">
+                  <span className="bg-slate-50 w-1/3 p-2 rounded-md transition-colors">
+                    <span className="text-gray-500 text-sm">{nextFridayDates[index] || ''}</span>
+                  </span>
+                  <DraggableGenre
+                    item={item}
+                    index={index}
+                    moveItem={moveItem}
+                    removeItem={removeItem}
+                  />
+                </div>
+              ))}
+            </div>
           </ul>
 
           {!isSaved && (
@@ -150,20 +167,31 @@ function DraggableGenre({ item, index, moveItem, removeItem }) {
   return (
     <li
       ref={ref}
-      className={`bg-blue-50 rounded-lg p-4 transition-colors ${isDragging ? 'opacity-50' : ''}`}
+      className={`bg-blue-50 w-full rounded-lg p-2 transition-colors ${isDragging ? 'opacity-50' : ''}`}
     >
       <div className="flex justify-between items-center">
-        <div className="flex">
-          <GripHorizontal className="text-gray-500 mr-2 w-5 cursor-move" />
-          <span className="text-gray-700">{item.key}</span>
+        <div className="w-1/5">
+          <GripHorizontal className="text-gray-500 w-5 h-5 cursor-move" />
         </div>
-        <button
-          onClick={() => removeItem(item)}
-          className="ml-4 text-red-500 hover:text-red-600 hover:scale-110 transition-all"
-          title="Remove genre"
-        >
-          ❌
-        </button>
+        <div className="flex w-3/5 justify-between items-center">
+          <span className="text-gray-700 ">{item.key}</span>
+        </div>
+        <div className="flex w-1/5 justify-end items-center">
+          <button
+            onClick={() => handleEdit(item)}
+            className="ml-2 text-sm text-blue-500 hover:text-blue-600 hover:scale-110 transition-all"
+            title="Edit genre"
+          >
+            ✏️
+          </button>
+          <button
+            onClick={() => removeItem(item)}
+            className="ml-4 text-sm text-red-500 hover:text-red-600 hover:scale-110 transition-all"
+            title="Remove genre"
+          >
+            ❌
+          </button>
+        </div>
       </div>
     </li>
   );

@@ -6,7 +6,6 @@ const submitWeeklyQuizAnswers = async (
   employeeId,
   orgId,
   quizId,
-  multiplier,
   score,
   points,
   genre,
@@ -18,7 +17,6 @@ const submitWeeklyQuizAnswers = async (
     quizId,
     score,
     points,
-    multiplier,
     genre,
     answers,
   });

@@ -31,6 +31,8 @@ const cleanUpWeeklyQuizService = async () => {
     questionRepository.dropWeeklyQuestionCollection(),
   ]);
 
+  await employeeRepository.awardStreakBadges();
+
   return { message: 'Cleaned up weekly quiz.' };
 };
 

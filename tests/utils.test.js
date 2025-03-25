@@ -1,7 +1,6 @@
 import fs from 'fs';
 
 import {
-  calculateMultiplier,
   getMonth,
   getMonthAndYear,
   getNextFridayDate,
@@ -113,18 +112,6 @@ describe('Utility Functions', () => {
     it('should return correct month abbreviation', () => {
       expect(getMonth(0)).toBe('Jan');
       expect(getMonth(11)).toBe('Dec');
-    });
-  });
-
-  describe('calculateMultiplier', () => {
-    it('should return 1.5 if streak is 4 or more', () => {
-      expect(calculateMultiplier(4)).toBe(1.5);
-      expect(calculateMultiplier(10)).toBe(1.5);
-    });
-
-    it('should return 1 for streak less than 4', () => {
-      expect(calculateMultiplier(3)).toBe(1);
-      expect(calculateMultiplier(1)).toBe(1);
     });
   });
 });

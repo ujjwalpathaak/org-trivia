@@ -83,12 +83,3 @@ export const getMonth = (month) => {
   ];
   return months[month];
 };
-
-export const calculateMultiplier = (updatedStreak) => {
-  switch (true) {
-    case updatedStreak >= 4:
-      return 1.5;
-    default:
-      return 1;
-  }
-};

@@ -68,13 +68,8 @@ describe('Org Service', () => {
       genre: 'PnA',
       count: 10,
     });
-    leaderboardRepository.getLast3Leaderboards.mockResolvedValue([
-      { leaderboard: 'test' },
-    ]);
-
     const result = await orgRepository.getAnalytics('60d5ec49fbd9b01234567895');
     expect(resultRepository.getParticipationByGenre).toHaveBeenCalled();
-    expect(leaderboardRepository.getLast3Leaderboards).toHaveBeenCalled();
     expect(result).toEqual({
       participationByGenre: { genre: 'PnA', count: 10 },
       last3Leaderboards: [{ leaderboard: 'test' }],
