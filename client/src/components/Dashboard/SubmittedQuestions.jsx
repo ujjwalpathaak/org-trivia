@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getPastSubmittedQuestionsAPI } from '../../api'; // Update this with the correct API import
 
-const SubmittedQuestions = ({ setIsSubmittedQuestionsOpen }) => {
+const SubmittedQuestions = ({ setIsSubmittedQuestionOpen }) => {
   const [pageNumber, setPageNumber] = useState(0);
   const [submittedQuestions, setSubmittedQuestions] = useState([]);
   const [totalPages, setTotalPages] = useState(0);
@@ -52,7 +52,7 @@ const SubmittedQuestions = ({ setIsSubmittedQuestionsOpen }) => {
           <div className="flex w-full justify-between">
             <h2 className="text-lg font-semibold mb-4">All Submitted Questions</h2>
             <button
-              onClick={() => setIsSubmittedQuestionsOpen(false)}
+              onClick={() => setIsSubmittedQuestionOpen(false)}
               className="hover:text-red-900 bg-gray-200 hover:bg-red-300 rounded-full px-2 py-2 w-8 h-8 flex items-center justify-center"
             >
               X

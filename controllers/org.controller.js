@@ -4,7 +4,8 @@ const changeGenreSettings = async (req, res, next) => {
   try {
     const { orgId } = req.data;
     const genre = req.body;
-    if (!genre) {
+
+    if (!genre || Object.keys(genre).length === 0) {
       return res.status(400).json({ message: 'Missing required fields' });
     }
 

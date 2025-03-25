@@ -1,5 +1,77 @@
 # Qrg-Trivia
 
+## ⏳ Features
+
+### Employee Interactions
+
+- Give Weekly Quizzes.
+- Earn Badges based on the monthly leaderboard ratings.
+- Submit new questions.
+- View submitted questions.
+- See past quizzes taken.
+- View past badges earned.
+- Access monthly leaderboard history.
+
+### Admin Features
+
+- View analytics.
+- Access monthly leaderboard history.
+- Toggle the trivia feature on/off permanently.
+- Approve pending questions.
+- Edit questions before approval.
+- Replace suggested questions with AI-generated or employee-submitted questions.
+
+### Backend Features
+
+- HRD Workflow
+- PnA Workflow
+- CAnIT Workflow
+- Leaderboard
+- Scoring
+- Authentication
+- Awards
+- Question Scheduling
+
+### Lambda Functions
+
+- checkAPI_Working
+- generatePnA_Questions
+- generateCAnIT_Questions
+- generateHRD_Questions
+
+## ⏳ Tech Stack
+
+### Frontend
+
+- React.js
+- Tailwind
+- react-toastify
+
+### Backend
+
+- Node.js
+- Express.js
+- JWT
+- Cron Jobs
+
+### Database
+
+- MongoDB
+
+### AWS
+
+- S3
+- API Gateway
+- Lambda Functions
+- CloudWatch
+
+### Question Generation
+
+- llama-3.3-70b-specdec
+- Google RSS Feed
+- pdf-parser
+- gemini-2.0-flash
+
 ## ⏳ Cron Jobs
 
 | Task                                                                   | Frequency                        | Name                              |
@@ -13,73 +85,62 @@
 
 ### Authentication
 
-| Method | Endpoint       | Description                              | Protected | Allowed Roles |
-| ------ | -------------- | ---------------------------------------- | --------- | ------------- |
-| POST   | /auth/register | Registers a new user                     | No        | Public        |
-| POST   | /auth/login    | Authenticates a user and returns a token | No        | Public        |
+| Method | Endpoint         | Description                              | Protected | Allowed Roles |
+| ------ | ---------------- | ---------------------------------------- | --------- | ------------- |
+| `POST` | `/auth/register` | Registers a new user                     | No        | Public        |
+| `POST` | `/auth/login`    | Authenticates a user and returns a token | No        | Public        |
 
 ### Employee
 
-| Method | Endpoint                              | Description                                              | Protected | Allowed Roles |
-| ------ | ------------------------------------- | -------------------------------------------------------- | --------- | ------------- |
-| GET    | /employee/org/:orgId                  | Fetch all employees belonging to a specific organization | Yes       | Admin         |
-| GET    | /employee/score/:employeeId           | Get Employee Score                                       | Yes       | Employee      |
-| GET    | /employee/:employeeId                 | Fetch employees details                                  | Yes       | Employee      |
-| GET    | /employee/quizzes/results/:employeeId | Get all past quizzes results                             | Yes       | Employee      |
+| Method | Endpoint                        | Description                            | Protected | Allowed Roles |
+| ------ | ------------------------------- | -------------------------------------- | --------- | ------------- |
+| `GET`  | `/employee`                     | Fetch all employees in an organization | Yes       | Admin         |
+| `GET`  | `/employee/submitted-questions` | Fetch employee details                 | Yes       | Employee      |
 
 ### Organization
 
-| Method | Endpoint                          | Description             | Protected | Allowed Roles |
-| ------ | --------------------------------- | ----------------------- | --------- | ------------- |
-| GET    | /org                              | Fetch all organizations | Yes       | Public        |
-| PATCH  | /org/settings/toggleTrivia/:orgId | Toggle trivia settin    | Yes       | Admin         |
-| GET    | /org/settings/:orgId              | Fetch all settings      | Yes       | Admin         |
-| POST   | /org/settings/genre/:orgId        | Fetch all settings      | Yes       | Admin         |
-| GET    | /org/analytics/:orgId             | Fetch all settings      | Yes       | Admin         |
+| Method  | Endpoint                     | Description              | Protected | Allowed Roles |
+| ------- | ---------------------------- | ------------------------ | --------- | ------------- |
+| `GET`   | `/org`                       | Fetch all organizations  | Yes       | Public        |
+| `PATCH` | `/org/settings/toggleTrivia` | Toggle trivia setting    | Yes       | Admin         |
+| `GET`   | `/org/settings`              | Fetch all settings       | Yes       | Admin         |
+| `POST`  | `/org/settings/genre`        | Add settings for a genre | Yes       | Admin         |
+| `GET`   | `/org/analytics`             | Fetch analytics          | Yes       | Admin         |
 
 ### Question
 
-| Method | Endpoint                                         | Description                                | Protected | Allowed Roles |
-| ------ | ------------------------------------------------ | ------------------------------------------ | --------- | ------------- |
-| POST   | /question/                                       | Submit a new question                      | Yes       | Employee      |
-| POST   | /question/new/HRdocs                             | Saves New HR Docs Questions                |           |               |
-| GET    | /question/weekly/unapproved/:orgId               | Fetch weekly unapproved questions for quiz | Yes       | Admin         |
-| GET    | /question/test/scheduleNextWeekQuestionsApproval | TEST ROUTE                                 |           |               |
+| Method | Endpoint                                           | Description                            | Protected | Allowed Roles |
+| ------ | -------------------------------------------------- | -------------------------------------- | --------- | ------------- |
+| `POST` | `/question`                                        | Submit a new question                  | Yes       | Employee      |
+| `GET`  | `/question/weekly/unapproved`                      | Fetch unapproved weekly quiz questions | Yes       | Admin         |
+| `GET`  | `/question/test/scheduleNextWeekQuestionsApproval` | TEST ROUTE                             | No        | Admin         |
 
-### Answer
+### Cron Jobs
 
-| Method | Endpoint                        | Description           | Protected | Allowed Roles |
-| ------ | ------------------------------- | --------------------- | --------- | ------------- |
-| POST   | /answer/submitWeeklyQuizAnswers | Mark answers for quiz | Yes       | Employee      |
-
-### Cron
-
-| Method | Endpoint                             | Description                                                      | Protected | Allowed Roles |
-| ------ | ------------------------------------ | ---------------------------------------------------------------- | --------- | ------------- |
-| post   | /cron/test/startPnAWorkflow/:orgId   | TEST: Start the startPnAWorkflow for a particular organization   |           |               |
-| post   | /cron/test/startCAnITWorkflow/:orgId | TEST: Start the startCAnITWorkflow for a particular organization |           |               |
-| post   | /cron/test/cleanWeeklyQuiz           | TEST: Clean Weekly Quiz                                          |           |               |
-| post   | /cron/test/makeQuizLiveTest          | TEST: Make Quiz Live                                             |           |               |
+| Method | Endpoint                      | Description             | Protected | Allowed Roles |
+| ------ | ----------------------------- | ----------------------- | --------- | ------------- |
+| `POST` | `/cron/test/cleanWeeklyQuiz`  | TEST: Clean Weekly Quiz | No        | Admin         |
+| `POST` | `/cron/test/makeQuizLiveTest` | TEST: Make Quiz Live    | No        | Admin         |
 
 ### Result
 
-| Method | Endpoint                        | Description               | Protected | Allowed Roles |
-| ------ | ------------------------------- | ------------------------- | --------- | ------------- |
-| post   | /result/submitWeeklyQuizAnswers | Submit ans of weekly test | Yes       | Employee      |
-| get    | /past/:employeeId               | Get past Employee Scores  | Yes       | Employee      |
+| Method | Endpoint                          | Description                | Protected | Allowed Roles |
+| ------ | --------------------------------- | -------------------------- | --------- | ------------- |
+| `POST` | `/result/submitWeeklyQuizAnswers` | Submit weekly quiz answers | Yes       | Employee      |
+| `GET`  | `/result/employee`                | Get past employee scores   | Yes       | Employee      |
 
 ### Leaderboard
 
-| Method | Endpoint                | Description                       | Protected | Allowed Roles   |
-| ------ | ----------------------- | --------------------------------- | --------- | --------------- |
-| post   | /leaderboard/:orgId     | Toggle trivia on & off for an org | Yes       | Admin, Employee |
-| post   | /leaderboard/test/reset | TEST: resets the leaderboard      |           | Admin           |
+| Method | Endpoint                  | Description                     | Protected | Allowed Roles   |
+| ------ | ------------------------- | ------------------------------- | --------- | --------------- |
+| `POST` | `/leaderboard`            | Toggle trivia on/off for an org | Yes       | Admin, Employee |
+| `POST` | `/leaderboard/test/reset` | TEST: Reset leaderboard         | No        | Admin           |
 
 ### Quiz
 
-| Method | Endpoint                        | Description                                                 | Protected | Allowed Roles |
-| ------ | ------------------------------- | ----------------------------------------------------------- | --------- | ------------- |
-| post   | /quiz/status/:orgId/:employeeId | Checks if user can give quiz                                | Yes       | Employee      |
-| post   | /quiz/approve/:orgId            | Approve weekly quiz questions                               | Yes       | Admin         |
-| post   | /quiz/weekly/lambda/callback    | Callback function for Lmabda to add questions               |           |               |
-| post   | /quiz/questions/:orgId          | Get all questions for the next quiz for that particular org | Yes       | Employee      |
+| Method | Endpoint                       | Description                                                | Protected | Allowed Roles |
+| ------ | ------------------------------ | ---------------------------------------------------------- | --------- | ------------- |
+| `POST` | `/quiz/status`                 | Check if user can take a quiz                              | Yes       | Employee      |
+| `POST` | `/quiz/approve`                | Approve weekly quiz questions                              | Yes       | Admin         |
+| `POST` | `/quiz/weekly/lambda/callback` | Callback function for Lambda to add questions              | No        | Admin         |
+| `POST` | `/quiz/questions`              | Fetch all questions for the next quiz for a particular org | Yes       | Employee      |

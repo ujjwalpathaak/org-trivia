@@ -31,6 +31,18 @@ const adminSchema = new mongoose.Schema({
   },
 });
 
+adminSchema.pre('save', function (next) {
+  if (!this.isNew) {
+    if (this.isModified('role')) {
+      return next(new Error('Role cannot be changed'));
+    }
+    if (this.isModified('orgId')) {
+      return next(new Error('Organization ID cannot be changed'));
+    }
+  }
+  next();
+});
+
 const Admin = mongoose.model('Admin', adminSchema);
 
 export default Admin;

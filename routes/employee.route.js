@@ -11,11 +11,6 @@ employeeRouter.get(
   employeeController.getEmployeeDetails,
 );
 employeeRouter.get(
-  '/quizzes/results',
-  checkRole('Employee'),
-  employeeController.getPastQuizResultsController,
-);
-employeeRouter.get(
   '/submitted-questions',
   checkRole('Employee'),
   employeeController.getSubmittedQuestionsController,
