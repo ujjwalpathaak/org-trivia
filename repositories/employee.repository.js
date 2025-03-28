@@ -9,7 +9,11 @@ const isWeeklyQuizGiven = async (employeeId) => {
 };
 
 const awardStreakBadges = async () => {
-  const [quater_year_streak_employees, half_year_streak_employees, yearly_streak_employees] = await Promise.all([
+  const [
+    quater_year_streak_employees,
+    half_year_streak_employees,
+    yearly_streak_employees,
+  ] = await Promise.all([
     Employee.find({ streak: 13 }),
     Employee.find({ streak: 26 }),
     Employee.find({ streak: 52 }),
@@ -29,17 +33,31 @@ const awardStreakBadges = async () => {
 
   await Promise.all([
     ...quater_year_streak_employees.map((employee) =>
-      addBadgesToEmployees(employee._id, badges['3 Months'], new Date().getMonth(), new Date().getFullYear())
+      addBadgesToEmployees(
+        employee._id,
+        badges['3 Months'],
+        new Date().getMonth(),
+        new Date().getFullYear(),
+      ),
     ),
     ...half_year_streak_employees.map((employee) =>
-      addBadgesToEmployees(employee._id, badges['6 Months'], new Date().getMonth(), new Date().getFullYear())
+      addBadgesToEmployees(
+        employee._id,
+        badges['6 Months'],
+        new Date().getMonth(),
+        new Date().getFullYear(),
+      ),
     ),
     ...yearly_streak_employees.map((employee) =>
-      addBadgesToEmployees(employee._id, badges['1 Year'], new Date().getMonth(), new Date().getFullYear())
+      addBadgesToEmployees(
+        employee._id,
+        badges['1 Year'],
+        new Date().getMonth(),
+        new Date().getFullYear(),
+      ),
     ),
   ]);
 };
-
 
 const updateEmployeeStreaksAndMarkAllEmployeesAsQuizNotGiven = async () => {
   await Employee.bulkWrite([
@@ -66,13 +84,14 @@ const addSubmittedQuestion = async (questionId, employeeId) => {
   );
 };
 
-const updateWeeklyQuizScore = async (employeeId, points) => {
+const updateWeeklyQuizScore = async (employeeId, points, session) => {
   const employee = await Employee.findById(employeeId, 'streak quizGiven');
   if (employee.quizGiven) return false;
 
   await Employee.updateOne(
     { _id: employeeId },
     { $set: { quizGiven: true }, $inc: { score: points } },
+    { session },
   );
 
   return { score: points };
@@ -166,7 +185,7 @@ const getEmployeeDetails = async (employeeId) => {
 
   return {
     employee,
-    badges: badges[0]?.badges || []
+    badges: badges[0]?.badges || [],
   };
 };
 

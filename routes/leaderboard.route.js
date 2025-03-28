@@ -8,11 +8,11 @@ const leaderboardRouter = express.Router();
 leaderboardRouter.get(
   '/',
   protectRoute,
-  leaderboardController.getLeaderboardByOrgHandler,
+  leaderboardController.getLeaderboardByOrgController,
 );
 leaderboardRouter.post(
   '/test/reset',
-  leaderboardController.resetLeaderboardHandler,
+  leaderboardController.resetLeaderboardController,
 );
 
 export default leaderboardRouter;

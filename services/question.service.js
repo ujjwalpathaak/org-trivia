@@ -231,7 +231,7 @@ async function getWeeklyUnapprovedQuestions(orgId, quizId) {
   return (await questionRepository.getWeeklyUnapprovedQuestions(quizId)) || [];
 }
 
-async function getWeeklyQuizCorrectAnswers(orgId) {
+async function getWeeklyQuizCorrectAnswersService(orgId) {
   const correctWeeklyQuizAnswers =
     await questionRepository.getCorrectWeeklyQuizAnswers(orgId);
   return correctWeeklyQuizAnswers.map((curr) => curr.question);
@@ -274,7 +274,7 @@ export default {
   approveWeeklyQuizQuestions,
   getUpcomingWeeklyQuizByOrgId,
   getWeeklyUnapprovedQuestions,
-  getWeeklyQuizCorrectAnswers,
+  getWeeklyQuizCorrectAnswersService,
   getWeeklyQuizQuestions,
   startHRDWorkflow,
 };

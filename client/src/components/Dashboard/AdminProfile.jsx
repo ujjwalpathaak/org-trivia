@@ -3,7 +3,7 @@ import Leaderboard from '../Leaderboard';
 
 const AdminProfile = ({ data }) => {
   return (
-    <div className="col-span-2 col-start-2 mb-4">
+    <div className="col-span-3 mb-4">
       <div className="bg-white rounded-lg p-6 shadow mb-4">
         <div className="flex flex-col items-center">
           <img

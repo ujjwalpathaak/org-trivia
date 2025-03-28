@@ -1,3 +1,4 @@
+import { dbConnection } from '../Database.js';
 import {
   getMonthAndYear,
   mergeUserAnswersAndCorrectAnswers,
@@ -8,20 +9,16 @@ import quizRepository from '../repositories/quiz.repository.js';
 import resultRepository from '../repositories/result.repository.js';
 import questionService from './question.service.js';
 
-const calculateWeeklyQuizScore = async (userAnswers, correctAnswers) => {
-  let weeklyQuizScore = 0;
+const calculateWeeklyQuizScore = (userAnswers, correctAnswers) => {
+  const correctAnswerMap = new Map(
+    correctAnswers.map(({ _id, answer }) => [_id.toString(), answer]),
+  );
 
-  userAnswers.forEach(({ questionId, answer }) => {
-    const correctAnswer = correctAnswers.find(
-      (correctAnswer) => correctAnswer._id.toString() === questionId,
-    );
-
-    if (correctAnswer && answer === correctAnswer.answer) {
-      weeklyQuizScore += 10;
-    }
-  });
-
-  return weeklyQuizScore;
+  return userAnswers.reduce(
+    (score, { questionId, answer }) =>
+      score + (Object.is(correctAnswerMap.get(questionId), answer) ? 10 : 0),
+    0,
+  );
 };
 
 const getEmployeePastResultsService = async (employeeId, page, size) => {
@@ -34,55 +31,62 @@ const submitWeeklyQuizAnswersService = async (
   orgId,
   quizId,
 ) => {
-  const correctAnswers = await questionService.getWeeklyQuizCorrectAnswers(
-    orgId,
-    quizId,
-  );
-  const points = await calculateWeeklyQuizScore(userAnswers, correctAnswers);
+  const session = await dbConnection.startSession();
+  session.startTransaction();
 
-  const data = await employeeRepository.updateWeeklyQuizScore(
-    employeeId,
-    points,
-  );
+  try {
+    const correctAnswers =
+      await questionService.getWeeklyQuizCorrectAnswersService(orgId, quizId);
+    const points = calculateWeeklyQuizScore(userAnswers, correctAnswers);
 
-  if (!data) {
-    return {
-      success: false,
-      message: 'Error updating employee score - quiz already given',
-    };
+    const quiz = await quizRepository.findLiveQuizByOrgId(orgId);
+    if (!quiz) {
+      throw new Error('No active quiz found for this organization.');
+    }
+
+    const data = await employeeRepository.updateWeeklyQuizScore(
+      employeeId,
+      points,
+      session,
+    );
+    if (!data) {
+      throw new Error('Error updating employee score - quiz already given.');
+    }
+
+    const [month, year] = getMonthAndYear();
+
+    await leaderboardRepository.updateLeaderboard(
+      orgId,
+      employeeId,
+      data.score,
+      month,
+      year,
+      session,
+    );
+
+    const mergedUserAnswersAndCorrectAnswers =
+      mergeUserAnswersAndCorrectAnswers(correctAnswers, userAnswers);
+
+    await resultRepository.submitWeeklyQuizAnswers(
+      employeeId,
+      orgId,
+      quizId,
+      data.score,
+      points,
+      quiz.genre,
+      mergedUserAnswersAndCorrectAnswers,
+      session,
+    );
+
+    await session.commitTransaction();
+    session.endSession();
+
+    return { success: true, score: data.score, points };
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    throw new Error(`Failed to submit quiz: ${error.message}`);
   }
-
-  const [month, year] = getMonthAndYear();
-
-  await leaderboardRepository.updateLeaderboard(
-    orgId,
-    employeeId,
-    data.score,
-    month,
-    year,
-  );
-
-  const mergedUserAnswersAndCorrectAnswers = mergeUserAnswersAndCorrectAnswers(
-    correctAnswers,
-    userAnswers,
-  );
-  const quiz = await quizRepository.findLiveQuizByOrgId(orgId);
-
-  await resultRepository.submitWeeklyQuizAnswers(
-    employeeId,
-    orgId,
-    quizId,
-    data.score,
-    points,
-    quiz.genre,
-    mergedUserAnswersAndCorrectAnswers,
-  );
-
-  return {
-    success: true,
-    score: data.score,
-    points,
-  };
 };
 
 export default {

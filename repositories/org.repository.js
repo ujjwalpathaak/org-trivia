@@ -2,7 +2,6 @@ import { ObjectId } from 'mongodb';
 
 import Org from '../models/org.model.js';
 import Question from '../models/question.model.js';
-import leaderboardRepository from './leaderboard.respository.js';
 import resultRepository from './result.repository.js';
 
 const categoryMap = {
@@ -147,7 +146,6 @@ const fetchHRDQuestions = async (orgId) => {
 
 const getSettings = async (orgId) => Org.findById(orgId).select('settings');
 const getAllOrgNames = async () => Org.find({}, 'id name');
-const getAllOrgIds = async () => Org.find({}, 'id');
 const getOrgById = async (orgId) => Org.findById(orgId);
 const isTriviaEnabled = async (orgId) =>
   Org.findById(orgId).select('settings.isTriviaEnabled');
@@ -159,7 +157,7 @@ const updateTriviaSettings = async (orgId, newStatus) =>
 
 const getAnalytics = async (orgId) => {
   const [participationByGenre, last3Leaderboards] = await Promise.all([
-    resultRepository.getParticipationByGenre(orgId)
+    resultRepository.getParticipationByGenre(orgId),
   ]);
   return { participationByGenre, last3Leaderboards };
 };
@@ -207,7 +205,6 @@ export default {
   getSettings,
   fetchExtraEmployeeQuestions,
   getAllOrgNames,
-  getAllOrgIds,
   pushQuestionsInOrg,
   getOrgById,
   isTriviaEnabled,

@@ -19,6 +19,11 @@ const getWeeklyQuizStatusService = async (orgId, employeeId) => {
   }
 };
 
+const cancelLiveQuizService = async (quizId) => {
+  await quizRepository.cancelLiveQuiz(quizId);
+  return { message: 'Live quiz cancelled' };
+};
+
 const makeWeeklyQuizLiveService = async () => {
   await quizRepository.makeWeeklyQuizLive();
   return { message: 'All weekly quizzes are live' };
@@ -40,4 +45,5 @@ export default {
   getWeeklyQuizStatusService,
   makeWeeklyQuizLiveService,
   cleanUpWeeklyQuizService,
+  cancelLiveQuizService,
 };

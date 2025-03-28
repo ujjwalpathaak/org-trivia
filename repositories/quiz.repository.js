@@ -1,7 +1,8 @@
 import { ObjectId } from 'mongodb';
 
-import Quiz from '../models/quiz.model.js';
 import { getNextFridayDate } from '../middleware/utils.js';
+import Quiz from '../models/quiz.model.js';
+import resultRepository from './result.repository.js';
 
 const findLiveQuizByOrgId = (orgId) => {
   return Quiz.findOne({ orgId: new ObjectId(orgId), status: 'live' });
@@ -14,6 +15,14 @@ const getQuizStatus = (orgId) => {
       $or: [{ status: 'live' }, { status: 'cancelled' }],
     },
     { status: 1, _id: 0 },
+  );
+};
+
+const cancelLiveQuiz = async (quizId) => {
+  await resultRepository.rollbackWeeklyQuizScores(quizId);
+  return Quiz.updateOne(
+    { _id: new ObjectId(quizId), status: 'live' },
+    { $set: { status: 'cancelled' } },
   );
 };
 
@@ -85,6 +94,7 @@ export default {
   scheduleNewWeeklyQuiz,
   getQuizStatus,
   makeWeeklyQuizLive,
+  cancelLiveQuiz,
   markAllQuizAsExpired,
   updateQuizStatusToApproved,
   getUpcomingWeeklyQuiz,

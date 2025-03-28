@@ -4,7 +4,14 @@ import Leaderboard from '../models/leaderboard.model.js';
 import badgeRepository from './badge.repository.js';
 import employeeRepository from './employee.repository.js';
 
-const updateLeaderboard = async (orgId, employeeId, score, month, year) =>
+const updateLeaderboard = async (
+  orgId,
+  employeeId,
+  score,
+  month,
+  year,
+  session,
+) =>
   Leaderboard.updateOne(
     {
       orgId: new ObjectId(orgId),
@@ -13,34 +20,32 @@ const updateLeaderboard = async (orgId, employeeId, score, month, year) =>
       year,
     },
     { $inc: { totalScore: score } },
-    { upsert: true },
+    { upsert: true, session },
   );
 
 const getLeaderboardYearBoundary = async (orgId) => {
   return Leaderboard.aggregate([
     {
       $match: {
-        orgId: new ObjectId(
-          "67c69382f8c3ce19ef544cad"
-        )
-      }
+        orgId: new ObjectId('67c69382f8c3ce19ef544cad'),
+      },
     },
     {
       $group: {
-        _id: "$orgId",
+        _id: '$orgId',
         years: {
-          $min: '$year'
-        }
-      }
+          $min: '$year',
+        },
+      },
     },
     {
       $project: {
         _id: 0,
-        years: 1
-      }
-    }
-  ])
-}
+        years: 1,
+      },
+    },
+  ]);
+};
 
 const getLeaderboardByOrg = async (orgId, month, year) => {
   return Leaderboard.aggregate([
@@ -65,7 +70,7 @@ const getLeaderboardByOrg = async (orgId, month, year) => {
     { $unwind: '$employee' },
     { $project: { 'employee.name': 1, totalScore: 1 } },
   ]);
-}
+};
 
 const resetLeaderboard = async (month, year, pMonth, pYear) => {
   const topThreePerOrg = await Leaderboard.aggregate([

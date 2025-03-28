@@ -1,3 +1,4 @@
+import { getValue, setValue } from '../Redis.js';
 import orgRepository from '../repositories/org.repository.js';
 
 const changeGenreSettings = async (genre, orgId) => {
@@ -26,7 +27,14 @@ const toggleTrivia = async (orgId) => {
 };
 
 const getAnalytics = async (orgId) => {
-  return await orgRepository.getAnalytics(orgId);
+  const cache = await getValue(`analytics:${orgId}`);
+  if (cache) return cache;
+
+  const analytics = await orgRepository.getAnalytics(orgId);
+
+  await setValue(`analytics:${orgId}`, analytics, 600);
+
+  return analytics;
 };
 
 export default {

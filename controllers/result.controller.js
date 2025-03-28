@@ -5,7 +5,7 @@ const submitWeeklyQuizAnswersController = async (req, res, next) => {
     const { answers, quizId } = req.body;
     const { employeeId, orgId } = req.data;
     if (!answers || !employeeId || !orgId || !quizId) {
-      return res.status(400).json({ message: 'All fields are required' });
+      return res.status(400).json({ message: 'Required fields not present' });
     }
 
     const data = await resultService.submitWeeklyQuizAnswersService(

@@ -22,6 +22,53 @@ const submitWeeklyQuizAnswers = async (
   });
 };
 
+const rollbackWeeklyQuizScores = async (quizId) => {
+  await Result.aggregate([
+    {
+      $match: {
+        quizId: new ObjectId(quizId),
+      },
+    },
+    {
+      $lookup: {
+        from: 'employees',
+        localField: 'employeeId',
+        foreignField: '_id',
+        as: 'employee',
+      },
+    },
+    {
+      $unwind: {
+        path: '$employee',
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $set: {
+        'employee.score': {
+          $subtract: [
+            { $ifNull: ['$employee.score', 0] },
+            { $ifNull: ['$score', 0] },
+          ],
+        },
+      },
+    },
+    {
+      $replaceRoot: { newRoot: '$employee' },
+    },
+    {
+      $merge: {
+        into: 'employees',
+        on: '_id',
+        whenMatched: 'merge',
+        whenNotMatched: 'discard',
+      },
+    },
+  ]);
+
+  return await Result.deleteMany({ quizId: new ObjectId(quizId) });
+};
+
 const getParticipationByGenre = async (orgId) => {
   return await Result.aggregate([
     { $match: { orgId: new ObjectId(orgId) } },
@@ -58,6 +105,7 @@ const getEmployeePastResults = async (employeeId, page = 0, size = 10) => {
 
 export default {
   submitWeeklyQuizAnswers,
+  rollbackWeeklyQuizScores,
   getParticipationByGenre,
   getEmployeePastResults,
 };

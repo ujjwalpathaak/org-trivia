@@ -8,6 +8,7 @@ import { connectDatabase } from './Database.js';
 import { startJobs } from './jobs/index.js';
 import { isProduction, logService } from './middleware/utils.js';
 import router from './routes/router.js';
+import {sanitizeRequest} from './middleware/sanitizeRequest.js';
 
 const app = express();
 const isProductionServer = isProduction();
@@ -23,6 +24,8 @@ app.use(cors({ origin: ALLOWED_ORIGINS }));
 // app.use(express.json());
 // app.use(express.urlencoded({ extended: true }));
 
+app.use(sanitizeRequest);
+
 connectDatabase();
 isProductionServer && startJobs();
 
@@ -30,15 +33,11 @@ app.use('/', router);
 
 app.use(logService);
 
-app.use((error, req, res) => {
-  error.status = error.status || 500;
-  error.message = error.message || 'Server Error';
-
-  console.error(error);
-
-  res.status(error.status).json({
-    status: error.status,
-    message: error.message,
+app.use((err, req, res, next) => {
+  console.log(err);
+  res.status(500).json({
+    success: false,
+    message: err.message || 'Something went wrong!',
   });
 });
 

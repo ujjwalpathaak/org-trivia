@@ -10,8 +10,14 @@ const Settings = () => {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const response = await getSettingsAPI();
-
+        // const response = await getSettingsAPI();
+        // console.log(response);
+        const response = {
+          isTriviaEnabled: true,
+          currentGenre: 0,
+          selectedGenre: ['HRD', 'PnA', 'CAnIT'],
+          _id: '67e437a6fc13ed2317a414ea',
+        };
         setSettings(response);
         setIsTriviaEnabled(response.isTriviaEnabled);
       } catch (error) {

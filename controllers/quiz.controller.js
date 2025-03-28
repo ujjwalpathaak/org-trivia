@@ -54,6 +54,21 @@ const approveWeeklyQuizQuestions = async (req, res, next) => {
   }
 };
 
+const cancelLiveQuizController = async (req, res, next) => {
+  try {
+    const { quizId } = req.params;
+    if (!orgId) {
+      return res.status(400).json({ message: 'Missing required fields' });
+    }
+
+    await quizService.cancelLiveQuizService(quizId);
+
+    res.status(200).json({ message: 'Live quiz cancelled' });
+  } catch (error) {
+    next(error);
+  }
+};
+
 const handleLambdaCallback = async (req, res, next) => {
   try {
     const { category, quizId, file, questions, orgId } = req.body;
@@ -79,6 +94,7 @@ const handleLambdaCallback = async (req, res, next) => {
 export default {
   getWeeklyQuizStatusController,
   getWeeklyQuizQuestions,
+  cancelLiveQuizController,
   approveWeeklyQuizQuestions,
   handleLambdaCallback,
 };

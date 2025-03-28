@@ -1,6 +1,5 @@
 import Org from '../../models/org.model.js';
 import Question from '../../models/question.model.js';
-import leaderboardRepository from '../../repositories/leaderboard.respository.js';
 import orgRepository from '../../repositories/org.repository.js';
 import resultRepository from '../../repositories/result.repository.js';
 

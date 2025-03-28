@@ -122,7 +122,20 @@ export const getNextThreeFridays = () => {
     date.setDate(date.getDate() + 1);
   }
 
-  const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const monthNames = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+  ];
 
   for (let i = 0; i < 3; i++) {
     fridays.push(`${date.getDate()} ${monthNames[date.getMonth()]}`); // Format: DD MMM
@@ -131,7 +144,6 @@ export const getNextThreeFridays = () => {
 
   return fridays;
 };
-
 
 export const getMonth = (month) => {
   const months = [
