@@ -9,12 +9,14 @@ import orgRouter from './org.route.js';
 import questionRouter from './question.route.js';
 import quizRouter from './quiz.route.js';
 import resultRouter from './result.route.js';
+import { sanitizeRequest } from '../middleware/sanitizeRequest.js';
 
 const router = express.Router();
 
 router.get('/', (req, res) => res.send('API Working'));
 
 router.use('/auth', authRouter);
+router.use(sanitizeRequest);
 router.use('/employee', protectRoute, employeeRouter);
 router.use('/org', orgRouter);
 router.use('/question', questionRouter);

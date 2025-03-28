@@ -8,7 +8,6 @@ import { connectDatabase } from './Database.js';
 import { startJobs } from './jobs/index.js';
 import { isProduction, logService } from './middleware/utils.js';
 import router from './routes/router.js';
-import {sanitizeRequest} from './middleware/sanitizeRequest.js';
 
 const app = express();
 const isProductionServer = isProduction();
@@ -23,8 +22,6 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(cors({ origin: ALLOWED_ORIGINS }));
 // app.use(express.json());
 // app.use(express.urlencoded({ extended: true }));
-
-app.use(sanitizeRequest);
 
 connectDatabase();
 isProductionServer && startJobs();

@@ -10,7 +10,6 @@ const getUserByEmail = async (email) => {
     Admin.findOne({ email }),
     Employee.findOne({ email }),
   ]);
-
   return admin || employee || null;
 };
 

@@ -18,6 +18,9 @@ const Leaderboard = () => {
       if (!orgId) return;
       try {
         const data = await getLeaderboardAPI(selectedMonth, selectedYear);
+        while (data.leaderboard.length < 3) {
+          data.leaderboard.push({ employee: { name: '' }, totalScore: '' });
+        }
         setLeaderboard(data.leaderboard);
         setYears(
           Array.from(
@@ -88,7 +91,9 @@ const Leaderboard = () => {
             <tbody>
               {leaderboard.map((player, index) => (
                 <tr key={index} className="border-t bg-gray-100">
-                  <td className="p-3 font-semibold">#{index + 1}</td>
+                  <td className="p-3 font-semibold h-12">
+                    {player.employee.name.length > 0 && `${index + 1}`}
+                  </td>
                   <td className="p-3">{player.employee.name}</td>
                   <td className="p-3 text-left font-bold">{player.totalScore}</td>
                 </tr>
