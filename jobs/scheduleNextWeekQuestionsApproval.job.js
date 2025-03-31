@@ -4,11 +4,11 @@ import leaderboardService from '../services/leaderboard.service.js';
 import questionService from '../services/question.service.js';
 import quizService from '../services/quiz.service.js';
 
-export const scheduleNextWeekQuestionsApprovalJob = cron.schedule(
+export const scheduleQuizzesJob = cron.schedule(
   '1 0 * * 0',
   async () => {
     console.log('Running Scheduled Task: Approve Next Week Questions...');
-    await questionService.scheduleNextWeekQuestionsApproval();
+    await questionService.scheduleQuizzesJob();
   },
   { scheduled: true, timezone: 'UTC' },
 );

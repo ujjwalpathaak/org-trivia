@@ -1,6 +1,5 @@
 import { ObjectId } from 'mongodb';
 
-import { getNextFridayDate } from '../middleware/utils.js';
 import Quiz from '../models/quiz.model.js';
 import resultRepository from './result.repository.js';
 
@@ -26,12 +25,17 @@ const cancelLiveQuiz = async (quizId) => {
   );
 };
 
-const scheduleNewWeeklyQuiz = (orgId, genre) => {
-  const dateNextFriday = getNextFridayDate();
+const getScheduledQuizzes = (orgId) => {
+  return Quiz.find({ orgId: new ObjectId(orgId), status: 'upcoming' }).sort({
+    scheduledDate: 1,
+  });
+}
+
+const scheduleNewWeeklyQuiz = (orgId, date, genre) => {
   return Quiz.create({
     orgId,
     status: 'upcoming',
-    scheduledDate: dateNextFriday,
+    scheduledDate: date,
     genre,
   });
 };
@@ -89,14 +93,22 @@ const getLiveQuizByEmployeeId = (employeeId) => {
   });
 };
 
+const changeQuizGenre = async (newGenre, quizId) => {
+  return Quiz.updateOne(
+    { _id: new ObjectId(quizId), status: 'upcoming' },
+    { $set: { 'genre': newGenre } },
+  );
+}
+
 export default {
   findLiveQuizByOrgId,
   scheduleNewWeeklyQuiz,
+  changeQuizGenre,
   getQuizStatus,
   makeWeeklyQuizLive,
   cancelLiveQuiz,
   markAllQuizAsExpired,
-  updateQuizStatusToApproved,
+  updateQuizStatusToApproved,getScheduledQuizzes,
   getUpcomingWeeklyQuiz,
   updateQuizStatus,
   getLiveQuizByEmployeeId,

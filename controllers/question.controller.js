@@ -63,9 +63,9 @@ const getWeeklyUnapprovedQuestions = async (req, res, next) => {
   }
 };
 
-const testScheduleNextWeekQuestionsApproval = async (req, res, next) => {
+const scheduleQuizzesJob = async (req, res, next) => {
   try {
-    await questionService.scheduleNextWeekQuestionsApproval();
+    await questionService.scheduleQuizzesJob();
     res.json('Job running');
   } catch (error) {
     next(error);
@@ -75,5 +75,5 @@ const testScheduleNextWeekQuestionsApproval = async (req, res, next) => {
 export default {
   addQuestion,
   getWeeklyUnapprovedQuestions,
-  testScheduleNextWeekQuestionsApproval,
+  scheduleQuizzesJob,
 };

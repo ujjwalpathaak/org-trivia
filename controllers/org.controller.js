@@ -1,15 +1,11 @@
 import OrgService from '../services/org.service.js';
 
-const changeGenreSettings = async (req, res, next) => {
+const saveNewSettingsController = async (req, res, next) => {
   try {
     const { orgId } = req.data;
-    const genre = req.body;
+    const {newGenreOrder, changedGenres} = req.body;
 
-    if (!genre || Object.keys(genre).length === 0) {
-      return res.status(400).json({ message: 'Missing required fields' });
-    }
-
-    await OrgService.changeGenreSettings(genre, orgId);
+    await OrgService.saveSettingsService(orgId, newGenreOrder, changedGenres);
     res.json({ message: 'Genre settings updated successfully' });
   } catch (error) {
     next(error);
@@ -68,7 +64,7 @@ const getAnalytics = async (req, res, next) => {
 };
 
 export default {
-  changeGenreSettings,
+  saveNewSettingsController,
   getSettings,
   toggleTrivia,
   getAllOrgNames,

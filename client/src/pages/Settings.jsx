@@ -6,18 +6,12 @@ import ListManager from '../components/ListManager';
 const Settings = () => {
   const [isTriviaEnabled, setIsTriviaEnabled] = useState(false);
   const [settings, setSettings] = useState(null);
+  const [isSaved, setIsSaved] = useState(true);
 
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        // const response = await getSettingsAPI();
-        // console.log(response);
-        const response = {
-          isTriviaEnabled: true,
-          currentGenre: 0,
-          selectedGenre: ['HRD', 'PnA', 'CAnIT'],
-          _id: '67e437a6fc13ed2317a414ea',
-        };
+        const response = await getSettingsAPI();
         setSettings(response);
         setIsTriviaEnabled(response.isTriviaEnabled);
       } catch (error) {
@@ -59,7 +53,13 @@ const Settings = () => {
           </div>
           <hr></hr>
 
-          {isTriviaEnabled && settings && <ListManager selectedGenre={settings.selectedGenre} />}
+          {isTriviaEnabled && settings && (
+            <ListManager
+              isSaved={isSaved}
+              setIsSaved={setIsSaved}
+              selectedGenre={settings.selectedGenre}
+            />
+          )}
         </div>
       </div>
     </div>

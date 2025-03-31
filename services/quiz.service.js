@@ -41,9 +41,14 @@ const cleanUpWeeklyQuizService = async () => {
   return { message: 'Cleaned up weekly quiz.' };
 };
 
+const getScheduledQuizzesService = async (orgId) => {
+  return await quizRepository.getScheduledQuizzes(orgId);
+}
+
 export default {
   getWeeklyQuizStatusService,
   makeWeeklyQuizLiveService,
   cleanUpWeeklyQuizService,
   cancelLiveQuizService,
+  getScheduledQuizzesService
 };

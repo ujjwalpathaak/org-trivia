@@ -22,10 +22,10 @@ orgRouter.get(
 );
 
 orgRouter.post(
-  '/settings/genre',
+  '/save/settings',
   protectRoute,
   checkRole('Admin'),
-  OrgController.changeGenreSettings,
+  OrgController.saveNewSettingsController,
 );
 
 orgRouter.get(

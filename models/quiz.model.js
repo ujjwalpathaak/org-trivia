@@ -18,7 +18,7 @@ const quizSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['upcoming', 'scheduled', 'cancelled', 'live', 'expired'],
+    enum: ['upcoming', 'cancelled', 'live', 'expired'],
     required: true,
     default: 'upcoming',
   },

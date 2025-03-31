@@ -18,8 +18,8 @@ questionRouter.get(
 );
 
 questionRouter.get(
-  '/test/scheduleNextWeekQuestionsApproval',
-  questionController.testScheduleNextWeekQuestionsApproval,
+  '/test/scheduleQuizzesJob',
+  questionController.scheduleQuizzesJob,
 );
 
 export default questionRouter;

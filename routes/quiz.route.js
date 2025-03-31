@@ -29,6 +29,13 @@ quizRouter.post(
 );
 
 quizRouter.get(
+  '/scheduled',
+  protectRoute,
+  checkRole('Admin'),
+  QuizController.getScheduledQuizzes
+);
+
+quizRouter.get(
   '/questions',
   protectRoute,
   checkRole('Employee'),

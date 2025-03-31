@@ -8,6 +8,7 @@ import employeeRepository from '../repositories/employee.repository.js';
 import orgRepository from '../repositories/org.repository.js';
 import questionRepository from '../repositories/question.repository.js';
 import quizRepository from '../repositories/quiz.repository.js';
+import { getFridaysOfNextMonth } from '../middleware/utils.js';
 
 async function saveQuestion(newQuestionData, employeeId) {
   const orgId = newQuestionData.orgId;
@@ -17,7 +18,7 @@ async function saveQuestion(newQuestionData, employeeId) {
   return newQuestion && addedToList;
 }
 
-async function scheduleNextWeekQuestionsApproval() {
+async function scheduleQuizzesJob() {
   const triviaEnabledOrgs = await orgRepository.getTriviaEnabledOrgs();
   for (const element of triviaEnabledOrgs) {
     const plainElement = element.toObject();
@@ -26,21 +27,27 @@ async function scheduleNextWeekQuestionsApproval() {
 }
 
 async function scheduleQuizForOrgService(element) {
-  const genre = element.settings.selectedGenre[element.settings.currentGenre];
-  const newWeeklyQuiz = await quizRepository.scheduleNewWeeklyQuiz(
-    element._id,
-    genre,
+  let currentGenre = element.settings.currentGenre;
+  let allGenres = element.settings.selectedGenre;
+  console.log(currentGenre, allGenres);
+  let fridaysOfMonth = getFridaysOfNextMonth();
+
+  await Promise.all(
+    fridaysOfMonth.map((friday) => {
+      console.log(allGenres[currentGenre])
+      quizRepository.scheduleNewWeeklyQuiz(element._id, friday, allGenres[currentGenre])
+      currentGenre = (currentGenre + 1) % allGenres.length;
+      console.log(currentGenre)
+    }
+    )
   );
-  if (newWeeklyQuiz) {
-    const quizId = newWeeklyQuiz._id;
-    await orgRepository.setNextQuestionGenre(
-      element._id,
-      element.settings.currentGenre,
-    );
-    startQuestionGenerationWorkflow(genre, element, quizId);
-  } else {
-    console.error(`Error scheduling quiz for org ${element._id}:`);
-  }
+
+  await orgRepository.setNextQuestionGenre(
+    element._id,
+    element.settings.currentGenre,
+  );
+
+  // startQuestionGenerationWorkflow(genre, element, quizId);
 }
 
 async function startQuestionGenerationWorkflow(genre, element, quizId) {
@@ -258,7 +265,7 @@ async function startHRDWorkflow(orgId, quizId) {
 
 export default {
   saveQuestion,
-  scheduleNextWeekQuestionsApproval,
+  scheduleQuizzesJob,
   startQuestionGenerationWorkflow,
   formatQuestionsWeeklyFormat,
   formatQuestionsForOrgs,

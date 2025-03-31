@@ -92,7 +92,7 @@ const updateNewUserInOrg = async (orgId, isAdmin, newUser) => {
 
 const changeGenreSettings = async (genre, orgId) => {
   return Org.updateOne(
-    { _id: orgId },
+    { _id: new ObjectId(orgId) },
     { $set: { 'settings.selectedGenre': genre, 'settings.currentGenre': 0 } },
   );
 };

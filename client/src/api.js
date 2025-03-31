@@ -104,15 +104,15 @@ export const createNewQuestionAPI = async (formData) => {
   }
 };
 
-export const saveGenreSettingsAPI = async (newGenres) => {
+export const saveSettingsAPI = async (newGenreOrder, changedGenres) => {
   try {
-    const response = await fetch(`${BACKEND_URL}/org/settings/genre`, {
+    const response = await fetch(`${BACKEND_URL}/org/save/settings`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify(newGenres),
+      body: JSON.stringify({newGenreOrder, changedGenres}),
     });
 
     if (!response.ok) {
@@ -273,6 +273,27 @@ export const getLeaderboardAPI = async (month, year) => {
     return { success: false, error: error.message };
   }
 };
+
+export const getMonthQuizzesAPI = async (month, year) => {
+  try {
+    const response = await fetch(`${BACKEND_URL}/quiz/scheduled`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to create question');
+    }
+
+    return await response.json();
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+}
 
 export const getWeeklyQuizStatusAPI = async () => {
   try {

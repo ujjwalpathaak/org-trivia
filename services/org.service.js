@@ -1,8 +1,15 @@
 import { getValue, setValue } from '../Redis.js';
 import orgRepository from '../repositories/org.repository.js';
+import quizRepository from '../repositories/quiz.repository.js';
 
-const changeGenreSettings = async (genre, orgId) => {
-  return await orgRepository.changeGenreSettings(genre, orgId);
+const saveSettingsService = async (orgId, newGenreOrder, changedGenres) => {
+  console.log(changedGenres)
+  Promise.all(
+    changedGenres.map(async (genre) => {
+      return await quizRepository.changeQuizGenre(genre.newGenre, genre.quizId);
+    }),
+  );
+  return await orgRepository.changeGenreSettings(newGenreOrder, orgId);
 };
 
 const getSettings = async (orgId) => {
@@ -38,7 +45,7 @@ const getAnalytics = async (orgId) => {
 };
 
 export default {
-  changeGenreSettings,
+  saveSettingsService,
   getSettings,
   getAllOrgNames,
   getOrgById,
