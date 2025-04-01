@@ -1,19 +1,17 @@
 import express from 'express';
 
-import employeeController from '../controllers/employee.controller.js';
+import { getEmployeeDetails, getSubmittedQuestionsController } from '../controllers/employee.controller.js';
 import { checkRole } from '../middleware/auth.middleware.js';
 
-const employeeRouter = express.Router();
+export const employeeRouter = express.Router();
 
 employeeRouter.get(
   '/',
   checkRole('Employee'),
-  employeeController.getEmployeeDetails,
+  getEmployeeDetails,
 );
 employeeRouter.get(
   '/submitted-questions',
   checkRole('Employee'),
-  employeeController.getSubmittedQuestionsController,
+  getSubmittedQuestionsController,
 );
-
-export default employeeRouter;

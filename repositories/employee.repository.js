@@ -3,13 +3,13 @@ import { ObjectId } from 'mongodb';
 import { getMonth } from '../middleware/utils.js';
 import Employee from '../models/employee.model.js';
 import Question from '../models/question.model.js';
-import badgeRepository from './badge.repository.js';
+import { findBadgeByStreak } from './badge.repository.js';
 
-const isWeeklyQuizGiven = async (employeeId) => {
+export const isWeeklyQuizGiven = async (employeeId) => {
   return Employee.findById(employeeId, 'quizGiven');
 };
 
-const awardStreakBadges = async () => {
+export const awardStreakBadges = async () => {
   const [
     quater_year_streak_employees,
     half_year_streak_employees,
@@ -21,9 +21,9 @@ const awardStreakBadges = async () => {
   ]);
 
   const streaks = await Promise.all([
-    badgeRepository.findBadgeByStreak('3 Months'),
-    badgeRepository.findBadgeByStreak('6 Months'),
-    badgeRepository.findBadgeByStreak('1 Year'),
+    findBadgeByStreak('3 Months'),
+    findBadgeByStreak('6 Months'),
+    findBadgeByStreak('1 Year'),
   ]);
 
   const badges = {
@@ -60,7 +60,7 @@ const awardStreakBadges = async () => {
   ]);
 };
 
-const updateEmployeeStreaksAndMarkAllEmployeesAsQuizNotGiven = async () => {
+export const updateEmployeeStreaksAndMarkAllEmployeesAsQuizNotGiven = async () => {
   await Employee.bulkWrite([
     {
       updateMany: {
@@ -78,14 +78,14 @@ const updateEmployeeStreaksAndMarkAllEmployeesAsQuizNotGiven = async () => {
   ]);
 };
 
-const addSubmittedQuestion = async (questionId, employeeId) => {
+export const addSubmittedQuestion = async (questionId, employeeId) => {
   return Employee.updateOne(
     { _id: new ObjectId(employeeId) },
     { $push: { submittedQuestions: new ObjectId(questionId) } },
   );
 };
 
-const updateWeeklyQuizScore = async (employeeId, points, session) => {
+export const updateWeeklyQuizScore = async (employeeId, points, session) => {
   const employee = await Employee.findById(employeeId, 'streak quizGiven');
   if (employee.quizGiven) return false;
 
@@ -98,7 +98,7 @@ const updateWeeklyQuizScore = async (employeeId, points, session) => {
   return { score: points };
 };
 
-const addBadgesToEmployees = async (employeeId, badgeId, month, year) => {
+export const addBadgesToEmployees = async (employeeId, badgeId, month, year) => {
   return Employee.updateOne(
     { _id: employeeId },
     {
@@ -109,37 +109,11 @@ const addBadgesToEmployees = async (employeeId, badgeId, month, year) => {
   );
 };
 
-// const addBadgesToEmployees = async (employeeId, badgeId, type, month, year) => {
-//   switch(type){
-//     case 'streak':
-//       return Employee.updateOne(
-//         { _id: employeeId },
-//         {
-//           $push: {
-//             badges: { badgeId, description: `${getMonth(month)} ${year}` },
-//           },
-//         },
-//       );
-//       break;
-//     case 'leaderboard':
-//       return Employee.updateOne(
-//         { _id: employeeId },
-//         {
-//           $push: {
-//             badges: { badgeId, description: `${getMonth(month)} ${year}` },
-//           },
-//         },
-//       );
-//     default:
-//       break;
-//   }
-// };
-
-const resetAllEmployeesScores = async () => {
+export const resetAllEmployeesScores = async () => {
   return Employee.updateMany({}, { $set: { score: 0, streak: 0 } });
 };
 
-const getSubmittedQuestions = async (employeeId, page, size) => {
+export const getSubmittedQuestions = async (employeeId, page, size) => {
   const questionsIds = await Employee.findById(
     employeeId,
     'submittedQuestions',
@@ -153,7 +127,7 @@ const getSubmittedQuestions = async (employeeId, page, size) => {
   return { data: questions, total: questionsIds.submittedQuestions.length };
 };
 
-const getEmployeeDetails = async (employeeId) => {
+export const getEmployeeDetails = async (employeeId) => {
   const employee = await Employee.findById(employeeId, '-password').lean();
   if (!employee) return null;
 
@@ -188,16 +162,4 @@ const getEmployeeDetails = async (employeeId) => {
     employee,
     badges: badges[0]?.badges || [],
   };
-};
-
-export default {
-  isWeeklyQuizGiven,
-  updateEmployeeStreaksAndMarkAllEmployeesAsQuizNotGiven,
-  addSubmittedQuestion,
-  updateWeeklyQuizScore,
-  addBadgesToEmployees,
-  resetAllEmployeesScores,
-  awardStreakBadges,
-  getSubmittedQuestions,
-  getEmployeeDetails,
 };

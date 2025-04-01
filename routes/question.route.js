@@ -1,25 +1,24 @@
 import express from 'express';
-const questionRouter = express.Router();
-import questionController from '../controllers/question.controller.js';
 import { checkRole, protectRoute } from '../middleware/auth.middleware.js';
+import { addQuestionController, getWeeklyQuizQuestionsController, scheduleQuizzesJobController } from '../controllers/question.controller.js';
+
+export const questionRouter = express.Router();
 
 questionRouter.post(
   '/',
   protectRoute,
   checkRole('Employee'),
-  questionController.addQuestionController,
+  addQuestionController,
 );
 
 questionRouter.get(
   '/weekly-quiz/:quizId',
   protectRoute,
   checkRole('Admin'),
-  questionController.getWeeklyQuizQuestionsController,
+  getWeeklyQuizQuestionsController,
 );
 
 questionRouter.get(
   '/test/scheduleQuizzesJob',
-  questionController.scheduleQuizzesJobController,
+  scheduleQuizzesJobController,
 );
-
-export default questionRouter;

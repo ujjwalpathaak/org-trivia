@@ -1,6 +1,9 @@
-import resultService from '../services/result.service.js';
+import {
+  submitWeeklyQuizAnswersService,
+  getEmployeePastResultsService,
+} from '../services/result.service.js';
 
-const submitWeeklyQuizAnswersController = async (req, res, next) => {
+export const submitWeeklyQuizAnswersController = async (req, res, next) => {
   try {
     const { answers, quizId } = req.body;
     const { employeeId, orgId } = req.data;
@@ -8,7 +11,7 @@ const submitWeeklyQuizAnswersController = async (req, res, next) => {
       return res.status(400).json({ message: 'Required fields not present' });
     }
 
-    const data = await resultService.submitWeeklyQuizAnswersService(
+    const data = await submitWeeklyQuizAnswersService(
       answers,
       employeeId,
       orgId,
@@ -18,41 +21,25 @@ const submitWeeklyQuizAnswersController = async (req, res, next) => {
     if (!data.success) {
       return res.status(400).json({
         message: data.message,
-        data: null,
       });
     }
 
-    res.status(200).json({
-      message: 'Submitted weekly quiz answers',
-      data,
-    });
-  } catch (err) {
-    next(err);
+    res.status(200).json(data);
+  } catch (error) {
+    next(error);
   }
 };
 
-const getEmployeePastResultsController = async (req, res, next) => {
+export const getEmployeePastResultsController = async (req, res, next) => {
   try {
-    const { employeeId } = req.data;
-    const { page = 0, size = 10 } = req.query;
-
+    const { employeeId } = req.params;
     if (!employeeId) {
-      return res.status(400).json({ message: 'Missing required fields' });
+      return res.status(400).json({ message: 'Missing employeeId' });
     }
 
-    const pastRecords = await resultService.getEmployeePastResultsService(
-      employeeId,
-      page,
-      size,
-    );
-
-    res.status(200).json(pastRecords);
-  } catch (err) {
-    next(err);
+    const results = await getEmployeePastResultsService(employeeId);
+    res.status(200).json(results);
+  } catch (error) {
+    next(error);
   }
-};
-
-export default {
-  submitWeeklyQuizAnswersController,
-  getEmployeePastResultsController,
 };

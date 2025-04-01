@@ -1,6 +1,6 @@
-import authService from '../services/auth.service.js';
+import { registerUser, loginUser } from '../services/auth.service.js';
 
-const register = async (req, res, next) => {
+export const registerController = async (req, res, next) => {
   try {
     const { isAdmin, email, password, name, org } = req.body;
 
@@ -11,20 +11,14 @@ const register = async (req, res, next) => {
       return res.status(400).json({ message: 'No such organisation exists' });
     }
 
-    const response = await authService.registerUser(
-      isAdmin,
-      email,
-      password,
-      name,
-      org,
-    );
-    res.status(response.status).json(response.data);
+    const response = await registerUser(isAdmin, email, password, name, org);
+    res.status(201).json(response);
   } catch (error) {
     next(error);
   }
 };
 
-const login = async (req, res, next) => {
+export const loginController = async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
@@ -32,11 +26,9 @@ const login = async (req, res, next) => {
       return res.status(400).json({ message: 'Missing required fields' });
     }
 
-    const response = await authService.loginUser(email, password);
-    res.status(response.status).json(response.data);
+    const response = await loginUser(email, password);
+    res.status(200).json(response);
   } catch (error) {
     next(error);
   }
 };
-
-export default { register, login };

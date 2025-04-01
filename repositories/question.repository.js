@@ -2,14 +2,14 @@ import { ObjectId } from 'mongodb';
 
 import Question from '../models/question.model.js';
 import WeeklyQuestion from '../models/weeklyQuestion.model.js';
-import orgRepository from './org.repository.js';
-import quizRepository from './quiz.repository.js';
+import { fetchExtraEmployeeQuestions } from './org.repository.js';
+import { updateQuizStatus } from './quiz.repository.js';
 
-const saveQuestion = async (newQuestion) => {
+export const saveQuestion = async (newQuestion) => {
   return await new Question(newQuestion).save();
 };
 
-const addQuestions = async (newQuestions) => {
+export const addQuestions = async (newQuestions) => {
   const existingQuestions = await Question.find(
     { question: { $in: newQuestions.map((q) => q.question) } },
     { question: 1, _id: 0 },
@@ -27,17 +27,17 @@ const addQuestions = async (newQuestions) => {
   return await Question.insertMany(filteredQuestions, { ordered: false });
 };
 
-const getApprovedWeeklyQuizQuestion = async (orgId) => {
+export const getApprovedWeeklyQuizQuestion = async (orgId) => {
   return await WeeklyQuestion.find({ orgId, isApproved: true })
     .select('-question.answer')
     .lean();
 };
 
-const dropWeeklyQuestionCollection = async () => {
+export const dropWeeklyQuestionCollection = async () => {
   return await WeeklyQuestion.deleteMany();
 };
 
-const updateWeeklyQuestionsStatusToApproved = async (
+export const updateWeeklyQuestionsStatusToApproved = async (
   ids,
   employeeQuestionsToAdd,
   idsOfQuestionsToDelete,
@@ -53,36 +53,24 @@ const updateWeeklyQuestionsStatusToApproved = async (
   );
 };
 
-const getCorrectWeeklyQuizAnswers = async (orgId) => {
+export const getCorrectWeeklyQuizAnswers = async (orgId) => {
   return await WeeklyQuestion.find({ orgId })
     .select('question._id question.answer')
     .lean();
 };
 
-const saveWeeklyQuizQuestions = async (quizId, newQuestions) => {
+export const saveWeeklyQuizQuestions = async (quizId, newQuestions) => {
   if (newQuestions.length > 0) {
-    await quizRepository.updateQuizStatus(quizId, 'scheduled');
+    await updateQuizStatus(quizId, 'scheduled');
     return await WeeklyQuestion.insertMany(newQuestions);
   }
   return [];
 };
 
-const getExtraEmployeeQuestions = async (orgId, quizId, genre) => {
-  return await orgRepository.fetchExtraEmployeeQuestions(orgId, quizId, genre);
+export const getExtraEmployeeQuestions = async (orgId, quizId, genre) => {
+  return await fetchExtraEmployeeQuestions(orgId, quizId, genre);
 };
 
-const getWeeklyQuestions = async (quizId) => {
+export const getWeeklyQuestions = async (quizId) => {
   return await WeeklyQuestion.find({ quizId: new ObjectId(quizId) });
-};
-
-export default {
-  saveQuestion,
-  addQuestions,
-  getApprovedWeeklyQuizQuestion,
-  dropWeeklyQuestionCollection,
-  updateWeeklyQuestionsStatusToApproved,
-  getCorrectWeeklyQuizAnswers,
-  saveWeeklyQuizQuestions,
-  getExtraEmployeeQuestions,
-  getWeeklyQuestions,
 };

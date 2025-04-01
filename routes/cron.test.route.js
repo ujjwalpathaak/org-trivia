@@ -1,17 +1,15 @@
 import express from 'express';
 
-import cronTestController from '../controllers/cron.test.controller.js';
+import { cleanUpWeeklyQuizController, makeWeeklyQuizLiveConroller } from '../controllers/cron.test.controller.js';
 
-const cronTestRouter = express.Router();
+export const cronTestRouter = express.Router();
 
 cronTestRouter.post(
   '/test/cleanWeeklyQuiz',
-  cronTestController.cleanUpWeeklyQuizController,
+  cleanUpWeeklyQuizController,
 );
 
 cronTestRouter.post(
   '/test/makeQuizLiveTest',
-  cronTestController.makeWeeklyQuizLiveConroller,
+  makeWeeklyQuizLiveConroller,
 );
-
-export default cronTestRouter;

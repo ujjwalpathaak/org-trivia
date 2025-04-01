@@ -1,12 +1,18 @@
-import OrgService from '../services/org.service.js';
+import {
+  saveSettingsService,
+  getSettingsService,
+  toggleTriviaService,
+  getAllOrgNamesService,
+  getAnalyticsService,
+} from '../services/org.service.js';
 
-const saveNewSettingsController = async (req, res, next) => {
+export const saveNewSettingsController = async (req, res, next) => {
   try {
     const { orgId } = req.data;
     const { newGenreOrder, changedGenres, companyCurrentAffairsTimeline } =
       req.body;
 
-    await OrgService.saveSettingsService(
+    await saveSettingsService(
       orgId,
       newGenreOrder,
       changedGenres,
@@ -18,61 +24,42 @@ const saveNewSettingsController = async (req, res, next) => {
   }
 };
 
-const getSettings = async (req, res, next) => {
+export const getSettingsController = async (req, res, next) => {
   try {
     const { orgId } = req.data;
-    if (!orgId) {
-      return res.status(400).json({ message: 'Missing required fields' });
-    }
-
-    const orgSettings = await OrgService.getSettings(orgId);
-    res.status(200).json(orgSettings);
+    const settings = await getSettingsService(orgId);
+    res.json(settings);
   } catch (error) {
     next(error);
   }
 };
 
-const toggleTrivia = async (req, res, next) => {
+export const toggleTriviaController = async (req, res, next) => {
   try {
     const { orgId } = req.data;
-    if (!orgId) {
-      return res.status(400).json({ message: 'Missing required fields' });
-    }
-
-    const response = await OrgService.toggleTrivia(orgId);
-    res.status(200).json(response);
+    const { isEnabled } = req.body;
+    await toggleTriviaService(orgId, isEnabled);
+    res.json({ message: 'Trivia settings updated successfully' });
   } catch (error) {
     next(error);
   }
 };
 
-const getAllOrgNames = async (req, res, next) => {
+export const getAllOrgNamesController = async (req, res, next) => {
   try {
-    const response = await OrgService.getAllOrgNames();
-    res.status(200).json(response);
+    const orgs = await getAllOrgNamesService();
+    res.json(orgs);
   } catch (error) {
     next(error);
   }
 };
 
-const getAnalytics = async (req, res, next) => {
+export const getAnalyticsController = async (req, res, next) => {
   try {
     const { orgId } = req.data;
-    if (!orgId) {
-      return res.status(400).json({ message: 'Missing required fields' });
-    }
-
-    const analytics = await OrgService.getAnalytics(orgId);
-    res.status(200).json(analytics);
+    const analytics = await getAnalyticsService(orgId);
+    res.json(analytics);
   } catch (error) {
     next(error);
   }
-};
-
-export default {
-  saveNewSettingsController,
-  getSettings,
-  toggleTrivia,
-  getAllOrgNames,
-  getAnalytics,
 };

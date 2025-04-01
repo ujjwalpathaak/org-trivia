@@ -2,7 +2,7 @@ import { ObjectId } from 'mongodb';
 
 import Result from '../models/result.model.js';
 
-const submitWeeklyQuizAnswers = async (
+export const submitWeeklyQuizAnswers = async (
   employeeId,
   orgId,
   quizId,
@@ -10,6 +10,7 @@ const submitWeeklyQuizAnswers = async (
   points,
   genre,
   answers,
+  session,
 ) => {
   return await Result.create({
     employeeId,
@@ -19,10 +20,10 @@ const submitWeeklyQuizAnswers = async (
     points,
     genre,
     answers,
-  });
+  }, { session });
 };
 
-const rollbackWeeklyQuizScores = async (quizId) => {
+export const rollbackWeeklyQuizScores = async (quizId) => {
   await Result.aggregate([
     {
       $match: {
@@ -69,7 +70,7 @@ const rollbackWeeklyQuizScores = async (quizId) => {
   return await Result.deleteMany({ quizId: new ObjectId(quizId) });
 };
 
-const getParticipationByGenre = async (orgId) => {
+export const getParticipationByGenre = async (orgId) => {
   return await Result.aggregate([
     { $match: { orgId: new ObjectId(orgId) } },
     {
@@ -81,7 +82,7 @@ const getParticipationByGenre = async (orgId) => {
   ]);
 };
 
-const getEmployeePastResults = async (employeeId, page = 0, size = 10) => {
+export const getEmployeePastResults = async (employeeId, page = 0, size = 10) => {
   const skip = parseInt(page) * parseInt(size);
   const limit = parseInt(size);
 
@@ -101,11 +102,4 @@ const getEmployeePastResults = async (employeeId, page = 0, size = 10) => {
     results[0].totalCount.length > 0 ? results[0].totalCount[0].total : 0;
 
   return { data, total, page, size };
-};
-
-export default {
-  submitWeeklyQuizAnswers,
-  rollbackWeeklyQuizScores,
-  getParticipationByGenre,
-  getEmployeePastResults,
 };

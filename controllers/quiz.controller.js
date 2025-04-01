@@ -1,13 +1,24 @@
-import questionService from '../services/question.service.js';
-import quizService from '../services/quiz.service.js';
+import {
+  getWeeklyQuizQuestions,
+  approveWeeklyQuizQuestions,
+  addLambdaCallbackQuestions,
+} from '../services/question.service.js';
+import {
+  getWeeklyQuizStatusService,
+  getWeeklyQuizService,
+  makeWeeklyQuizLiveService,
+  cleanUpWeeklyQuizService,
+  cancelLiveQuizService,
+  getScheduledQuizzesService,
+} from '../services/quiz.service.js';
 
-const getWeeklyQuizStatusController = async (req, res, next) => {
+export const getWeeklyQuizStatusController = async (req, res, next) => {
   try {
     const { orgId, employeeId } = req.data;
     if (!orgId || !employeeId)
       return res.status(404).json({ message: 'Missing organizationId' });
 
-    const weeklyQuizStatus = await quizService.getWeeklyQuizStatusService(
+    const weeklyQuizStatus = await getWeeklyQuizStatusService(
       orgId,
       employeeId,
     );
@@ -18,15 +29,62 @@ const getWeeklyQuizStatusController = async (req, res, next) => {
   }
 };
 
-const getWeeklyQuizQuestions = async (req, res, next) => {
+export const getWeeklyQuizController = async (req, res, next) => {
+  try {
+    const { quizId } = req.params;
+    const quiz = await getWeeklyQuizService(quizId);
+    res.status(200).json(quiz);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const makeWeeklyQuizLiveController = async (req, res, next) => {
+  try {
+    const result = await makeWeeklyQuizLiveService();
+    res.status(200).json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const cleanUpWeeklyQuizController = async (req, res, next) => {
+  try {
+    const result = await cleanUpWeeklyQuizService();
+    res.status(200).json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const cancelLiveQuizController = async (req, res, next) => {
+  try {
+    const { quizId } = req.params;
+    const result = await cancelLiveQuizService(quizId);
+    res.status(200).json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getScheduledQuizzesController = async (req, res, next) => {
+  try {
+    const { orgId } = req.data;
+    const quizzes = await getScheduledQuizzesService(orgId);
+    res.status(200).json(quizzes);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getWeeklyQuizQuestionsController = async (req, res, next) => {
   try {
     const { orgId } = req.data;
     if (!orgId) {
       return res.status(400).json({ message: 'Missing required fields' });
     }
 
-    const weeklyQuizQuestions =
-      await questionService.getWeeklyQuizQuestions(orgId);
+    const weeklyQuizQuestions = await getWeeklyQuizQuestions(orgId);
 
     res.status(200).json(weeklyQuizQuestions);
   } catch (error) {
@@ -34,7 +92,7 @@ const getWeeklyQuizQuestions = async (req, res, next) => {
   }
 };
 
-const approveWeeklyQuizQuestions = async (req, res, next) => {
+export const approveWeeklyQuizQuestionsController = async (req, res, next) => {
   try {
     const { orgId } = req.data;
     const { questions, questionsToDelete } = req.body;
@@ -42,11 +100,7 @@ const approveWeeklyQuizQuestions = async (req, res, next) => {
       return res.status(400).json({ message: 'Missing required fields' });
     }
 
-    await questionService.approveWeeklyQuizQuestions(
-      questions,
-      questionsToDelete,
-      orgId,
-    );
+    await approveWeeklyQuizQuestions(questions, questionsToDelete, orgId);
 
     res.status(200).json({ message: 'Questions marked as approved' });
   } catch (error) {
@@ -54,38 +108,7 @@ const approveWeeklyQuizQuestions = async (req, res, next) => {
   }
 };
 
-const getScheduledQuizzes = async (req, res, next) => {
-  try {
-    const { orgId } = req.data;
-    if (!orgId) {
-      return res.status(400).json({ message: 'Missing required fields' });
-    }
-
-    const scheduledQuizzes =
-      await quizService.getScheduledQuizzesService(orgId);
-
-    res.status(200).json(scheduledQuizzes);
-  } catch (error) {
-    next(error);
-  }
-};
-
-const cancelLiveQuizController = async (req, res, next) => {
-  try {
-    const { quizId } = req.params;
-    if (!orgId) {
-      return res.status(400).json({ message: 'Missing required fields' });
-    }
-
-    await quizService.cancelLiveQuizService(quizId);
-
-    res.status(200).json({ message: 'Live quiz cancelled' });
-  } catch (error) {
-    next(error);
-  }
-};
-
-const handleLambdaCallback = async (req, res, next) => {
+export const handleLambdaCallbackController = async (req, res, next) => {
   try {
     const { category, quizId, file, questions, orgId } = req.body;
     if (!questions || !orgId || !category) {
@@ -93,25 +116,10 @@ const handleLambdaCallback = async (req, res, next) => {
       return;
     }
 
-    await questionService.addLambdaCallbackQuestions(
-      questions,
-      category,
-      orgId,
-      quizId,
-      file,
-    );
+    await addLambdaCallbackQuestions(questions, category, orgId, quizId, file);
 
     res.status(200).json({ message: 'Scheduled new questions' });
   } catch (error) {
     next(error);
   }
-};
-
-export default {
-  getWeeklyQuizStatusController,
-  getWeeklyQuizQuestions,
-  getScheduledQuizzes,
-  cancelLiveQuizController,
-  approveWeeklyQuizQuestions,
-  handleLambdaCallback,
 };

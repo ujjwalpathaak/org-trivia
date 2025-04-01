@@ -1,16 +1,14 @@
 import express from 'express';
 
-import ResultController from '../controllers/result.controller.js';
+import { submitWeeklyQuizAnswersController, getEmployeePastResultsController } from '../controllers/result.controller.js';
 
-const resultRouter = express.Router();
+export const resultRouter = express.Router();
 
 resultRouter.post(
   '/submitWeeklyQuizAnswers',
-  ResultController.submitWeeklyQuizAnswersController,
+  submitWeeklyQuizAnswersController,
 );
 resultRouter.get(
   '/employee',
-  ResultController.getEmployeePastResultsController,
+  getEmployeePastResultsController,
 );
-
-export default resultRouter;

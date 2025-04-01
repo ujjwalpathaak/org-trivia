@@ -1,38 +1,36 @@
 import express from 'express';
 
-import OrgController from '../controllers/org.controller.js';
+import { getAllOrgNames, toggleTrivia, getSettings, saveNewSettingsController, getAnalytics } from '../controllers/org.controller.js';
 import { checkRole, protectRoute } from '../middleware/auth.middleware.js';
 
-const orgRouter = express.Router();
+export const orgRouter = express.Router();
 
-orgRouter.get('/', OrgController.getAllOrgNames);
+orgRouter.get('/', getAllOrgNames);
 
 orgRouter.patch(
   '/settings/toggleTrivia',
   protectRoute,
   checkRole('Admin'),
-  OrgController.toggleTrivia,
+  toggleTrivia,
 );
 
 orgRouter.get(
   '/settings',
   protectRoute,
   checkRole('Admin'),
-  OrgController.getSettings,
+  getSettings,
 );
 
 orgRouter.post(
   '/save/settings',
   protectRoute,
   checkRole('Admin'),
-  OrgController.saveNewSettingsController,
+  saveNewSettingsController,
 );
 
 orgRouter.get(
   '/analytics',
   protectRoute,
   checkRole('Admin'),
-  OrgController.getAnalytics,
+  getAnalytics,
 );
-
-export default orgRouter;

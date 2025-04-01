@@ -1,18 +1,16 @@
 import express from 'express';
 
-import leaderboardController from '../controllers/leaderboard.controller.js';
+import { getLeaderboardByOrgController, resetLeaderboardController } from '../controllers/leaderboard.controller.js';
 import { protectRoute } from '../middleware/auth.middleware.js';
 
-const leaderboardRouter = express.Router();
+export const leaderboardRouter = express.Router();
 
 leaderboardRouter.get(
   '/',
   protectRoute,
-  leaderboardController.getLeaderboardByOrgController,
+  getLeaderboardByOrgController,
 );
 leaderboardRouter.post(
   '/test/reset',
-  leaderboardController.resetLeaderboardController,
+  resetLeaderboardController,
 );
-
-export default leaderboardRouter;

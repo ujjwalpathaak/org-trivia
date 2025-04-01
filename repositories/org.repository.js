@@ -3,7 +3,7 @@ import { ObjectId } from 'mongodb';
 import { HRP_QUESTIONS_PER_QUIZ } from '../constants.js';
 import Org from '../models/org.model.js';
 import Question from '../models/question.model.js';
-import resultRepository from './result.repository.js';
+import { findResultByQuizId } from './result.repository.js';
 
 const categoryMap = {
   PnA: 'questionsPnA',
@@ -11,7 +11,7 @@ const categoryMap = {
   HRD: 'questionsHRD',
 };
 
-const updateQuestionsStatusInOrgToUsed = async (
+export const updateQuestionsStatusInOrgToUsed = async (
   orgId,
   category,
   questionIds,
@@ -37,7 +37,7 @@ const updateQuestionsStatusInOrgToUsed = async (
   );
 };
 
-const addQuestionToOrg = async (question, orgId) => {
+export const addQuestionToOrg = async (question, orgId) => {
   const questionField = categoryMap[question.category];
   if (!questionField) throw new Error('Invalid question category');
 
@@ -59,7 +59,7 @@ const addQuestionToOrg = async (question, orgId) => {
   return true;
 };
 
-const getTriviaEnabledOrgs = async () =>
+export const getTriviaEnabledOrgs = async () =>
   Org.find(
     { 'settings.isTriviaEnabled': true },
     {
@@ -69,7 +69,7 @@ const getTriviaEnabledOrgs = async () =>
     },
   );
 
-const setNextQuestionGenre = async (orgId, currentGenreIndex) => {
+export const setNextQuestionGenre = async (orgId, currentGenreIndex) => {
   const org = await Org.findById(orgId).select('settings.selectedGenre');
   if (!org) throw new Error('Organization not found');
 
@@ -84,7 +84,7 @@ const setNextQuestionGenre = async (orgId, currentGenreIndex) => {
   return true;
 };
 
-const changeCompanyCurrentAffairsTimeline = async (
+export const changeCompanyCurrentAffairsTimeline = async (
   companyCurrentAffairsTimeline,
   orgId,
 ) => {
@@ -98,21 +98,21 @@ const changeCompanyCurrentAffairsTimeline = async (
   );
 };
 
-const updateNewUserInOrg = async (orgId, isAdmin, newUser) => {
+export const updateNewUserInOrg = async (orgId, isAdmin, newUser) => {
   return Org.updateOne(
     { _id: new ObjectId(orgId) },
     { $push: { [isAdmin ? 'admins' : 'employees']: newUser._id } },
   );
 };
 
-const changeGenreSettings = async (genre, orgId) => {
+export const changeGenreSettings = async (genre, orgId) => {
   return Org.updateOne(
     { _id: new ObjectId(orgId) },
     { $set: { 'settings.selectedGenre': genre, 'settings.currentGenre': 0 } },
   );
 };
 
-const fetchHRDQuestions = async (orgId) => {
+export const fetchHRDQuestions = async (orgId) => {
   const files_with_unused_questions = await Org.aggregate([
     { $match: { _id: new ObjectId(orgId) } },
     { $unwind: '$questionsHRD' },
@@ -130,7 +130,7 @@ const fetchHRDQuestions = async (orgId) => {
   // how many questions per file to take for HRD_QUESTIONS_PER_QUIZ number of questions
   const questions_per_file = Math.max(
     1,
-    Math.floor(HRP_QUESTIONS_PER_QUIZ / files.length),
+    Math.floor(HRP_QUESTIONS_PER_QUIZ / files_with_unused_questions.length),
   );
 
   // return questions
@@ -164,14 +164,14 @@ const fetchHRDQuestions = async (orgId) => {
   ]);
 };
 
-const HRPQuestionsCount = async (orgId) => {
+export const HRPQuestionsCount = async (orgId) => {
   return Org.countDocuments({
     _id: new ObjectId(orgId),
     'questionsHRD.isUsed': false,
   });
 };
 
-const getSettings = async (orgId) => {
+export const getSettings = async (orgId) => {
   const [count_hrd_questions] = await Promise.all([HRPQuestionsCount(orgId)]);
 
   const settings = await Org.findById(orgId).select('settings');
@@ -185,94 +185,82 @@ const getSettings = async (orgId) => {
   };
 };
 
-const getAllOrgNames = async () => Org.find({}, 'id name');
-const getOrgById = async (orgId) => Org.findById(orgId);
-const isTriviaEnabled = async (orgId) =>
+export const getAllOrgNames = async () => Org.find({}, 'id name');
+export const getOrgById = async (orgId) => Org.findById(orgId);
+export const isTriviaEnabled = async (orgId) =>
   Org.findById(orgId).select('settings.isTriviaEnabled');
-const updateTriviaSettings = async (orgId, newStatus) => {
-  const update = await Org.updateOne(
+export const updateTriviaSettings = async (orgId, newStatus) => {
+  await Org.updateOne(
     { _id: new ObjectId(orgId) },
     { $set: { 'settings.isTriviaEnabled': newStatus } },
   );
 };
 
-const makeGenreUnavailable = async (orgId, genre) => {
+export const makeGenreUnavailable = async (orgId, genre) => {
+  return Org.updateOne(
+    { _id: new ObjectId(orgId) },
+    { $pull: { 'settings.selectedGenre': genre } },
+  );
+};
+
+export const makeGenreAvailable = async (orgId, genre) => {
+  return Org.updateOne(
+    { _id: new ObjectId(orgId) },
+    { $addToSet: { 'settings.selectedGenre': genre } },
+  );
+};
+
+export const getAnalytics = async (orgId) => {
+  return Org.findById(orgId).select('analytics');
+};
+
+export const pushQuestionsInOrg = (questions, genre, orgId) => {
+  const questionField = categoryMap[genre];
+  if (!questionField) throw new Error('Invalid genre');
+
   return Org.updateOne(
     { _id: new ObjectId(orgId) },
     {
-      $addToSet: { 'settings.unavailableGenre': genre },
-      $pull: { 'settings.selectedGenre': genre },
+      $push: {
+        [questionField]: {
+          $each: questions.map((question) => ({
+            questionId: question._id,
+            isUsed: false,
+            category: genre,
+            source: question.source,
+          })),
+        },
+      },
     },
   );
 };
 
-const makeGenreAvailable = async (orgId, genre) => {
-  return Org.updateOne(
-    { _id: new ObjectId(orgId) },
-    {
-      $pull: { 'settings.unavailableGenre': genre },
-      $addToSet: { 'settings.selectedGenre': genre },
-    },
-  );
-};
+export const fetchExtraEmployeeQuestions = async (orgId, quizId, genre) => {
+  const questionField = categoryMap[genre];
+  if (!questionField) throw new Error('Invalid genre');
 
-const getAnalytics = async (orgId) => {
-  const [participationByGenre, last3Leaderboards] = await Promise.all([
-    resultRepository.getParticipationByGenre(orgId),
-  ]);
-  return { participationByGenre, last3Leaderboards };
-};
-
-const pushQuestionsInOrg = (questions, genre, orgId) => {
-  return Org.updateMany(
-    { _id: new ObjectId(orgId) },
-    { $push: { [`questions${genre}`]: { $each: questions } } },
-  );
-};
-
-const fetchExtraEmployeeQuestions = async (orgId, quizId, genre) => {
-  const genreField = categoryMap[genre];
+  const result = await findResultByQuizId(quizId);
+  if (!result) return [];
 
   return Org.aggregate([
     { $match: { _id: new ObjectId(orgId) } },
-    { $unwind: `$${genreField}` },
+    { $unwind: `$${questionField}` },
     {
       $match: {
-        [`${genreField}.isUsed`]: false,
-        [`${genreField}.source`]: 'Employee',
+        [`${questionField}.isUsed`]: false,
+        [`${questionField}.source`]: 'AI',
       },
     },
     {
       $lookup: {
         from: 'questions',
-        localField: `${genreField}.questionId`,
+        localField: `${questionField}.questionId`,
         foreignField: '_id',
         as: 'questionDetails',
       },
     },
     { $unwind: '$questionDetails' },
     { $replaceRoot: { newRoot: '$questionDetails' } },
+    { $limit: 5 },
   ]);
-};
-
-export default {
-  updateQuestionsStatusInOrgToUsed,
-  addQuestionToOrg,
-  getTriviaEnabledOrgs,
-  setNextQuestionGenre,
-  updateNewUserInOrg,
-  fetchHRDQuestions,
-  changeGenreSettings,
-  getSettings,
-  fetchExtraEmployeeQuestions,
-  getAllOrgNames,
-  makeGenreUnavailable,
-  makeGenreAvailable,
-  pushQuestionsInOrg,
-  getOrgById,
-  HRPQuestionsCount,
-  isTriviaEnabled,
-  updateTriviaSettings,
-  changeCompanyCurrentAffairsTimeline,
-  getAnalytics,
 };

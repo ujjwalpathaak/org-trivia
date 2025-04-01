@@ -2,16 +2,16 @@ import express from 'express';
 
 import { checkRole, protectRoute } from '../middleware/auth.middleware.js';
 import { sanitizeRequest } from '../middleware/sanitizeRequest.js';
-import authRouter from './auth.route.js';
-import cronTestRouter from './cron.test.route.js';
-import employeeRouter from './employee.route.js';
-import leaderboardRouter from './leaderboard.route.js';
-import orgRouter from './org.route.js';
-import questionRouter from './question.route.js';
-import quizRouter from './quiz.route.js';
-import resultRouter from './result.route.js';
+import { authRouter } from './auth.route.js';
+import { cronTestRouter } from './cron.test.route.js';
+import { employeeRouter } from './employee.route.js';
+import { leaderboardRouter } from './leaderboard.route.js';
+import { orgRouter } from './org.route.js';
+import { questionRouter } from './question.route.js';
+import { quizRouter } from './quiz.route.js';
+import { resultRouter } from './result.route.js';
 
-const router = express.Router();
+export const router = express.Router();
 
 router.get('/', (req, res) => res.send('API Working'));
 
@@ -30,5 +30,3 @@ router.use('*', (req, res, next) => {
   error.status = 404;
   next(error);
 });
-
-export default router;

@@ -1,17 +1,17 @@
 import { ObjectId } from 'mongodb';
 
 import Quiz from '../models/quiz.model.js';
-import resultRepository from './result.repository.js';
+import { findResultByQuizId } from './result.repository.js';
 
-const findLiveQuizByOrgId = (orgId) => {
+export const findLiveQuizByOrgId = (orgId) => {
   return Quiz.findOne({ orgId: new ObjectId(orgId), status: 'live' });
 };
 
-const findQuiz = (quizId) => {
+export const findQuiz = (quizId) => {
   return Quiz.findOne({ _id: new ObjectId(quizId) });
 };
 
-const getQuizStatus = (orgId) => {
+export const getQuizStatus = (orgId) => {
   return Quiz.findOne(
     {
       orgId: new ObjectId(orgId),
@@ -21,15 +21,15 @@ const getQuizStatus = (orgId) => {
   );
 };
 
-const cancelLiveQuiz = async (quizId) => {
-  await resultRepository.rollbackWeeklyQuizScores(quizId);
+export const cancelLiveQuiz = async (quizId) => {
+  await findResultByQuizId(quizId);
   return Quiz.updateOne(
     { _id: new ObjectId(quizId), status: 'live' },
     { $set: { status: 'cancelled' } },
   );
 };
 
-const getScheduledQuizzes = (orgId) => {
+export const getScheduledQuizzes = (orgId) => {
   return Quiz.find({
     orgId: new ObjectId(orgId),
     status: { $in: ['upcoming', 'scheduled'] },
@@ -38,7 +38,7 @@ const getScheduledQuizzes = (orgId) => {
   });
 };
 
-const scheduleNewWeeklyQuiz = (orgId, date, genre) => {
+export const scheduleNewWeeklyQuiz = (orgId, date, genre) => {
   return Quiz.create({
     orgId,
     status: 'upcoming',
@@ -47,7 +47,7 @@ const scheduleNewWeeklyQuiz = (orgId, date, genre) => {
   });
 };
 
-const makeWeeklyQuizLive = () => {
+export const makeWeeklyQuizLive = () => {
   return Quiz.bulkWrite([
     {
       updateMany: {
@@ -64,25 +64,25 @@ const makeWeeklyQuizLive = () => {
   ]);
 };
 
-const markAllQuizAsExpired = () => {
+export const markAllQuizAsExpired = () => {
   return Quiz.updateMany({}, { $set: { status: 'expired' } });
 };
 
-const updateQuizStatusToApproved = (quizId) => {
+export const updateQuizStatusToApproved = (quizId) => {
   return Quiz.updateMany(
     { _id: new ObjectId(quizId) },
     { $set: { status: 'approved' } },
   );
 };
 
-const getUpcomingWeeklyQuiz = (orgId) => {
+export const getUpcomingWeeklyQuiz = (orgId) => {
   return Quiz.findOne({
     orgId: new ObjectId(orgId),
     status: 'unapproved',
   });
 };
 
-const updateQuizStatus = (quizId, status) => {
+export const updateQuizStatus = (quizId, status) => {
   return Quiz.updateOne(
     { _id: new ObjectId(quizId) },
     {
@@ -93,32 +93,14 @@ const updateQuizStatus = (quizId, status) => {
   );
 };
 
-const getLiveQuizByEmployeeId = (employeeId) => {
-  return Quiz.findOne({
-    employeeId: new ObjectId(employeeId),
-    status: 'live',
-  });
+export const getLiveQuizByEmployeeId = async (employeeId) => {
+  const result = await findResultByQuizId(employeeId);
+  return result?.quizId;
 };
 
-const changeQuizGenre = async (newGenre, quizId) => {
+export const changeQuizGenre = async (newGenre, quizId) => {
   return Quiz.updateOne(
     { _id: new ObjectId(quizId), status: 'upcoming' },
     { $set: { genre: newGenre } },
   );
-};
-
-export default {
-  findLiveQuizByOrgId,
-  scheduleNewWeeklyQuiz,
-  findQuiz,
-  changeQuizGenre,
-  getQuizStatus,
-  makeWeeklyQuizLive,
-  cancelLiveQuiz,
-  markAllQuizAsExpired,
-  updateQuizStatusToApproved,
-  getScheduledQuizzes,
-  getUpcomingWeeklyQuiz,
-  updateQuizStatus,
-  getLiveQuizByEmployeeId,
 };

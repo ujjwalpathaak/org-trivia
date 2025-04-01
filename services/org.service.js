@@ -1,65 +1,81 @@
 import { getValue, setValue } from '../Redis.js';
-import orgRepository from '../repositories/org.repository.js';
-import quizRepository from '../repositories/quiz.repository.js';
+import {
+  changeCompanyCurrentAffairsTimeline,
+  getOrgSettings,
+  getAllOrgNames,
+  getOrgById,
+  toggleTrivia,
+  getOrgAnalytics,
+} from '../repositories/org.repository.js';
+import { changeQuizGenre } from '../repositories/quiz.repository.js';
 
-const saveSettingsService = async (
+export const saveSettingsService = async (
   orgId,
   newGenreOrder,
   changedGenres,
   companyCurrentAffairsTimeline,
 ) => {
-  console.log(  orgId,
+  console.log(
+    orgId,
     newGenreOrder,
     changedGenres,
-    companyCurrentAffairsTimeline);
-Promise.all(
-  changedGenres.map(async (genre) => {
-    return await quizRepository.changeQuizGenre(genre.newGenre, genre.quizId);
-  }),
-);
-  orgRepository.changeCompanyCurrentAffairsTimeline(
     companyCurrentAffairsTimeline,
-    orgId,
   );
-  return await orgRepository.changeGenreSettings(newGenreOrder, orgId);
+  await Promise.all(
+    changedGenres.map(async (genre) => {
+      return await changeQuizGenre(genre.newGenre, genre.quizId);
+    }),
+  );
+  await changeCompanyCurrentAffairsTimeline(
+    orgId,
+    companyCurrentAffairsTimeline,
+  );
+  await setValue(`org:${orgId}`, null);
+  return { message: 'Settings saved successfully' };
 };
 
-const getSettings = async (orgId) => {
-  return await orgRepository.getSettings(orgId);
+export const getSettingsService = async (orgId) => {
+  const cache = await getValue(`org:${orgId}`);
+  if (cache) {
+    return cache;
+  }
+  const settings = await getOrgSettings(orgId);
+  await setValue(`org:${orgId}`, settings);
+  return settings;
 };
 
-const getAllOrgNames = async () => {
-  return await orgRepository.getAllOrgNames();
+export const getAllOrgNamesService = async () => {
+  const cache = await getValue('allOrgNames');
+  if (cache) {
+    return cache;
+  }
+  const orgs = await getAllOrgNames();
+  await setValue('allOrgNames', orgs);
+  return orgs;
 };
 
-const getOrgById = async (orgId) => {
-  return await orgRepository.getOrgById(orgId);
+export const getOrgByIdService = async (orgId) => {
+  const cache = await getValue(`org:${orgId}`);
+  if (cache) {
+    return cache;
+  }
+  const org = await getOrgById(orgId);
+  await setValue(`org:${orgId}`, org);
+  return org;
 };
 
-const toggleTrivia = async (orgId) => {
-  const org = await orgRepository.isTriviaEnabled(orgId);
-  if (!org) return false;
-
-  const newStatus = !org.settings.isTriviaEnabled;
-  return await orgRepository.updateTriviaSettings(orgId, newStatus);
+export const toggleTriviaService = async (orgId, isEnabled) => {
+  await toggleTrivia(orgId, isEnabled);
+  await setValue(`org:${orgId}`, null);
+  return { message: 'Trivia settings updated successfully' };
 };
 
-const getAnalytics = async (orgId) => {
-  const cache = await getValue(`analytics:${orgId}`);
-  if (cache) return cache;
-
-  const analytics = await orgRepository.getAnalytics(orgId);
-
-  await setValue(`analytics:${orgId}`, analytics, 600);
-
+export const getAnalyticsService = async (orgId) => {
+  const cache = await getValue(`org:${orgId}:analytics`);
+  if (cache) {
+    return cache;
+  }
+  const analytics = await getOrgAnalytics(orgId);
+  await setValue(`org:${orgId}:analytics`, analytics);
   return analytics;
-};
-
-export default {
-  saveSettingsService,
-  getSettings,
-  getAllOrgNames,
-  getOrgById,
-  toggleTrivia,
-  getAnalytics,
 };

@@ -1,45 +1,43 @@
 import express from 'express';
 
-import QuizController from '../controllers/quiz.controller.js';
+import { getWeeklyQuizStatusController, handleLambdaCallback, cancelLiveQuizController, approveWeeklyQuizQuestions, getScheduledQuizzes, getWeeklyQuizQuestions } from '../controllers/quiz.controller.js';
 import { checkRole, protectRoute } from '../middleware/auth.middleware.js';
 
-const quizRouter = express.Router();
+export const quizRouter = express.Router();
 
 quizRouter.get(
   '/status',
   protectRoute,
   checkRole('Employee'),
-  QuizController.getWeeklyQuizStatusController,
+  getWeeklyQuizStatusController,
 );
 
-quizRouter.post('/weekly/lambda/callback', QuizController.handleLambdaCallback);
+quizRouter.post('/weekly/lambda/callback', handleLambdaCallback);
 
 quizRouter.put(
   '/live/cancel/:quizId',
   protectRoute,
   checkRole('Admin'),
-  QuizController.cancelLiveQuizController,
+  cancelLiveQuizController,
 );
 
 quizRouter.post(
   '/approve',
   protectRoute,
   checkRole('Admin'),
-  QuizController.approveWeeklyQuizQuestions,
+  approveWeeklyQuizQuestions,
 );
 
 quizRouter.get(
   '/scheduled',
   protectRoute,
   checkRole('Admin'),
-  QuizController.getScheduledQuizzes,
+  getScheduledQuizzes,
 );
 
 quizRouter.get(
   '/questions',
   protectRoute,
   checkRole('Employee'),
-  QuizController.getWeeklyQuizQuestions,
+  getWeeklyQuizQuestions,
 );
-
-export default quizRouter;

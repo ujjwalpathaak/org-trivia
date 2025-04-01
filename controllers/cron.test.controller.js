@@ -1,25 +1,22 @@
-import quizService from '../services/quiz.service.js';
-const makeWeeklyQuizLiveConroller = async (req, res, next) => {
-  try {
-    await quizService.makeWeeklyQuizLiveService();
+import {
+  makeWeeklyQuizLiveService,
+  cleanUpWeeklyQuizService,
+} from '../services/quiz.service.js';
 
+export const makeWeeklyQuizLiveController = async (req, res, next) => {
+  try {
+    await makeWeeklyQuizLiveService();
     res.status(200).json({});
   } catch (error) {
     next(error);
   }
 };
 
-const cleanUpWeeklyQuizController = async (req, res, next) => {
+export const cleanUpWeeklyQuizController = async (req, res, next) => {
   try {
-    await quizService.cleanUpWeeklyQuizService();
-
+    await cleanUpWeeklyQuizService();
     res.status(200).json({ message: 'Weekly quiz cleaned successfully' });
   } catch (error) {
     next(error);
   }
-};
-
-export default {
-  makeWeeklyQuizLiveConroller,
-  cleanUpWeeklyQuizController,
 };

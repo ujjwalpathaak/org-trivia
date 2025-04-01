@@ -6,28 +6,44 @@ import {
 } from '../api/lambda.api.js';
 import { MIN_NEW_HRP_QUESTIONS_PER_QUIZ } from '../constants.js';
 import { getFridaysOfNextMonth } from '../middleware/utils.js';
-import employeeRepository from '../repositories/employee.repository.js';
-import orgRepository from '../repositories/org.repository.js';
-import questionRepository from '../repositories/question.repository.js';
-import quizRepository from '../repositories/quiz.repository.js';
+import {
+  addSubmittedQuestion,
+} from '../repositories/employee.repository.js';
+import {
+  addQuestionToOrg,
+  getTriviaEnabledOrgs,
+  setNextQuestionGenre,
+  HRPQuestionsCount,
+  makeGenreUnavailable,
+  makeGenreAvailable,
+  pushQuestionsInOrg as pushQuestionsInOrgRepo,
+} from '../repositories/org.repository.js';
+import {
+  saveQuestion as saveQuestionRepo,
+  saveWeeklyQuizQuestions,
+  addQuestions,
+} from '../repositories/question.repository.js';
+import {
+  scheduleNewWeeklyQuiz,
+} from '../repositories/quiz.repository.js';
 
-async function saveQuestion(newQuestionData, employeeId) {
+export async function saveQuestion(newQuestionData, employeeId) {
   const orgId = newQuestionData.orgId;
-  const newQuestion = await questionRepository.saveQuestion(newQuestionData);
-  const addedToList = await orgRepository.addQuestionToOrg(newQuestion, orgId);
-  await employeeRepository.addSubmittedQuestion(newQuestion._id, employeeId);
+  const newQuestion = await saveQuestionRepo(newQuestionData);
+  const addedToList = await addQuestionToOrg(newQuestion, orgId);
+  await addSubmittedQuestion(newQuestion._id, employeeId);
   return newQuestion && addedToList;
 }
 
-async function scheduleQuizzesJob() {
-  const triviaEnabledOrgs = await orgRepository.getTriviaEnabledOrgs();
+export async function scheduleQuizzesJob() {
+  const triviaEnabledOrgs = await getTriviaEnabledOrgs();
   for (const org of triviaEnabledOrgs) {
     const plainElement = org.toObject();
     await scheduleQuizForOrgService(plainElement);
   }
 }
 
-async function scheduleQuizForOrgService(org) {
+export async function scheduleQuizForOrgService(org) {
   let currentGenre = org.settings.currentGenre;
   let allGenres = org.settings.selectedGenre;
   let fridaysOfMonth = getFridaysOfNextMonth();
@@ -37,7 +53,7 @@ async function scheduleQuizForOrgService(org) {
   for (const friday of fridaysOfMonth) {
     const genre = allGenres[currentGenre];
 
-    const quiz = await quizRepository.scheduleNewWeeklyQuiz(
+    const quiz = await scheduleNewWeeklyQuiz(
       org._id,
       friday,
       genre,
@@ -47,19 +63,19 @@ async function scheduleQuizForOrgService(org) {
     currentGenre = (currentGenre + 1) % allGenres.length;
   }
 
-  await orgRepository.setNextQuestionGenre(org._id, currentGenre - 1);
+  await setNextQuestionGenre(org._id, currentGenre - 1);
 
   scheduledQuizzes.forEach((quiz) => {
     startQuestionGenerationWorkflow(quiz.genre, org, quiz._id);
   });
 }
 
-async function canConductQuizHRP(orgId) {
-  const unusedQuestions = await orgRepository.HRPQuestionsCount(orgId, false);
+export async function canConductQuizHRP(orgId) {
+  const unusedQuestions = await HRPQuestionsCount(orgId, false);
   return unusedQuestions >= MIN_NEW_HRP_QUESTIONS_PER_QUIZ;
 }
 
-async function canConductQuizCAnIT(orgId) {
+export async function canConductQuizCAnIT(orgId) {
   // steps to check if can conduct quizzes
   // see duration set - eg past 2 weeks
   // check if there are unused questions from last 2 weeks - can be possible only when this quiz is being run in overlapped time frame.
@@ -68,7 +84,7 @@ async function canConductQuizCAnIT(orgId) {
   // else return true
 }
 
-async function startQuestionGenerationWorkflow(genre, org, quizId) {
+export async function startQuestionGenerationWorkflow(genre, org, quizId) {
   switch (genre) {
     case 'PnA':
       console.log('Starting PnA for', org.name);
@@ -78,9 +94,9 @@ async function startQuestionGenerationWorkflow(genre, org, quizId) {
       console.log('Starting HRD for', org.name);
       const conductQuizHRP = await canConductQuizHRP(org._id, quizId);
       if (!conductQuizHRP) {
-        orgRepository.makeGenreUnavailable(org._id, genre);
-      }else{
-        orgRepository.makeGenreAvailable(org._id, genre); 
+        makeGenreUnavailable(org._id, genre);
+      } else {
+        makeGenreAvailable(org._id, genre); 
       }
       startHRDWorkflow(org._id, quizId);
       break;
@@ -88,9 +104,9 @@ async function startQuestionGenerationWorkflow(genre, org, quizId) {
       console.log('Starting CAnIT for', org.name);
       const conductQuizCAnIT = await canConductQuizCAnIT(org._id, quizId);
       if (!conductQuizCAnIT) {
-        orgRepository.makeGenreUnavailable(org._id, genre);
-      }else{
-        orgRepository.makeGenreAvailable(org._id, genre); 
+        makeGenreUnavailable(org._id, genre);
+      } else {
+        makeGenreAvailable(org._id, genre); 
       }
       fetchNewCAnITQuestions(
         org.name,
@@ -106,7 +122,7 @@ async function startQuestionGenerationWorkflow(genre, org, quizId) {
   }
 }
 
-function formatQuestionsWeeklyFormat(questions, orgId, quizId) {
+export function formatQuestionsWeeklyFormat(questions, orgId, quizId) {
   const extra = getExtraQuestionLimit(questions);
   return questions.map((curr, index) => ({
     isApproved: false,
@@ -117,7 +133,7 @@ function formatQuestionsWeeklyFormat(questions, orgId, quizId) {
   }));
 }
 
-function getExtraQuestionLimit(questions) {
+export function getExtraQuestionLimit(questions) {
   if (questions.length > 0 && questions[0].category) {
     const categoryLimits = { CAnIT: 7, PnA: 4, HRD: 10 };
     return categoryLimits[questions[0].category] ?? 7;
@@ -125,7 +141,7 @@ function getExtraQuestionLimit(questions) {
   return 7;
 }
 
-function formatQuestionsForOrgs(questions, file) {
+export function formatQuestionsForOrgs(questions, file) {
   return questions.map((question) => ({
     questionId: new ObjectId(question._id),
     isUsed: false,
@@ -133,7 +149,7 @@ function formatQuestionsForOrgs(questions, file) {
   }));
 }
 
-function formatQuestionsForDatabase(questions, category) {
+export function formatQuestionsForDatabase(questions, category) {
   return questions.map((question) => ({
     question: question.question,
     answer: question.answer,
@@ -146,33 +162,33 @@ function formatQuestionsForDatabase(questions, category) {
   }));
 }
 
-async function pushQuestionsForApprovals(questions, orgId, quizId) {
+export async function pushQuestionsForApprovals(questions, orgId, quizId) {
   const refactoredQuestions = formatQuestionsWeeklyFormat(
     questions,
     orgId,
     quizId,
   );
-  return await questionRepository.saveWeeklyQuizQuestions(
+  return await saveWeeklyQuizQuestions(
     quizId,
     refactoredQuestions,
   );
 }
 
-async function pushQuestionsInOrg(questions, genre, orgId, file) {
+export async function pushQuestionsInOrg(questions, genre, orgId, file) {
   const refactoredQuestions = formatQuestionsForOrgs(questions, file);
-  return await orgRepository.pushQuestionsInOrg(
+  return await pushQuestionsInOrgRepo(
     refactoredQuestions,
     genre,
     orgId,
   );
 }
 
-async function pushQuestionsToDatabase(questions, category) {
+export async function pushQuestionsToDatabase(questions, category) {
   const refactoredQuestions = formatQuestionsForDatabase(questions, category);
-  return await questionRepository.addQuestions(refactoredQuestions);
+  return await addQuestions(refactoredQuestions);
 }
 
-async function addLambdaCallbackQuestions(
+export async function addLambdaCallbackQuestions(
   newQuestions,
   category,
   orgId,
@@ -184,12 +200,12 @@ async function addLambdaCallbackQuestions(
   if (quizId) await pushQuestionsForApprovals(questions, orgId, quizId);
 }
 
-async function validateEmployeeQuestionSubmission(question) {
+export async function validateEmployeeQuestionSubmission(question) {
   const errors = getValidationErrors(question);
   return Object.keys(errors).length;
 }
 
-function getValidationErrors(question) {
+export function getValidationErrors(question) {
   const errors = {};
   if (!question.question.trim()) {
     errors.question = 'Question is required.';
@@ -198,28 +214,18 @@ function getValidationErrors(question) {
     errors.category = 'Category is required.';
   }
   if (question.category === 'PnA' && !question.config.puzzleType) {
-    errors.puzzleType = 'Puzzle type is required for PnA.';
+    errors.puzzleType = 'Puzzle type is required for PnA questions.';
   }
-  const nonEmptyOptions = question.options.filter((opt) => opt.trim() !== '');
-  if (nonEmptyOptions.length !== 4) {
-    errors.options = 'Four options are required.';
+  if (!question.answer) {
+    errors.answer = 'Answer is required.';
   }
-  if (question.answer === '') {
-    errors.answer = 'Correct answer must be selected.';
-  }
-  if (question.image) {
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
-    if (!allowedTypes.includes(question.image.type)) {
-      errors.image = 'Only JPG, PNG, and GIF images are allowed.';
-    }
-    if (question.image.size > 5 * 1024 * 1024) {
-      errors.image = 'Image size must be less than 5MB.';
-    }
+  if (!question.options || question.options.length < 4) {
+    errors.options = 'At least 4 options are required.';
   }
   return errors;
 }
 
-async function getExtraEmployeeQuestions(orgId, quizId, quizGenre) {
+export async function getExtraEmployeeQuestions(orgId, quizId, quizGenre) {
   const employeeQuestions = await questionRepository.getExtraEmployeeQuestions(
     orgId,
     quizId,
@@ -228,7 +234,7 @@ async function getExtraEmployeeQuestions(orgId, quizId, quizGenre) {
   return formatQuestionsWeeklyFormat(employeeQuestions, orgId, quizId);
 }
 
-async function approveWeeklyQuizQuestions(
+export async function approveWeeklyQuizQuestions(
   unapprovedQuestions,
   questionsToDelete,
   orgId,
@@ -261,21 +267,21 @@ async function approveWeeklyQuizQuestions(
   return { message: 'Questions approved.' };
 }
 
-async function getWeeklyQuestionsService(orgId, quizId) {
+export async function getWeeklyQuestionsService(orgId, quizId) {
   return (await questionRepository.getWeeklyQuestions(quizId)) || [];
 }
 
-async function getWeeklyQuizCorrectAnswersService(orgId) {
+export async function getWeeklyQuizCorrectAnswersService(orgId) {
   const correctWeeklyQuizAnswers =
     await questionRepository.getCorrectWeeklyQuizAnswers(orgId);
   return correctWeeklyQuizAnswers.map((curr) => curr.question);
 }
 
-async function fetchHRDQuestions(orgId) {
+export async function fetchHRDQuestions(orgId) {
   return await orgRepository.fetchHRDQuestions(orgId);
 }
 
-async function getWeeklyQuizQuestions(orgId) {
+export async function getWeeklyQuizQuestions(orgId) {
   const approvedWeeklyQuizQuestion =
     await questionRepository.getApprovedWeeklyQuizQuestion(orgId);
   const quizQuestions = approvedWeeklyQuizQuestion.map((ques) => ques.question);
@@ -285,32 +291,10 @@ async function getWeeklyQuizQuestions(orgId) {
   };
 }
 
-async function startHRDWorkflow(orgId, quizId) {
+export async function startHRDWorkflow(orgId, quizId) {
   const questions = await orgRepository.fetchHRDQuestions(orgId);
   // const quesReqParaphrase = HRP_QUESTIONS_PER_QUIZ - questions.length;
   // rephraseQuestions(questions_to_rephrase, orgId, quizId)
 
   await pushQuestionsForApprovals(questions, orgId, quizId);
 }
-
-export default {
-  saveQuestion,
-  scheduleQuizzesJob,
-  startQuestionGenerationWorkflow,
-  formatQuestionsWeeklyFormat,
-  formatQuestionsForOrgs,
-  formatQuestionsForDatabase,
-  fetchHRDQuestions,
-  pushQuestionsForApprovals,
-  pushQuestionsInOrg,
-  pushQuestionsToDatabase,
-  addLambdaCallbackQuestions,
-  validateEmployeeQuestionSubmission,
-  getExtraEmployeeQuestions,
-  scheduleQuizForOrgService,
-  approveWeeklyQuizQuestions,
-  getWeeklyQuizQuestions,
-  getWeeklyQuestionsService,
-  getWeeklyQuizCorrectAnswersService,
-  startHRDWorkflow,
-};

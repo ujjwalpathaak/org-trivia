@@ -1,10 +1,10 @@
 import { ObjectId } from 'mongodb';
 
 import Leaderboard from '../models/leaderboard.model.js';
-import badgeRepository from './badge.repository.js';
-import employeeRepository from './employee.repository.js';
+import { findBadgeByRank } from './badge.repository.js';
+import { addBadgesToEmployees, resetAllEmployeesScores } from './employee.repository.js';
 
-const updateLeaderboard = async (
+export const updateLeaderboard = async (
   orgId,
   employeeId,
   score,
@@ -23,7 +23,7 @@ const updateLeaderboard = async (
     { upsert: true, session },
   );
 
-const getLeaderboardYearBoundary = async (orgId) => {
+export const getLeaderboardYearBoundary = async (orgId) => {
   return Leaderboard.aggregate([
     {
       $match: {
@@ -47,7 +47,7 @@ const getLeaderboardYearBoundary = async (orgId) => {
   ]);
 };
 
-const getLeaderboardByOrg = async (orgId, month, year) => {
+export const getLeaderboardByOrg = async (orgId, month, year) => {
   return Leaderboard.aggregate([
     {
       $match: {
@@ -72,7 +72,7 @@ const getLeaderboardByOrg = async (orgId, month, year) => {
   ]);
 };
 
-const resetLeaderboard = async (month, year, pMonth, pYear) => {
+export const resetLeaderboard = async (month, year, pMonth, pYear) => {
   const topThreePerOrg = await Leaderboard.aggregate([
     { $match: { month: pMonth, year: pYear, totalScore: { $gt: 0 } } },
     { $sort: { orgId: 1, totalScore: -1 } },
@@ -91,9 +91,9 @@ const resetLeaderboard = async (month, year, pMonth, pYear) => {
   ]);
 
   const badges = {
-    Gold: await badgeRepository.findBadgeByRank('Gold'),
-    Silver: await badgeRepository.findBadgeByRank('Silver'),
-    Bronze: await badgeRepository.findBadgeByRank('Bronze'),
+    Gold: await findBadgeByRank('Gold'),
+    Silver: await findBadgeByRank('Silver'),
+    Bronze: await findBadgeByRank('Bronze'),
   };
 
   const ranks = ['Gold', 'Silver', 'Bronze'];
@@ -103,7 +103,7 @@ const resetLeaderboard = async (month, year, pMonth, pYear) => {
       Promise.all(
         topEmployees.map(async (employee, index) => {
           if (badges[ranks[index]]) {
-            await employeeRepository.addBadgesToEmployees(
+            await addBadgesToEmployees(
               employee.employeeId,
               badges[ranks[index]]._id,
               pMonth,
@@ -115,14 +115,7 @@ const resetLeaderboard = async (month, year, pMonth, pYear) => {
     ),
   );
 
-  await employeeRepository.resetAllEmployeesScores();
+  await resetAllEmployeesScores();
 
   return { message: 'Leaderboard reset successfully' };
-};
-
-export default {
-  updateLeaderboard,
-  getLeaderboardByOrg,
-  getLeaderboardYearBoundary,
-  resetLeaderboard,
 };

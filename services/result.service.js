@@ -3,13 +3,24 @@ import {
   getMonthAndYear,
   mergeUserAnswersAndCorrectAnswers,
 } from '../middleware/utils.js';
-import employeeRepository from '../repositories/employee.repository.js';
-import leaderboardRepository from '../repositories/leaderboard.respository.js';
-import quizRepository from '../repositories/quiz.repository.js';
-import resultRepository from '../repositories/result.repository.js';
-import questionService from './question.service.js';
+import {
+  updateWeeklyQuizScore,
+} from '../repositories/employee.repository.js';
+import {
+  updateLeaderboard,
+} from '../repositories/leaderboard.respository.js';
+import {
+  findLiveQuizByOrgId,
+} from '../repositories/quiz.repository.js';
+import {
+  getEmployeePastResults,
+  submitWeeklyQuizAnswers as submitAnswers,
+} from '../repositories/result.repository.js';
+import {
+  getWeeklyQuizCorrectAnswersService,
+} from './question.service.js';
 
-const calculateWeeklyQuizScore = (userAnswers, correctAnswers) => {
+export const calculateWeeklyQuizScore = (userAnswers, correctAnswers) => {
   const correctAnswerMap = new Map(
     correctAnswers.map(({ _id, answer }) => [_id.toString(), answer]),
   );
@@ -21,11 +32,11 @@ const calculateWeeklyQuizScore = (userAnswers, correctAnswers) => {
   );
 };
 
-const getEmployeePastResultsService = async (employeeId, page, size) => {
-  return await resultRepository.getEmployeePastResults(employeeId, page, size);
+export const getEmployeePastResultsService = async (employeeId, page, size) => {
+  return await getEmployeePastResults(employeeId, page, size);
 };
 
-const submitWeeklyQuizAnswersService = async (
+export const submitWeeklyQuizAnswersService = async (
   userAnswers,
   employeeId,
   orgId,
@@ -35,16 +46,15 @@ const submitWeeklyQuizAnswersService = async (
   session.startTransaction();
 
   try {
-    const correctAnswers =
-      await questionService.getWeeklyQuizCorrectAnswersService(orgId, quizId);
+    const correctAnswers = await getWeeklyQuizCorrectAnswersService(orgId, quizId);
     const points = calculateWeeklyQuizScore(userAnswers, correctAnswers);
 
-    const quiz = await quizRepository.findLiveQuizByOrgId(orgId);
+    const quiz = await findLiveQuizByOrgId(orgId);
     if (!quiz) {
       throw new Error('No active quiz found for this organization.');
     }
 
-    const data = await employeeRepository.updateWeeklyQuizScore(
+    const data = await updateWeeklyQuizScore(
       employeeId,
       points,
       session,
@@ -55,7 +65,7 @@ const submitWeeklyQuizAnswersService = async (
 
     const [month, year] = getMonthAndYear();
 
-    await leaderboardRepository.updateLeaderboard(
+    await updateLeaderboard(
       orgId,
       employeeId,
       data.score,
@@ -67,7 +77,7 @@ const submitWeeklyQuizAnswersService = async (
     const mergedUserAnswersAndCorrectAnswers =
       mergeUserAnswersAndCorrectAnswers(correctAnswers, userAnswers);
 
-    await resultRepository.submitWeeklyQuizAnswers(
+    await submitAnswers(
       employeeId,
       orgId,
       quizId,
@@ -87,10 +97,4 @@ const submitWeeklyQuizAnswersService = async (
     session.endSession();
     throw new Error(`Failed to submit quiz: ${error.message}`);
   }
-};
-
-export default {
-  calculateWeeklyQuizScore,
-  getEmployeePastResultsService,
-  submitWeeklyQuizAnswersService,
 };

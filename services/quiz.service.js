@@ -1,11 +1,22 @@
-import employeeRepository from '../repositories/employee.repository.js';
-import questionRepository from '../repositories/question.repository.js';
-import quizRepository from '../repositories/quiz.repository.js';
+import {
+  isWeeklyQuizGiven,
+  updateEmployeeStreaksAndMarkAllEmployeesAsQuizNotGiven,
+  awardStreakBadges,
+} from '../repositories/employee.repository.js';
+import {
+  getQuizStatus,
+  cancelLiveQuiz,
+  findQuiz,
+  makeWeeklyQuizLive,
+  markAllQuizAsExpired,
+  getScheduledQuizzes,
+} from '../repositories/quiz.repository.js';
+import { dropWeeklyQuestionCollection } from '../repositories/question.repository.js';
 
-const getWeeklyQuizStatusService = async (orgId, employeeId) => {
+export const getWeeklyQuizStatusService = async (orgId, employeeId) => {
   const [quiz, employee] = await Promise.all([
-    quizRepository.getQuizStatus(orgId),
-    employeeRepository.isWeeklyQuizGiven(employeeId),
+    getQuizStatus(orgId),
+    isWeeklyQuizGiven(employeeId),
   ]);
 
   if (quiz?.status === 'cancelled') {
@@ -19,41 +30,32 @@ const getWeeklyQuizStatusService = async (orgId, employeeId) => {
   }
 };
 
-const cancelLiveQuizService = async (quizId) => {
-  await quizRepository.cancelLiveQuiz(quizId);
+export const cancelLiveQuizService = async (quizId) => {
+  await cancelLiveQuiz(quizId);
   return { message: 'Live quiz cancelled' };
 };
 
-const getWeeklyQuizService = async (quizId) => {
-  return await quizRepository.findQuiz(quizId);
+export const getWeeklyQuizService = async (quizId) => {
+  return await findQuiz(quizId);
 };
 
-const makeWeeklyQuizLiveService = async () => {
-  await quizRepository.makeWeeklyQuizLive();
+export const makeWeeklyQuizLiveService = async () => {
+  await makeWeeklyQuizLive();
   return { message: 'All weekly quizzes are live' };
 };
 
-const cleanUpWeeklyQuizService = async () => {
+export const cleanUpWeeklyQuizService = async () => {
   await Promise.all([
-    quizRepository.markAllQuizAsExpired(),
-    employeeRepository.updateEmployeeStreaksAndMarkAllEmployeesAsQuizNotGiven(),
-    questionRepository.dropWeeklyQuestionCollection(),
+    markAllQuizAsExpired(),
+    updateEmployeeStreaksAndMarkAllEmployeesAsQuizNotGiven(),
+    dropWeeklyQuestionCollection(),
   ]);
 
-  await employeeRepository.awardStreakBadges();
+  await awardStreakBadges();
 
   return { message: 'Cleaned up weekly quiz.' };
 };
 
-const getScheduledQuizzesService = async (orgId) => {
-  return await quizRepository.getScheduledQuizzes(orgId);
-};
-
-export default {
-  getWeeklyQuizStatusService,
-  makeWeeklyQuizLiveService,
-  cleanUpWeeklyQuizService,
-  getWeeklyQuizService,
-  cancelLiveQuizService,
-  getScheduledQuizzesService,
+export const getScheduledQuizzesService = async (orgId) => {
+  return await getScheduledQuizzes(orgId);
 };

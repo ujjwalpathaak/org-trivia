@@ -3,9 +3,9 @@ import jwt from 'jsonwebtoken';
 
 import Admin from '../models/admin.model.js';
 import Employee from '../models/employee.model.js';
-import orgRepository from './org.repository.js';
+import { updateNewUserInOrg } from './org.repository.js';
 
-const getUserByEmail = async (email) => {
+export const getUserByEmail = async (email) => {
   const [admin, employee] = await Promise.all([
     Admin.findOne({ email }),
     Employee.findOne({ email }),
@@ -13,15 +13,9 @@ const getUserByEmail = async (email) => {
   return admin || employee || null;
 };
 
-const createNewUser = async (
-  UserModel,
-  email,
-  password,
-  name,
-  orgId,
-  isAdmin,
-) => {
+export const createNewUser = async (email, password, name, orgId, isAdmin) => {
   const hashedPassword = await bcrypt.hash(password, 10);
+  const UserModel = isAdmin ? Admin : Employee;
   const newUser = await new UserModel({
     email,
     password: hashedPassword,
@@ -29,15 +23,15 @@ const createNewUser = async (
     orgId,
   }).save();
 
-  await orgRepository.updateNewUserInOrg(orgId, isAdmin, newUser);
+  await updateNewUserInOrg(orgId, isAdmin, newUser);
   return newUser;
 };
 
-const isPasswordsMatch = async (password, hashedPassword) => {
+export const isPasswordsMatch = async (password, hashedPassword) => {
   return await bcrypt.compare(password, hashedPassword);
 };
 
-const generateToken = (user) => {
+export const generateToken = (user) => {
   return jwt.sign(
     {
       employeeId: user._id,
@@ -50,11 +44,4 @@ const generateToken = (user) => {
       expiresIn: '7d',
     },
   );
-};
-
-export default {
-  getUserByEmail,
-  createNewUser,
-  isPasswordsMatch,
-  generateToken,
 };

@@ -1,35 +1,32 @@
-import employeeService from '../services/employee.service.js';
+import {
+  fetchEmployeeDetails,
+  getSubmittedQuestions,
+} from '../services/employee.service.js';
 
-const getEmployeeDetails = async (req, res, next) => {
+export const getEmployeeDetailsController = async (req, res, next) => {
   try {
     const { employeeId } = req.data;
     if (!employeeId) {
       return res.status(400).json({ message: 'Missing required fields' });
     }
-    const employeeDetails =
-      await employeeService.fetchEmployeeDetails(employeeId);
+    const employeeDetails = await fetchEmployeeDetails(employeeId);
     res.status(200).json(employeeDetails);
   } catch (error) {
     next(error);
   }
 };
 
-const getSubmittedQuestionsController = async (req, res, next) => {
+export const getSubmittedQuestionsController = async (req, res, next) => {
   try {
     const { employeeId } = req.data;
     const { page = 0, size = 10 } = req.query;
-    const submittedQuestions = await employeeService.fetchSubmittedQuestions(
-      employeeId,
-      page,
-      size,
-    );
-    res.status(200).json(submittedQuestions);
+    if (!employeeId) {
+      return res.status(400).json({ message: 'Missing required fields' });
+    }
+
+    const questions = await getSubmittedQuestions(employeeId, page, size);
+    res.status(200).json(questions);
   } catch (error) {
     next(error);
   }
-};
-
-export default {
-  getEmployeeDetails,
-  getSubmittedQuestionsController,
 };
