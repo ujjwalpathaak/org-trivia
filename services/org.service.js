@@ -8,11 +8,15 @@ const saveSettingsService = async (
   changedGenres,
   companyCurrentAffairsTimeline,
 ) => {
-  Promise.all(
-    changedGenres.map(async (genre) => {
-      return await quizRepository.changeQuizGenre(genre.newGenre, genre.quizId);
-    }),
-  );
+  console.log(  orgId,
+    newGenreOrder,
+    changedGenres,
+    companyCurrentAffairsTimeline);
+Promise.all(
+  changedGenres.map(async (genre) => {
+    return await quizRepository.changeQuizGenre(genre.newGenre, genre.quizId);
+  }),
+);
   orgRepository.changeCompanyCurrentAffairsTimeline(
     companyCurrentAffairsTimeline,
     orgId,

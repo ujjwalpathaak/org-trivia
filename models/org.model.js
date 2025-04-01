@@ -68,13 +68,14 @@ const orgSchema = new mongoose.Schema({
       unavailableGenre: {
         type: [String],
         default: ['PnA', 'HRD', 'CAnIT'],
-        set: (arr) => [...new Set(arr)],
+        set: (arr) => [...new Set(arr ?? [])], // Ensure it's an array
       },
       selectedGenre: {
         type: [String],
         default: ['PnA', 'HRD', 'CAnIT'],
         set: function (arr) {
-          return arr.filter((genre) => !this.unavailableGenre.includes(genre));
+          const unavailable = this?.settings?.unavailableGenre ?? []; // Ensure unavailableGenre is defined
+          return (arr ?? []).filter((genre) => !unavailable.includes(genre));
         },
       },
     },
@@ -87,18 +88,14 @@ const orgSchema = new mongoose.Schema({
   },
 });
 
-// Middleware to update selectedGenre before saving
 orgSchema.pre('save', function (next) {
-  if (this.settings) {
-    this.settings.unavailableGenre = [
-      ...new Set(this.settings.unavailableGenre),
-    ];
-    this.settings.selectedGenre = this.settings.selectedGenre.filter(
-      (genre) => !this.settings.unavailableGenre.includes(genre),
-    );
-  }
+  this.settings.unavailableGenre = this.settings.unavailableGenre ?? [];
+  this.settings.selectedGenre = this.settings.selectedGenre.filter(
+    (genre) => !this.settings.unavailableGenre.includes(genre)
+  );
   next();
 });
+
 
 const Org = mongoose.model('Org', orgSchema);
 

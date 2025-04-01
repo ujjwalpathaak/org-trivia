@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-import { getSettingsAPI, toggleTriviaAPI } from '../api';
+import { getMonthQuizzesAPI, getSettingsAPI, toggleTriviaAPI } from '../api';
 import ListManager from '../components/ListManager';
 
 const Settings = () => {
@@ -8,6 +8,7 @@ const Settings = () => {
   const [settings, setSettings] = useState(null);
   const [questionCountStatus, setQuestionCountStatus] = useState(null);
   const [isSaved, setIsSaved] = useState(true);
+  const [quizzes, setQuizzes] = useState(true);
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -22,6 +23,14 @@ const Settings = () => {
     };
 
     fetchSettings();
+  }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const response = await getMonthQuizzesAPI();
+      setQuizzes(response);
+    };
+    fetchData();
   }, []);
 
   const toggleIsTriviaEnabled = async () => {
@@ -54,14 +63,15 @@ const Settings = () => {
             </button>
           </div>
           <hr></hr>
-          {isTriviaEnabled && settings && (
+          {quizzes && isTriviaEnabled && settings && (
             <ListManager
               settings={settings}
               isSaved={isSaved}
               setIsSaved={setIsSaved}
               selectedGenre={settings.selectedGenre}
               questionCountStatus={questionCountStatus}
-              setSettings={setSettings}
+              quizzes={quizzes}
+              setQuizzes={setQuizzes}
             />
           )}
         </div>
