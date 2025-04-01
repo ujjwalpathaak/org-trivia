@@ -46,7 +46,6 @@ export default function ScheduleQuestions() {
   useEffect(() => {
     const getQuestionsToApproveFunc = async () => {
       const response = await getQuestionsToApproveAPI(quizId);
-      console.log(response);
       if (response.status === 400) {
         noQuestionFound();
         navigate('/dashboard');

@@ -8,7 +8,6 @@ const saveSettingsService = async (
   changedGenres,
   companyCurrentAffairsTimeline,
 ) => {
-  console.log(changedGenres);
   Promise.all(
     changedGenres.map(async (genre) => {
       return await quizRepository.changeQuizGenre(genre.newGenre, genre.quizId);

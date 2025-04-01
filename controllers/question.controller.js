@@ -51,9 +51,6 @@ const getWeeklyQuizQuestionsController = async (req, res, next) => {
         quiz._id,
         quiz.genre,
       );
-
-    console.log(weeklyQuestions, extraEmployeeQuestions);
-
     if (!weeklyQuestions) {
       return res
         .status(400)

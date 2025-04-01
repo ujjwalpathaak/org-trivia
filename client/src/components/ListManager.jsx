@@ -17,7 +17,6 @@ export default function ListManager({
   setSettings,
 }) {
   function getInfo(value, questionCountStatus) {
-    console.log(value);
     const key = value?.toLowerCase();
     const questions = questionCountStatus[`${key}_questions`];
     const required_questions = questionCountStatus[`${key}_questions_required_per_quiz`];
@@ -37,13 +36,11 @@ export default function ListManager({
 
   const handleEditQuestions = (quiz) => {
     navigate(`approve-questions/${quiz._id}`);
-    console.log('Edit questions for quiz:', quiz);
   };
 
   useEffect(() => {
     const fetchData = async () => {
       const response = await getMonthQuizzesAPI();
-      console.log(response);
       setQuizzes(response);
     };
 
@@ -149,6 +146,21 @@ export default function ListManager({
       <hr></hr>
       <DndProvider backend={HTML5Backend}>
         <div className="max-w-2xl mx-auto bg-white rounded-xl">
+          {settings.unavailableGenre.length !== 0 && (
+            <div className="mb-8">
+              <h3 className="font-semibold text-gray-800 mb-4">Unavailable Quizzes</h3>
+              <ul className="space-y-3">
+                {settings?.unavailableGenre.map((item) => (
+                  <li className="cursor-not-allowed flex text-slate-500 justify-between items-center bg-gray-100 rounded-lg p-4 hover:bg-gray-100 transition-colors">
+                    {item}
+                    <span className="text-red-400 text-xs px-2 py-1 rounded-md">
+                      ! {getInfo(item, questionCountStatus)}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
           {availableItems.length !== 0 && (
             <div className="mb-8">
               <h3 className="font-semibold text-gray-800 mb-4">Available Quizzes</h3>
@@ -186,23 +198,7 @@ export default function ListManager({
               </ul>
             </div>
           )}
-        </div>
-        <div className="max-w-2xl mx-auto bg-white rounded-xl">
-          {settings.unavailableGenre.length !== 0 && (
-            <div className="mb-8">
-              <h3 className="font-semibold text-gray-800 mb-4">Unavailable Quizzes</h3>
-              <ul className="space-y-3">
-                {settings?.unavailableGenre.map((item) => (
-                  <li className="cursor-not-allowed flex text-slate-500 justify-between items-center bg-gray-100 rounded-lg p-4 hover:bg-gray-100 transition-colors">
-                    {item}
-                    <span className="text-red-400 text-xs px-2 py-1 rounded-md">
-                      ! {getInfo(item, questionCountStatus)}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
+
           <div>
             <h3 className="font-semibold mr-2 text-gray-800">Order of Quizzes</h3>
             <span className="text-sm italic text-gray-400">{`(Drag and drop to reorder quizzes. The updated order will apply from next month.)`}</span>
@@ -304,7 +300,6 @@ export default function ListManager({
                                 </span>
                               </div>
                             )}
-                            {console.log(quiz)}
                             {quiz.status === 'scheduled' && (
                               <div className="flex items-center">
                                 <span className="text-xs italic text-green-700">

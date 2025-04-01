@@ -30,14 +30,12 @@ async function scheduleQuizzesJob() {
 async function scheduleQuizForOrgService(org) {
   let currentGenre = org.settings.currentGenre;
   let allGenres = org.settings.selectedGenre;
-  console.log(allGenres);
   let fridaysOfMonth = getFridaysOfNextMonth();
 
   const scheduledQuizzes = [];
 
   for (const friday of fridaysOfMonth) {
     const genre = allGenres[currentGenre];
-    console.log(genre);
 
     const quiz = await quizRepository.scheduleNewWeeklyQuiz(
       org._id,
@@ -56,9 +54,18 @@ async function scheduleQuizForOrgService(org) {
   });
 }
 
-async function canConductQuiz(orgId, quizId) {
+async function canConductQuizHRP(orgId) {
   const unusedQuestions = await orgRepository.HRPQuestionsCount(orgId, false);
   return unusedQuestions >= MIN_NEW_HRP_QUESTIONS_PER_QUIZ;
+}
+
+async function canConductQuizCAnIT(orgId) {
+  // steps to check if can conduct quizzes
+  // see duration set - eg past 2 weeks
+  // check if there are unused questions from last 2 weeks - can be possible only when this quiz is being run in overlapped time frame.
+  // if yes, then count how many questions are there
+  // if count is less than 5, then return false
+  // else return true
 }
 
 async function startQuestionGenerationWorkflow(genre, org, quizId) {
@@ -69,14 +76,22 @@ async function startQuestionGenerationWorkflow(genre, org, quizId) {
       break;
     case 'HRD':
       console.log('Starting HRD for', org.name);
-      const conductQuiz = await canConductQuiz(org._id, quizId);
-      if (!conductQuiz) {
+      const conductQuizHRP = await canConductQuizHRP(org._id, quizId);
+      if (!conductQuizHRP) {
         orgRepository.makeGenreUnavailable(org._id, genre);
+      }else{
+        orgRepository.makeGenreAvailable(org._id, genre); 
       }
-      // startHRDWorkflow(org._id, quizId);
+      startHRDWorkflow(org._id, quizId);
       break;
     case 'CAnIT':
       console.log('Starting CAnIT for', org.name);
+      const conductQuizCAnIT = await canConductQuizCAnIT(org._id, quizId);
+      if (!conductQuizCAnIT) {
+        orgRepository.makeGenreUnavailable(org._id, genre);
+      }else{
+        orgRepository.makeGenreAvailable(org._id, genre); 
+      }
       fetchNewCAnITQuestions(
         org.name,
         org.orgIndustry,
