@@ -7,7 +7,7 @@ import express from 'express';
 import { connectDatabase } from './Database.js';
 import { startJobs } from './jobs/index.js';
 import { isProduction, logService } from './middleware/utils.js';
-import router from './routes/router.js';
+import {router} from './routes/router.js';
 
 const app = express();
 const isProductionServer = isProduction();

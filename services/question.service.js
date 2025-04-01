@@ -234,7 +234,7 @@ export async function getExtraEmployeeQuestions(orgId, quizId, quizGenre) {
   return formatQuestionsWeeklyFormat(employeeQuestions, orgId, quizId);
 }
 
-export async function approveWeeklyQuizQuestions(
+export async function approveWeeklyQuizQuestionsService(
   unapprovedQuestions,
   questionsToDelete,
   orgId,

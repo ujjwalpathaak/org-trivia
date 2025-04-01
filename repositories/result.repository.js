@@ -82,6 +82,10 @@ export const getParticipationByGenre = async (orgId) => {
   ]);
 };
 
+export const findResultByQuizId = (quizId) => {
+  return Result.findOne({ quizId: new ObjectId(quizId) });
+}
+
 export const getEmployeePastResults = async (employeeId, page = 0, size = 10) => {
   const skip = parseInt(page) * parseInt(size);
   const limit = parseInt(size);

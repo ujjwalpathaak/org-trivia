@@ -1,6 +1,6 @@
 import express from 'express';
 
-import { cleanUpWeeklyQuizController, makeWeeklyQuizLiveConroller } from '../controllers/cron.test.controller.js';
+import { cleanUpWeeklyQuizController, makeWeeklyQuizLiveController } from '../controllers/cron.test.controller.js';
 
 export const cronTestRouter = express.Router();
 
@@ -11,5 +11,5 @@ cronTestRouter.post(
 
 cronTestRouter.post(
   '/test/makeQuizLiveTest',
-  makeWeeklyQuizLiveConroller,
+  makeWeeklyQuizLiveController,
 );

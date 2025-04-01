@@ -1,14 +1,14 @@
 import {
-  cleanWeeklyQuizJob,
-  leaderboardResetJob,
-  makeQuizLiveTestJob,
-  scheduleQuizzesJob,
+  cleanWeeklyQuizJobCron,
+  leaderboardResetJobCron,
+  makeQuizLiveTestJobCron,
+  scheduleQuizzesJobCron,
 } from './scheduleNextWeekQuestionsApproval.job.js';
 
 export const startJobs = () => {
   console.log('Starting cron jobs...');
-  scheduleQuizzesJob.start();
-  makeQuizLiveTestJob.start();
-  cleanWeeklyQuizJob.start();
-  leaderboardResetJob.start();
+  scheduleQuizzesJobCron.start();
+  makeQuizLiveTestJobCron.start();
+  cleanWeeklyQuizJobCron.start();
+  leaderboardResetJobCron.start();
 };

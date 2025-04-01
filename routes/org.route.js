@@ -1,24 +1,24 @@
 import express from 'express';
 
-import { getAllOrgNames, toggleTrivia, getSettings, saveNewSettingsController, getAnalytics } from '../controllers/org.controller.js';
+import { saveNewSettingsController, getAllOrgNamesController, toggleTriviaController, getSettingsController, getAnalyticsController } from '../controllers/org.controller.js';
 import { checkRole, protectRoute } from '../middleware/auth.middleware.js';
 
 export const orgRouter = express.Router();
 
-orgRouter.get('/', getAllOrgNames);
+orgRouter.get('/', getAllOrgNamesController);
 
 orgRouter.patch(
   '/settings/toggleTrivia',
   protectRoute,
   checkRole('Admin'),
-  toggleTrivia,
+  toggleTriviaController,
 );
 
 orgRouter.get(
   '/settings',
   protectRoute,
   checkRole('Admin'),
-  getSettings,
+  getSettingsController,
 );
 
 orgRouter.post(
@@ -32,5 +32,5 @@ orgRouter.get(
   '/analytics',
   protectRoute,
   checkRole('Admin'),
-  getAnalytics,
+  getAnalyticsController,
 );

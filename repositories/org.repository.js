@@ -171,7 +171,7 @@ export const HRPQuestionsCount = async (orgId) => {
   });
 };
 
-export const getSettings = async (orgId) => {
+export const getOrgSettings = async (orgId) => {
   const [count_hrd_questions] = await Promise.all([HRPQuestionsCount(orgId)]);
 
   const settings = await Org.findById(orgId).select('settings');
@@ -189,7 +189,7 @@ export const getAllOrgNames = async () => Org.find({}, 'id name');
 export const getOrgById = async (orgId) => Org.findById(orgId);
 export const isTriviaEnabled = async (orgId) =>
   Org.findById(orgId).select('settings.isTriviaEnabled');
-export const updateTriviaSettings = async (orgId, newStatus) => {
+export const toggleTrivia = async (orgId, newStatus) => {
   await Org.updateOne(
     { _id: new ObjectId(orgId) },
     { $set: { 'settings.isTriviaEnabled': newStatus } },
@@ -210,7 +210,7 @@ export const makeGenreAvailable = async (orgId, genre) => {
   );
 };
 
-export const getAnalytics = async (orgId) => {
+export const getOrgAnalytics = async (orgId) => {
   return Org.findById(orgId).select('analytics');
 };
 

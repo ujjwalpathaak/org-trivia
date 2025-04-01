@@ -56,18 +56,19 @@ export default function ListManager({
       })),
     [selectedGenre, allItems]
   );
-  const initialQuizItems = useMemo(() => {
-    const uniqueMap = new Map();
-    (quizzes || []).forEach((quiz) => {
-      if (!uniqueMap.has(quiz.genre)) {
-        uniqueMap.set(quiz.genre, {
-          key: allItems.find((item) => item.value === quiz.genre)?.key || '',
-          value: quiz.genre,
-        });
-      }
-    });
-    return Array.from(uniqueMap.values());
-  }, [quizzes, allItems]);
+  const initialQuizItems = [];
+  // const initialQuizItems = useMemo(() => {
+  //   const uniqueMap = new Map();
+  //   (Array.isArray(quizzes)  || []).forEach((quiz) => {
+  //     if (!uniqueMap.has(quiz.genre)) {
+  //       uniqueMap.set(quiz.genre, {
+  //         key: allItems.find((item) => item.value === quiz.genre)?.key || '',
+  //         value: quiz.genre,
+  //       });
+  //     }
+  //   });
+  //   return Array.from(uniqueMap.values());
+  // }, [quizzes, allItems]);
 
   const [selectedItems, setSelectedItems] = useState(initialSelectedItems);
 

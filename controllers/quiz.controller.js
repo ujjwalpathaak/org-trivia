@@ -1,6 +1,6 @@
 import {
   getWeeklyQuizQuestions,
-  approveWeeklyQuizQuestions,
+  approveWeeklyQuizQuestionsService,
   addLambdaCallbackQuestions,
 } from '../services/question.service.js';
 import {
@@ -100,7 +100,7 @@ export const approveWeeklyQuizQuestionsController = async (req, res, next) => {
       return res.status(400).json({ message: 'Missing required fields' });
     }
 
-    await approveWeeklyQuizQuestions(questions, questionsToDelete, orgId);
+    await approveWeeklyQuizQuestionsService(questions, questionsToDelete, orgId);
 
     res.status(200).json({ message: 'Questions marked as approved' });
   } catch (error) {
