@@ -6,14 +6,16 @@ import ListManager from '../components/ListManager';
 const Settings = () => {
   const [isTriviaEnabled, setIsTriviaEnabled] = useState(false);
   const [settings, setSettings] = useState(null);
+  const [questionCountStatus, setQuestionCountStatus] = useState(null);
   const [isSaved, setIsSaved] = useState(true);
 
   useEffect(() => {
     const fetchSettings = async () => {
       try {
         const response = await getSettingsAPI();
-        setSettings(response);
-        setIsTriviaEnabled(response.isTriviaEnabled);
+        setQuestionCountStatus(response.question_count);
+        setSettings(response.settings);
+        setIsTriviaEnabled(response.settings.isTriviaEnabled);
       } catch (error) {
         console.error(error);
       }
@@ -52,12 +54,14 @@ const Settings = () => {
             </button>
           </div>
           <hr></hr>
-
           {isTriviaEnabled && settings && (
             <ListManager
+              settings={settings}
               isSaved={isSaved}
               setIsSaved={setIsSaved}
               selectedGenre={settings.selectedGenre}
+              questionCountStatus={questionCountStatus}
+              setSettings={setSettings}
             />
           )}
         </div>

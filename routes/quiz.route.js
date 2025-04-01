@@ -32,7 +32,7 @@ quizRouter.get(
   '/scheduled',
   protectRoute,
   checkRole('Admin'),
-  QuizController.getScheduledQuizzes
+  QuizController.getScheduledQuizzes,
 );
 
 quizRouter.get(

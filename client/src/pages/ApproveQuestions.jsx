@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 import { getQuestionsToApproveAPI, handleApproveWeeklyQuizAPI } from '../api.js';
@@ -9,7 +9,7 @@ export default function ScheduleQuestions() {
   const [aiQuestions, setAiQuestions] = useState([]);
 
   const [empQuestions, setEmpQuestions] = useState([]);
-
+  const { quizId } = useParams();
   const [addQuestion, setAddQuestion] = useState(false);
   const [removedQuestionIndex, setRemovedQuestionIndex] = useState(-1);
   const [questions, setQuestions] = useState([]);
@@ -45,14 +45,15 @@ export default function ScheduleQuestions() {
 
   useEffect(() => {
     const getQuestionsToApproveFunc = async () => {
-      const response = await getQuestionsToApproveAPI();
+      const response = await getQuestionsToApproveAPI(quizId);
+      console.log(response);
       if (response.status === 400) {
         noQuestionFound();
         navigate('/dashboard');
         return;
       }
-      setAiQuestions(response.data.weeklyUnapprovedQuestions.filter((q) => q.type === 'extra'));
-      setQuestions(response.data.weeklyUnapprovedQuestions.filter((q) => q.type === 'main'));
+      setAiQuestions(response.data.weeklyQuestions.filter((q) => q.type === 'extra'));
+      setQuestions(response.data.weeklyQuestions.filter((q) => q.type === 'main'));
       setEmpQuestions(response.data.extraEmployeeQuestions);
     };
 
@@ -176,7 +177,7 @@ export default function ScheduleQuestions() {
                 onClick={handleApproveQuiz}
                 className="px-6 py-2 ml-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition duration-200 font-medium"
               >
-                Schedule Quiz
+                Save Changes
               </button>
             </div>
           </div>

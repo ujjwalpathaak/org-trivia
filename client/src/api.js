@@ -104,7 +104,11 @@ export const createNewQuestionAPI = async (formData) => {
   }
 };
 
-export const saveSettingsAPI = async (newGenreOrder, changedGenres) => {
+export const saveSettingsAPI = async (
+  newGenreOrder,
+  changedGenres,
+  companyCurrentAffairsTimeline
+) => {
   try {
     const response = await fetch(`${BACKEND_URL}/org/save/settings`, {
       method: 'POST',
@@ -112,7 +116,7 @@ export const saveSettingsAPI = async (newGenreOrder, changedGenres) => {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({newGenreOrder, changedGenres}),
+      body: JSON.stringify({ newGenreOrder, changedGenres, companyCurrentAffairsTimeline }),
     });
 
     if (!response.ok) {
@@ -126,9 +130,9 @@ export const saveSettingsAPI = async (newGenreOrder, changedGenres) => {
   }
 };
 
-export const getQuestionsToApproveAPI = async () => {
+export const getQuestionsToApproveAPI = async (quizId) => {
   try {
-    const response = await fetch(`${BACKEND_URL}/question/weekly/unapproved`, {
+    const response = await fetch(`${BACKEND_URL}/question/weekly-quiz/${quizId}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -293,7 +297,7 @@ export const getMonthQuizzesAPI = async (month, year) => {
   } catch (error) {
     return { success: false, error: error.message };
   }
-}
+};
 
 export const getWeeklyQuizStatusAPI = async () => {
   try {

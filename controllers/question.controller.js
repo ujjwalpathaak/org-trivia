@@ -1,6 +1,7 @@
 import questionService from '../services/question.service.js';
+import quizService from '../services/quiz.service.js';
 
-const addQuestion = async (req, res, next) => {
+const addQuestionController = async (req, res, next) => {
   try {
     const { question } = req.body;
     const { employeeId } = req.data;
@@ -24,46 +25,48 @@ const addQuestion = async (req, res, next) => {
   }
 };
 
-const getWeeklyUnapprovedQuestions = async (req, res, next) => {
+const getWeeklyQuizQuestionsController = async (req, res, next) => {
   try {
+    const { quizId } = req.params;
     const { orgId } = req.data;
     if (!orgId) {
       return res.status(400).json({ message: 'Missing required fields' });
     }
 
-    const upcomingQuiz =
-      await questionService.getUpcomingWeeklyQuizByOrgId(orgId);
-    if (!upcomingQuiz) {
+    const quiz = await quizService.getWeeklyQuizService(quizId);
+
+    if (!quiz || !quiz.status === 'scheduled') {
       return res
         .status(400)
         .json({ message: 'No questions scheduled till now' });
     }
 
-    const weeklyUnapprovedQuestions =
-      await questionService.getWeeklyUnapprovedQuestions(
-        orgId,
-        upcomingQuiz._id,
-      );
+    const weeklyQuestions = await questionService.getWeeklyQuestionsService(
+      orgId,
+      quiz._id,
+    );
     const extraEmployeeQuestions =
       await questionService.getExtraEmployeeQuestions(
         orgId,
-        upcomingQuiz._id,
-        upcomingQuiz.genre,
+        quiz._id,
+        quiz.genre,
       );
 
-    if (!weeklyUnapprovedQuestions) {
+    console.log(weeklyQuestions, extraEmployeeQuestions);
+
+    if (!weeklyQuestions) {
       return res
         .status(400)
         .json({ message: 'No questions scheduled till now' });
     }
 
-    res.status(200).json({ weeklyUnapprovedQuestions, extraEmployeeQuestions });
+    res.status(200).json({ weeklyQuestions, extraEmployeeQuestions });
   } catch (error) {
     next(error);
   }
 };
 
-const scheduleQuizzesJob = async (req, res, next) => {
+const scheduleQuizzesJobController = async (req, res, next) => {
   try {
     await questionService.scheduleQuizzesJob();
     res.json('Job running');
@@ -73,7 +76,7 @@ const scheduleQuizzesJob = async (req, res, next) => {
 };
 
 export default {
-  addQuestion,
-  getWeeklyUnapprovedQuestions,
-  scheduleQuizzesJob,
+  addQuestionController,
+  getWeeklyQuizQuestionsController,
+  scheduleQuizzesJobController,
 };

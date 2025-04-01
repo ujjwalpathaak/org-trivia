@@ -3,6 +3,7 @@ import { ObjectId } from 'mongodb';
 import { getMonth } from '../middleware/utils.js';
 import Employee from '../models/employee.model.js';
 import Question from '../models/question.model.js';
+import badgeRepository from './badge.repository.js';
 
 const isWeeklyQuizGiven = async (employeeId) => {
   return Employee.findById(employeeId, 'quizGiven');

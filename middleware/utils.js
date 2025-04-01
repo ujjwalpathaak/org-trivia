@@ -66,7 +66,10 @@ export const mergeUserAnswersAndCorrectAnswers = (
   });
 };
 
-export const getFridaysOfNextMonth = (year = new Date().getFullYear(), month = new Date().getMonth()) => {
+export const getFridaysOfNextMonth = (
+  year = new Date().getFullYear(),
+  month = new Date().getMonth(),
+) => {
   month = (month + 1) % 12;
   if (month === 0) year++;
 
@@ -84,7 +87,6 @@ export const getFridaysOfNextMonth = (year = new Date().getFullYear(), month = n
 
   return fridays;
 };
-
 
 export const getMonth = (month) => {
   const months = [

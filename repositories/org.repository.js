@@ -1,5 +1,6 @@
 import { ObjectId } from 'mongodb';
 
+import { HRP_QUESTIONS_PER_QUIZ } from '../constants.js';
 import Org from '../models/org.model.js';
 import Question from '../models/question.model.js';
 import resultRepository from './result.repository.js';
@@ -83,6 +84,20 @@ const setNextQuestionGenre = async (orgId, currentGenreIndex) => {
   return true;
 };
 
+const changeCompanyCurrentAffairsTimeline = async (
+  companyCurrentAffairsTimeline,
+  orgId,
+) => {
+  return Org.updateOne(
+    { _id: new ObjectId(orgId) },
+    {
+      $set: {
+        'settings.companyCurrentAffairsTimeline': companyCurrentAffairsTimeline,
+      },
+    },
+  );
+};
+
 const updateNewUserInOrg = async (orgId, isAdmin, newUser) => {
   return Org.updateOne(
     { _id: new ObjectId(orgId) },
@@ -98,7 +113,7 @@ const changeGenreSettings = async (genre, orgId) => {
 };
 
 const fetchHRDQuestions = async (orgId) => {
-  const files = await Org.aggregate([
+  const files_with_unused_questions = await Org.aggregate([
     { $match: { _id: new ObjectId(orgId) } },
     { $unwind: '$questionsHRD' },
     { $match: { 'questionsHRD.isUsed': false } },
@@ -110,10 +125,15 @@ const fetchHRDQuestions = async (orgId) => {
     },
   ]);
 
-  if (files.length === 0) return [];
+  if (files_with_unused_questions.length === 0) return [];
 
-  const questionsPerFile = Math.max(1, Math.floor(15 / files.length));
+  // how many questions per file to take for HRD_QUESTIONS_PER_QUIZ number of questions
+  const questions_per_file = Math.max(
+    1,
+    Math.floor(HRP_QUESTIONS_PER_QUIZ / files.length),
+  );
 
+  // return questions
   return Org.aggregate([
     { $match: { _id: new ObjectId(orgId) } },
     { $unwind: '$questionsHRD' },
@@ -127,7 +147,7 @@ const fetchHRDQuestions = async (orgId) => {
     {
       $project: {
         _id: 1,
-        questions: { $slice: ['$questions', questionsPerFile] },
+        questions: { $slice: ['$questions', questions_per_file] },
       },
     },
     { $unwind: '$questions' },
@@ -144,16 +164,57 @@ const fetchHRDQuestions = async (orgId) => {
   ]);
 };
 
-const getSettings = async (orgId) => Org.findById(orgId).select('settings');
+const HRPQuestionsCount = async (orgId) => {
+  return Org.countDocuments({
+    _id: new ObjectId(orgId),
+    'questionsHRD.isUsed': false,
+  });
+};
+
+const getSettings = async (orgId) => {
+  const [count_hrd_questions] = await Promise.all([HRPQuestionsCount(orgId)]);
+
+  const settings = await Org.findById(orgId).select('settings');
+
+  return {
+    settings: settings?.settings,
+    question_count: {
+      hrd_questions: count_hrd_questions,
+      hrd_questions_required_per_quiz: HRP_QUESTIONS_PER_QUIZ,
+    },
+  };
+};
+
 const getAllOrgNames = async () => Org.find({}, 'id name');
 const getOrgById = async (orgId) => Org.findById(orgId);
 const isTriviaEnabled = async (orgId) =>
   Org.findById(orgId).select('settings.isTriviaEnabled');
-const updateTriviaSettings = async (orgId, newStatus) =>
-  Org.updateOne(
-    { _id: orgId },
+const updateTriviaSettings = async (orgId, newStatus) => {
+  const update = await Org.updateOne(
+    { _id: new ObjectId(orgId) },
     { $set: { 'settings.isTriviaEnabled': newStatus } },
   );
+};
+
+const makeGenreUnavailable = async (orgId, genre) => {
+  return Org.updateOne(
+    { _id: new ObjectId(orgId) },
+    {
+      $addToSet: { 'settings.unavailableGenre': genre },
+      $pull: { 'settings.selectedGenre': genre },
+    },
+  );
+};
+
+const makeGenreAvailable = async (orgId, genre) => {
+  return Org.updateOne(
+    { _id: new ObjectId(orgId) },
+    {
+      $pull: { 'settings.unavailableGenre': genre },
+      $addToSet: { 'settings.selectedGenre': genre },
+    },
+  );
+};
 
 const getAnalytics = async (orgId) => {
   const [participationByGenre, last3Leaderboards] = await Promise.all([
@@ -205,9 +266,13 @@ export default {
   getSettings,
   fetchExtraEmployeeQuestions,
   getAllOrgNames,
+  makeGenreUnavailable,
+  makeGenreAvailable,
   pushQuestionsInOrg,
   getOrgById,
+  HRPQuestionsCount,
   isTriviaEnabled,
   updateTriviaSettings,
+  changeCompanyCurrentAffairsTimeline,
   getAnalytics,
 };

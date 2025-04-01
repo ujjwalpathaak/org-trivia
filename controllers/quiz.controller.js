@@ -61,13 +61,14 @@ const getScheduledQuizzes = async (req, res, next) => {
       return res.status(400).json({ message: 'Missing required fields' });
     }
 
-    const scheduledQuizzes = await quizService.getScheduledQuizzesService(orgId);
+    const scheduledQuizzes =
+      await quizService.getScheduledQuizzesService(orgId);
 
     res.status(200).json(scheduledQuizzes);
   } catch (error) {
     next(error);
   }
-}
+};
 
 const cancelLiveQuizController = async (req, res, next) => {
   try {
@@ -108,7 +109,8 @@ const handleLambdaCallback = async (req, res, next) => {
 
 export default {
   getWeeklyQuizStatusController,
-  getWeeklyQuizQuestions,getScheduledQuizzes,
+  getWeeklyQuizQuestions,
+  getScheduledQuizzes,
   cancelLiveQuizController,
   approveWeeklyQuizQuestions,
   handleLambdaCallback,

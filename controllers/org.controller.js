@@ -3,9 +3,15 @@ import OrgService from '../services/org.service.js';
 const saveNewSettingsController = async (req, res, next) => {
   try {
     const { orgId } = req.data;
-    const {newGenreOrder, changedGenres} = req.body;
+    const { newGenreOrder, changedGenres, companyCurrentAffairsTimeline } =
+      req.body;
 
-    await OrgService.saveSettingsService(orgId, newGenreOrder, changedGenres);
+    await OrgService.saveSettingsService(
+      orgId,
+      newGenreOrder,
+      changedGenres,
+      companyCurrentAffairsTimeline,
+    );
     res.json({ message: 'Genre settings updated successfully' });
   } catch (error) {
     next(error);

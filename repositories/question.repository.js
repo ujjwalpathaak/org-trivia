@@ -1,3 +1,5 @@
+import { ObjectId } from 'mongodb';
+
 import Question from '../models/question.model.js';
 import WeeklyQuestion from '../models/weeklyQuestion.model.js';
 import orgRepository from './org.repository.js';
@@ -59,7 +61,7 @@ const getCorrectWeeklyQuizAnswers = async (orgId) => {
 
 const saveWeeklyQuizQuestions = async (quizId, newQuestions) => {
   if (newQuestions.length > 0) {
-    await quizRepository.updateQuizStatus(quizId, 'unapproved');
+    await quizRepository.updateQuizStatus(quizId, 'scheduled');
     return await WeeklyQuestion.insertMany(newQuestions);
   }
   return [];
@@ -69,12 +71,8 @@ const getExtraEmployeeQuestions = async (orgId, quizId, genre) => {
   return await orgRepository.fetchExtraEmployeeQuestions(orgId, quizId, genre);
 };
 
-const getWeeklyUnapprovedQuestions = async (quizId) => {
-  return await WeeklyQuestion.find({ quizId });
-};
-
-const fetchHRDQuestions = async (orgId) => {
-  return await orgRepository.fetchHRDQuestions(orgId);
+const getWeeklyQuestions = async (quizId) => {
+  return await WeeklyQuestion.find({ quizId: new ObjectId(quizId) });
 };
 
 export default {
@@ -86,6 +84,5 @@ export default {
   getCorrectWeeklyQuizAnswers,
   saveWeeklyQuizQuestions,
   getExtraEmployeeQuestions,
-  getWeeklyUnapprovedQuestions,
-  fetchHRDQuestions,
+  getWeeklyQuestions,
 };

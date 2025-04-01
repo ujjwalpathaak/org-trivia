@@ -7,19 +7,19 @@ questionRouter.post(
   '/',
   protectRoute,
   checkRole('Employee'),
-  questionController.addQuestion,
+  questionController.addQuestionController,
 );
 
 questionRouter.get(
-  '/weekly/unapproved',
+  '/weekly-quiz/:quizId',
   protectRoute,
   checkRole('Admin'),
-  questionController.getWeeklyUnapprovedQuestions,
+  questionController.getWeeklyQuizQuestionsController,
 );
 
 questionRouter.get(
   '/test/scheduleQuizzesJob',
-  questionController.scheduleQuizzesJob,
+  questionController.scheduleQuizzesJobController,
 );
 
 export default questionRouter;
