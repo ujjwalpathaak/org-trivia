@@ -1,6 +1,6 @@
 import cron from 'node-cron';
 
-import {scheduleQuizzesJob} from '../services/question.service.js';
+import { scheduleQuizzesJob } from '../services/question.service.js';
 
 export const scheduleQuizzesJobCron = cron.schedule(
   '1 0 * * 0',

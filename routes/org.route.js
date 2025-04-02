@@ -1,6 +1,12 @@
 import express from 'express';
 
-import { saveNewSettingsController, getAllOrgNamesController, toggleTriviaController, getSettingsController, getAnalyticsController } from '../controllers/org.controller.js';
+import {
+  getAllOrgNamesController,
+  getAnalyticsController,
+  getSettingsController,
+  saveNewSettingsController,
+  toggleTriviaController,
+} from '../controllers/org.controller.js';
 import { checkRole, protectRoute } from '../middleware/auth.middleware.js';
 
 export const orgRouter = express.Router();

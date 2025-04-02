@@ -36,9 +36,9 @@ export const fetchNewPnAQuestions = (orgName, orgId, quizId) => {
     },
     body: JSON.stringify({
       orgName: orgName,
-      callbackUrl: 'https://4ebf-122-187-121-22.ngrok-free.app',
+      callbackUrl: 'https://6ca8-122-187-121-22.ngrok-free.app',
       orgId: orgId,
-      quizId: quizId,
+      quizId: quizId
     }),
   }).catch((error) => console.error('Error triggering Lambda:', error));
 };

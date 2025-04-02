@@ -1,15 +1,15 @@
 import {
-  getWeeklyQuizQuestions,
-  approveWeeklyQuizQuestionsService,
   addLambdaCallbackQuestions,
+  approveWeeklyQuizQuestionsService,
+  getWeeklyQuizLiveQuestions,
 } from '../services/question.service.js';
 import {
-  getWeeklyQuizStatusService,
-  getWeeklyQuizService,
-  makeWeeklyQuizLiveService,
-  cleanUpWeeklyQuizService,
   cancelLiveQuizService,
+  cleanUpWeeklyQuizService,
   getScheduledQuizzesService,
+  getWeeklyQuizService,
+  getWeeklyQuizStatusService,
+  makeWeeklyQuizLiveService,
 } from '../services/quiz.service.js';
 
 export const getWeeklyQuizStatusController = async (req, res, next) => {
@@ -77,14 +77,14 @@ export const getScheduledQuizzesController = async (req, res, next) => {
   }
 };
 
-export const getWeeklyQuizQuestionsController = async (req, res, next) => {
+export const getWeeklyQuizLiveQuestionsController = async (req, res, next) => {
   try {
     const { orgId } = req.data;
     if (!orgId) {
       return res.status(400).json({ message: 'Missing required fields' });
     }
 
-    const weeklyQuizQuestions = await getWeeklyQuizQuestions(orgId);
+    const weeklyQuizQuestions = await getWeeklyQuizLiveQuestions(orgId);
 
     res.status(200).json(weeklyQuizQuestions);
   } catch (error) {
@@ -100,7 +100,11 @@ export const approveWeeklyQuizQuestionsController = async (req, res, next) => {
       return res.status(400).json({ message: 'Missing required fields' });
     }
 
-    await approveWeeklyQuizQuestionsService(questions, questionsToDelete, orgId);
+    await approveWeeklyQuizQuestionsService(
+      questions,
+      questionsToDelete,
+      orgId,
+    );
 
     res.status(200).json({ message: 'Questions marked as approved' });
   } catch (error) {
@@ -110,13 +114,20 @@ export const approveWeeklyQuizQuestionsController = async (req, res, next) => {
 
 export const handleLambdaCallbackController = async (req, res, next) => {
   try {
-    const { category, quizId, file, questions, orgId } = req.body;
+    const { category, quizId, file, questions, orgId, newsTimeline } = req.body;
     if (!questions || !orgId || !category) {
       next(new Error('Invalid request body'));
       return;
     }
 
-    await addLambdaCallbackQuestions(questions, category, orgId, quizId, file);
+    await addLambdaCallbackQuestions(
+      questions,
+      category,
+      orgId,
+      quizId,
+      file,
+      newsTimeline,
+    );
 
     res.status(200).json({ message: 'Scheduled new questions' });
   } catch (error) {

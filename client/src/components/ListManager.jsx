@@ -27,7 +27,7 @@ export default function ListManager({
     () => [
       { key: 'Puzzles and Aptitude', value: 'PnA' },
       { key: 'Company Achievements', value: 'CAnIT' },
-      { key: 'HR Policies', value: 'HRD' },
+      { key: 'HR Policies', value: 'HRP' },
     ],
     []
   );
@@ -38,7 +38,7 @@ export default function ListManager({
       const questions = questionCountStatus[`${key}_questions`];
       const required_questions = questionCountStatus[`${key}_questions_required_per_quiz`];
       if (questions <= required_questions) {
-        if (key === 'hrd') {
+        if (key === 'hrp') {
           return `${questions} new questions available. Will start to paraphrase old questions`;
         }
       }
@@ -56,19 +56,22 @@ export default function ListManager({
       })),
     [selectedGenre, allItems]
   );
-  const initialQuizItems = [];
-  // const initialQuizItems = useMemo(() => {
-  //   const uniqueMap = new Map();
-  //   (Array.isArray(quizzes)  || []).forEach((quiz) => {
-  //     if (!uniqueMap.has(quiz.genre)) {
-  //       uniqueMap.set(quiz.genre, {
-  //         key: allItems.find((item) => item.value === quiz.genre)?.key || '',
-  //         value: quiz.genre,
-  //       });
-  //     }
-  //   });
-  //   return Array.from(uniqueMap.values());
-  // }, [quizzes, allItems]);
+  // const initialQuizItems = [];
+  const initialQuizItems = useMemo(() => {
+    if (!Array.isArray(quizzes)) {
+      return [];
+    }
+
+    const uniqueMap = new Map();
+    quizzes.forEach((quiz) => {
+      if (!uniqueMap.has(quiz.genre)) {
+        const key = allItems.find((item) => item.value === quiz.genre)?.key || 'default-key';
+        uniqueMap.set(quiz.genre, { key, value: quiz.genre });
+      }
+    });
+
+    return Array.from(uniqueMap.values());
+  }, [quizzes, allItems]);
 
   const [selectedItems, setSelectedItems] = useState(initialSelectedItems);
 

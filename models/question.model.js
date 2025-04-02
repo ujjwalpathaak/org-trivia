@@ -10,7 +10,7 @@ const questionSchema = new mongoose.Schema({
   },
   category: {
     type: String,
-    enum: ['CCnHnFF', 'CAnIT', 'HRD', 'PnA'],
+    enum: ['CAnIT', 'HRP', 'PnA'],
     immutable: true,
     required: true,
   },

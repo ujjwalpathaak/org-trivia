@@ -12,15 +12,18 @@ export const submitWeeklyQuizAnswers = async (
   answers,
   session,
 ) => {
-  return await Result.create({
-    employeeId,
-    orgId,
-    quizId,
-    score,
-    points,
-    genre,
-    answers,
-  }, { session });
+  return await Result.create(
+    {
+      employeeId,
+      orgId,
+      quizId,
+      score,
+      points,
+      genre,
+      answers,
+    },
+    { session },
+  );
 };
 
 export const rollbackWeeklyQuizScores = async (quizId) => {
@@ -84,9 +87,13 @@ export const getParticipationByGenre = async (orgId) => {
 
 export const findResultByQuizId = (quizId) => {
   return Result.findOne({ quizId: new ObjectId(quizId) });
-}
+};
 
-export const getEmployeePastResults = async (employeeId, page = 0, size = 10) => {
+export const getEmployeePastResults = async (
+  employeeId,
+  page = 0,
+  size = 10,
+) => {
   const skip = parseInt(page) * parseInt(size);
   const limit = parseInt(size);
 

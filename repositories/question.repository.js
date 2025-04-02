@@ -9,6 +9,14 @@ export const saveQuestion = async (newQuestion) => {
   return await new Question(newQuestion).save();
 };
 
+export const getUnusedQuestionsFromTimeline = async (orgId, isApproved) => {
+  const questions = await WeeklyQuestion.find({ orgId, isApproved })
+    .select('question._id')
+    .lean();
+
+  return questions.map((q) => q.question._id);
+}
+
 export const addQuestions = async (newQuestions) => {
   const existingQuestions = await Question.find(
     { question: { $in: newQuestions.map((q) => q.question) } },
@@ -27,8 +35,13 @@ export const addQuestions = async (newQuestions) => {
   return await Question.insertMany(filteredQuestions, { ordered: false });
 };
 
-export const getApprovedWeeklyQuizQuestion = async (orgId) => {
-  return await WeeklyQuestion.find({ orgId, isApproved: true })
+export const getWeeklyQuizScheduledQuestions = async (orgId) => {
+  return await WeeklyQuestion.find({ orgId }).lean();
+};
+
+export const getWeeklyQuizLiveQuestions = async (orgId) => {
+  // only if quiz is live
+  return await WeeklyQuestion.find({ orgId })
     .select('-question.answer')
     .lean();
 };
@@ -65,10 +78,6 @@ export const saveWeeklyQuizQuestions = async (quizId, newQuestions) => {
     return await WeeklyQuestion.insertMany(newQuestions);
   }
   return [];
-};
-
-export const getExtraEmployeeQuestions = async (orgId, quizId, genre) => {
-  return await fetchExtraEmployeeQuestions(orgId, quizId, genre);
 };
 
 export const getWeeklyQuestions = async (quizId) => {

@@ -2,3 +2,5 @@ export const HRP_QUESTIONS_PER_QUIZ = 10;
 export const MIN_NEW_HRP_QUESTIONS_PER_QUIZ = 5;
 export const CAnIT_QUESTIONS_PER_QUIZ = 10;
 export const MIN_NEW_CAnIT_QUESTIONS_PER_QUIZ = 5;
+export const PnA_QUESTIONS_PER_QUIZ = 4;
+export const MIN_EXTRA_PnA_QUESTIONS = 4;

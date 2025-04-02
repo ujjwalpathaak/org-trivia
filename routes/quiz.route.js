@@ -1,6 +1,13 @@
 import express from 'express';
 
-import { getWeeklyQuizStatusController, cancelLiveQuizController, getScheduledQuizzesController, getWeeklyQuizQuestionsController, handleLambdaCallbackController, approveWeeklyQuizQuestionsController } from '../controllers/quiz.controller.js';
+import {
+  approveWeeklyQuizQuestionsController,
+  cancelLiveQuizController,
+  getScheduledQuizzesController,
+  getWeeklyQuizLiveQuestionsController,
+  getWeeklyQuizStatusController,
+  handleLambdaCallbackController,
+} from '../controllers/quiz.controller.js';
 import { checkRole, protectRoute } from '../middleware/auth.middleware.js';
 
 export const quizRouter = express.Router();
@@ -39,5 +46,5 @@ quizRouter.get(
   '/questions',
   protectRoute,
   checkRole('Employee'),
-  getWeeklyQuizQuestionsController,
+  getWeeklyQuizLiveQuestionsController,
 );

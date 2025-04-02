@@ -10,7 +10,7 @@ const questionSchema = new mongoose.Schema({
   },
   category: {
     type: String,
-    enum: ['CCnHnFF', 'CAnIT', 'HRD', 'PnA'],
+    enum: ['CCnHnFF', 'CAnIT', 'HRP', 'PnA'],
     immutable: true,
     required: true,
   },
@@ -51,19 +51,9 @@ const questionSchema = new mongoose.Schema({
 });
 
 const weeklyQuestionSchema = new mongoose.Schema({
-  isApproved: {
-    type: Boolean,
-    required: true,
-    default: false,
-  },
   quizId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Quiz',
-    required: true,
-  },
-  type: {
-    type: String,
-    enum: ['main', 'extra'],
     required: true,
   },
   question: questionSchema,

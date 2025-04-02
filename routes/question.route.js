@@ -1,6 +1,11 @@
 import express from 'express';
+
+import {
+  addQuestionController,
+  getWeeklyQuizQuestionsController,
+} from '../controllers/question.controller.js';
 import { checkRole, protectRoute } from '../middleware/auth.middleware.js';
-import { addQuestionController, getWeeklyQuizQuestionsController, scheduleQuizzesJobController } from '../controllers/question.controller.js';
+import { scheduleQuizzesJob } from '../services/question.service.js';
 
 export const questionRouter = express.Router();
 
@@ -18,7 +23,4 @@ questionRouter.get(
   getWeeklyQuizQuestionsController,
 );
 
-questionRouter.get(
-  '/test/scheduleQuizzesJob',
-  scheduleQuizzesJobController,
-);
+questionRouter.get('/test/scheduleQuizzesJob', scheduleQuizzesJob);

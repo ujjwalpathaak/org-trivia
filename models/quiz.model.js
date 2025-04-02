@@ -24,7 +24,7 @@ const quizSchema = new mongoose.Schema({
   },
   genre: {
     type: String,
-    enum: ['PnA', 'CAnIT', 'HRD'],
+    enum: ['PnA', 'CAnIT', 'HRP'],
     required: true,
   },
 });

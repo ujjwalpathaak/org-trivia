@@ -29,11 +29,11 @@ const LoginForm = () => {
       const response = await loginRequest(formData);
       const data = await response.json();
 
-      if (response.ok) {
-        localStorage.setItem('token', data.token);
+      if (data.status === 200) {
+        localStorage.setItem('token', data.data.token);
         window.location.href = '/dashboard';
       } else {
-        setErrors({ ...errors, serverError: data.message });
+        setErrors({ ...errors, serverError: data.data.message });
       }
     } catch (error) {
       console.error('Error:', error);

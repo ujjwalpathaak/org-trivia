@@ -2,7 +2,10 @@ import { ObjectId } from 'mongodb';
 
 import Leaderboard from '../models/leaderboard.model.js';
 import { findBadgeByRank } from './badge.repository.js';
-import { addBadgesToEmployees, resetAllEmployeesScores } from './employee.repository.js';
+import {
+  addBadgesToEmployees,
+  resetAllEmployeesScores,
+} from './employee.repository.js';
 
 export const updateLeaderboard = async (
   orgId,

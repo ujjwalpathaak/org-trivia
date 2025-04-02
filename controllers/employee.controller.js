@@ -24,7 +24,11 @@ export const getSubmittedQuestionsController = async (req, res, next) => {
       return res.status(400).json({ message: 'Missing required fields' });
     }
 
-    const questions = await getSubmittedQuestionsService(employeeId, page, size);
+    const questions = await getSubmittedQuestionsService(
+      employeeId,
+      page,
+      size,
+    );
     res.status(200).json(questions);
   } catch (error) {
     next(error);

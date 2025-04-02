@@ -39,7 +39,7 @@ const orgSchema = new mongoose.Schema({
     type: [questionSchema],
     default: [],
   },
-  questionsHRD: {
+  questionsHRP: {
     type: [questionSchema],
     default: [],
   },
@@ -67,12 +67,12 @@ const orgSchema = new mongoose.Schema({
       currentGenre: { type: Number, default: 0, min: 0, max: 3 },
       unavailableGenre: {
         type: [String],
-        default: ['PnA', 'HRD', 'CAnIT'],
+        default: ['PnA', 'HRP', 'CAnIT'],
         set: (arr) => [...new Set(arr ?? [])], // Ensure it's an array
       },
       selectedGenre: {
         type: [String],
-        default: ['PnA', 'HRD', 'CAnIT'],
+        default: ['PnA', 'HRP', 'CAnIT'],
         set: function (arr) {
           const unavailable = this?.settings?.unavailableGenre ?? []; // Ensure unavailableGenre is defined
           return (arr ?? []).filter((genre) => !unavailable.includes(genre));
@@ -80,9 +80,10 @@ const orgSchema = new mongoose.Schema({
       },
     },
     default: () => ({
-      isTriviaEnabled: false,
+      isTriviaEnabled: true,
       currentGenre: 0,
-      selectedGenre: ['PnA', 'HRD', 'CAnIT'],
+      companyCurrentAffairsTimeline: 3,
+      selectedGenre: ['PnA', 'HRP', 'CAnIT'],
       unavailableGenre: [],
     }),
   },
@@ -91,11 +92,10 @@ const orgSchema = new mongoose.Schema({
 orgSchema.pre('save', function (next) {
   this.settings.unavailableGenre = this.settings.unavailableGenre ?? [];
   this.settings.selectedGenre = this.settings.selectedGenre.filter(
-    (genre) => !this.settings.unavailableGenre.includes(genre)
+    (genre) => !this.settings.unavailableGenre.includes(genre),
   );
   next();
 });
-
 
 const Org = mongoose.model('Org', orgSchema);
 

@@ -23,7 +23,6 @@ export default function ScheduleQuestions() {
   const [tempRemovedQuestion, setTempRemovedQuestion] = useState(null);
 
   const handleQuestionRemove = (idx) => {
-    // if (isAI) setUsingAI(true);
     setTempRemovedQuestion({ index: idx, question: questions[idx] });
     const updatedQuestions = [...questions];
     updatedQuestions[idx] = { question: null };
@@ -46,13 +45,14 @@ export default function ScheduleQuestions() {
   useEffect(() => {
     const getQuestionsToApproveFunc = async () => {
       const response = await getQuestionsToApproveAPI(quizId);
+      console.log(response);
       if (response.status === 400) {
         noQuestionFound();
         navigate('/dashboard');
         return;
       }
-      setAiQuestions(response.data.weeklyQuestions.filter((q) => q.type === 'extra'));
-      setQuestions(response.data.weeklyQuestions.filter((q) => q.type === 'main'));
+      setAiQuestions(response.data.extraAIQuestions);
+      setQuestions(response.data.weeklyQuizQuestions);
       setEmpQuestions(response.data.extraEmployeeQuestions);
     };
 
@@ -71,15 +71,15 @@ export default function ScheduleQuestions() {
 
   const selectQuestion = (question) => {
     if (!addQuestion) return;
-    const isDuplicate = questions.some((q) => q.question === question);
+    const isDuplicate = questions.some((q) => q === question);
     if (isDuplicate) {
       toast.error('This question is already selected!');
       return;
     }
-    if (question.question.source === 'AI') {
-      setAiQuestions(aiQuestions.filter((q) => q.question !== question.question));
+    if (question.source === 'AI') {
+      setAiQuestions(aiQuestions.filter((q) => q !== question));
     } else if (question.question.source === 'Employee') {
-      setEmpQuestions(empQuestions.filter((q) => q.question !== question.question));
+      setEmpQuestions(empQuestions.filter((q) => q !== question));
     }
     const updatedQuestions = [...questions];
     updatedQuestions[removedQuestionIndex] = question;
@@ -91,19 +91,19 @@ export default function ScheduleQuestions() {
 
   const handleQuestionChangeType = (idx, newQuestion) => {
     const updatedQuestions = [...questions];
-    updatedQuestions[idx].question.question = newQuestion;
+    updatedQuestions[idx].question = newQuestion;
     setQuestions(updatedQuestions);
   };
 
   const handleOptionChange = (qIdx, optionIdx, newOption) => {
     const updatedQuestions = [...questions];
-    updatedQuestions[qIdx].question.options[optionIdx] = newOption;
+    updatedQuestions[qIdx].options[optionIdx] = newOption;
     setQuestions(updatedQuestions);
   };
 
   const handleCorrectAnswerChange = (idx, correctOption) => {
     const updatedQuestions = [...questions];
-    updatedQuestions[idx].question.answer = parseInt(correctOption, 10);
+    updatedQuestions[idx].answer = parseInt(correctOption, 10);
     setQuestions(updatedQuestions);
   };
 
@@ -119,7 +119,7 @@ export default function ScheduleQuestions() {
     <div className="h-[93vh] bg-gradient-to-br from-blue-50 to-indigo-50 p-6">
       <div className="flex gap-6 h-full">
         <div
-          className={`w-1/3 bg-white rounded-xl shadow-lg p-6 flex-1 ${
+          className={`w-1/3 bg-white rounded-xl shadow-lg p-6 flex-2 ${
             !addQuestion ? 'opacity-50 pointer-events-none' : ''
           }`}
         >
@@ -183,7 +183,7 @@ export default function ScheduleQuestions() {
 
           <div className="space-y-6 overflow-auto max-h-[calc(100vh-14rem)]">
             {questions?.map((q, idx) => {
-              if (q.question) {
+              if (q) {
                 return (
                   <div key={idx} className="bg-gray-50 rounded-lg p-6 shadow-sm relative">
                     <div className="flex justify-between items-center mb-4">
@@ -206,27 +206,27 @@ export default function ScheduleQuestions() {
                       </div> */}
                     </div>
                     <textarea
-                      value={q.question?.question}
+                      value={q.question}
                       onChange={(e) => handleQuestionChangeType(idx, e.target.value)}
                       className="w-full p-4 border border-gray-200 rounded-lg mb-4 focus:ring-2 focus:ring-blue-500 focus:border-transparent min-h-[100px]"
                     />
-                    {q.question?.image && (
+                    {q?.image && (
                       <img
-                        src={q.question.image}
+                        src={q.image}
                         alt="Question"
                         className="w-[20%] mx-auto mb-4 rounded-lg shadow-sm"
                       />
                     )}
                     <div className="space-y-4">
                       <p className="font-medium text-gray-700">Options:</p>
-                      {q?.question?.options?.map((option, i) => (
+                      {q?.options?.map((option, i) => (
                         <input
                           key={i}
                           type="text"
                           value={option}
                           onChange={(e) => handleOptionChange(idx, i, e.target.value)}
                           className={`w-full p-3 border rounded-lg transition duration-200 ${
-                            i === q.question.answer
+                            i === q.answer
                               ? 'bg-green-50 border-green-200'
                               : 'bg-red-50 border-red-200'
                           }`}
@@ -236,11 +236,11 @@ export default function ScheduleQuestions() {
                     <div className="mt-4">
                       <p className="font-medium text-gray-700 mb-2">Correct Answer:</p>
                       <select
-                        value={q.question?.answer || ''}
+                        value={q?.answer || ''}
                         onChange={(e) => handleCorrectAnswerChange(idx, e.target.value)}
                         className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       >
-                        {q?.question?.options?.map((option, i) => (
+                        {q?.options?.map((option, i) => (
                           <option key={i} value={i}>
                             {option}
                           </option>

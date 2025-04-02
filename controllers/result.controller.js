@@ -1,6 +1,6 @@
 import {
-  submitWeeklyQuizAnswersService,
   getEmployeePastResultsService,
+  submitWeeklyQuizAnswersService,
 } from '../services/result.service.js';
 
 export const submitWeeklyQuizAnswersController = async (req, res, next) => {

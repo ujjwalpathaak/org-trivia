@@ -21,6 +21,14 @@ export const getQuizStatus = (orgId) => {
   );
 };
 
+// export const lastQuizByGenre = (orgId, genre) => {
+//   return Quiz.findOne(
+//     { orgId: new ObjectId(orgId), genre: genre },
+//     { sort: { scheduledDate: -1 } },
+//     { limit: 1 },
+//   );
+// };
+
 export const cancelLiveQuiz = async (quizId) => {
   await findResultByQuizId(quizId);
   return Quiz.updateOne(

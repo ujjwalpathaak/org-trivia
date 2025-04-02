@@ -113,7 +113,7 @@ const QuestionMaker = ({ setIsQuestionMakerOpen }) => {
           >
             <option value="">Select Category</option>
             <option value="CAnIT">Company Achievements and Industry Trends</option>
-            <option value="HRD">HR Docs</option>
+            <option value="HRP">HR Policies</option>
             <option value="PnA">Puzzles and Aptitude</option>
           </select>
           {errors.category && <p className="text-red-500 text-sm">{errors.category}</p>}

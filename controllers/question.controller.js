@@ -1,13 +1,9 @@
 import {
-  validateEmployeeQuestionSubmission,
-  saveQuestion,
-  getWeeklyQuizQuestions,
   approveWeeklyQuizQuestionsService,
+  getWeeklyQuizQuestions,
+  saveQuestion,
+  validateEmployeeQuestionSubmission,
 } from '../services/question.service.js';
-import {
-  getWeeklyQuizService,
-  makeWeeklyQuizLiveService,
-} from '../services/quiz.service.js';
 
 export const addQuestionController = async (req, res, next) => {
   try {
@@ -31,12 +27,16 @@ export const addQuestionController = async (req, res, next) => {
 
 export const getWeeklyQuizQuestionsController = async (req, res, next) => {
   try {
+    const {quizId} = req.params;
     const { orgId } = req.data;
+    if (!quizId) {
+      return res.status(400).json({ message: 'Missing required fields' });
+    }
     if (!orgId) {
       return res.status(400).json({ message: 'Missing required fields' });
     }
 
-    const weeklyQuizQuestions = await getWeeklyQuizQuestions(orgId);
+    const weeklyQuizQuestions = await getWeeklyQuizQuestions(orgId, quizId);
     res.status(200).json(weeklyQuizQuestions);
   } catch (error) {
     next(error);
@@ -51,27 +51,12 @@ export const approveWeeklyQuizQuestionsController = async (req, res, next) => {
       return res.status(400).json({ message: 'Missing required fields' });
     }
 
-    await approveWeeklyQuizQuestionsService(questions, questionsToDelete, orgId);
+    await approveWeeklyQuizQuestionsService(
+      questions,
+      questionsToDelete,
+      orgId,
+    );
     res.status(200).json({ message: 'Questions marked as approved' });
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const scheduleQuizzesJobController = async (req, res, next) => {
-  try {
-    const { orgId } = req.data;
-    if (!orgId) {
-      return res.status(400).json({ message: 'Missing required fields' });
-    }
-
-    const quiz = await getWeeklyQuizService(orgId);
-    if (!quiz) {
-      return res.status(404).json({ message: 'No quiz found' });
-    }
-
-    await makeWeeklyQuizLiveService();
-    res.status(200).json({ message: 'Quizzes scheduled successfully' });
   } catch (error) {
     next(error);
   }

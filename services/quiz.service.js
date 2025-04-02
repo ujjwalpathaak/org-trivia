@@ -1,17 +1,17 @@
 import {
+  awardStreakBadges,
   isWeeklyQuizGiven,
   updateEmployeeStreaksAndMarkAllEmployeesAsQuizNotGiven,
-  awardStreakBadges,
 } from '../repositories/employee.repository.js';
+import { dropWeeklyQuestionCollection } from '../repositories/question.repository.js';
 import {
-  getQuizStatus,
   cancelLiveQuiz,
   findQuiz,
+  getQuizStatus,
+  getScheduledQuizzes,
   makeWeeklyQuizLive,
   markAllQuizAsExpired,
-  getScheduledQuizzes,
 } from '../repositories/quiz.repository.js';
-import { dropWeeklyQuestionCollection } from '../repositories/question.repository.js';
 
 export const getWeeklyQuizStatusService = async (orgId, employeeId) => {
   const [quiz, employee] = await Promise.all([
@@ -38,6 +38,26 @@ export const cancelLiveQuizService = async (quizId) => {
 export const getWeeklyQuizService = async (quizId) => {
   return await findQuiz(quizId);
 };
+
+// export const isCAnITQuizOverlappingService = async (
+//   orgId,
+//   companyCurrentAffairsTimeline,
+//   quizId,
+// ) => {
+//   const quiz = findQuiz(quizId);
+//   const days = companyCurrentAffairsTimeline * 7;
+//   const quizDate = new Date(quiz?.scheduledDate);
+
+//   const lastQuiz = await lastQuizByGenre(orgId, 'CANIT');
+
+//   if (!lastQuiz?.scheduledDate) {
+//     return false;
+//   }
+
+//   const lastQuizDate = new Date(lastQuiz.scheduledDate);
+
+//   return Math.abs((quizDate - lastQuizDate) / (1000 * 60 * 60 * 24)) < days;
+// };
 
 export const makeWeeklyQuizLiveService = async () => {
   await makeWeeklyQuizLive();

@@ -3,22 +3,14 @@ import {
   getMonthAndYear,
   mergeUserAnswersAndCorrectAnswers,
 } from '../middleware/utils.js';
-import {
-  updateWeeklyQuizScore,
-} from '../repositories/employee.repository.js';
-import {
-  updateLeaderboard,
-} from '../repositories/leaderboard.respository.js';
-import {
-  findLiveQuizByOrgId,
-} from '../repositories/quiz.repository.js';
+import { updateWeeklyQuizScore } from '../repositories/employee.repository.js';
+import { updateLeaderboard } from '../repositories/leaderboard.respository.js';
+import { findLiveQuizByOrgId } from '../repositories/quiz.repository.js';
 import {
   getEmployeePastResults,
   submitWeeklyQuizAnswers as submitAnswers,
 } from '../repositories/result.repository.js';
-import {
-  getWeeklyQuizCorrectAnswersService,
-} from './question.service.js';
+import { getWeeklyQuizCorrectAnswersService } from './question.service.js';
 
 export const calculateWeeklyQuizScore = (userAnswers, correctAnswers) => {
   const correctAnswerMap = new Map(
@@ -46,7 +38,10 @@ export const submitWeeklyQuizAnswersService = async (
   session.startTransaction();
 
   try {
-    const correctAnswers = await getWeeklyQuizCorrectAnswersService(orgId, quizId);
+    const correctAnswers = await getWeeklyQuizCorrectAnswersService(
+      orgId,
+      quizId,
+    );
     const points = calculateWeeklyQuizScore(userAnswers, correctAnswers);
 
     const quiz = await findLiveQuizByOrgId(orgId);
@@ -54,11 +49,7 @@ export const submitWeeklyQuizAnswersService = async (
       throw new Error('No active quiz found for this organization.');
     }
 
-    const data = await updateWeeklyQuizScore(
-      employeeId,
-      points,
-      session,
-    );
+    const data = await updateWeeklyQuizScore(employeeId, points, session);
     if (!data) {
       throw new Error('Error updating employee score - quiz already given.');
     }

@@ -60,23 +60,24 @@ export const awardStreakBadges = async () => {
   ]);
 };
 
-export const updateEmployeeStreaksAndMarkAllEmployeesAsQuizNotGiven = async () => {
-  await Employee.bulkWrite([
-    {
-      updateMany: {
-        filter: { quizGiven: true },
-        update: { $inc: { streak: 1 } },
+export const updateEmployeeStreaksAndMarkAllEmployeesAsQuizNotGiven =
+  async () => {
+    await Employee.bulkWrite([
+      {
+        updateMany: {
+          filter: { quizGiven: true },
+          update: { $inc: { streak: 1 } },
+        },
       },
-    },
-    {
-      updateMany: {
-        filter: { quizGiven: false },
-        update: { $set: { streak: 0 } },
+      {
+        updateMany: {
+          filter: { quizGiven: false },
+          update: { $set: { streak: 0 } },
+        },
       },
-    },
-    { updateMany: { filter: {}, update: { $set: { quizGiven: false } } } },
-  ]);
-};
+      { updateMany: { filter: {}, update: { $set: { quizGiven: false } } } },
+    ]);
+  };
 
 export const addSubmittedQuestion = async (questionId, employeeId) => {
   return Employee.updateOne(
@@ -98,7 +99,12 @@ export const updateWeeklyQuizScore = async (employeeId, points, session) => {
   return { score: points };
 };
 
-export const addBadgesToEmployees = async (employeeId, badgeId, month, year) => {
+export const addBadgesToEmployees = async (
+  employeeId,
+  badgeId,
+  month,
+  year,
+) => {
   return Employee.updateOne(
     { _id: employeeId },
     {

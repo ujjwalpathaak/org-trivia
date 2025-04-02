@@ -1,4 +1,5 @@
 import { ObjectId } from 'mongodb';
+
 import {
   getLeaderboardByOrgService,
   resetLeaderboardService,
@@ -11,11 +12,7 @@ export const getLeaderboardByOrgController = async (req, res, next) => {
     if (!orgId || !ObjectId.isValid(orgId)) {
       return res.status(400).json({ message: 'Invalid or missing orgId' });
     }
-    const leaderboard = await getLeaderboardByOrgService(
-      orgId,
-      month,
-      year,
-    );
+    const leaderboard = await getLeaderboardByOrgService(orgId, month, year);
     res.status(200).json(leaderboard);
   } catch (error) {
     console.error('Error fetching leaderboard:', error);

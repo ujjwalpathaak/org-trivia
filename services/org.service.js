@@ -1,11 +1,12 @@
 import { getValue, setValue } from '../Redis.js';
 import {
   changeCompanyCurrentAffairsTimeline,
-  getOrgSettings,
+  changeGenreSettings,
   getAllOrgNames,
-  getOrgById,
-  toggleTrivia,
   getOrgAnalytics,
+  getOrgById,
+  getOrgSettings,
+  toggleTrivia,
 } from '../repositories/org.repository.js';
 import { changeQuizGenre } from '../repositories/quiz.repository.js';
 
@@ -15,12 +16,6 @@ export const saveSettingsService = async (
   changedGenres,
   companyCurrentAffairsTimeline,
 ) => {
-  console.log(
-    orgId,
-    newGenreOrder,
-    changedGenres,
-    companyCurrentAffairsTimeline,
-  );
   await Promise.all(
     changedGenres.map(async (genre) => {
       return await changeQuizGenre(genre.newGenre, genre.quizId);
@@ -30,17 +25,12 @@ export const saveSettingsService = async (
     orgId,
     companyCurrentAffairsTimeline,
   );
-  await setValue(`org:${orgId}`, null);
+  await changeGenreSettings(newGenreOrder, orgId);
   return { message: 'Settings saved successfully' };
 };
 
 export const getSettingsService = async (orgId) => {
-  const cache = await getValue(`org:${orgId}`);
-  if (cache) {
-    return cache;
-  }
   const settings = await getOrgSettings(orgId);
-  await setValue(`org:${orgId}`, settings);
   return settings;
 };
 
@@ -49,19 +39,11 @@ export const getAllOrgNamesService = async () => {
   if (cache) {
     return cache;
   }
-  const orgs = await getAllOrgNames();
-  await setValue('allOrgNames', orgs);
-  return orgs;
+  return await getAllOrgNames();
 };
 
 export const getOrgByIdService = async (orgId) => {
-  const cache = await getValue(`org:${orgId}`);
-  if (cache) {
-    return cache;
-  }
-  const org = await getOrgById(orgId);
-  await setValue(`org:${orgId}`, org);
-  return org;
+  return await getOrgById(orgId);
 };
 
 export const toggleTriviaService = async (orgId, isEnabled) => {

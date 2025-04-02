@@ -11,7 +11,7 @@ node_modules
 dist
 dist-ssr
 *.local
-HR_Docs
+HR_Policies
 sample.pdf
 testing
 .env

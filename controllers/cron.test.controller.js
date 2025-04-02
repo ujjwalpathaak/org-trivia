@@ -1,6 +1,6 @@
 import {
-  makeWeeklyQuizLiveService,
   cleanUpWeeklyQuizService,
+  makeWeeklyQuizLiveService,
 } from '../services/quiz.service.js';
 
 export const makeWeeklyQuizLiveController = async (req, res, next) => {

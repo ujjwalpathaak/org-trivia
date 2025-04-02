@@ -1,8 +1,8 @@
 import {
-  getUserByEmail,
   createNewUser,
-  isPasswordsMatch,
   generateToken,
+  getUserByEmail,
+  isPasswordsMatch,
 } from '../repositories/auth.repository.js';
 
 export const registerUser = async (isAdmin, email, password, name, orgId) => {

@@ -1,9 +1,9 @@
 import {
-  saveSettingsService,
-  getSettingsService,
-  toggleTriviaService,
   getAllOrgNamesService,
   getAnalyticsService,
+  getSettingsService,
+  saveSettingsService,
+  toggleTriviaService,
 } from '../services/org.service.js';
 
 export const saveNewSettingsController = async (req, res, next) => {
@@ -11,7 +11,6 @@ export const saveNewSettingsController = async (req, res, next) => {
     const { orgId } = req.data;
     const { newGenreOrder, changedGenres, companyCurrentAffairsTimeline } =
       req.body;
-
     await saveSettingsService(
       orgId,
       newGenreOrder,

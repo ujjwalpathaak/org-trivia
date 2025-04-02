@@ -23,7 +23,7 @@
 
 ### Backend Features
 
-- HRD Workflow
+- HRP Workflow
 - PnA Workflow
 - CAnIT Workflow
 - Leaderboard
@@ -37,7 +37,7 @@
 - checkAPI_Working
 - generatePnA_Questions
 - generateCAnIT_Questions
-- generateHRD_Questions
+- generateHRP_Questions
 
 ## ⏳ Tech Stack
 

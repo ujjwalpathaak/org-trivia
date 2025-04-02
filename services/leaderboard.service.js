@@ -1,7 +1,7 @@
-import { getPreviousMonthAndYear } from '../middleware/utils.js';
 import { getValue, setValue } from '../Redis.js';
 import {
   getLeaderboardByOrg,
+  getLeaderboardYearBoundary,
   resetLeaderboard,
 } from '../repositories/leaderboard.respository.js';
 
@@ -18,7 +18,7 @@ export const getLeaderboardByOrgService = async (orgId, month, year) => {
 
   const [leaderboard, yearBoundary] = await Promise.all([
     getLeaderboardByOrg(orgId, month, year),
-    getPreviousMonthAndYear(month, year),
+    getLeaderboardYearBoundary(orgId),
   ]);
 
   await Promise.all([
