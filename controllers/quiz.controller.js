@@ -1,6 +1,6 @@
 import {
   addLambdaCallbackQuestions,
-  approveWeeklyQuizQuestionsService,
+  editWeeklyQuizQuestionsService,
   getWeeklyQuizLiveQuestions,
 } from '../services/question.service.js';
 import {
@@ -92,7 +92,7 @@ export const getWeeklyQuizLiveQuestionsController = async (req, res, next) => {
   }
 };
 
-export const approveWeeklyQuizQuestionsController = async (req, res, next) => {
+export const editWeeklyQuizQuestionsController = async (req, res, next) => {
   try {
     const { orgId } = req.data;
     const { questions, questionsToDelete } = req.body;
@@ -100,7 +100,7 @@ export const approveWeeklyQuizQuestionsController = async (req, res, next) => {
       return res.status(400).json({ message: 'Missing required fields' });
     }
 
-    await approveWeeklyQuizQuestionsService(
+    await editWeeklyQuizQuestionsService(
       questions,
       questionsToDelete,
       orgId,

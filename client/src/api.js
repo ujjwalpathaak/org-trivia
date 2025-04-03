@@ -209,9 +209,9 @@ export const toggleTriviaAPI = async () => {
   }
 };
 
-export const handleApproveWeeklyQuizAPI = async (questions, questionsToDelete) => {
+export const handleEditWeeklyQuizAPI = async (questions, questionsToDelete) => {
   try {
-    const response = await fetch(`${BACKEND_URL}/quiz/approve`, {
+    const response = await fetch(`${BACKEND_URL}/quiz/questions/edit`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

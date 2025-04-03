@@ -1,10 +1,8 @@
-import { ObjectId } from 'mongodb';
-
 import {
   fetchNewCAnITQuestions,
   fetchNewPnAQuestions,
 } from '../api/lambda.api.js';
-import { MIN_EXTRA_PnA_QUESTIONS, MIN_NEW_HRP_QUESTIONS_PER_QUIZ, PnA_QUESTIONS_PER_QUIZ } from '../constants.js';
+import { MIN_NEW_HRP_QUESTIONS_PER_QUIZ, PnA_QUESTIONS_PER_QUIZ } from '../constants.js';
 import { getFridaysOfNextMonth } from '../middleware/utils.js';
 import {
   addSubmittedQuestion,
@@ -14,24 +12,25 @@ import {
   getTriviaEnabledOrgs,
   setNextQuestionGenre,
   HRPQuestionsCount,
-  makeGenreUnavailable,
-  makeGenreAvailable,
   pushQuestionsInOrg as pushQuestionsInOrgRepo,
-  getExtraQuestionsCount,
   fetchExtraEmployeeQuestions,
   fetchExtraAIQuestions,
+  fetchPnAQuestions,
+  removeAllQuestionsPnAFromOrg,
 } from '../repositories/org.repository.js';
 import {
   saveQuestion as saveQuestionRepo,
-  saveWeeklyQuizQuestions,
+  saveWeeklyQuiz,
   addQuestions,
-  getUnusedQuestionsFromTimeline,
   getWeeklyQuizScheduledQuestions,
+  removeQuestionsPnAFromDatabase,
+  editQuestions,
 } from '../repositories/question.repository.js';
 import {
   findQuiz,
   scheduleNewWeeklyQuiz,
 } from '../repositories/quiz.repository.js';
+import { getPnAQuestionsLeft } from '../repositories/org.repository.js'
 
 export async function saveQuestion(newQuestionData, employeeId) {
   const orgId = newQuestionData.orgId;
@@ -41,12 +40,14 @@ export async function saveQuestion(newQuestionData, employeeId) {
   return newQuestion && addedToList;
 }
 
-export async function scheduleQuizzesJob() {
+export async function scheduleQuizzesJob(req, res) {
   const triviaEnabledOrgs = await getTriviaEnabledOrgs();
   for (const org of triviaEnabledOrgs) {
-    const plainElement = org.toObject();
-    await scheduleQuizForOrgService(plainElement);
+    const orgObject = org.toObject();
+    scheduleQuizForOrgService(orgObject);
   }
+  
+  return res.status(200).json({ message: "Scheduling started" });
 }
 
 export async function scheduleQuizForOrgService(org) {
@@ -68,17 +69,49 @@ export async function scheduleQuizForOrgService(org) {
 
     currentGenre = (currentGenre + 1) % allGenres.length;
   }
+
   await setNextQuestionGenre(org._id, currentGenre);
 
-  scheduledQuizzes.forEach((quiz) => {
-    startQuestionGenerationWorkflow(quiz.genre, org, quiz);
-  });
+  console.log('Starting to debug')
+
+  const PnAQuizzesToConduct = scheduledQuizzes.filter((q) => q.genre === "PnA")
+  const PnAQuestionsRequired = PnAQuizzesToConduct.length * PnA_QUESTIONS_PER_QUIZ;
+  const PnAQuestionsLeft = await getPnAQuestionsLeft(org._id);
+  const PnAQuestionsLeftCount = PnAQuestionsLeft[0]?.count || 0;
+  
+  if(PnAQuestionsLeft.length === 0 || (PnAQuestionsLeftCount <= PnAQuestionsRequired)){
+    const questionsToRemove = await removeAllQuestionsPnAFromOrg(org._id);
+    const response = await removeQuestionsPnAFromDatabase(questionsToRemove);
+    const newQuestions = await fetchNewPnAQuestions(org.name);
+
+    let questions = await pushQuestionsToDatabase(newQuestions.questions, 'PnA');
+    await pushQuestionsInOrg(questions, 'PnA', org._id);
+  }
+
+  for (const quiz of scheduledQuizzes) {
+    await startQuestionGenerationWorkflow(quiz.genre, org, quiz);
+    // const shouldBreak = 
+    // if (shouldBreak) break;
+  }
 }
 
 export async function canConductQuizHRP(orgId) {
   const unusedQuestions = await HRPQuestionsCount(orgId, false);
   return unusedQuestions >= MIN_NEW_HRP_QUESTIONS_PER_QUIZ;
 }
+
+export async function startPnAWorkflow(orgName, orgId, quizId) {
+  const PnAQuestions = await fetchPnAQuestions(orgId);
+  await pushQuestionsInQuiz(PnAQuestions, orgId, quizId, 'PnA')
+  // const PnAQuestionsLeft = await getPnAQuestionsLeft(orgId);
+  // if(PnAQuestionsLeft.length === 0 || (PnAQuestionsLeft[0].count < MIN_PNA_QUESTIONS_TO_CONDUCT_QUIZ)){
+  //   fetchNewPnAQuestions(orgName, orgId, quizId);
+  //   return true;
+  // }else{
+    // return false;
+  // }
+}
+
 
 export async function startQuestionGenerationWorkflow(genre, org, quiz) {
   const quizId = quiz._id;
@@ -90,42 +123,43 @@ export async function startQuestionGenerationWorkflow(genre, org, quiz) {
   switch (genre) {
     case 'PnA':
       console.log('Starting PnA for', orgName);
-      fetchNewPnAQuestions(orgName, orgId, quizId);
+      await startPnAWorkflow(orgName, orgId, quizId);
       break;
 
-    case 'HRP':
-      console.log('Starting HRP for', orgName);
-      const conductQuizHRP = await canConductQuizHRP(orgId, quizId);
-      if (!conductQuizHRP) {
-        makeGenreUnavailable(orgId, genre);
-      } else {
-        makeGenreAvailable(orgId, genre); 
-      }
-      startHRPWorkflow(orgId, quizId);
-      break;
+    // case 'HRP':
+    //   console.log('Starting HRP for', orgName);
+    //   const conductQuizHRP = await canConductQuizHRP(orgId, quizId);
+    //   if (!conductQuizHRP) {
+    //     makeGenreUnavailable(orgId, genre);
+    //   } else {
+    //     makeGenreAvailable(orgId, genre); 
+    //   }
+    //   startHRPWorkflow(orgId, quizId);
+    //   break;
 
-    case 'CAnIT':
-      console.log('Starting CAnIT for', orgName);
-      startCAnITWorkflow(orgId, quizId);
-      break;
+    // case 'CAnIT':
+    //   console.log('Starting CAnIT for', orgName);
+    //   startCAnITWorkflow(orgId, quizId);
+    //   break;
 
     default:
       break;
   }
 }
 
-export function formatQuestionsWeeklyFormat(questions, orgId, quizId) {
-  return questions.map((curr) => ({
+export function formatWeeklyQuizDocument(questions, orgId, quizId) {
+  const questionIds = questions.map((curr) => curr._id);
+  return {
+    questions: questionIds,
     quizId: quizId,
-    question: curr,
     orgId: orgId,
-  }));
+  }
 }
 
 export function formatQuestionsForOrgs(questions, file) {
   return questions.map((question) => ({
-    questionId: new ObjectId(question._id),
-    isUsed: false,
+    questionId: question._id,
+    ...(question.config.puzzleType && { puzzleType: question.config.puzzleType }),
     ...(file && { file: file }),
   }));
 }
@@ -138,20 +172,24 @@ export function formatQuestionsForDatabase(questions, category) {
     category: category,
     source: 'AI',
     status: 'extra',
-    image: null,
-    config: {},
+    config: {
+      puzzleType: question.puzzleType
+    },
   }));
 }
 
-export async function pushQuestionsForApprovals(questions, orgId, quizId) {
-  const refactoredQuestions = formatQuestionsWeeklyFormat(
+export async function pushQuestionsInQuiz(questions, orgId, quizId, genre) {
+  const weeklyQuiz = formatWeeklyQuizDocument(
     questions,
     orgId,
     quizId,
   );
-  return await saveWeeklyQuizQuestions(
+  console.log('weeklyQuiz',weeklyQuiz)
+  return await saveWeeklyQuiz(
+    orgId,
     quizId,
-    refactoredQuestions,
+    weeklyQuiz,
+    genre
   );
 }
 
@@ -177,33 +215,23 @@ export async function addLambdaCallbackQuestions(
   file,
   newsTimeline
 ) {
-  if(category === 'CAnIT') {
-    const unusedQuestionsFromTimeline = await getUnusedQuestionsFromTimeline(orgId, newsTimeline);
-    const questionsCount = newQuestions.length + unusedQuestionsFromTimeline.length;
+  // if(category === 'CAnIT') {
+  //   const unusedQuestionsFromTimeline = await getUnusedQuestionsFromTimeline(orgId, newsTimeline);
+  //   const questionsCount = newQuestions.length + unusedQuestionsFromTimeline.length;
 
-    if(questionsCount < CAnIT_QUESTIONS_PER_QUIZ) {
-      makeGenreUnavailable(orgId, category);
-      return;
-    }else{
-      makeGenreAvailable(orgId, category);
-    }
+  //   if(questionsCount < CAnIT_QUESTIONS_PER_QUIZ) {
+  //     makeGenreUnavailable(orgId, category);
+  //     return;
+  //   }else{
+  //     makeGenreAvailable(orgId, category);
+  //   }
 
-    // logic to use unusedQuestionsFromTimeline
+  //   // logic to use unusedQuestionsFromTimeline
 
-    return;
-  }
-  if(category === 'PnA') {
-    const extraPnAQuestions = await getExtraQuestionsCount(orgId, category);
-    if(extraPnAQuestions < MIN_EXTRA_PnA_QUESTIONS){
-      const extraQuestionsNeeded = MIN_EXTRA_PnA_QUESTIONS - extraPnAQuestions;
-      newQuestions = newQuestions.slice(0, PnA_QUESTIONS_PER_QUIZ + extraQuestionsNeeded);
-    }
-  }
+  //   return;
+  // }
 
-  let questions = await pushQuestionsToDatabase(newQuestions, category);
-  await pushQuestionsInOrg(questions, category, orgId, file);
-  if(category === 'PnA') questions = questions.slice(0, PnA_QUESTIONS_PER_QUIZ);
-  if (quizId) await pushQuestionsForApprovals(questions, orgId, quizId);
+  // if (quizId) await pushQuestionsInQuiz(questions, orgId, quizId);
 }
 
 export async function validateEmployeeQuestionSubmission(question) {
@@ -234,7 +262,7 @@ export function getValidationErrors(question) {
 export async function getExtraAIQuestionsService(orgId, quizId, quizGenre) {
   const aiQuestions = await fetchExtraAIQuestions(orgId, quizGenre);
   console.log('aiQuestions', aiQuestions);
-  return formatQuestionsWeeklyFormat(aiQuestions, orgId, quizId);
+  return formatWeeklyQuizDocument(aiQuestions, orgId, quizId);
 }
 
 export async function getExtraEmployeeQuestionsService(orgId, quizId, quizGenre) {
@@ -243,38 +271,40 @@ export async function getExtraEmployeeQuestionsService(orgId, quizId, quizGenre)
     quizGenre,
   );
   console.log(employeeQuestions);
-  return formatQuestionsWeeklyFormat(employeeQuestions, orgId, quizId);
+  return formatWeeklyQuizDocument(employeeQuestions, orgId, quizId);
 }
 
-export async function approveWeeklyQuizQuestionsService(
-  unapprovedQuestions,
+export async function editWeeklyQuizQuestionsService(
+  questionsToEdit,
   questionsToDelete,
   orgId,
 ) {
-  const idsOfQuestionsToApprove = unapprovedQuestions.map(
-    (q) => new ObjectId(q.question._id),
-  );
-  const idsOfQuestionsToDelete = questionsToDelete.map(
-    (q) => new ObjectId(q.question._id),
-  );
-  const quizId = unapprovedQuestions[0].quizId || null;
-  const category = unapprovedQuestions[0].question.category || null;
+  await editQuestions(questionsToEdit);
 
-  await orgRepository.updateQuestionsStatusInOrgToUsed(
-    orgId,
-    category,
-    idsOfQuestionsToApprove,
-    idsOfQuestionsToDelete,
-  );
-  const employeeQuestionsToAdd = unapprovedQuestions.filter(
-    (q) => q.question.source === 'Employee',
-  );
-  await quizRepository.updateQuizStatusToApproved(quizId);
-  await updateWeeklyQuestionsStatusToApproved(
-    idsOfQuestionsToApprove,
-    employeeQuestionsToAdd,
-    idsOfQuestionsToDelete,
-  );
+  // const idsOfQuestionsToChange = questions.map(
+  //   (q) => new ObjectId(q.question._id),
+  // );
+  // const idsOfQuestionsToDelete = questionsToDelete.map(
+  //   (q) => new ObjectId(q.question._id),
+  // );
+  // const employeeQuestionsToAdd = questions.filter(
+  //   (q) => q.question.source === 'Employee',
+  // );
+  // const quizId = questions[0].quizId || null;
+  // const category = questions[0].question.category || null;
+
+  // await orgRepository.updateQuestionsStatusInOrgToUsed(
+  //   orgId,
+  //   category,
+  //   idsOfQuestionsToChange,
+  //   idsOfQuestionsToDelete,
+  // );
+  // await quizRepository.updateQuizStatusToApproved(quizId);
+  // await updateWeeklyQuestionsStatusToApproved(
+  //   idsOfQuestionsToApprove,
+  //   employeeQuestionsToAdd,
+  //   idsOfQuestionsToDelete,
+  // );
 
   return { message: 'Questions approved.' };
 }
@@ -295,26 +325,26 @@ export async function fetchHRPQuestions(orgId) {
 
 export async function getWeeklyQuizQuestions(orgId, quizId) {
   const quiz = await findQuiz(quizId);
-  console.log('quiz', quiz);
+
   const weeklyQuizQuestion =
-    await getWeeklyQuizScheduledQuestions(orgId);
-  const extraEmployeeQuestions = await getExtraEmployeeQuestionsService(
-    orgId,
-    weeklyQuizQuestion[0]?.quizId,
-    quiz.genre
-  );
-  const extraAIQuestions = await getExtraAIQuestionsService(
-    orgId,
-    weeklyQuizQuestion[0]?.quizId,
-    quiz.genre
-  );
-  console.log('extraAIQuestions', extraAIQuestions);
-  const quizQuestions = weeklyQuizQuestion.map((ques) => ques.question);
+    await getWeeklyQuizScheduledQuestions(orgId, quizId);
+
+  // const extraEmployeeQuestions = await getExtraEmployeeQuestionsService(
+  //   orgId,
+  //   quizId,
+  //   quiz.genre
+  // );
+  // const extraAIQuestions = await getExtraAIQuestionsService(
+  //   orgId,
+  //   quizId,
+  //   quiz.genre
+  // );
+
   return {
-    weeklyQuizQuestions: quizQuestions || [],
-    extraEmployeeQuestions: extraEmployeeQuestions || [],
-    extraAIQuestions: extraAIQuestions || [],
-    quizId: weeklyQuizQuestion[0]?.quizId || null,
+    weeklyQuizQuestions: weeklyQuizQuestion || [],
+    extraEmployeeQuestions: [],
+    extraAIQuestions: [],
+    quizId: quizId || null,
   };
 }
 
@@ -347,7 +377,7 @@ export async function startHRPWorkflow(orgId, quizId) {
   // const quesReqParaphrase = HRP_QUESTIONS_PER_QUIZ - questions.length;
   // rephraseQuestions(questions_to_rephrase, orgId, quizId)
 
-  await pushQuestionsForApprovals(questions, orgId, quizId);
+  await pushQuestionsInQuiz(questions, orgId, quizId);
 }
 
 export async function startCAnITWorkflow(org, quizId) {

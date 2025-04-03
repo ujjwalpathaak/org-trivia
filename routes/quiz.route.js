@@ -1,8 +1,8 @@
 import express from 'express';
 
 import {
-  approveWeeklyQuizQuestionsController,
   cancelLiveQuizController,
+  editWeeklyQuizQuestionsController,
   getScheduledQuizzesController,
   getWeeklyQuizLiveQuestionsController,
   getWeeklyQuizStatusController,
@@ -29,10 +29,10 @@ quizRouter.put(
 );
 
 quizRouter.post(
-  '/approve',
+  '/questions/edit',
   protectRoute,
   checkRole('Admin'),
-  approveWeeklyQuizQuestionsController,
+  editWeeklyQuizQuestionsController,
 );
 
 quizRouter.get(

@@ -14,10 +14,6 @@ const questionSchema = new mongoose.Schema({
     immutable: true,
     required: true,
   },
-  image: {
-    type: String,
-    default: '',
-  },
   question: {
     type: String,
     trim: true,

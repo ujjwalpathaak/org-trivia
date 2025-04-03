@@ -1,5 +1,4 @@
 import {
-  approveWeeklyQuizQuestionsService,
   getWeeklyQuizQuestions,
   saveQuestion,
   validateEmployeeQuestionSubmission,
@@ -43,21 +42,21 @@ export const getWeeklyQuizQuestionsController = async (req, res, next) => {
   }
 };
 
-export const approveWeeklyQuizQuestionsController = async (req, res, next) => {
-  try {
-    const { orgId } = req.data;
-    const { questions, questionsToDelete } = req.body;
-    if (!orgId || !questions) {
-      return res.status(400).json({ message: 'Missing required fields' });
-    }
+// export const approveWeeklyQuizQuestionsController = async (req, res, next) => {
+//   try {
+//     const { orgId } = req.data;
+//     const { questions, questionsToDelete } = req.body;
+//     if (!orgId || !questions) {
+//       return res.status(400).json({ message: 'Missing required fields' });
+//     }
 
-    await approveWeeklyQuizQuestionsService(
-      questions,
-      questionsToDelete,
-      orgId,
-    );
-    res.status(200).json({ message: 'Questions marked as approved' });
-  } catch (error) {
-    next(error);
-  }
-};
+//     await approveWeeklyQuizQuestionsService(
+//       questions,
+//       questionsToDelete,
+//       orgId,
+//     );
+//     res.status(200).json({ message: 'Questions marked as approved' });
+//   } catch (error) {
+//     next(error);
+//   }
+// };

@@ -2,7 +2,7 @@ import { ObjectId } from 'mongodb';
 
 import Question from '../models/question.model.js';
 import WeeklyQuestion from '../models/weeklyQuestion.model.js';
-import { fetchExtraEmployeeQuestions } from './org.repository.js';
+import { fetchExtraEmployeeQuestions, updateQuestionsStatus } from './org.repository.js';
 import { updateQuizStatus } from './quiz.repository.js';
 
 export const saveQuestion = async (newQuestion) => {
@@ -35,8 +35,43 @@ export const addQuestions = async (newQuestions) => {
   return await Question.insertMany(filteredQuestions, { ordered: false });
 };
 
-export const getWeeklyQuizScheduledQuestions = async (orgId) => {
-  return await WeeklyQuestion.find({ orgId }).lean();
+export const getWeeklyQuizScheduledQuestions = async (orgId, quizId) => {
+  return WeeklyQuestion.aggregate(
+    [
+      {
+        $match: {
+          quizId: new ObjectId(
+            quizId,
+          )
+        }
+      },
+      {
+        $unwind: {
+          path: "$questions",
+          preserveNullAndEmptyArrays: true
+        }
+      },
+      {
+        $lookup: {
+          from: "questions",
+          localField: "questions",
+          foreignField: "_id",
+          as: 'question'
+        }
+      },
+      {
+        $unwind: {
+          path: "$question",
+          preserveNullAndEmptyArrays: true
+        }
+      },
+      {
+        $replaceRoot: {
+          newRoot: '$question'
+        }
+      }
+    ]
+  )
 };
 
 export const getWeeklyQuizLiveQuestions = async (orgId) => {
@@ -50,21 +85,45 @@ export const dropWeeklyQuestionCollection = async () => {
   return await WeeklyQuestion.deleteMany();
 };
 
-export const updateWeeklyQuestionsStatusToApproved = async (
-  ids,
-  employeeQuestionsToAdd,
-  idsOfQuestionsToDelete,
-) => {
-  await WeeklyQuestion.deleteMany({
-    'question._id': { $in: idsOfQuestionsToDelete },
+export const editQuestions = async (questionsToEdit) => {
+  if (!Array.isArray(questionsToEdit) || questionsToEdit.length === 0) {
+    throw new Error("Invalid input: questionsToEdit must be a non-empty array.");
+  }
+
+  const bulkOps = questionsToEdit.map(({ _id, ...rest }) => {
+    console.log("Updating:", _id, rest);
+
+    return {
+      updateOne: {
+        filter: { _id: new ObjectId(_id) }, // Correct filter format
+        update: { $set: rest },
+      },
+    };
   });
-  await WeeklyQuestion.insertMany(employeeQuestionsToAdd);
-  return await WeeklyQuestion.updateMany(
-    { 'question._id': { $in: ids } },
-    { $set: { isApproved: true } },
-    { multi: true },
-  );
+
+  try {
+    return await Question.bulkWrite(bulkOps);
+  } catch (error) {
+    console.error("Error updating weekly quiz questions:", error);
+    throw new Error("Failed to update quiz questions.");
+  }
 };
+
+// export const updateWeeklyQuestionsStatusToApproved = async (
+//   ids,
+//   employeeQuestionsToAdd,
+//   idsOfQuestionsToDelete,
+// ) => {
+//   await WeeklyQuestion.deleteMany({
+//     'question._id': { $in: idsOfQuestionsToDelete },
+//   });
+//   await WeeklyQuestion.insertMany(employeeQuestionsToAdd);
+//   return await WeeklyQuestion.updateMany(
+//     { 'question._id': { $in: ids } },
+//     { $set: { isApproved: true } },
+//     { multi: true },
+//   );
+// };
 
 export const getCorrectWeeklyQuizAnswers = async (orgId) => {
   return await WeeklyQuestion.find({ orgId })
@@ -72,10 +131,21 @@ export const getCorrectWeeklyQuizAnswers = async (orgId) => {
     .lean();
 };
 
-export const saveWeeklyQuizQuestions = async (quizId, newQuestions) => {
-  if (newQuestions.length > 0) {
+export const removeQuestionsPnAFromDatabase = async (questionsToRemove) => {
+  return Question.deleteMany({
+    _id: { $in: questionsToRemove }
+  })
+}
+
+export const saveWeeklyQuiz = async (orgId,
+  quizId,
+  weeklyQuiz,
+  genre) => {
+
+  if (weeklyQuiz.questions.length > 0) {
     await updateQuizStatus(quizId, 'scheduled');
-    return await WeeklyQuestion.insertMany(newQuestions);
+    await updateQuestionsStatus(orgId, weeklyQuiz.questions, genre)
+    return await WeeklyQuestion.insertOne(weeklyQuiz);
   }
   return [];
 };

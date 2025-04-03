@@ -76,12 +76,12 @@ export const markAllQuizAsExpired = () => {
   return Quiz.updateMany({}, { $set: { status: 'expired' } });
 };
 
-export const updateQuizStatusToApproved = (quizId) => {
-  return Quiz.updateMany(
-    { _id: new ObjectId(quizId) },
-    { $set: { status: 'approved' } },
-  );
-};
+// export const updateQuizStatusToApproved = (quizId) => {
+//   return Quiz.updateMany(
+//     { _id: new ObjectId(quizId) },
+//     { $set: { status: 'approved' } },
+//   );
+// };
 
 export const getUpcomingWeeklyQuiz = (orgId) => {
   return Quiz.findOne({

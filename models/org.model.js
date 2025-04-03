@@ -7,17 +7,20 @@ const questionSchema = new mongoose.Schema(
       ref: 'Question',
       required: true,
     },
-    isUsed: {
-      type: Boolean,
-      default: false,
+    state: {
+      type: Number,
+      enum: [0, 1, 2], // 0 -> unUsed, 1 -> pending, 2 -> used
+      required: true,
+      default: 0,
     },
     category: {
       type: String,
-      default: null,
+    },
+    puzzleType: {
+      type: String
     },
     file: {
-      type: String,
-      default: null,
+      type: String
     },
     source: {
       type: String,

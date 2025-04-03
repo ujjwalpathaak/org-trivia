@@ -28,19 +28,19 @@ export const fetchNewCAnITQuestions = (
   }).catch((error) => console.error('Error triggering Lambda:', error));
 };
 
-export const fetchNewPnAQuestions = (orgName, orgId, quizId) => {
-  fetch(API_GATEWAY_URL + '/generatePnA_Questions', {
+export const fetchNewPnAQuestions = async (orgName) => {
+  const response = await fetch(API_GATEWAY_URL + '/generatePnA_Questions', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      orgName: orgName,
-      callbackUrl: 'https://6ca8-122-187-121-22.ngrok-free.app',
-      orgId: orgId,
-      quizId: quizId
+      orgName: orgName
     }),
-  }).catch((error) => console.error('Error triggering Lambda:', error));
+  })
+
+  const questions = await response.json();
+  return questions;
 };
 
 export const rephraseQuestions = (questions_to_rephrase, orgId, quizId) => {

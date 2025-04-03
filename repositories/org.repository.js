@@ -7,6 +7,19 @@ import {
   findResultByQuizId,
   getParticipationByGenre,
 } from './result.repository.js';
+import mongoose from 'mongoose';
+
+export const getTriviaEnabledOrgs = async () =>
+  Org.find(
+    { 'settings.isTriviaEnabled': true },
+    {
+      questionsCAnIT: 0,
+      questionsHRP: 0,
+      questionsPnA: 0,
+    },
+  );
+
+// ------------------------------
 
 const categoryMap = {
   PnA: 'questionsPnA',
@@ -14,31 +27,31 @@ const categoryMap = {
   HRP: 'questionsHRP',
 };
 
-export const updateQuestionsStatusInOrgToUsed = async (
-  orgId,
-  category,
-  questionIds,
-  idsOfQuestionsToDelete,
-) => {
-  const questionField = categoryMap[category];
-  if (!questionField) throw new Error('Invalid category');
+// export const updateQuestionsStatusInOrgToUsed = async (
+//   orgId,
+//   category,
+//   questionIds,
+//   idsOfQuestionsToDelete,
+// ) => {
+//   const questionField = categoryMap[category];
+//   if (!questionField) throw new Error('Invalid category');
 
-  await Question.deleteMany({ _id: { $in: idsOfQuestionsToDelete } });
-  await Org.updateMany(
-    { _id: new ObjectId(orgId) },
-    {
-      $pull: {
-        [questionField]: { questionId: { $in: idsOfQuestionsToDelete } },
-      },
-    },
-  );
+//   await Question.deleteMany({ _id: { $in: idsOfQuestionsToDelete } });
+//   await Org.updateMany(
+//     { _id: new ObjectId(orgId) },
+//     {
+//       $pull: {
+//         [questionField]: { questionId: { $in: idsOfQuestionsToDelete } },
+//       },
+//     },
+//   );
 
-  return Org.updateMany(
-    { _id: new ObjectId(orgId) },
-    { $set: { [`${questionField}.$[elem].isUsed`]: true } },
-    { arrayFilters: [{ 'elem.questionId': { $in: questionIds } }] },
-  );
-};
+//   return Org.updateMany(
+//     { _id: new ObjectId(orgId) },
+//     { $set: { [`${questionField}.$[elem].isUsed`]: true } },
+//     { arrayFilters: [{ 'elem.questionId': { $in: questionIds } }] },
+//   );
+// };
 
 export const addQuestionToOrg = async (question, orgId) => {
   const questionField = categoryMap[question.category];
@@ -61,16 +74,6 @@ export const addQuestionToOrg = async (question, orgId) => {
   if (!result.matchedCount) throw new Error('Organization not found');
   return true;
 };
-
-export const getTriviaEnabledOrgs = async () =>
-  Org.find(
-    { 'settings.isTriviaEnabled': true },
-    {
-      questionsCAnIT: 0,
-      questionsHRP: 0,
-      questionsPnA: 0,
-    },
-  );
 
 export const setNextQuestionGenre = async (orgId, currentGenreIndex) => {
   const org = await Org.findById(orgId).select('settings.selectedGenre');
@@ -167,6 +170,128 @@ export const fetchHRPQuestions = async (orgId) => {
   ]);
 };
 
+export const updateQuestionsStatus = async (orgId, idsToUpdate, genre) => {
+  return Org.updateMany(
+    {
+      _id: new ObjectId(orgId)
+    },
+    [
+      {
+        $set: {
+          questionsPnA: {
+            $map: {
+              input: "$questionsPnA",
+              as: "item",
+              in: {
+                $cond: {
+                  if: { $in: ["$$item.questionId", idsToUpdate] },
+                  then: { $mergeObjects: ["$$item", { state: 1 }] },
+                  else: "$$item"
+                }
+              }
+            }
+          }
+        }
+      }
+    ]
+  );
+}
+
+export const removeAllQuestionsPnAFromOrg = async (orgId) => {
+  const questionsToRemove = await Org.findById(orgId, 'questionsPnA');
+  await Org.updateOne(
+    { _id: new ObjectId(orgId) },
+    { $set: { questionsPnA: [] } }
+  );
+
+  return questionsToRemove.questionsPnA.map((q) => q.questionId)
+};
+
+export const fetchPnAQuestions = async (orgId) => {
+  return Org.aggregate([
+    {
+      "$match": {
+        "_id": {
+          "$eq": new ObjectId(orgId)
+        }
+      }
+    },
+    {
+      "$unwind": {
+        "path": "$questionsPnA",
+        "preserveNullAndEmptyArrays": true
+      }
+    },
+    {
+      "$match": {
+        "questionsPnA.state": 0
+      }
+    },
+    {
+      "$replaceRoot": {
+        "newRoot": "$questionsPnA"
+      }
+    },
+    {
+      "$group": {
+        "_id": "$puzzleType",
+        "questionId": {
+          "$first": "$questionId"
+        }
+      }
+    },
+    {
+      "$lookup": {
+        "from": "questions",
+        "localField": "questionId",
+        "foreignField": "_id",
+        "as": "questionObject"
+      }
+    },
+    {
+      "$unwind": {
+        "path": "$questionObject",
+        "preserveNullAndEmptyArrays": true
+      }
+    },
+    {
+      "$replaceRoot": {
+        "newRoot": "$questionObject"
+      }
+    }
+  ]
+  
+  )
+}
+
+export const getPnAQuestionsLeft = async (orgId) => {
+  return Org.aggregate(
+    [
+      {
+        $match: {
+          _id: new ObjectId(orgId),
+          'questionsPnA.state': 0
+        }
+      },
+      {
+        $project: {
+          _id: 1,
+          count: {
+            $size: {
+              $filter: {
+                input: '$questionsPnA',
+                as: 'q',
+                cond: { $eq: ['$$q.state', 0] }
+              }
+            }
+          }
+        }
+      }
+    ]
+    
+  )
+  }
+
 export const HRPQuestionsCount = async (orgId) => {
   return Org.countDocuments({
     _id: new ObjectId(orgId),
@@ -189,7 +314,9 @@ export const getOrgSettings = async (orgId) => {
 };
 
 export const getAllOrgNames = async () => Org.find({}, 'id name');
+
 export const getOrgById = async (orgId) => Org.findById(orgId);
+
 export const isTriviaEnabled = async (orgId) =>
   Org.findById(orgId).select('settings.isTriviaEnabled');
 export const toggleTrivia = async (orgId, newStatus) => {
@@ -242,10 +369,11 @@ export const pushQuestionsInOrg = (questions, genre, orgId) => {
       $push: {
         [questionField]: {
           $each: questions.map((question) => ({
-            questionId: question._id,
-            isUsed: false,
+            questionId: question.questionId,
+            state: 0,
             category: genre,
-            source: question.source,
+            source: 'AI',
+            ...(question.puzzleType && { puzzleType: question.puzzleType })
           })),
         },
       },
