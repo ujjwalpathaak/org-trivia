@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ListChecks, Calendar, Trophy, TrendingUp, Coins } from 'lucide-react';
-import { getPastQuizResultsAPI } from '../../api';
+import { fetchEmployeeQuizResultsAPI } from '../../api';
 
 const PastQuizViewer = ({ setIsPastQuizViewerOpen }) => {
   const [quizCache, setQuizCache] = useState({}); // Store fetched pages
@@ -22,7 +22,7 @@ const PastQuizViewer = ({ setIsPastQuizViewerOpen }) => {
       try {
         setLoading(true);
         setError(null);
-        const response = await getPastQuizResultsAPI(pageNumber, pageSize);
+        const response = await fetchEmployeeQuizResultsAPI(pageNumber, pageSize);
         console.log('Fetched past quizzes:', response);
         if (response && response.data) {
           setPastQuizzes(response.data);

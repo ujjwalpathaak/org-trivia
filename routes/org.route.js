@@ -14,7 +14,7 @@ export const orgRouter = express.Router();
 orgRouter.get('/', getAllOrgNamesController);
 
 orgRouter.patch(
-  '/settings/toggleTrivia',
+  '/settings/trivia/toggle',
   protectRoute,
   checkRole('Admin'),
   toggleTriviaController,
@@ -28,7 +28,7 @@ orgRouter.get(
 );
 
 orgRouter.post(
-  '/save/settings',
+  '/settings/save',
   protectRoute,
   checkRole('Admin'),
   saveNewSettingsController,

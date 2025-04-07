@@ -1,67 +1,66 @@
 import { fetchWithAuth } from './utils';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
-const token = localStorage.getItem('token');
+
+const getToken = () => localStorage.getItem('token');
+
+const handleResponse = async (response, fallbackMessage = 'Something went wrong') => {
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || fallbackMessage);
+  }
+  return await response.json();
+};
+
+const fetchWithToken = async (url, options = {}, fallbackMessage) => {
+  const token = getToken();
+  const headers = {
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${token}`,
+    ...options.headers,
+  };
+
+  const response = await fetch(url, {
+    ...options,
+    headers,
+  });
+
+  return await handleResponse(response, fallbackMessage);
+};
 
 export const loginRequest = async (formData) => {
-  const response = await fetch(BACKEND_URL + '/auth/login', {
+  return await fetch(`${BACKEND_URL}/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(formData),
   });
-
-  return response;
 };
 
 export const registerRequest = async (formData) => {
-  const response = await fetch(BACKEND_URL + '/auth/register', {
+  return await fetch(`${BACKEND_URL}/auth/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(formData),
   });
-
-  return response;
 };
 
-export const getPastSubmittedQuestionsAPI = async (pageNumber = 0, pageSize = 10) => {
-  const response = await fetch(
-    `${BACKEND_URL}/employee/submitted-questions?page=${pageNumber}&size=${pageSize}`,
-    {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-    }
+export const fetchSubmittedQuestionsAPI = async (pageNumber = 0, pageSize = 10) => {
+  return await fetchWithToken(
+    `${BACKEND_URL}/employee/questions/submitted?page=${pageNumber}&size=${pageSize}`,
+    { method: 'GET' },
+    'Failed to fetch submitted questions'
   );
-
-  if (!response.ok) {
-    throw new Error('Network response was not ok');
-  }
-
-  return await response.json();
 };
 
-export const getPastQuizResultsAPI = async (pageNumber = 0, pageSize = 10) => {
-  const response = await fetch(
-    `${BACKEND_URL}/result/employee?page=${pageNumber}&size=${pageSize}`,
-    {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-    }
+export const fetchEmployeeQuizResultsAPI = async (pageNumber = 0, pageSize = 10) => {
+  return await fetchWithToken(
+    `${BACKEND_URL}/result/past?page=${pageNumber}&size=${pageSize}`,
+    { method: 'GET' },
+    'Failed to fetch quiz results'
   );
-
-  if (!response.ok) {
-    throw new Error('Network response was not ok');
-  }
-
-  return await response.json();
 };
 
-export const getAnalyticsAPI = async () => {
+export const getOrgAnalyticsAPI = async () => {
   return await fetchWithAuth(`${BACKEND_URL}/org/analytics`, {
     method: 'GET',
   });
@@ -73,248 +72,156 @@ export const getEmployeeDetailsAPI = async () => {
   });
 };
 
-export const getAllOrgsAPI = async () => {
-  const response = await fetch(BACKEND_URL + '/org', {
+export const fetchAllOrganizations = async () => {
+  const response = await fetch(`${BACKEND_URL}/org`, {
     method: 'GET',
     headers: { 'Content-Type': 'application/json' },
   });
-
   return response;
 };
 
-export const createNewQuestionAPI = async (formData) => {
+export const createQuestionAPI = async (question) => {
   try {
-    const response = await fetch(`${BACKEND_URL}/question`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
+    return await fetchWithToken(
+      `${BACKEND_URL}/question`,
+      {
+        method: 'POST',
+        body: JSON.stringify(question),
       },
-      body: JSON.stringify({ question: formData }),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Failed to create question');
-    }
-
-    return await response.json();
+      'Failed to create question'
+    );
   } catch (error) {
     return { success: false, error: error.message };
   }
 };
 
-export const saveSettingsAPI = async (
-  newGenreOrder,
-  changedGenres,
-  companyCurrentAffairsTimeline
-) => {
+export const saveOrgSettings = async (newGenreOrder, changedGenres, companyCurrentAffairsTimeline) => {
   try {
-    const response = await fetch(`${BACKEND_URL}/org/save/settings`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
+    return await fetchWithToken(
+      `${BACKEND_URL}/org/settings/save`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ newGenreOrder, changedGenres, companyCurrentAffairsTimeline }),
       },
-      body: JSON.stringify({ newGenreOrder, changedGenres, companyCurrentAffairsTimeline }),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Failed to save genre settings');
-    }
-
-    return await response.json();
+      'Failed to save organization settings'
+    );
   } catch (error) {
     return { success: false, error: error.message };
   }
 };
 
-export const getQuestionsToApproveAPI = async (quizId) => {
+export const fetchQuizDetailsAPI = async (quizId) => {
   try {
-    const response = await fetch(`${BACKEND_URL}/question/weekly-quiz/${quizId}`, {
+    const response = await fetch(`${BACKEND_URL}/question/scheduled/quiz/${quizId}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${getToken()}`,
       },
     });
-
     return { status: response.status, data: await response.json() };
   } catch (error) {
     return { success: false, error: error.message };
   }
 };
 
-export const getWeeklyQuizQuestionsAPI = async () => {
+export const fetchLiveQuizQuestionsAPI = async () => {
   try {
-    const response = await fetch(`${BACKEND_URL}/quiz/questions`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Failed to create question');
-    }
-
-    return await response.json();
+    return await fetchWithToken(
+      `${BACKEND_URL}/quiz/live/questions`,
+      { method: 'GET' },
+      'Failed to fetch live quiz questions'
+    );
   } catch (error) {
     return { success: false, error: error.message };
   }
 };
 
-export const getSettingsAPI = async () => {
+export const fetchOrgSettingsAPI = async () => {
   try {
-    const response = await fetch(`${BACKEND_URL}/org/settings`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Failed to create question');
-    }
-
-    return await response.json();
+    return await fetchWithToken(
+      `${BACKEND_URL}/org/settings`,
+      { method: 'GET' },
+      'Failed to fetch organization settings'
+    );
   } catch (error) {
     return { success: false, error: error.message };
   }
 };
 
-export const toggleTriviaAPI = async () => {
+export const toggleTriviaSettingAPI = async () => {
   try {
-    const response = await fetch(`${BACKEND_URL}/org/settings/toggleTrivia`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Failed to create question');
-    }
-
-    return await response.json();
+    return await fetchWithToken(
+      `${BACKEND_URL}/org/settings/trivia/toggle`,
+      { method: 'PATCH' },
+      'Failed to toggle trivia setting'
+    );
   } catch (error) {
     return { success: false, error: error.message };
   }
 };
 
-export const handleEditWeeklyQuizAPI = async (questions, questionsToDelete) => {
+export const editWeeklyQuizAPI = async (questions, questionsToDelete) => {
   try {
-    const response = await fetch(`${BACKEND_URL}/quiz/questions/edit`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
+    return await fetchWithToken(
+      `${BACKEND_URL}/quiz/questions`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ questions, questionsToDelete }),
       },
-      body: JSON.stringify({ questions, questionsToDelete }),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Failed to create question');
-    }
-
-    return await response.json();
+      'Failed to edit weekly quiz'
+    );
   } catch (error) {
     return { success: false, error: error.message };
   }
 };
 
-export const submitWeeklyQuizAnswersAPI = async (weeklyQuizAnswers, quizId) => {
+export const submitQuizAnswersAPI = async (answers, quizId) => {
   try {
-    const data = {
-      answers: weeklyQuizAnswers,
-      quizId: quizId,
-    };
-    const response = await fetch(`${BACKEND_URL}/result/submitWeeklyQuizAnswers`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
+    return await fetchWithToken(
+      `${BACKEND_URL}/quiz/submit`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ answers, quizId }),
       },
-      body: JSON.stringify(data),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Failed to create question');
-    }
-
-    return await response.json();
+      'Failed to submit quiz answers'
+    );
   } catch (error) {
     return { success: false, error: error.message };
   }
 };
 
-export const getLeaderboardAPI = async (month, year) => {
+export const fetchLeaderboardAPI = async (month, year) => {
   try {
-    const response = await fetch(`${BACKEND_URL}/leaderboard?month=${month}&year=${year}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Failed to create question');
-    }
-
-    return await response.json();
+    return await fetchWithToken(
+      `${BACKEND_URL}/leaderboard?month=${month}&year=${year}`,
+      { method: 'GET' },
+      'Failed to fetch leaderboard'
+    );
   } catch (error) {
     return { success: false, error: error.message };
   }
 };
 
-export const cancelQuizAPI = async (quizId) => {
+export const cancelLiveQuizAPI = async (quizId) => {
   try {
-    const response = await fetch(`${BACKEND_URL}/quiz/live/cancel?quizId=${quizId} `, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Failed to create question');
-    }
-
-    return await response.json();
+    return await fetchWithToken(
+      `${BACKEND_URL}/quiz/${quizId}/cancel`,
+      { method: 'PATCH' },
+      'Failed to cancel live quiz'
+    );
   } catch (error) {
     return { success: false, error: error.message };
   }
 };
 
-export const getMonthQuizzesAPI = async (month, year) => {
+export const fetchScheduledQuizzesAPI = async (month, year) => {
   try {
-    const response = await fetch(`${BACKEND_URL}/quiz/scheduled`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Failed to create question');
-    }
-
-    return await response.json();
+    return await fetchWithToken(
+      `${BACKEND_URL}/quiz/scheduled?month=${month}&year=${year}`,
+      { method: 'GET' },
+      'Failed to fetch scheduled quizzes'
+    );
   } catch (error) {
     return { success: false, error: error.message };
   }
@@ -322,20 +229,11 @@ export const getMonthQuizzesAPI = async (month, year) => {
 
 export const getWeeklyQuizStatusAPI = async () => {
   try {
-    const response = await fetch(`${BACKEND_URL}/quiz/status`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Failed to create question');
-    }
-
-    return await response.json();
+    return await fetchWithToken(
+      `${BACKEND_URL}/quiz/status`,
+      { method: 'GET' },
+      'Failed to fetch weekly quiz status'
+    );
   } catch (error) {
     return { success: false, error: error.message };
   }

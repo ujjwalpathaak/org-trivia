@@ -6,7 +6,7 @@ import {
 
 export const addQuestionController = async (req, res, next) => {
   try {
-    const { question } = req.body;
+    const question = req.body;
     const { employeeId } = req.data;
     const errors = await validateEmployeeQuestionSubmission(question);
     if (errors) {

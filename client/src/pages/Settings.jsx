@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-import { getMonthQuizzesAPI, getSettingsAPI, toggleTriviaAPI } from '../api';
+import { fetchScheduledQuizzesAPI, fetchOrgSettingsAPI, toggleTriviaSettingAPI } from '../api';
 import ListManager from '../components/ListManager';
 
 const Settings = () => {
@@ -13,7 +13,7 @@ const Settings = () => {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const response = await getSettingsAPI();
+        const response = await fetchOrgSettingsAPI();
         setQuestionCountStatus(response.question_count);
         setSettings(response.settings);
         setIsTriviaEnabled(response.settings.isTriviaEnabled);
@@ -27,7 +27,7 @@ const Settings = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const response = await getMonthQuizzesAPI();
+      const response = await fetchScheduledQuizzesAPI();
       setQuizzes(response);
     };
     fetchData();
@@ -35,8 +35,8 @@ const Settings = () => {
 
   const toggleIsTriviaEnabled = async () => {
     setIsTriviaEnabled(!isTriviaEnabled);
-    await toggleTriviaAPI();
-    await getSettingsAPI();
+    await toggleTriviaSettingAPI();
+    await fetchOrgSettingsAPI();
   };
 
   return (

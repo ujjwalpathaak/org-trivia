@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { createNewQuestionAPI } from '../api';
+import { createQuestionAPI } from '../api';
 import { useOrgId } from '../context/auth.context';
 import { toast } from 'react-toastify';
 import { validateQuestionMakerForm } from '../utils';
@@ -66,7 +66,7 @@ const QuestionMaker = ({ setIsQuestionMakerOpen }) => {
     }
 
     notifyQuestionSubmitted();
-    createNewQuestionAPI(question);
+    createQuestionAPI(question);
     setQuestion({
       question: '',
       answer: '',

@@ -17,7 +17,7 @@ questionRouter.post(
 );
 
 questionRouter.get(
-  '/weekly-quiz/:quizId',
+  '/scheduled/quiz/:quizId',
   protectRoute,
   checkRole('Admin'),
   getWeeklyQuizQuestionsController,

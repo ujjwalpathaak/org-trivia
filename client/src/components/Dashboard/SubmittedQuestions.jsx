@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getPastSubmittedQuestionsAPI } from '../../api'; // Update this with the correct API import
+import { fetchSubmittedQuestionsAPI } from '../../api'; // Update this with the correct API import
 
 const SubmittedQuestions = ({ setIsSubmittedQuestionOpen }) => {
   const [pageNumber, setPageNumber] = useState(0);
@@ -17,7 +17,7 @@ const SubmittedQuestions = ({ setIsSubmittedQuestionOpen }) => {
 
     const fetchSubmittedQuestions = async () => {
       try {
-        const response = await getPastSubmittedQuestionsAPI(pageNumber, pageSize);
+        const response = await fetchSubmittedQuestionsAPI(pageNumber, pageSize);
         if (response && response.data) {
           setSubmittedQuestions(response.data);
           setTotalPages(Math.max(1, Math.ceil(response.total / pageSize)));

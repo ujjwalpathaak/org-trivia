@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getQuestionsToApproveAPI, handleEditWeeklyQuizAPI } from '../api.js';
+import { fetchQuizDetailsAPI, editWeeklyQuizAPI } from '../api.js';
 
 function numToAlpha(num) {
   let alpha = '';
@@ -194,7 +194,7 @@ function App() {
   useEffect(() => {
     const getQuestionsToApproveFunc = async () => {
       try {
-        const response = await getQuestionsToApproveAPI(quizId);
+        const response = await fetchQuizDetailsAPI(quizId);
         if (response.status === 400) {
           toast.info('No questions found');
           navigate('/dashboard');
@@ -283,7 +283,7 @@ function App() {
     }
 
     try {
-      await handleEditWeeklyQuizAPI(editedQuestions);
+      await editWeeklyQuizAPI(editedQuestions);
       toast.success('Quiz updated successfully');
       navigate('/dashboard');
     } catch (error) {

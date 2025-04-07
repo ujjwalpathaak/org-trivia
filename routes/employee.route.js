@@ -10,7 +10,7 @@ export const employeeRouter = express.Router();
 
 employeeRouter.get('/', checkRole('Employee'), getEmployeeDetailsController);
 employeeRouter.get(
-  '/submitted-questions',
+  '/questions/submitted',
   checkRole('Employee'),
   getSubmittedQuestionsController,
 );

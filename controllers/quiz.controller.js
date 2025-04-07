@@ -59,7 +59,7 @@ export const cleanUpWeeklyQuizController = async (req, res, next) => {
 
 export const cancelLiveQuizController = async (req, res, next) => {
   try {
-    const { quizId } = req.query;
+    const { quizId } = req.params;
     const result = await cancelLiveQuizService(quizId);
     res.status(200).json(result);
   } catch (error) {
@@ -69,8 +69,9 @@ export const cancelLiveQuizController = async (req, res, next) => {
 
 export const getScheduledQuizzesController = async (req, res, next) => {
   try {
+    const { month, year } = req.query;
     const { orgId } = req.data;
-    const quizzes = await getScheduledQuizzesService(orgId);
+    const quizzes = await getScheduledQuizzesService(orgId, month, year);
     res.status(200).json(quizzes);
   } catch (error) {
     next(error);

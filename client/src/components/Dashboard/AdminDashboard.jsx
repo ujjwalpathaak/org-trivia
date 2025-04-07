@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../../context/auth.context';
-import { getAnalyticsAPI } from '../../api';
+import { getOrgAnalyticsAPI } from '../../api';
 import AdminProfile from './AdminProfile';
 import AdminMainContent from './AdminMainContent';
 import AdminSidebar from './AdminSidebar';
@@ -12,7 +12,7 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     const getOrgAnalytics = async () => {
-      const data = await getAnalyticsAPI();
+      const data = await getOrgAnalyticsAPI();
       setAnalytics(data);
     };
     getOrgAnalytics();

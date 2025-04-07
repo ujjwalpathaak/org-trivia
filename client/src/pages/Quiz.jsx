@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getWeeklyQuizQuestionsAPI, submitWeeklyQuizAnswersAPI } from '../api';
+import { fetchLiveQuizQuestionsAPI, submitQuizAnswersAPI } from '../api';
 import { toast } from 'react-toastify';
 import { Loader, Clock, CheckCircle, Coins } from 'lucide-react';
 
@@ -33,7 +33,7 @@ const Quiz = ({ setQuizStatus, setIsQuizOpen }) => {
     };
 
     const fetchWeeklyQuizQuestions = async () => {
-      let response = await getWeeklyQuizQuestionsAPI();
+      let response = await fetchLiveQuizQuestionsAPI();
       setQuizId(response.quizId);
       getLiveQuizState(response.quizId);
       setQuestions(response.weeklyQuizQuestions);
@@ -89,7 +89,7 @@ const Quiz = ({ setQuizStatus, setIsQuizOpen }) => {
     const optionsSelected = JSON.parse(state);
     if (currentQuestion >= questions.length - 1) {
       if (optionsSelected.answers) {
-        const response = await submitWeeklyQuizAnswersAPI(optionsSelected.answers, quizId);
+        const response = await submitQuizAnswersAPI(optionsSelected.answers, quizId);
         setResult({
           ...response.data,
         });

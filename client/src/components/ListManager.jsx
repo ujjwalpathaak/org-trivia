@@ -4,7 +4,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import { CircleAlert, GripHorizontal } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { cancelQuizAPI, getMonthQuizzesAPI, saveSettingsAPI } from '../api';
+import { cancelLiveQuizAPI, saveOrgSettings } from '../api';
 
 const ItemType = 'GENRE';
 
@@ -113,13 +113,13 @@ export default function ListManager({
   );
 
   const handleCancelQuiz = async (quiz) => {
-    const respones = await cancelQuizAPI(quiz._id);
+    const respones = await cancelLiveQuizAPI(quiz._id);
     // if (respones.status === 200) {
     toast.error('Quiz cancelled');
   };
 
   const handleSaveChanges = useCallback(async () => {
-    await saveSettingsAPI(
+    await saveOrgSettings(
       selectedItems.map((genre) => genre.value),
       changedGenres,
       companyCurrentAffairsTimeline

@@ -78,6 +78,6 @@ export const cleanUpWeeklyQuizService = async () => {
   return { message: 'Cleaned up weekly quiz.' };
 };
 
-export const getScheduledQuizzesService = async (orgId) => {
-  return await getScheduledQuizzes(orgId);
+export const getScheduledQuizzesService = async (orgId, month, year) => {
+  return await getScheduledQuizzes(orgId, month, year);
 };

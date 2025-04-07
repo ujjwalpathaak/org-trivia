@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { getLeaderboardAPI } from '../api';
+import { fetchLeaderboardAPI } from '../api';
 import { useOrgId } from '../context/auth.context';
 import { getMonth } from '../utils';
 
@@ -17,7 +17,7 @@ const Leaderboard = () => {
     const fetchLeaderboardByOrgId = async () => {
       if (!orgId) return;
       try {
-        const data = await getLeaderboardAPI(selectedMonth, selectedYear);
+        const data = await fetchLeaderboardAPI(selectedMonth, selectedYear);
         while (data.leaderboard.length < 3) {
           data.leaderboard.push({ employee: { name: '' }, totalScore: '' });
         }
