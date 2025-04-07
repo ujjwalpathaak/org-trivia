@@ -26,7 +26,7 @@ export const addQuestionController = async (req, res, next) => {
 
 export const getWeeklyQuizQuestionsController = async (req, res, next) => {
   try {
-    const {quizId} = req.params;
+    const { quizId } = req.params;
     const { orgId } = req.data;
     if (!quizId) {
       return res.status(400).json({ message: 'Missing required fields' });

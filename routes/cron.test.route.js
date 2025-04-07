@@ -12,4 +12,7 @@ cronTestRouter.post('/test/cleanWeeklyQuiz', cleanUpWeeklyQuizController);
 
 cronTestRouter.post('/test/makeQuizLiveTest', makeWeeklyQuizLiveController);
 
-cronTestRouter.post('/test/generateCAnITQuestions', generateCAnITQuestionsController);
+cronTestRouter.post(
+  '/test/generateCAnITQuestions',
+  generateCAnITQuestionsController,
+);

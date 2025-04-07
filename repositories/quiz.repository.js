@@ -11,6 +11,66 @@ export const findQuiz = (quizId) => {
   return Quiz.findOne({ _id: new ObjectId(quizId) });
 };
 
+export const getLiveQuizQuestionsByOrgId = (orgId) => {
+  return Quiz.aggregate([
+    {
+      $match: {
+        orgId: new ObjectId('67c6904cf8c3ce19ef544cac'),
+        status: 'live',
+      },
+    },
+    {
+      $lookup: {
+        from: 'weeklyquestions',
+        localField: '_id',
+        foreignField: 'quizId',
+        as: 'questions',
+      },
+    },
+    {
+      $unwind: {
+        path: '$questions',
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $replaceRoot: {
+        newRoot: '$questions',
+      },
+    },
+    {
+      $unwind: {
+        path: '$questions',
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $lookup: {
+        from: 'questions',
+        localField: 'questions',
+        foreignField: '_id',
+        as: 'question',
+      },
+    },
+    {
+      $unwind: {
+        path: '$question',
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $addFields: {
+        'question.quizId': '$quizId',
+      },
+    },
+    {
+      $replaceRoot: {
+        newRoot: '$question',
+      },
+    },
+  ]);
+};
+
 export const getQuizStatus = (orgId) => {
   return Quiz.findOne(
     {
@@ -30,17 +90,24 @@ export const getQuizStatus = (orgId) => {
 // };
 
 export const cancelLiveQuiz = async (quizId) => {
-  await findResultByQuizId(quizId);
   return Quiz.updateOne(
     { _id: new ObjectId(quizId), status: 'live' },
     { $set: { status: 'cancelled' } },
   );
 };
 
-export const getScheduledQuizzes = (orgId) => {
+export const getScheduledQuizzes = (orgId, date = new Date()) => {
+  const monthStart = new Date(date.getFullYear(), date.getMonth() - 1);
+  const monthEnd = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+  const startDate = new Date(monthStart);
+  const endDate = new Date(monthEnd);
+  startDate.setHours(0, 0, 0, 0);
+  endDate.setHours(0, 0, 0, 0);
+
   return Quiz.find({
     orgId: new ObjectId(orgId),
-    status: { $in: ['upcoming', 'scheduled'] },
+    scheduledDate: { $gte: startDate, $lte: endDate },
+    status: { $in: ['upcoming', 'scheduled', 'live'] },
   }).sort({
     scheduledDate: 1,
   });
@@ -67,63 +134,64 @@ export const getScheduledQuizzes = (orgId) => {
 export const lastQuizByGenre = () => {
   return Quiz.aggregate([
     {
-    $match:{ genre: "CAnIT", status: "expired"}
-  },{
-    $sort: {
-      scheduledDate: -1
-    }  
-  },
-    {
-    $group: {
-      _id: '$orgId',
-      scheduledDate: {
-        $first: '$scheduledDate'
-      },
-      quizId: {
-        $first: '$_id'
-      }
-    }
-  },
-  {
-    $project: {
-      orgId: '$_id',
-      scheduledDate: 1,
-      quizId: 1,
-      _id: 0
-    }
-  }
-  ])
-};
-
-// will need to change this later --- 
-export const getCAnITQuizzesScheduledTomm = () => {
-  return Quiz.aggregate([
-    {
-      $match: {
-        genre: 'CAnIT',
-        status: "upcoming"
-      }
+      $match: { genre: 'CAnIT', status: 'expired' },
     },
     {
       $sort: {
-        scheduledDate: 1
-      }
+        scheduledDate: -1,
+      },
     },
     {
       $group: {
         _id: '$orgId',
-        scheduledDate: { $first: '$scheduledDate' },
-        quizId: { $first: '$_id' }
-      }
+        scheduledDate: {
+          $first: '$scheduledDate',
+        },
+        quizId: {
+          $first: '$_id',
+        },
+      },
     },
     {
       $project: {
         orgId: '$_id',
         scheduledDate: 1,
         quizId: 1,
-        _id: 0
-      }
-    }
+        _id: 0,
+      },
+    },
+  ]);
+};
+
+// will need to change this later ---
+export const getCAnITQuizzesScheduledTomm = () => {
+  return Quiz.aggregate([
+    {
+      $match: {
+        genre: 'CAnIT',
+        status: 'upcoming',
+      },
+    },
+    {
+      $sort: {
+        scheduledDate: 1,
+      },
+    },
+    {
+      $group: {
+        _id: '$orgId',
+        scheduledDate: { $first: '$scheduledDate' },
+        quizId: { $first: '$_id' },
+      },
+    },
+    {
+      $project: {
+        orgId: '$_id',
+        scheduledDate: 1,
+        quizId: 1,
+        _id: 0,
+      },
+    },
   ]);
 };
 
@@ -136,17 +204,29 @@ export const scheduleNewWeeklyQuiz = (orgId, date, genre) => {
   });
 };
 
-export const makeWeeklyQuizLive = () => {
+export const makeWeeklyQuizLive = async (date = new Date()) => {
+  date.setHours(0, 0, 0, 0);
+
   return Quiz.bulkWrite([
     {
       updateMany: {
-        filter: { status: { $in: ['upcoming'] } },
+        filter: {
+          status: { $in: ['upcoming'] },
+          scheduledDate: {
+            $lte: date,
+          },
+        },
         update: { $set: { status: 'cancelled' } },
       },
     },
     {
       updateMany: {
-        filter: { status: 'scheduled' },
+        filter: {
+          status: 'scheduled',
+          scheduledDate: {
+            $lte: date,
+          },
+        },
         update: { $set: { status: 'live' } },
       },
     },

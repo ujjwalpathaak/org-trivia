@@ -1,10 +1,10 @@
 import { ObjectId } from 'mongodb';
 
+import Org from '../models/org.model.js';
 import Question from '../models/question.model.js';
 import WeeklyQuestion from '../models/weeklyQuestion.model.js';
 import { updateQuestionsStatus } from './org.repository.js';
 import { updateQuizStatus } from './quiz.repository.js';
-import Org from '../models/org.model.js';
 
 export const saveQuestion = async (newQuestion) => {
   return await new Question(newQuestion).save();
@@ -16,7 +16,7 @@ export const getUnusedQuestionsFromTimeline = async (orgId, isApproved) => {
     .lean();
 
   return questions.map((q) => q.question._id);
-}
+};
 
 export const addQuestions = async (newQuestions) => {
   const existingQuestions = await Question.find(
@@ -37,49 +37,43 @@ export const addQuestions = async (newQuestions) => {
 };
 
 export const getWeeklyQuizScheduledQuestions = async (orgId, quizId) => {
-  return WeeklyQuestion.aggregate(
-    [
-      {
-        $match: {
-          quizId: new ObjectId(
-            quizId,
-          )
-        }
+  return WeeklyQuestion.aggregate([
+    {
+      $match: {
+        quizId: new ObjectId(quizId),
       },
-      {
-        $unwind: {
-          path: "$questions",
-          preserveNullAndEmptyArrays: true
-        }
+    },
+    {
+      $unwind: {
+        path: '$questions',
+        preserveNullAndEmptyArrays: true,
       },
-      {
-        $lookup: {
-          from: "questions",
-          localField: "questions",
-          foreignField: "_id",
-          as: 'question'
-        }
+    },
+    {
+      $lookup: {
+        from: 'questions',
+        localField: 'questions',
+        foreignField: '_id',
+        as: 'question',
       },
-      {
-        $unwind: {
-          path: "$question",
-          preserveNullAndEmptyArrays: true
-        }
+    },
+    {
+      $unwind: {
+        path: '$question',
+        preserveNullAndEmptyArrays: true,
       },
-      {
-        $replaceRoot: {
-          newRoot: '$question'
-        }
-      }
-    ]
-  )
+    },
+    {
+      $replaceRoot: {
+        newRoot: '$question',
+      },
+    },
+  ]);
 };
 
 export const getWeeklyQuizLiveQuestions = async (orgId) => {
   // only if quiz is live
-  return await WeeklyQuestion.find({ orgId })
-    .select('-question.answer')
-    .lean();
+  return await WeeklyQuestion.find({ orgId }).select('-question.answer').lean();
 };
 
 export const dropWeeklyQuestionCollection = async () => {
@@ -91,47 +85,48 @@ export const getCAnITQuestionsInTimeline = async (orgId, newsTimelineStart) => {
     {
       $match: {
         _id: new ObjectId(orgId),
-        "questionsCAnIT.date": {
+        'questionsCAnIT.date': {
           $gt: new Date(newsTimelineStart),
-          $lt: new Date()
-        }
-      }
+          $lt: new Date(),
+        },
+      },
     },
     {
-      $unwind: "$questionsCAnIT"
+      $unwind: '$questionsCAnIT',
     },
     {
       $sort: {
-        "questionsCAnIT.date": -1
-      }
+        'questionsCAnIT.date': -1,
+      },
     },
     {
       $addFields: {
-        "questionsCAnIT.orgName": '$name',
-        "questionsCAnIT.orgIndustry": "$settings.orgIndustry",
-        "questionsCAnIT.orgCountry": "$settings.orgCountry",
-      }
+        'questionsCAnIT.orgName': '$name',
+        'questionsCAnIT.orgIndustry': '$settings.orgIndustry',
+        'questionsCAnIT.orgCountry': '$settings.orgCountry',
+      },
     },
     {
       $replaceRoot: {
-        newRoot: "$questionsCAnIT"
-      }
+        newRoot: '$questionsCAnIT',
+      },
     },
     {
       $lookup: {
-        from: "questions",
-        localField: "questionId",
-        foreignField: "_id",
-        as: "questionsInfo"
-      }
-    }
-  ]
-  )
+        from: 'questions',
+        localField: 'questionId',
+        foreignField: '_id',
+        as: 'questionsInfo',
+      },
+    },
+  ]);
 };
 
 export const editQuestions = async (questionsToEdit) => {
   if (!Array.isArray(questionsToEdit) || questionsToEdit.length === 0) {
-    throw new Error("Invalid input: questionsToEdit must be a non-empty array.");
+    throw new Error(
+      'Invalid input: questionsToEdit must be a non-empty array.',
+    );
   }
 
   const bulkOps = questionsToEdit.map(({ _id, ...rest }) => {
@@ -146,8 +141,8 @@ export const editQuestions = async (questionsToEdit) => {
   try {
     return await Question.bulkWrite(bulkOps);
   } catch (error) {
-    console.error("Error updating weekly quiz questions:", error);
-    throw new Error("Failed to update quiz questions.");
+    console.error('Error updating weekly quiz questions:', error);
+    throw new Error('Failed to update quiz questions.');
   }
 };
 
@@ -167,25 +162,57 @@ export const editQuestions = async (questionsToEdit) => {
 //   );
 // };
 
-export const getCorrectWeeklyQuizAnswers = async (orgId) => {
-  return await WeeklyQuestion.find({ orgId })
-    .select('question._id question.answer')
-    .lean();
+export const getCorrectWeeklyQuizAnswers = async (quizId) => {
+  return await WeeklyQuestion.aggregate([
+    {
+      $match: {
+        quizId: new ObjectId(quizId),
+      },
+    },
+    {
+      $unwind: {
+        path: '$questions',
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $lookup: {
+        from: 'questions',
+        localField: 'questions',
+        foreignField: '_id',
+        as: 'question',
+      },
+    },
+    {
+      $unwind: {
+        path: '$question',
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $replaceRoot: {
+        newRoot: '$question',
+      },
+    },
+    {
+      $project: {
+        _id: 1,
+        answer: 1,
+      },
+    },
+  ]);
 };
 
 export const removeQuestionsPnAFromDatabase = async (questionsToRemove) => {
   return Question.deleteMany({
-    _id: { $in: questionsToRemove }
-  })
-}
+    _id: { $in: questionsToRemove },
+  });
+};
 
-export const saveWeeklyQuiz = async (orgId,
-  quizId,
-  weeklyQuiz,
-  genre) => {
+export const saveWeeklyQuiz = async (orgId, quizId, weeklyQuiz, genre) => {
   if (weeklyQuiz.questions.length > 0) {
     await updateQuizStatus(quizId, 'scheduled');
-    await updateQuestionsStatus(orgId, weeklyQuiz.questions, genre)
+    await updateQuestionsStatus(orgId, weeklyQuiz.questions, genre);
     return await WeeklyQuestion.insertOne(weeklyQuiz);
   }
   return [];

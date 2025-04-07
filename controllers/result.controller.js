@@ -32,11 +32,10 @@ export const submitWeeklyQuizAnswersController = async (req, res, next) => {
 
 export const getEmployeePastResultsController = async (req, res, next) => {
   try {
-    const { employeeId } = req.params;
+    const { employeeId } = req.data;
     if (!employeeId) {
       return res.status(400).json({ message: 'Missing employeeId' });
     }
-
     const results = await getEmployeePastResultsService(employeeId);
     res.status(200).json(results);
   } catch (error) {

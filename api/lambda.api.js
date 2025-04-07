@@ -22,10 +22,9 @@ export const fetchNewCAnITQuestions = async (
       quizId: quizId,
       days: days,
     }),
-  })
+  });
 
   const questions = await response.json();
-  console.log('questions', questions);
   return questions;
 };
 
@@ -36,9 +35,9 @@ export const fetchNewPnAQuestions = async (orgName) => {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      orgName: orgName
+      orgName: orgName,
     }),
-  })
+  });
 
   const questions = await response.json();
   return questions;

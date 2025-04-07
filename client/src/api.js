@@ -278,6 +278,27 @@ export const getLeaderboardAPI = async (month, year) => {
   }
 };
 
+export const cancelQuizAPI = async (quizId) => {
+  try {
+    const response = await fetch(`${BACKEND_URL}/quiz/live/cancel?quizId=${quizId} `, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to create question');
+    }
+
+    return await response.json();
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+};
+
 export const getMonthQuizzesAPI = async (month, year) => {
   try {
     const response = await fetch(`${BACKEND_URL}/quiz/scheduled`, {

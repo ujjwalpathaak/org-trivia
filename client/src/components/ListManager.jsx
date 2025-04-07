@@ -4,7 +4,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import { CircleAlert, GripHorizontal } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { getMonthQuizzesAPI, saveSettingsAPI } from '../api';
+import { cancelQuizAPI, getMonthQuizzesAPI, saveSettingsAPI } from '../api';
 
 const ItemType = 'GENRE';
 
@@ -111,6 +111,12 @@ export default function ListManager({
     },
     [setIsSaved]
   );
+
+  const handleCancelQuiz = async (quiz) => {
+    const respones = await cancelQuizAPI(quiz._id);
+    // if (respones.status === 200) {
+    toast.error('Quiz cancelled');
+  };
 
   const handleSaveChanges = useCallback(async () => {
     await saveSettingsAPI(
@@ -289,7 +295,7 @@ export default function ListManager({
                                   className="text-gray-700 bg-white border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                   onChange={(e) => handleGenreChange(e, quiz)}
                                 >
-                                  {initialQuizItems.map((item) => (
+                                  {allItems.map((item) => (
                                     <option
                                       key={item.value}
                                       value={item.value}
@@ -338,7 +344,18 @@ export default function ListManager({
                                 )}
                               </>
                             ) : (
-                              <span className="text-gray-700">{quiz.genre}</span>
+                              <>
+                                <span className="text-sm text-green-700">
+                                  {quiz.genre} is live!
+                                </span>
+                                <button
+                                  onClick={() => handleCancelQuiz(quiz)}
+                                  className="text-xs m-auto hover:p-2 hover:rounded-full hover:bg-red-700 hover:text-red-500 text-red-700"
+                                  title="Cancel Quiz"
+                                >
+                                  Cancel Quiz
+                                </button>
+                              </>
                             )}
                           </div>
                         </div>

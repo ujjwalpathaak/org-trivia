@@ -1,4 +1,5 @@
 import { ObjectId } from 'mongodb';
+
 import { HRP_QUESTIONS_PER_QUIZ } from '../constants.js';
 import Org from '../models/org.model.js';
 import { getParticipationByGenre } from './result.repository.js';
@@ -128,9 +129,9 @@ export const fetchHRPQuestions = async (orgId) => {
       },
     },
   ]);
-  
+
   if (files_with_unused_questions.length === 0) return [];
-  
+
   const questions_per_file = Math.max(
     1,
     Math.floor(HRP_QUESTIONS_PER_QUIZ / files_with_unused_questions.length),
@@ -169,133 +170,125 @@ export const fetchHRPQuestions = async (orgId) => {
 export const isGenreAvailable = async (orgId, genre) => {
   const org = await Org.findOne({
     _id: new ObjectId(orgId),
-    "settings.unavailableGenre": { $in: [genre] }
-  })
+    'settings.unavailableGenre': { $in: [genre] },
+  });
 
   return !org;
-}
+};
 
 export const updateQuestionsStatus = async (orgId, idsToUpdate, genre) => {
   const arrayField = categoryMap[genre];
 
-  return Org.updateMany(
-    { _id: new ObjectId(orgId) },
-    [
-      {
-        $set: {
-          [arrayField]: {
-            $map: {
-              input: `$${arrayField}`,
-              as: "item",
-              in: {
-                $cond: {
-                  if: { $in: ["$$item.questionId", idsToUpdate] },
-                  then: { $mergeObjects: ["$$item", { state: 1 }] },
-                  else: "$$item"
-                }
-              }
-            }
-          }
-        }
-      }
-    ]
-  );
+  return Org.updateMany({ _id: new ObjectId(orgId) }, [
+    {
+      $set: {
+        [arrayField]: {
+          $map: {
+            input: `$${arrayField}`,
+            as: 'item',
+            in: {
+              $cond: {
+                if: { $in: ['$$item.questionId', idsToUpdate] },
+                then: { $mergeObjects: ['$$item', { state: 1 }] },
+                else: '$$item',
+              },
+            },
+          },
+        },
+      },
+    },
+  ]);
 };
 
 export const removeAllQuestionsPnAFromOrg = async (orgId) => {
   const questionsToRemove = await Org.findById(orgId, 'questionsPnA');
   await Org.updateOne(
     { _id: new ObjectId(orgId) },
-    { $set: { questionsPnA: [] } }
+    { $set: { questionsPnA: [] } },
   );
 
-  return questionsToRemove.questionsPnA.map((q) => q.questionId)
+  return questionsToRemove.questionsPnA.map((q) => q.questionId);
 };
 
 export const fetchPnAQuestions = async (orgId) => {
   return Org.aggregate([
     {
-      "$match": {
-        "_id": {
-          "$eq": new ObjectId(orgId)
-        }
-      }
+      $match: {
+        _id: {
+          $eq: new ObjectId(orgId),
+        },
+      },
     },
     {
-      "$unwind": {
-        "path": "$questionsPnA",
-        "preserveNullAndEmptyArrays": true
-      }
+      $unwind: {
+        path: '$questionsPnA',
+        preserveNullAndEmptyArrays: true,
+      },
     },
     {
-      "$match": {
-        "questionsPnA.state": 0
-      }
+      $match: {
+        'questionsPnA.state': 0,
+      },
     },
     {
-      "$replaceRoot": {
-        "newRoot": "$questionsPnA"
-      }
+      $replaceRoot: {
+        newRoot: '$questionsPnA',
+      },
     },
     {
-      "$group": {
-        "_id": "$puzzleType",
-        "questionId": {
-          "$first": "$questionId"
-        }
-      }
+      $group: {
+        _id: '$puzzleType',
+        questionId: {
+          $first: '$questionId',
+        },
+      },
     },
     {
-      "$lookup": {
-        "from": "questions",
-        "localField": "questionId",
-        "foreignField": "_id",
-        "as": "questionObject"
-      }
+      $lookup: {
+        from: 'questions',
+        localField: 'questionId',
+        foreignField: '_id',
+        as: 'questionObject',
+      },
     },
     {
-      "$unwind": {
-        "path": "$questionObject",
-        "preserveNullAndEmptyArrays": true
-      }
+      $unwind: {
+        path: '$questionObject',
+        preserveNullAndEmptyArrays: true,
+      },
     },
     {
-      "$replaceRoot": {
-        "newRoot": "$questionObject"
-      }
-    }
-  ]
-  
-  )
-}
+      $replaceRoot: {
+        newRoot: '$questionObject',
+      },
+    },
+  ]);
+};
 
 export const getPnAQuestionsLeft = async (orgId) => {
-  return Org.aggregate(
-    [
-      {
-        $match: {
-          _id: new ObjectId(orgId),
-          'questionsPnA.state': 0
-        }
+  return Org.aggregate([
+    {
+      $match: {
+        _id: new ObjectId(orgId),
+        'questionsPnA.state': 0,
       },
-      {
-        $project: {
-          _id: 1,
-          count: {
-            $size: {
-              $filter: {
-                input: '$questionsPnA',
-                as: 'q',
-                cond: { $eq: ['$$q.state', 0] }
-              }
-            }
-          }
-        }
-      }
-    ]
-    
-  )
-  }
+    },
+    {
+      $project: {
+        _id: 1,
+        count: {
+          $size: {
+            $filter: {
+              input: '$questionsPnA',
+              as: 'q',
+              cond: { $eq: ['$$q.state', 0] },
+            },
+          },
+        },
+      },
+    },
+  ]);
+};
 
 // export const HRPQuestionsCount = async (orgId) => {
 //   return Org.countDocuments({
@@ -305,33 +298,30 @@ export const getPnAQuestionsLeft = async (orgId) => {
 // };
 
 export const HRPQuestionsCount = async (orgId) => {
-  const HRDquestions = await Org.aggregate(
-    [
-      {
-        $match: {
-          _id: new ObjectId(orgId),
-          'questionsHRP.state': 0
-        }
+  const HRDquestions = await Org.aggregate([
+    {
+      $match: {
+        _id: new ObjectId(orgId),
+        'questionsHRP.state': 0,
       },
-      {
-        $project: {
-          _id: 1,
-          count: {
-            $size: {
-              $filter: {
-                input: '$questionsHRP',
-                as: 'q',
-                cond: { $eq: ['$$q.state', 0] }
-              }
-            }
-          }
-        }
-      }
-    ]
-  )
+    },
+    {
+      $project: {
+        _id: 1,
+        count: {
+          $size: {
+            $filter: {
+              input: '$questionsHRP',
+              as: 'q',
+              cond: { $eq: ['$$q.state', 0] },
+            },
+          },
+        },
+      },
+    },
+  ]);
   return HRDquestions[0]?.count;
-  }
-
+};
 
 export const getOrgSettings = async (orgId) => {
   const [count_hrp_questions] = await Promise.all([HRPQuestionsCount(orgId)]);
@@ -366,9 +356,9 @@ export const getExtraQuestionsCount = async (orgId, genre) => {
 
   return Org.countDocuments({
     _id: new ObjectId(orgId),
-    [`${questionField}.isUsed`]: false
+    [`${questionField}.isUsed`]: false,
   });
-}
+};
 
 export const makeGenreUnavailable = async (orgId, genre) => {
   return Org.updateOne(
@@ -408,7 +398,7 @@ export const pushQuestionsInOrg = (questions, genre, orgId) => {
             category: genre,
             source: 'AI',
             ...(question.puzzleType && { puzzleType: question.puzzleType }),
-            ...(question.file && { file: question.file })
+            ...(question.file && { file: question.file }),
           })),
         },
       },

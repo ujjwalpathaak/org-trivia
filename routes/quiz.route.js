@@ -21,8 +21,8 @@ quizRouter.get(
 
 quizRouter.post('/weekly/lambda/callback', handleLambdaCallbackController);
 
-quizRouter.put(
-  '/live/cancel/:quizId',
+quizRouter.get(
+  '/live/cancel',
   protectRoute,
   checkRole('Admin'),
   cancelLiveQuizController,

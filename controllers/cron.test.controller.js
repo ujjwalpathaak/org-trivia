@@ -29,4 +29,4 @@ export const generateCAnITQuestionsController = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-}
+};

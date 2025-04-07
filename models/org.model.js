@@ -17,10 +17,10 @@ const questionSchema = new mongoose.Schema(
       type: String,
     },
     puzzleType: {
-      type: String
+      type: String,
     },
     file: {
-      type: String
+      type: String,
     },
     source: {
       type: String,

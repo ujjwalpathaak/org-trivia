@@ -21,7 +21,7 @@ const weeklyQuestionSchema = new mongoose.Schema(
       required: true,
     },
   },
-  { timestamps: true } // Adds createdAt and updatedAt fields
+  { timestamps: true }, // Adds createdAt and updatedAt fields
 );
 
 const WeeklyQuestion = mongoose.model('WeeklyQuestion', weeklyQuestionSchema);

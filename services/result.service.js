@@ -38,24 +38,19 @@ export const submitWeeklyQuizAnswersService = async (
   session.startTransaction();
 
   try {
-    const correctAnswers = await getWeeklyQuizCorrectAnswersService(
-      orgId,
-      quizId,
-    );
+    const correctAnswers = await getWeeklyQuizCorrectAnswersService(quizId);
     const points = calculateWeeklyQuizScore(userAnswers, correctAnswers);
-
     const quiz = await findLiveQuizByOrgId(orgId);
     if (!quiz) {
+      console.error('❌ No active quiz found for org:', orgId);
       throw new Error('No active quiz found for this organization.');
     }
-
     const data = await updateWeeklyQuizScore(employeeId, points, session);
     if (!data) {
+      console.warn('⚠️ Quiz already submitted by employee:', employeeId);
       throw new Error('Error updating employee score - quiz already given.');
     }
-
     const [month, year] = getMonthAndYear();
-
     await updateLeaderboard(
       orgId,
       employeeId,
@@ -64,10 +59,8 @@ export const submitWeeklyQuizAnswersService = async (
       year,
       session,
     );
-
     const mergedUserAnswersAndCorrectAnswers =
       mergeUserAnswersAndCorrectAnswers(correctAnswers, userAnswers);
-
     await submitAnswers(
       employeeId,
       orgId,
@@ -78,14 +71,13 @@ export const submitWeeklyQuizAnswersService = async (
       mergedUserAnswersAndCorrectAnswers,
       session,
     );
-
     await session.commitTransaction();
     session.endSession();
-
     return { success: true, score: data.score, points };
   } catch (error) {
     await session.abortTransaction();
     session.endSession();
+    console.error('❌ Transaction aborted due to error:', error.message);
     throw new Error(`Failed to submit quiz: ${error.message}`);
   }
 };

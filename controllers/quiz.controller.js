@@ -59,7 +59,7 @@ export const cleanUpWeeklyQuizController = async (req, res, next) => {
 
 export const cancelLiveQuizController = async (req, res, next) => {
   try {
-    const { quizId } = req.params;
+    const { quizId } = req.query;
     const result = await cancelLiveQuizService(quizId);
     res.status(200).json(result);
   } catch (error) {
@@ -100,11 +100,7 @@ export const editWeeklyQuizQuestionsController = async (req, res, next) => {
       return res.status(400).json({ message: 'Missing required fields' });
     }
 
-    await editWeeklyQuizQuestionsService(
-      questions,
-      questionsToDelete,
-      orgId,
-    );
+    await editWeeklyQuizQuestionsService(questions, questionsToDelete, orgId);
 
     res.status(200).json({ message: 'Questions marked as approved' });
   } catch (error) {

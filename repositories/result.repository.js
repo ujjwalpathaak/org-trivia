@@ -12,18 +12,17 @@ export const submitWeeklyQuizAnswers = async (
   answers,
   session,
 ) => {
-  return await Result.create(
-    {
-      employeeId,
-      orgId,
-      quizId,
-      score,
-      points,
-      genre,
-      answers,
-    },
-    { session },
-  );
+  const resultDoc = {
+    employeeId,
+    orgId,
+    quizId,
+    score,
+    points,
+    genre,
+    answers,
+  };
+
+  return await Result.create([resultDoc], { session });
 };
 
 export const rollbackWeeklyQuizScores = async (quizId) => {

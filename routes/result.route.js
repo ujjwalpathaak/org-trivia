@@ -11,4 +11,5 @@ resultRouter.post(
   '/submitWeeklyQuizAnswers',
   submitWeeklyQuizAnswersController,
 );
+
 resultRouter.get('/employee', getEmployeePastResultsController);

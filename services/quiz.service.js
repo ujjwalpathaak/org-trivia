@@ -12,6 +12,7 @@ import {
   makeWeeklyQuizLive,
   markAllQuizAsExpired,
 } from '../repositories/quiz.repository.js';
+import { rollbackWeeklyQuizScores } from '../repositories/result.repository.js';
 
 export const getWeeklyQuizStatusService = async (orgId, employeeId) => {
   const [quiz, employee] = await Promise.all([
@@ -32,6 +33,7 @@ export const getWeeklyQuizStatusService = async (orgId, employeeId) => {
 
 export const cancelLiveQuizService = async (quizId) => {
   await cancelLiveQuiz(quizId);
+  await rollbackWeeklyQuizScores(quizId);
   return { message: 'Live quiz cancelled' };
 };
 

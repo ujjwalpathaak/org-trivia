@@ -23,7 +23,7 @@ const PastQuizViewer = ({ setIsPastQuizViewerOpen }) => {
         setLoading(true);
         setError(null);
         const response = await getPastQuizResultsAPI(pageNumber, pageSize);
-
+        console.log('Fetched past quizzes:', response);
         if (response && response.data) {
           setPastQuizzes(response.data);
           setQuizCache((prevCache) => ({
