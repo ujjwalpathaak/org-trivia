@@ -2,8 +2,9 @@ import { ObjectId } from 'mongodb';
 
 import Question from '../models/question.model.js';
 import WeeklyQuestion from '../models/weeklyQuestion.model.js';
-import { fetchExtraEmployeeQuestions, updateQuestionsStatus } from './org.repository.js';
+import { updateQuestionsStatus } from './org.repository.js';
 import { updateQuizStatus } from './quiz.repository.js';
+import Org from '../models/org.model.js';
 
 export const saveQuestion = async (newQuestion) => {
   return await new Question(newQuestion).save();
@@ -85,14 +86,55 @@ export const dropWeeklyQuestionCollection = async () => {
   return await WeeklyQuestion.deleteMany();
 };
 
+export const getCAnITQuestionsInTimeline = async (orgId, newsTimelineStart) => {
+  return Org.aggregate([
+    {
+      $match: {
+        _id: new ObjectId(orgId),
+        "questionsCAnIT.date": {
+          $gt: new Date(newsTimelineStart),
+          $lt: new Date()
+        }
+      }
+    },
+    {
+      $unwind: "$questionsCAnIT"
+    },
+    {
+      $sort: {
+        "questionsCAnIT.date": -1
+      }
+    },
+    {
+      $addFields: {
+        "questionsCAnIT.orgName": '$name',
+        "questionsCAnIT.orgIndustry": "$settings.orgIndustry",
+        "questionsCAnIT.orgCountry": "$settings.orgCountry",
+      }
+    },
+    {
+      $replaceRoot: {
+        newRoot: "$questionsCAnIT"
+      }
+    },
+    {
+      $lookup: {
+        from: "questions",
+        localField: "questionId",
+        foreignField: "_id",
+        as: "questionsInfo"
+      }
+    }
+  ]
+  )
+};
+
 export const editQuestions = async (questionsToEdit) => {
   if (!Array.isArray(questionsToEdit) || questionsToEdit.length === 0) {
     throw new Error("Invalid input: questionsToEdit must be a non-empty array.");
   }
 
   const bulkOps = questionsToEdit.map(({ _id, ...rest }) => {
-    console.log("Updating:", _id, rest);
-
     return {
       updateOne: {
         filter: { _id: new ObjectId(_id) }, // Correct filter format
@@ -141,7 +183,6 @@ export const saveWeeklyQuiz = async (orgId,
   quizId,
   weeklyQuiz,
   genre) => {
-
   if (weeklyQuiz.questions.length > 0) {
     await updateQuizStatus(quizId, 'scheduled');
     await updateQuestionsStatus(orgId, weeklyQuiz.questions, genre)

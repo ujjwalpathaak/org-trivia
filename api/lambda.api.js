@@ -3,29 +3,30 @@ import dotenv from 'dotenv';
 
 const API_GATEWAY_URL = process.env.API_GATEWAY_URL;
 
-export const fetchNewCAnITQuestions = (
+export const fetchNewCAnITQuestions = async (
   orgName,
   orgIndustry,
   orgCountry,
-  orgId,
   quizId,
-  newsTimeline,
+  days,
 ) => {
-  fetch(API_GATEWAY_URL + '/generateCAnIT_Questions', {
+  const response = await fetch(API_GATEWAY_URL + '/generateCAnIT_Questions', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
       orgName: orgName,
-      callbackUrl: 'https://4ebf-122-187-121-22.ngrok-free.app',
       orgIndustry: orgIndustry,
       orgCountry: orgCountry,
-      orgId: orgId,
       quizId: quizId,
-      newsTimeline: newsTimeline,
+      days: days,
     }),
-  }).catch((error) => console.error('Error triggering Lambda:', error));
+  })
+
+  const questions = await response.json();
+  console.log('questions', questions);
+  return questions;
 };
 
 export const fetchNewPnAQuestions = async (orgName) => {
@@ -41,19 +42,4 @@ export const fetchNewPnAQuestions = async (orgName) => {
 
   const questions = await response.json();
   return questions;
-};
-
-export const rephraseQuestions = (questions_to_rephrase, orgId, quizId) => {
-  fetch(API_GATEWAY_URL + '/paraphraseQuestions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      questions_to_rephrase: questions_to_rephrase,
-      callbackUrl: 'https://b141-122-187-121-22.ngrok-free.app',
-      orgId: orgId,
-      quizId: quizId,
-    }),
-  }).catch((error) => console.error('Error triggering Lambda:', error));
 };

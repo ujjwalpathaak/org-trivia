@@ -1,3 +1,4 @@
+import { generateCAnITQuestionsService } from '../services/question.service.js';
 import {
   cleanUpWeeklyQuizService,
   makeWeeklyQuizLiveService,
@@ -20,3 +21,12 @@ export const cleanUpWeeklyQuizController = async (req, res, next) => {
     next(error);
   }
 };
+
+export const generateCAnITQuestionsController = async (req, res, next) => {
+  try {
+    await generateCAnITQuestionsService();
+    res.status(200).json({ message: 'CAnIT questions generated successfully' });
+  } catch (error) {
+    next(error);
+  }
+}

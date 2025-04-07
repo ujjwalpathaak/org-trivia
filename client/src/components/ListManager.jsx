@@ -324,6 +324,18 @@ export default function ListManager({
                                     </button>
                                   </div>
                                 )}
+                                {quiz.status !== 'scheduled' && quiz.genre === 'CAnIT' && (
+                                  <div className="flex items-center">
+                                    <span className="text-xs text-slate-400">
+                                      Ready on{' '}
+                                      {new Date(
+                                        new Date(quiz.scheduledDate).setDate(
+                                          new Date(quiz.scheduledDate).getDate() - 1
+                                        )
+                                      ).toDateString()}
+                                    </span>
+                                  </div>
+                                )}
                               </>
                             ) : (
                               <span className="text-gray-700">{quiz.genre}</span>

@@ -5,7 +5,7 @@ import { getQuestionsToApproveAPI, handleEditWeeklyQuizAPI } from '../api.js';
 
 function numToAlpha(num) {
   let alpha = '';
-  num++; // Shift by 1 so 0 maps to 'A'
+  num++;
   while (num > 0) {
     num--;
     alpha = String.fromCharCode(65 + (num % 26)) + alpha;
@@ -16,16 +16,16 @@ function numToAlpha(num) {
 
 function ExtraQuestions({ aiQuestions, empQuestions, onReplaceQuestion, selectedQuestionIndex }) {
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6 w-1/4">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6">Extra Questions</h2>
+    <div
+      className={`${selectedQuestionIndex === null ? 'cursor-not-allowed text-gray-400' : 'text-gray-800'} bg-white rounded-xl shadow-lg p-6 w-1/4`}
+    >
+      <h2 className="text-2xl font-bold mb-6">Extra Questions</h2>
 
       <div className="space-y-6">
         <div>
-          <h3 className="text-lg font-semibold text-gray-700 mb-3">AI Questions</h3>
+          <h3 className="text-lg font-semibold mb-3">AI Questions</h3>
           <div className="space-y-2 overflow-auto max-h-[30vh]">
-            {aiQuestions.length === 0 && (
-              <span className="italic text-slate-400">No AI questions available</span>
-            )}
+            {aiQuestions.length === 0 && <span className="italic ">No AI questions available</span>}
             {aiQuestions?.map((q, idx) => (
               <button
                 key={idx}
@@ -33,26 +33,26 @@ function ExtraQuestions({ aiQuestions, empQuestions, onReplaceQuestion, selected
                 className="w-full text-left p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition duration-200 border border-gray-200"
                 disabled={selectedQuestionIndex === null}
               >
-                <div className="text-sm text-gray-600">{q.question.question}</div>
+                <div className="text-sm">{q.question}</div>
               </button>
             ))}
           </div>
         </div>
 
         <div>
-          <h3 className="text-lg font-semibold text-gray-700 mb-3">Employee Questions</h3>
+          <h3 className="text-lg font-semibold mb-3">Employee Questions</h3>
           <div className="space-y-2 overflow-auto max-h-[30vh]">
             {empQuestions.length === 0 && (
-              <span className="italic text-slate-400">No employee questions available</span>
+              <span className="italic ">No employee questions available</span>
             )}
             {empQuestions.map((q, idx) => (
               <button
                 key={idx}
                 onClick={() => onReplaceQuestion('employee', q, selectedQuestionIndex)}
-                className="w-full text-left p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition duration-200 border border-gray-200"
+                className={`${selectedQuestionIndex === null && 'cursor-not-allowed'} w-full text-left p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition duration-200 border border-gray-200`}
                 disabled={selectedQuestionIndex === null}
               >
-                <div className="text-sm text-gray-600">{q.question.question}</div>
+                <div className="text-sm">{q.question}</div>
               </button>
             ))}
           </div>
@@ -195,7 +195,6 @@ function App() {
     const getQuestionsToApproveFunc = async () => {
       try {
         const response = await getQuestionsToApproveAPI(quizId);
-        console.log(response);
         if (response.status === 400) {
           toast.info('No questions found');
           navigate('/dashboard');
@@ -219,7 +218,7 @@ function App() {
     }
 
     const updatedQuestions = [...questions];
-    updatedQuestions[index] = newQuestion.question;
+    updatedQuestions[index] = newQuestion;
     setQuestions(updatedQuestions);
 
     if (type === 'ai') {

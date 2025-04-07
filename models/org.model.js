@@ -28,6 +28,14 @@ const questionSchema = new mongoose.Schema(
       required: true,
       default: 'AI',
     },
+    date: {
+      type: Date,
+      default: () => {
+        const now = new Date();
+        now.setHours(0, 0, 0, 0);
+        return now;
+      },
+    },
   },
   { _id: false },
 );

@@ -20,6 +20,15 @@ export const makeQuizLiveTestJobCron = cron.schedule(
   { scheduled: true, timezone: 'UTC' },
 );
 
+export const generateCAnITQuestionsJobCron = cron.schedule(
+  '30 5 * * 4',
+  async () => {
+    console.log('Running Scheduled Task: Make Quiz Live...');
+    await generateCAnITQuestionsJob();
+  },
+  { scheduled: true, timezone: 'UTC' },
+);
+
 export const cleanWeeklyQuizJobCron = cron.schedule(
   '1 0 * * 5',
   async () => {

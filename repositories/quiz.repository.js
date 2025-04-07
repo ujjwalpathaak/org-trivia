@@ -46,6 +46,87 @@ export const getScheduledQuizzes = (orgId) => {
   });
 };
 
+// export const getCAnITQuizzesScheduledTomm = (genre) => {
+//   const tomorrow = new Date();
+//   tomorrow.setDate(tomorrow.getDate() + 1);
+//   tomorrow.setHours(0, 0, 0, 0);
+
+//   const dayAfterTomorrow = new Date(tomorrow);
+//   dayAfterTomorrow.setDate(tomorrow.getDate() + 1);
+
+//   return Quiz.find({
+//     genre: genre || "CAnIT",
+//     status: "upcoming",
+//     scheduledDate: {
+//       $gte: tomorrow,
+//       $lt: dayAfterTomorrow,
+//     },
+//   });
+// };
+
+export const lastQuizByGenre = () => {
+  return Quiz.aggregate([
+    {
+    $match:{ genre: "CAnIT", status: "expired"}
+  },{
+    $sort: {
+      scheduledDate: -1
+    }  
+  },
+    {
+    $group: {
+      _id: '$orgId',
+      scheduledDate: {
+        $first: '$scheduledDate'
+      },
+      quizId: {
+        $first: '$_id'
+      }
+    }
+  },
+  {
+    $project: {
+      orgId: '$_id',
+      scheduledDate: 1,
+      quizId: 1,
+      _id: 0
+    }
+  }
+  ])
+};
+
+// will need to change this later --- 
+export const getCAnITQuizzesScheduledTomm = () => {
+  return Quiz.aggregate([
+    {
+      $match: {
+        genre: 'CAnIT',
+        status: "upcoming"
+      }
+    },
+    {
+      $sort: {
+        scheduledDate: 1
+      }
+    },
+    {
+      $group: {
+        _id: '$orgId',
+        scheduledDate: { $first: '$scheduledDate' },
+        quizId: { $first: '$_id' }
+      }
+    },
+    {
+      $project: {
+        orgId: '$_id',
+        scheduledDate: 1,
+        quizId: 1,
+        _id: 0
+      }
+    }
+  ]);
+};
+
 export const scheduleNewWeeklyQuiz = (orgId, date, genre) => {
   return Quiz.create({
     orgId,
