@@ -2,9 +2,9 @@ import express from 'express';
 
 import {
   cancelLiveQuizController,
+  getQuizStatusController,
   getScheduledQuizzesController,
   getWeeklyQuizLiveQuestionsController,
-  getQuizStatusController,
   submitQuizAnswersController,
 } from '../controllers/quiz.controller.js';
 import { checkRole, protectRoute } from '../middleware/auth.middleware.js';

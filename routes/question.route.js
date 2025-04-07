@@ -1,11 +1,12 @@
 import express from 'express';
-import { checkRole, protectRoute } from '../middleware/auth.middleware.js';
+
 import {
+  addNewHRPQuestionsCallbackController,
   createNewQuestionController,
   editQuizQuestionsController,
   getScheduledQuizQuestionsController,
-  handleLambdaCallbackController,
 } from '../controllers/question.controller.js';
+import { checkRole, protectRoute } from '../middleware/auth.middleware.js';
 
 export const questionRouter = express.Router();
 
@@ -23,7 +24,6 @@ questionRouter.patch(
   editQuizQuestionsController,
 );
 
-
 questionRouter.get(
   '/scheduled/quiz/:quizId',
   protectRoute,
@@ -31,4 +31,4 @@ questionRouter.get(
   getScheduledQuizQuestionsController,
 );
 
-questionRouter.post('/new/HRD', handleLambdaCallbackController);
+questionRouter.post('/new/HRD', addNewHRPQuestionsCallbackController);

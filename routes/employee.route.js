@@ -1,4 +1,5 @@
 import express from 'express';
+
 import {
   getEmployeeDetailsController,
   getEmployeePastResultsController,
@@ -10,7 +11,11 @@ export const employeeRouter = express.Router();
 
 employeeRouter.get('/', checkRole('Employee'), getEmployeeDetailsController);
 
-employeeRouter.get('/results/past', checkRole('Employee'), getEmployeePastResultsController);
+employeeRouter.get(
+  '/results/past',
+  checkRole('Employee'),
+  getEmployeePastResultsController,
+);
 
 employeeRouter.get(
   '/questions/submitted',

@@ -1,13 +1,19 @@
 import { getValue, setValue } from '../Redis.js';
+
+import {
+  getLeaderboardByOrg,
+  getLeaderboardYearBoundary,
+} from '../repositories/leaderboard.respository.js';
+
 import {
   changeCompanyCurrentAffairsTimeline,
   changeGenreSettings,
   getAllOrgNames,
   getOrgAnalytics,
-  getOrgById,
   getOrgSettings,
   toggleTrivia,
 } from '../repositories/org.repository.js';
+
 import { changeQuizGenre } from '../repositories/quiz.repository.js';
 
 export const saveSettingsService = async (
@@ -40,10 +46,6 @@ export const getAllOrgNamesService = async () => {
     return cache;
   }
   return await getAllOrgNames();
-};
-
-export const getOrgByIdService = async (orgId) => {
-  return await getOrgById(orgId);
 };
 
 export const toggleTriviaService = async (orgId, isEnabled) => {

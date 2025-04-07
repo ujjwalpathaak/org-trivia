@@ -1,10 +1,10 @@
 import {
-  addLambdaCallbackQuestions,
-  editWeeklyQuizQuestionsService,
+  addNewHRPQuestionsCallbackService,
+  editQuizQuestionsService,
   generateCAnITQuestionsService,
   getWeeklyQuizQuestions,
-  saveQuestion,
-  scheduleQuizzesJob,
+  createNewQuestionService,
+  scheduleNextMonthQuizzesJob,
   validateEmployeeQuestionSubmission,
 } from '../services/question.service.js';
 
@@ -16,7 +16,7 @@ export const editQuizQuestionsController = async (req, res, next) => {
       return res.status(400).json({ message: 'Missing required fields' });
     }
 
-    await editWeeklyQuizQuestionsService(questions, questionsToDelete, orgId);
+    await editQuizQuestionsService(questions, questionsToDelete, orgId);
 
     res.status(200).json({ message: 'Questions marked as approved' });
   } catch (error) {
@@ -33,7 +33,7 @@ export const createNewQuestionController = async (req, res, next) => {
       return res.status(400).json(errors);
     }
 
-    const isQuestionAdded = await saveQuestion(question, employeeId);
+    const isQuestionAdded = await createNewQuestionService(question, employeeId);
     if (!isQuestionAdded) {
       return res.status(404).json({ message: 'Not able to save question' });
     }
@@ -62,22 +62,15 @@ export const getScheduledQuizQuestionsController = async (req, res, next) => {
   }
 };
 
-export const handleLambdaCallbackController = async (req, res, next) => {
+export const addNewHRPQuestionsCallbackController = async (req, res, next) => {
   try {
-    const { category, quizId, file, questions, orgId, newsTimeline } = req.body;
-    if (!questions || !orgId || !category) {
+    const { file, questions, orgId } = req.body;
+    if (!questions || !orgId) {
       next(new Error('Invalid request body'));
       return;
     }
 
-    await addLambdaCallbackQuestions(
-      questions,
-      category,
-      orgId,
-      quizId,
-      file,
-      newsTimeline,
-    );
+    await addNewHRPQuestionsCallbackService(questions, orgId, file);
 
     res.status(200).json({ message: 'Scheduled new questions' });
   } catch (error) {
@@ -98,8 +91,8 @@ export const generateCAnITQuestionsController = async (req, res, next) => {
 // test controller
 export const scheduleQuizzesJobController = async (req, res, next) => {
   try {
-    await scheduleQuizzesJob();
-    res.status(200).json({ message: 'Quizzes Scheduled successfully' });
+    const response = await scheduleNextMonthQuizzesJob();
+    res.status(200).json(response);
   } catch (error) {
     next(error);
   }

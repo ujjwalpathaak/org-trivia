@@ -3,11 +3,11 @@ import express from 'express';
 import { protectRoute } from '../middleware/auth.middleware.js';
 import { sanitizeRequest } from '../middleware/sanitizeRequest.js';
 import { authRouter } from './auth.route.js';
-import { testRouter } from './test.route.js';
 import { employeeRouter } from './employee.route.js';
 import { orgRouter } from './org.route.js';
 import { questionRouter } from './question.route.js';
 import { quizRouter } from './quiz.route.js';
+import { testRouter } from './test.route.js';
 
 export const router = express.Router();
 

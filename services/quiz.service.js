@@ -1,28 +1,35 @@
 import { dbConnection } from '../Database.js';
-import { getMonthAndYear, mergeUserAnswersAndCorrectAnswers } from '../middleware/utils.js';
-import { getWeeklyQuizCorrectAnswersService } from './question.service.js';
+
+import {
+  getMonthAndYear,
+  mergeUserAnswersAndCorrectAnswers,
+} from '../middleware/utils.js';
+
 import {
   awardStreakBadges,
   isWeeklyQuizGiven,
   updateEmployeeStreaksAndMarkAllEmployeesAsQuizNotGiven,
-  updateWeeklyQuizScore
+  updateWeeklyQuizScore,
 } from '../repositories/employee.repository.js';
-import { dropWeeklyQuestionCollection } from '../repositories/question.repository.js';
+
+import { updateLeaderboard } from '../repositories/leaderboard.respository.js';
+
+import { dropWeeklyQuestionCollection, getCorrectWeeklyQuizAnswers } from '../repositories/question.repository.js';
+
 import {
   cancelLiveQuiz,
-  findQuiz,
+  findLiveQuizByOrgId,
+  getLiveQuizQuestionsByOrgId,
   getQuizStatus,
   getScheduledQuizzes,
   makeWeeklyQuizLive,
   markAllQuizAsExpired,
-  findLiveQuizByOrgId,
-  getLiveQuizQuestionsByOrgId
 } from '../repositories/quiz.repository.js';
+
 import {
   rollbackWeeklyQuizScores,
-  submitWeeklyQuizAnswers as submitAnswers
+  submitWeeklyQuizAnswers,
 } from '../repositories/result.repository.js';
-import { updateLeaderboard } from '../repositories/leaderboard.respository.js';
 
 export const getWeeklyQuizStatusService = async (orgId, employeeId) => {
   const [quiz, employee] = await Promise.all([
@@ -47,37 +54,13 @@ export const cancelLiveQuizService = async (quizId) => {
   return { message: 'Live quiz cancelled' };
 };
 
-export async function getWeeklyQuizLiveQuestions(orgId, quizGenre) {
+export async function getWeeklyQuizLiveQuestionsService(orgId, quizGenre) {
   const questions = await getLiveQuizQuestionsByOrgId(orgId);
   return {
     weeklyQuizQuestions: questions || [],
     quizId: questions[0]?.quizId || null,
   };
 }
-
-export const getWeeklyQuizService = async (quizId) => {
-  return await findQuiz(quizId);
-};
-
-// export const isCAnITQuizOverlappingService = async (
-//   orgId,
-//   companyCurrentAffairsTimeline,
-//   quizId,
-// ) => {
-//   const quiz = findQuiz(quizId);
-//   const days = companyCurrentAffairsTimeline * 7;
-//   const quizDate = new Date(quiz?.scheduledDate);
-
-//   const lastQuiz = await lastQuizByGenre(orgId, 'CANIT');
-
-//   if (!lastQuiz?.scheduledDate) {
-//     return false;
-//   }
-
-//   const lastQuizDate = new Date(lastQuiz.scheduledDate);
-
-//   return Math.abs((quizDate - lastQuizDate) / (1000 * 60 * 60 * 24)) < days;
-// };
 
 export const makeWeeklyQuizLiveService = async () => {
   await makeWeeklyQuizLive();
@@ -122,16 +105,14 @@ export const submitWeeklyQuizAnswersService = async (
   session.startTransaction();
 
   try {
-    const correctAnswers = await getWeeklyQuizCorrectAnswersService(quizId);
+    const correctAnswers = await getCorrectWeeklyQuizAnswers(quizId);
     const points = calculateWeeklyQuizScore(userAnswers, correctAnswers);
     const quiz = await findLiveQuizByOrgId(orgId);
     if (!quiz) {
-      console.error('❌ No active quiz found for org:', orgId);
       throw new Error('No active quiz found for this organization.');
     }
     const data = await updateWeeklyQuizScore(employeeId, points, session);
     if (!data) {
-      console.warn('⚠️ Quiz already submitted by employee:', employeeId);
       throw new Error('Error updating employee score - quiz already given.');
     }
     const [month, year] = getMonthAndYear();
@@ -145,7 +126,7 @@ export const submitWeeklyQuizAnswersService = async (
     );
     const mergedUserAnswersAndCorrectAnswers =
       mergeUserAnswersAndCorrectAnswers(correctAnswers, userAnswers);
-    await submitAnswers(
+    await submitWeeklyQuizAnswers(
       employeeId,
       orgId,
       quizId,
@@ -161,7 +142,6 @@ export const submitWeeklyQuizAnswersService = async (
   } catch (error) {
     await session.abortTransaction();
     session.endSession();
-    console.error('❌ Transaction aborted due to error:', error.message);
     throw new Error(`Failed to submit quiz: ${error.message}`);
   }
 };

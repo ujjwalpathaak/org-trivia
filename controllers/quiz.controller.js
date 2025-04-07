@@ -2,10 +2,10 @@ import {
   cancelLiveQuizService,
   cleanUpWeeklyQuizService,
   getScheduledQuizzesService,
+  getWeeklyQuizLiveQuestionsService,
   getWeeklyQuizStatusService,
-  submitWeeklyQuizAnswersService,
   makeWeeklyQuizLiveService,
-  getWeeklyQuizLiveQuestions,
+  submitWeeklyQuizAnswersService,
 } from '../services/quiz.service.js';
 
 export const getQuizStatusController = async (req, res, next) => {
@@ -73,7 +73,7 @@ export const getWeeklyQuizLiveQuestionsController = async (req, res, next) => {
       return res.status(400).json({ message: 'Missing required fields' });
     }
 
-    const weeklyQuizQuestions = await getWeeklyQuizLiveQuestions(orgId);
+    const weeklyQuizQuestions = await getWeeklyQuizLiveQuestionsService(orgId);
 
     res.status(200).json(weeklyQuizQuestions);
   } catch (error) {

@@ -1,11 +1,11 @@
 import {
   getAllOrgNamesService,
   getAnalyticsService,
+  getLeaderboardByOrgService,
   getSettingsService,
+  resetLeaderboardService,
   saveSettingsService,
   toggleTriviaService,
-  getLeaderboardByOrgService,
-  resetLeaderboardService
 } from '../services/org.service.js';
 
 export const resetLeaderboardController = async (req, res, next) => {
@@ -43,8 +43,14 @@ export const saveOrgSettingsController = async (req, res, next) => {
     if (!orgId) {
       return res.status(400).json({ message: 'Missing orgId' });
     }
-    const { newGenreOrder, changedGenres, companyCurrentAffairsTimeline } = req.body;
-    await saveSettingsService(orgId, newGenreOrder, changedGenres, companyCurrentAffairsTimeline);
+    const { newGenreOrder, changedGenres, companyCurrentAffairsTimeline } =
+      req.body;
+    await saveSettingsService(
+      orgId,
+      newGenreOrder,
+      changedGenres,
+      companyCurrentAffairsTimeline,
+    );
     res.status(200).json({ message: 'Genre settings updated successfully' });
   } catch (error) {
     next(error);

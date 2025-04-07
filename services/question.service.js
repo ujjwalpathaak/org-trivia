@@ -2,14 +2,18 @@ import {
   fetchNewCAnITQuestions,
   fetchNewPnAQuestions,
 } from '../api/lambda.api.js';
+
 import {
   HRP_QUESTIONS_PER_QUIZ,
   PnA_QUESTIONS_PER_QUIZ,
 } from '../constants.js';
+
 import { getFridaysOfNextMonth } from '../middleware/utils.js';
+
 import { addSubmittedQuestion } from '../repositories/employee.repository.js';
+
 import {
-  addQuestionToOrg,
+  pushQuestionsInOrgRepo,
   fetchExtraAIQuestions,
   fetchExtraEmployeeQuestions,
   fetchHRPQuestions,
@@ -19,157 +23,159 @@ import {
   HRPQuestionsCount,
   isGenreAvailable,
   makeGenreUnavailable,
-  pushQuestionsInOrg as pushQuestionsInOrgRepo,
   removeAllQuestionsPnAFromOrg,
   setNextQuestionGenre,
+  getPnAQuestionsLeft
 } from '../repositories/org.repository.js';
-import { getPnAQuestionsLeft } from '../repositories/org.repository.js';
+
 import {
   addQuestions,
-  editQuestions,
+  editQuizQuestions,
   getCAnITQuestionsInTimeline,
-  getCorrectWeeklyQuizAnswers,
-  getWeeklyQuestions,
   getWeeklyQuizScheduledQuestions,
   removeQuestionsPnAFromDatabase,
-  saveQuestion as saveQuestionRepo,
+  createNewQuestion,
   saveWeeklyQuiz,
 } from '../repositories/question.repository.js';
+
 import {
   findQuiz,
   getCAnITQuizzesScheduledTomm,
-  getLiveQuizQuestionsByOrgId,
   lastQuizByGenre,
   scheduleNewWeeklyQuiz,
 } from '../repositories/quiz.repository.js';
 
-export async function saveQuestion(newQuestionData, employeeId) {
-  const orgId = newQuestionData.orgId;
-  const newQuestion = await saveQuestionRepo(newQuestionData);
-  const addedToList = await addQuestionToOrg(newQuestion, orgId);
-  await addSubmittedQuestion(newQuestion._id, employeeId);
-  return newQuestion && addedToList;
-}
-
-export async function scheduleQuizzesJob(req, res) {
+export const scheduleNextMonthQuizzesJob = async () => {
   const triviaEnabledOrgs = await getTriviaEnabledOrgs();
-  for (const org of triviaEnabledOrgs) {
+
+  triviaEnabledOrgs.forEach((org) => {
     const orgObject = org.toObject();
-    scheduleQuizForOrgService(orgObject);
-  }
+    scheduleQuizForOrgService(orgObject).catch((err) => {
+      console.error(`Error scheduling for org ${orgObject._id}:`, err);
+    });
+  });
 
-  return res.status(200).json({ message: 'Scheduling started' });
-}
+  return { message: 'Scheduling started in background' };
+};
 
-export async function checkIfMorePnAQuestionsNeeded(org, scheduledQuizzes) {
-  const PnAQuizzesToConduct = scheduledQuizzes.filter((q) => q.genre === 'PnA');
-  const PnAQuestionsRequired =
-    PnAQuizzesToConduct.length * PnA_QUESTIONS_PER_QUIZ;
-  const PnAQuestionsLeft = await getPnAQuestionsLeft(org._id);
-  const PnAQuestionsLeftCount = PnAQuestionsLeft[0]?.count || 0;
-
-  if (
-    PnAQuestionsLeft.length === 0 ||
-    PnAQuestionsLeftCount <= PnAQuestionsRequired
-  ) {
-    const questionsToRemove = await removeAllQuestionsPnAFromOrg(org._id);
-    await removeQuestionsPnAFromDatabase(questionsToRemove);
-    const newQuestions = await fetchNewPnAQuestions(org.name);
-
-    let questions = await pushQuestionsToDatabase(
-      newQuestions.questions,
-      'PnA',
-    );
-    await pushQuestionsInOrg(questions, 'PnA', org._id);
-  }
-}
-
-export async function scheduleQuizForOrgService(org) {
-  let currentGenre = org.settings.currentGenre;
-  let allGenres = org.settings.selectedGenre;
-  let fridaysOfMonth = getFridaysOfNextMonth();
+const scheduleQuizForOrgService = async (org) => {
+  const { currentGenre, selectedGenre: allGenres } = org.settings;
+  const fridaysOfMonth = getFridaysOfNextMonth();
 
   const scheduledQuizzes = [];
 
-  for (const friday of fridaysOfMonth) {
-    const genre = allGenres[currentGenre];
+  let nextGenreIndex = currentGenre;
 
+  for (const friday of fridaysOfMonth) {
+    const genre = allGenres[nextGenreIndex];
     const quiz = await scheduleNewWeeklyQuiz(org._id, friday, genre);
     scheduledQuizzes.push(quiz);
-
-    currentGenre = (currentGenre + 1) % allGenres.length;
+    nextGenreIndex = (nextGenreIndex + 1) % allGenres.length;
   }
 
-  await setNextQuestionGenre(org._id, currentGenre);
+  await setNextQuestionGenre(org._id, nextGenreIndex);
 
   await checkIfMorePnAQuestionsNeeded(org, scheduledQuizzes);
 
-  for (const quiz of scheduledQuizzes) {
-    await startQuestionGenerationWorkflow(quiz.genre, org, quiz);
-    // const shouldBreak =
-    // if (shouldBreak) break;
-  }
-}
+  await Promise.all(
+    scheduledQuizzes.map((quiz) =>
+      startQuestionGenerationWorkflow(quiz.genre, org, quiz).catch((err) => {
+        console.error(
+          `Failed to start question generation for quiz ${quiz._id}:`,
+          err,
+        );
+      }),
+    ),
+  );
+};
 
-export async function canConductQuizHRP(orgId) {
-  const unusedQuestions = await HRPQuestionsCount(orgId, false);
-  return unusedQuestions >= HRP_QUESTIONS_PER_QUIZ;
-}
-
-export async function startPnAWorkflow(orgName, orgId, quizId) {
-  const PnAQuestions = await fetchPnAQuestions(orgId);
-  await pushQuestionsInQuiz(PnAQuestions, orgId, quizId, 'PnA');
-}
-
-export async function startQuestionGenerationWorkflow(genre, org, quiz) {
-  const quizId = quiz._id;
-  const orgName = org.name;
+const checkIfMorePnAQuestionsNeeded = async (org, scheduledQuizzes) => {
   const orgId = org._id;
+  const orgName = org.name;
+
+  const pnaQuizzes = scheduledQuizzes.filter((q) => q.genre === 'PnA');
+  const requiredPnACount = pnaQuizzes.length * PnA_QUESTIONS_PER_QUIZ;
+
+  if (requiredPnACount === 0) return;
+
+  const [{ count: availablePnACount = 0 } = {}] =
+    await getPnAQuestionsLeft(orgId);
+
+  if (availablePnACount > requiredPnACount) return;
+
+  const questionsToRemove = await removeAllQuestionsPnAFromOrg(orgId);
+  await removeQuestionsPnAFromDatabase(questionsToRemove);
+
+  const { questions: fetchedQuestions } = await fetchNewPnAQuestions(orgName);
+
+  const insertedQuestions = await pushQuestionsToDatabase(
+    fetchedQuestions,
+    'PnA',
+  );
+  await addQuestionstoOrg(insertedQuestions, 'PnA', orgId);
+};
+
+const startQuestionGenerationWorkflow = async (genre, org, quiz) => {
+  const { _id: quizId } = quiz;
+  const { _id: orgId, name: orgName } = org;
 
   switch (genre) {
     case 'PnA':
-      console.log('Starting PnA for', orgName);
+      console.log(`[${orgName}] Starting PnA workflow`);
       await startPnAWorkflow(orgName, orgId, quizId);
       break;
 
     case 'HRP':
-      console.log('Starting HRP for', orgName);
-      if (isGenreAvailable(orgId, 'HRP')) {
-        const conductQuizHRP = await canConductQuizHRP(orgId, quizId);
-        if (!conductQuizHRP) {
-          makeGenreUnavailable(orgId, genre);
+      console.log(`[${orgName}] Starting HRP workflow`);
+      const isAvailable = await isGenreAvailable(orgId, 'HRP');
+
+      if (isAvailable) {
+        const canConduct = await canConductQuizHRP(orgId, quizId);
+        if (!canConduct) {
+          await makeGenreUnavailable(orgId, genre);
+          console.warn(
+            `[${orgName}] HRP quiz not allowed, genre marked unavailable`,
+          );
+          return;
         }
 
-        startHRPWorkflow(orgId, quizId);
+        await startHRPWorkflow(orgId, quizId);
+      } else {
+        console.warn(`[${orgName}] HRP genre is not available`);
       }
       break;
 
     default:
+      console.warn(`[${orgName}] Unknown genre: ${genre}`);
       break;
   }
-}
+};
 
-export function formatWeeklyQuizDocument(questions, orgId, quizId) {
+const addQuestionsToQuiz = async (questions, orgId, quizId, genre) => {
   const questionIds = questions.map((curr) => curr._id);
-  return {
+  const data = {
     questions: questionIds,
     quizId: quizId,
     orgId: orgId,
   };
-}
 
-export function formatQuestionsForOrgs(questions, file) {
-  return questions.map((question) => ({
+  return await saveWeeklyQuiz(orgId, quizId, data, genre);
+};
+
+const addQuestionstoOrg = async (questions, genre, orgId, file) => {
+  const refactoredQuestions = questions.map((question) => ({
     questionId: question._id,
     ...(question.config.puzzleType && {
       puzzleType: question.config.puzzleType,
     }),
     ...(file && { file: file }),
   }));
-}
 
-export function formatQuestionsForDatabase(questions, category) {
-  return questions.map((question) => ({
+  return await pushQuestionsInOrgRepo(refactoredQuestions, genre, orgId);
+};
+
+const pushQuestionsToDatabase = async (questions, category) => {
+  const refactoredQuestions = questions.map((question) => ({
     question: question.question,
     answer: question.answer,
     options: question.options,
@@ -180,63 +186,38 @@ export function formatQuestionsForDatabase(questions, category) {
       puzzleType: question.puzzleType,
     },
   }));
-}
 
-export async function pushQuestionsInQuiz(questions, orgId, quizId, genre) {
-  const weeklyQuiz = formatWeeklyQuizDocument(questions, orgId, quizId);
-
-  return await saveWeeklyQuiz(orgId, quizId, weeklyQuiz, genre);
-}
-
-export async function pushQuestionsInOrg(questions, genre, orgId, file) {
-  const refactoredQuestions = formatQuestionsForOrgs(questions, file);
-  return await pushQuestionsInOrgRepo(refactoredQuestions, genre, orgId);
-}
-
-export async function pushQuestionsToDatabase(questions, category) {
-  const refactoredQuestions = formatQuestionsForDatabase(questions, category);
   return await addQuestions(refactoredQuestions);
-}
+};
 
-export async function addLambdaCallbackQuestions(
+const startPnAWorkflow = async (orgName, orgId, quizId) => {
+  const questions = await fetchPnAQuestions(orgId);
+
+  await addQuestionsToQuiz(questions, orgId, quizId, 'PnA');
+};
+
+const canConductQuizHRP = async (orgId) => {
+  const unusedQuestions = await HRPQuestionsCount(orgId, false);
+  return unusedQuestions >= HRP_QUESTIONS_PER_QUIZ;
+};
+
+const startHRPWorkflow = async (orgId, quizId) => {
+  const questions = await fetchHRPQuestions(orgId);
+  await addQuestionsToQuiz(questions, orgId, quizId, 'HRP');
+};
+
+export const addNewHRPQuestionsCallbackService = async (
   newQuestions,
-  category,
   orgId,
-  quizId,
   file,
-  newsTimeline,
-) {
-  // if(category === 'CAnIT') {
-  //   const unusedQuestionsFromTimeline = await getUnusedQuestionsFromTimeline(orgId, newsTimeline);
-  //   const questionsCount = newQuestions.length + unusedQuestionsFromTimeline.length;
-
-  //   if(questionsCount < CAnIT_QUESTIONS_PER_QUIZ) {
-  //     makeGenreUnavailable(orgId, category);
-  //     return;
-  //   }else{
-  //     makeGenreAvailable(orgId, category);
-  //   }
-
-  //   // logic to use unusedQuestionsFromTimeline
-
-  //   return;
-  // }
-
-  if (category === 'HRP') {
-    let questions = await pushQuestionsToDatabase(newQuestions, category);
-    await pushQuestionsInOrg(questions, category, orgId, file);
-  }
-
-  // if (quizId) await pushQuestionsInQuiz(questions, orgId, quizId);
+) => {
+  let questions = await pushQuestionsToDatabase(newQuestions, 'HRP');
+  await addQuestionstoOrg(questions, 'HRP', orgId, file);
 }
 
-export async function validateEmployeeQuestionSubmission(question) {
-  const errors = getValidationErrors(question);
-  return Object.keys(errors).length;
-}
-
-export function getValidationErrors(question) {
+export const validateEmployeeQuestionSubmission = (question) => {
   const errors = {};
+
   if (!question.question.trim()) {
     errors.question = 'Question is required.';
   }
@@ -252,54 +233,55 @@ export function getValidationErrors(question) {
   if (!question.options || question.options.length < 4) {
     errors.options = 'At least 4 options are required.';
   }
-  return errors;
-}
 
-export async function getExtraAIQuestionsService(orgId, quizId, quizGenre) {
-  return await fetchExtraAIQuestions(orgId, quizGenre);
-}
+  return Object.keys(errors).length;
+};
 
-export async function getExtraEmployeeQuestionsService(
-  orgId,
-  quizId,
-  quizGenre,
-) {
-  return await fetchExtraEmployeeQuestions(orgId, quizGenre);
-}
-
-export async function editWeeklyQuizQuestionsService(
+export const editQuizQuestionsService = async (
   questionsToEdit,
   questionsToDelete,
-  orgId,
-) {
-  await editQuestions(questionsToEdit);
+  orgId
+) => {
+  await editQuizQuestions(questionsToEdit);
 
-  // const idsOfQuestionsToChange = questions.map(
-  //   (q) => new ObjectId(q.question._id),
-  // );
-  // const idsOfQuestionsToDelete = questionsToDelete.map(
-  //   (q) => new ObjectId(q.question._id),
-  // );
-  // const employeeQuestionsToAdd = questions.filter(
-  //   (q) => q.question.source === 'Employee',
-  // );
-  // const quizId = questions[0].quizId || null;
-  // const category = questions[0].question.category || null;
+  return { message: 'Questions Edited.' };
+};
 
-  // await orgRepository.updateQuestionsStatusInOrgToUsed(
-  //   orgId,
-  //   category,
-  //   idsOfQuestionsToChange,
-  //   idsOfQuestionsToDelete,
-  // );
-  // await quizRepository.updateQuizStatusToApproved(quizId);
-  // await updateWeeklyQuestionsStatusToApproved(
-  //   idsOfQuestionsToApprove,
-  //   employeeQuestionsToAdd,
-  //   idsOfQuestionsToDelete,
-  // );
+export const getWeeklyQuizQuestions = async (orgId, quizId) => {
+  const quiz = await findQuiz(quizId);
+  const quizGenre = quiz.genre;
 
-  return { message: 'Questions approved.' };
+  const weeklyQuizQuestion = await getWeeklyQuizScheduledQuestions(
+    orgId,
+    quizId,
+  );
+
+  const extraEmployeeQuestions = await fetchExtraEmployeeQuestions(
+    orgId,
+    quizGenre,
+  );
+
+  const extraAIQuestions = await fetchExtraAIQuestions(orgId, quizGenre);
+
+  return {
+    weeklyQuizQuestions: weeklyQuizQuestion || [],
+    extraEmployeeQuestions: extraEmployeeQuestions || [],
+    extraAIQuestions: extraAIQuestions || [],
+    quizId: quizId || null,
+  };
+}
+
+export async function createNewQuestionService(newQuestionData, employeeId) {
+  const { orgId } = newQuestionData;
+  const newQuestion = await createNewQuestion(newQuestionData);
+  if (!newQuestion) throw new Error('Failed to create question');
+
+  const added = await pushQuestionsInOrgRepo(newQuestion, orgId);
+  if (!added) throw new Error('Failed to add question to org');
+
+  await addSubmittedQuestion(newQuestion._id, employeeId);
+
+  return true;
 }
 
 export const generateCAnITQuestionsService = async () => {
@@ -343,60 +325,8 @@ export const generateCAnITQuestionsService = async () => {
       days,
     );
     const questions = await pushQuestionsToDatabase(newQuestions, 'CAnIT');
-    await pushQuestionsInOrg(questions, 'CAnIT', quiz.orgId);
-    await pushQuestionsInQuiz(questions, quiz.orgId, quiz.quizId, 'CAnIT');
+    await addQuestionstoOrg(questions, 'CAnIT', quiz.orgId);
+    await addQuestionsToQuiz(questions, quiz.orgId, quiz.quizId, 'CAnIT');
   }
   return { message: 'CAnIT questions generated successfully' };
 };
-
-export async function getWeeklyQuestionsService(orgId, quizId) {
-  return (await getWeeklyQuestions(quizId)) || [];
-}
-
-export async function getWeeklyQuizCorrectAnswersService(quizId) {
-  return await getCorrectWeeklyQuizAnswers(quizId);
-}
-
-export async function getWeeklyQuizQuestions(orgId, quizId) {
-  const quiz = await findQuiz(quizId);
-
-  const weeklyQuizQuestion = await getWeeklyQuizScheduledQuestions(
-    orgId,
-    quizId,
-  );
-
-  const extraEmployeeQuestions = await getExtraEmployeeQuestionsService(
-    orgId,
-    quizId,
-    quiz.genre,
-  );
-
-  const extraAIQuestions = await getExtraAIQuestionsService(
-    orgId,
-    quizId,
-    quiz.genre,
-  );
-
-  return {
-    weeklyQuizQuestions: weeklyQuizQuestion || [],
-    extraEmployeeQuestions: extraEmployeeQuestions || [],
-    extraAIQuestions: extraAIQuestions || [],
-    quizId: quizId || null,
-  };
-}
-
-export async function startHRPWorkflow(orgId, quizId) {
-  const questions = await fetchHRPQuestions(orgId);
-  await pushQuestionsInQuiz(questions, orgId, quizId, 'HRP');
-}
-
-export async function startCAnITWorkflow(org, quizId) {
-  fetchNewCAnITQuestions(
-    org.name,
-    org.orgIndustry,
-    org.orgCountry,
-    org._id,
-    quizId,
-    org.companyCurrentAffairsTimeline,
-  );
-}

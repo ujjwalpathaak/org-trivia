@@ -1,8 +1,14 @@
 import express from 'express';
 
-import { cleanUpWeeklyQuizController, makeWeeklyQuizLiveController } from '../controllers/quiz.controller.js';
-import { generateCAnITQuestionsController, scheduleQuizzesJobController } from '../controllers/question.controller.js';
 import { resetLeaderboardController } from '../controllers/org.controller.js';
+import {
+  generateCAnITQuestionsController,
+  scheduleQuizzesJobController,
+} from '../controllers/question.controller.js';
+import {
+  cleanUpWeeklyQuizController,
+  makeWeeklyQuizLiveController,
+} from '../controllers/quiz.controller.js';
 
 export const testRouter = express.Router();
 

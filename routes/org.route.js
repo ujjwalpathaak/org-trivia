@@ -5,7 +5,6 @@ import {
   getOrgAnalyticsController,
   getOrgLeaderboardController,
   getOrgSettingsController,
-  resetLeaderboardController,
   saveOrgSettingsController,
   toggleOrgTriviaSettingController,
 } from '../controllers/org.controller.js';
@@ -43,8 +42,4 @@ orgRouter.get(
   getOrgAnalyticsController,
 );
 
-orgRouter.get(
-  '/leaderboard',
-  protectRoute,
-  getOrgLeaderboardController,
-);
+orgRouter.get('/leaderboard', protectRoute, getOrgLeaderboardController);

@@ -2,8 +2,8 @@ import { ObjectId } from 'mongodb';
 
 import { getMonth } from '../middleware/utils.js';
 import Employee from '../models/employee.model.js';
-import Question from '../models/question.model.js';
 import { findBadgeByStreak } from './badge.repository.js';
+import { getQuestionsByIds } from './question.repository.js';
 
 export const isWeeklyQuizGiven = async (employeeId) => {
   return Employee.findById(employeeId, 'quizGiven');
@@ -124,12 +124,13 @@ export const getSubmittedQuestions = async (employeeId, page, size) => {
     employeeId,
     'submittedQuestions',
   );
-  const questions = await Question.find({
-    _id: { $in: questionsIds.submittedQuestions },
-  })
-    .skip(parseInt(page) * parseInt(size))
-    .limit(parseInt(size))
-    .lean();
+
+  const questions = await getQuestionsByIds(
+    questionsIds.submittedQuestions,
+    page,
+    size,
+  );
+
   return { data: questions, total: questionsIds.submittedQuestions.length };
 };
 

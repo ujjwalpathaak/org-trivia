@@ -6,7 +6,7 @@ import WeeklyQuestion from '../models/weeklyQuestion.model.js';
 import { updateQuestionsStatus } from './org.repository.js';
 import { updateQuizStatus } from './quiz.repository.js';
 
-export const saveQuestion = async (newQuestion) => {
+export const createNewQuestion = async (newQuestion) => {
   return await new Question(newQuestion).save();
 };
 
@@ -122,7 +122,16 @@ export const getCAnITQuestionsInTimeline = async (orgId, newsTimelineStart) => {
   ]);
 };
 
-export const editQuestions = async (questionsToEdit) => {
+export const getQuestionsByIds = async (ids, page, size) => {
+  return Question.find({
+    _id: { $in: ids },
+  })
+    .skip(parseInt(page) * parseInt(size))
+    .limit(parseInt(size))
+    .lean();
+};
+
+export const editQuizQuestions = async (questionsToEdit) => {
   if (!Array.isArray(questionsToEdit) || questionsToEdit.length === 0) {
     throw new Error(
       'Invalid input: questionsToEdit must be a non-empty array.',

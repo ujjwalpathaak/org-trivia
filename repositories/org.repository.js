@@ -46,7 +46,7 @@ const categoryMap = {
 //   );
 // };
 
-export const addQuestionToOrg = async (question, orgId) => {
+export const pushQuestionsInOrgRepo = async (question, orgId) => {
   const questionField = categoryMap[question.category];
   if (!questionField) throw new Error('Invalid question category');
 

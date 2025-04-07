@@ -11,6 +11,30 @@ export const logService = (request, response, next) => {
   });
 };
 
+export const getFridaysOfNextMonth = (
+  year = new Date().getFullYear(),
+  month = new Date().getMonth(),
+) => {
+  month = (month + 1) % 12;
+  if (month === 0) year++;
+
+  const fridays = [];
+  let date = new Date(year, month, 1);
+
+  while (date.getDay() !== 5) {
+    date.setDate(date.getDate() + 1);
+  }
+
+  while (date.getMonth() === month) {
+    fridays.push(new Date(year, month, date.getDate(), 0, 0, 0, 0));
+    date.setDate(date.getDate() + 7);
+  }
+
+  return fridays;
+};
+
+// ----------------------------------
+
 export const getTodayDate = () => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -64,28 +88,6 @@ export const mergeUserAnswersAndCorrectAnswers = (
       employeeAnswer: myAnswerObj ? myAnswerObj.answer : null,
     };
   });
-};
-
-export const getFridaysOfNextMonth = (
-  year = new Date().getFullYear(),
-  month = new Date().getMonth(),
-) => {
-  month = (month + 1) % 12;
-  if (month === 0) year++;
-
-  const fridays = [];
-  let date = new Date(year, month, 1);
-
-  while (date.getDay() !== 5) {
-    date.setDate(date.getDate() + 1);
-  }
-
-  while (date.getMonth() === month) {
-    fridays.push(new Date(year, month, date.getDate(), 0, 0, 0, 0));
-    date.setDate(date.getDate() + 7);
-  }
-
-  return fridays;
 };
 
 export const getMonth = (month) => {

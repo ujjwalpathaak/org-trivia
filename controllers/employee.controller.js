@@ -1,7 +1,7 @@
 import {
   getEmployeeDetailsService,
+  getEmployeePastResultsService,
   getSubmittedQuestionsService,
-  getEmployeePastResultsService
 } from '../services/employee.service.js';
 
 export const getEmployeeDetailsController = async (req, res, next) => {
@@ -35,7 +35,7 @@ export const getEmployeePastResultsController = async (req, res, next) => {
     const results = await getEmployeePastResultsService(
       employeeId,
       pageNum,
-      sizeNum
+      sizeNum,
     );
 
     res.status(200).json(results);
@@ -44,7 +44,11 @@ export const getEmployeePastResultsController = async (req, res, next) => {
   }
 };
 
-export const getEmployeeSubmittedQuestionsController = async (req, res, next) => {
+export const getEmployeeSubmittedQuestionsController = async (
+  req,
+  res,
+  next,
+) => {
   try {
     const { employeeId } = req.data;
     const { page = 0, size = 10 } = req.query;
@@ -59,7 +63,7 @@ export const getEmployeeSubmittedQuestionsController = async (req, res, next) =>
     const questions = await getSubmittedQuestionsService(
       employeeId,
       pageNum,
-      sizeNum
+      sizeNum,
     );
 
     res.status(200).json(questions);

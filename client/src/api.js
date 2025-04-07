@@ -84,14 +84,19 @@ export const createQuestionAPI = async (question) => {
       body: JSON.stringify(question),
     });
 
-    if (!response.ok) throw new Error((await response.json()).message || 'Failed to create question');
+    if (!response.ok)
+      throw new Error((await response.json()).message || 'Failed to create question');
     return await response.json();
   } catch (error) {
     return { success: false, error: error.message };
   }
 };
 
-export const saveOrgSettings = async (newGenreOrder, changedGenres, companyCurrentAffairsTimeline) => {
+export const saveOrgSettings = async (
+  newGenreOrder,
+  changedGenres,
+  companyCurrentAffairsTimeline
+) => {
   try {
     const response = await fetch(`${BACKEND_URL}/org/settings/save`, {
       method: 'POST',
@@ -99,7 +104,8 @@ export const saveOrgSettings = async (newGenreOrder, changedGenres, companyCurre
       body: JSON.stringify({ newGenreOrder, changedGenres, companyCurrentAffairsTimeline }),
     });
 
-    if (!response.ok) throw new Error((await response.json()).message || 'Failed to save genre settings');
+    if (!response.ok)
+      throw new Error((await response.json()).message || 'Failed to save genre settings');
     return await response.json();
   } catch (error) {
     return { success: false, error: error.message };
@@ -126,7 +132,8 @@ export const fetchLiveQuizQuestionsAPI = async () => {
       headers: getAuthHeaders(),
     });
 
-    if (!response.ok) throw new Error((await response.json()).message || 'Failed to fetch live questions');
+    if (!response.ok)
+      throw new Error((await response.json()).message || 'Failed to fetch live questions');
     return await response.json();
   } catch (error) {
     return { success: false, error: error.message };
@@ -140,7 +147,8 @@ export const fetchOrgSettingsAPI = async () => {
       headers: getAuthHeaders(),
     });
 
-    if (!response.ok) throw new Error((await response.json()).message || 'Failed to fetch org settings');
+    if (!response.ok)
+      throw new Error((await response.json()).message || 'Failed to fetch org settings');
     return await response.json();
   } catch (error) {
     return { success: false, error: error.message };
@@ -184,7 +192,8 @@ export const submitQuizAnswersAPI = async (answers, quizId) => {
       body: JSON.stringify({ answers, quizId }),
     });
 
-    if (!response.ok) throw new Error((await response.json()).message || 'Failed to submit answers');
+    if (!response.ok)
+      throw new Error((await response.json()).message || 'Failed to submit answers');
     return await response.json();
   } catch (error) {
     return { success: false, error: error.message };
@@ -199,7 +208,8 @@ export const fetchLeaderboardAPI = async (month, year) => {
       headers: getAuthHeaders(),
     });
 
-    if (!response.ok) throw new Error((await response.json()).message || 'Failed to fetch leaderboard');
+    if (!response.ok)
+      throw new Error((await response.json()).message || 'Failed to fetch leaderboard');
     return await response.json();
   } catch (error) {
     return { success: false, error: error.message };
@@ -228,7 +238,8 @@ export const fetchScheduledQuizzesAPI = async (month, year) => {
       headers: getAuthHeaders(),
     });
 
-    if (!response.ok) throw new Error((await response.json()).message || 'Failed to fetch scheduled quizzes');
+    if (!response.ok)
+      throw new Error((await response.json()).message || 'Failed to fetch scheduled quizzes');
     return await response.json();
   } catch (error) {
     return { success: false, error: error.message };
