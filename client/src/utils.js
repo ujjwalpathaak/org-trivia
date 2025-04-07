@@ -85,27 +85,6 @@ export const convertToReadableFormat = (utcTimestamp) => {
   return date.toLocaleString('en-US', options);
 };
 
-export const getMonthAndYear = () => {
-  const today = new Date();
-  const month = today.getMonth(); // 0-based index
-  const year = today.getFullYear();
-  return [month, year];
-};
-
-export const getPreviousMonthAndYear = () => {
-  const today = new Date();
-  let pMonth = today.getMonth() - 1; // Move to the previous month
-  let pYear = today.getFullYear();
-
-  if (pMonth < 0) {
-    // If January, move to December of previous year
-    pMonth = 11;
-    pYear -= 1;
-  }
-
-  return [pMonth, pYear];
-};
-
 export const daysUntilNextFriday = () => {
   const today = new Date();
   const dayOfWeek = today.getDay();

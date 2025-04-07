@@ -163,8 +163,8 @@ export const lastQuizByGenre = () => {
   ]);
 };
 
-// will need to change this later ---
-export const getCAnITQuizzesScheduledTomm = () => {
+// development
+export const getCAnITQuizzesScheduledNext = () => {
   return Quiz.aggregate([
     {
       $match: {
@@ -195,6 +195,25 @@ export const getCAnITQuizzesScheduledTomm = () => {
   ]);
 };
 
+// production
+export const getCAnITQuizzesScheduledTomm = () => {
+  const today = new Date();
+
+  const todayInUTCFormat = new Date(Date.UTC(
+    today.getUTCFullYear(),
+    today.getUTCMonth(),
+    today.getUTCDate()
+  ));
+
+  return Quiz.find(
+    {
+      genre: 'CAnIT',
+      status: 'upcoming',
+      questionGenerationDate: todayInUTCFormat
+    }
+  )
+};
+
 export const scheduleNewWeeklyQuiz = (orgId, date, genre) => {
   return Quiz.create({
     orgId,
@@ -204,17 +223,15 @@ export const scheduleNewWeeklyQuiz = (orgId, date, genre) => {
   });
 };
 
-export const makeWeeklyQuizLive = async (date = new Date()) => {
+export const makeQuizLive = async (date = new Date()) => {
   date.setHours(0, 0, 0, 0);
 
   return Quiz.bulkWrite([
     {
       updateMany: {
         filter: {
-          status: { $in: ['upcoming'] },
-          scheduledDate: {
-            $lte: date,
-          },
+          status: 'upcoming',
+          scheduledDate: date,
         },
         update: { $set: { status: 'cancelled' } },
       },
@@ -223,9 +240,7 @@ export const makeWeeklyQuizLive = async (date = new Date()) => {
       updateMany: {
         filter: {
           status: 'scheduled',
-          scheduledDate: {
-            $lte: date,
-          },
+          scheduledDate: date,
         },
         update: { $set: { status: 'live' } },
       },
@@ -233,6 +248,7 @@ export const makeWeeklyQuizLive = async (date = new Date()) => {
   ]);
 };
 
+// change
 export const markAllQuizAsExpired = () => {
   return Quiz.updateMany({}, { $set: { status: 'expired' } });
 };

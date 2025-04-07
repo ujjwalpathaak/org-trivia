@@ -6,21 +6,21 @@ import {
   scheduleQuizzesJobController,
 } from '../controllers/question.controller.js';
 import {
-  cleanUpWeeklyQuizController,
-  makeWeeklyQuizLiveController,
+  cleanUpQuizzesController,
+  makeQuizLiveController,
 } from '../controllers/quiz.controller.js';
 
 export const testRouter = express.Router();
 
-testRouter.post('/test/clean-quizzes', cleanUpWeeklyQuizController);
+testRouter.post('/clean-quizzes', cleanUpQuizzesController);
 
-testRouter.post('/test/make-quizzes-live', makeWeeklyQuizLiveController);
+testRouter.post('/make-quizzes-live', makeQuizLiveController);
 
 testRouter.post(
-  '/test/generate-CAnIT-questions',
+  '/generate-CAnIT-questions',
   generateCAnITQuestionsController,
 );
 
-testRouter.get('/test/schedule-quizzes', scheduleQuizzesJobController);
+testRouter.get('/schedule-quizzes', scheduleQuizzesJobController);
 
-testRouter.post('/test/reset-leaderboard', resetLeaderboardController);
+testRouter.post('/reset-leaderboard', resetLeaderboardController);

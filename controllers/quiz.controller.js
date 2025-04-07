@@ -1,10 +1,10 @@
 import {
   cancelLiveQuizService,
-  cleanUpWeeklyQuizService,
+  cleanUpQuizzesService,
   getScheduledQuizzesService,
   getWeeklyQuizLiveQuestionsService,
   getWeeklyQuizStatusService,
-  makeWeeklyQuizLiveService,
+  makeQuizLiveService,
   submitWeeklyQuizAnswersService,
 } from '../services/quiz.service.js';
 
@@ -26,9 +26,9 @@ export const getQuizStatusController = async (req, res, next) => {
 };
 
 // test controller
-export const makeWeeklyQuizLiveController = async (req, res, next) => {
+export const makeQuizLiveController = async (req, res, next) => {
   try {
-    const result = await makeWeeklyQuizLiveService();
+    const result = await makeQuizLiveService();
     res.status(200).json(result);
   } catch (error) {
     next(error);
@@ -36,9 +36,9 @@ export const makeWeeklyQuizLiveController = async (req, res, next) => {
 };
 
 // test controller
-export const cleanUpWeeklyQuizController = async (req, res, next) => {
+export const cleanUpQuizzesController = async (req, res, next) => {
   try {
-    const result = await cleanUpWeeklyQuizService();
+    const result = await cleanUpQuizzesService();
     res.status(200).json(result);
   } catch (error) {
     next(error);

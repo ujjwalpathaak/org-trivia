@@ -343,6 +343,7 @@ export const getOrgById = async (orgId) => Org.findById(orgId);
 
 export const isTriviaEnabled = async (orgId) =>
   Org.findById(orgId).select('settings.isTriviaEnabled');
+
 export const toggleTrivia = async (orgId, newStatus) => {
   await Org.updateOne(
     { _id: new ObjectId(orgId) },

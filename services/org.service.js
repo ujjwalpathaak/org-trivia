@@ -3,6 +3,7 @@ import { getValue, setValue } from '../Redis.js';
 import {
   getLeaderboardByOrg,
   getLeaderboardYearBoundary,
+  resetLeaderboard,
 } from '../repositories/leaderboard.respository.js';
 
 import {
@@ -91,7 +92,7 @@ export const getLeaderboardByOrgService = async (orgId, month, year) => {
   };
 };
 
-export const resetLeaderboardService = async (orgId) => {
-  await resetLeaderboard(orgId);
+export const resetLeaderboardService = async () => {
+  await resetLeaderboard();
   return { message: 'Leaderboard reset successfully' };
 };

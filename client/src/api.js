@@ -43,7 +43,7 @@ export const fetchSubmittedQuestionsAPI = async (pageNumber = 0, pageSize = 10) 
 // to merge: employee/dashboard
 export const fetchEmployeeQuizResultsAPI = async (pageNumber = 0, pageSize = 10) => {
   const response = await fetch(
-    `${BACKEND_URL}employee/results/past?page=${pageNumber}&size=${pageSize}`,
+    `${BACKEND_URL}/employee/results/past?page=${pageNumber}&size=${pageSize}`,
     {
       method: 'GET',
       headers: getAuthHeaders(),
@@ -155,11 +155,12 @@ export const fetchOrgSettingsAPI = async () => {
   }
 };
 
-export const toggleTriviaSettingAPI = async () => {
+export const toggleTriviaSettingAPI = async (isEnabled) => {
   try {
     const response = await fetch(`${BACKEND_URL}/org/settings/trivia/toggle`, {
       method: 'PATCH',
       headers: getAuthHeaders(),
+      body: JSON.stringify({ isEnabled }),
     });
 
     if (!response.ok) throw new Error((await response.json()).message || 'Failed to toggle trivia');
@@ -233,7 +234,7 @@ export const cancelLiveQuizAPI = async (quizId) => {
 // to merge: admin/dashboard
 export const fetchScheduledQuizzesAPI = async (month, year) => {
   try {
-    const response = await fetch(`${BACKEND_URL}/quiz/scheduled?month=${month}&year=${year}`, {
+    const response = await fetch(`${BACKEND_URL}/quiz/scheduled`, {
       method: 'GET',
       headers: getAuthHeaders(),
     });

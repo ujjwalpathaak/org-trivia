@@ -491,3 +491,12 @@ GET req on /question/weekly/unapproved/67b2fa464f423c3b4c544ca8 at 1740472838984
 GET req on /question/weekly/unapproved/67b2fa464f423c3b4c544ca8 at 1740472838997
 GET req on /admind at 1740479342973
 GET req on /admind at 1740479364112
+GET request on /api/v1employee/results/past at 1744031216319
+GET request on /api/v1employee/results/past at 1744031239817
+GET request on /favicon.ico at 1744031310490
+HEAD request on / at 1744039147259
+POST request on /test/clean-quizzes at 1744040010792
+POST request on /test/clean-quizzes at 1744040037505
+POST request on /test/clean-quizzes at 1744040055417
+POST request on /test/clean-quizzes at 1744040087285
+POST request on /test/cleanQuizzes at 1744040102482

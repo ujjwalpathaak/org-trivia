@@ -40,7 +40,7 @@ import {
 
 import {
   findQuiz,
-  getCAnITQuizzesScheduledTomm,
+  getCAnITQuizzesScheduledNext,
   lastQuizByGenre,
   scheduleNewWeeklyQuiz,
 } from '../repositories/quiz.repository.js';
@@ -119,10 +119,16 @@ const startQuestionGenerationWorkflow = async (genre, org, quiz) => {
   const { _id: quizId } = quiz;
   const { _id: orgId, name: orgName } = org;
 
+  console.log(genre)
+
   switch (genre) {
     case 'PnA':
       console.log(`[${orgName}] Starting PnA workflow`);
-      await startPnAWorkflow(orgName, orgId, quizId);
+      // await startPnAWorkflow(orgName, orgId, quizId);
+      break;
+
+    case 'CAnIT':
+      console.log(`[${orgName}] Scheduled CAnIT Quiz`);
       break;
 
     case 'HRP':
@@ -138,8 +144,7 @@ const startQuestionGenerationWorkflow = async (genre, org, quiz) => {
           );
           return;
         }
-
-        await startHRPWorkflow(orgId, quizId);
+        // await startHRPWorkflow(orgId, quizId);
       } else {
         console.warn(`[${orgName}] HRP genre is not available`);
       }
@@ -285,7 +290,8 @@ export async function createNewQuestionService(newQuestionData, employeeId) {
 }
 
 export const generateCAnITQuestionsService = async () => {
-  const quizzes = await getCAnITQuizzesScheduledTomm();
+  const quizzes = await getCAnITQuizzesScheduledNext();
+  // const quizzes = await getCAnITQuizzesScheduledTomm();
   const orgIds = quizzes.map((quiz) => quiz.orgId);
   const dropdowns = await getOrgCAnITDropdownValue(orgIds);
   const lastQuizzes = await lastQuizByGenre();

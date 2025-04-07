@@ -14,7 +14,7 @@ import {
 
 import { updateLeaderboard } from '../repositories/leaderboard.respository.js';
 
-import { dropWeeklyQuestionCollection, getCorrectWeeklyQuizAnswers } from '../repositories/question.repository.js';
+import { getCorrectWeeklyQuizAnswers } from '../repositories/question.repository.js';
 
 import {
   cancelLiveQuiz,
@@ -22,7 +22,7 @@ import {
   getLiveQuizQuestionsByOrgId,
   getQuizStatus,
   getScheduledQuizzes,
-  makeWeeklyQuizLive,
+  makeQuizLive,
   markAllQuizAsExpired,
 } from '../repositories/quiz.repository.js';
 
@@ -62,16 +62,17 @@ export async function getWeeklyQuizLiveQuestionsService(orgId, quizGenre) {
   };
 }
 
-export const makeWeeklyQuizLiveService = async () => {
-  await makeWeeklyQuizLive();
+export const makeQuizLiveService = async () => {
+  await makeQuizLive();
   return { message: 'All weekly quizzes are live' };
 };
 
-export const cleanUpWeeklyQuizService = async () => {
+// change
+export const cleanUpQuizzesService = async () => {
   await Promise.all([
     markAllQuizAsExpired(),
     updateEmployeeStreaksAndMarkAllEmployeesAsQuizNotGiven(),
-    dropWeeklyQuestionCollection(),
+    dropWeeklyQuestionForExpiredQuizzes(),
   ]);
 
   await awardStreakBadges();

@@ -16,6 +16,10 @@ const quizSchema = new mongoose.Schema({
       message: 'Scheduled date must be in the future.',
     },
   },
+  questionGenerationDate: {
+    type: Date,
+    default: null,
+  },
   status: {
     type: String,
     enum: ['upcoming', 'scheduled', 'cancelled', 'live', 'expired'],
@@ -27,6 +31,22 @@ const quizSchema = new mongoose.Schema({
     enum: ['PnA', 'CAnIT', 'HRP'],
     required: true,
   },
+});
+
+quizSchema.pre('save', function (next) {
+  if (this.genre === 'CAnIT' && this.scheduledDate) {
+    const scheduled = new Date(this.scheduledDate);
+    scheduled.setUTCDate(scheduled.getUTCDate() - 1);
+    this.questionGenerationDate = new Date(Date.UTC(
+      scheduled.getUTCFullYear(),
+      scheduled.getUTCMonth(),
+      scheduled.getUTCDate()
+    ));
+  } else {
+    this.questionGenerationDate = null;
+  }
+
+  next();
 });
 
 const Quiz = mongoose.model('Quiz', quizSchema, 'quizzes');

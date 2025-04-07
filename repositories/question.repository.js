@@ -76,7 +76,8 @@ export const getWeeklyQuizLiveQuestions = async (orgId) => {
   return await WeeklyQuestion.find({ orgId }).select('-question.answer').lean();
 };
 
-export const dropWeeklyQuestionCollection = async () => {
+// change
+export const dropWeeklyQuestionForExpiredQuizzes = async () => {
   return await WeeklyQuestion.deleteMany();
 };
 

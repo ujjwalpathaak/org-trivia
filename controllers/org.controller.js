@@ -10,11 +10,7 @@ import {
 
 export const resetLeaderboardController = async (req, res, next) => {
   try {
-    const { orgId } = req.data;
-    if (!orgId) {
-      return res.status(400).json({ message: 'Missing orgId' });
-    }
-    await resetLeaderboardService(orgId);
+    await resetLeaderboardService();
     res.status(200).json({ message: 'Leaderboard reset successfully' });
   } catch (error) {
     console.error('Error resetting leaderboard:', error);

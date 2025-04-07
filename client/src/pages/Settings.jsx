@@ -34,8 +34,8 @@ const Settings = () => {
   }, []);
 
   const toggleIsTriviaEnabled = async () => {
+    await toggleTriviaSettingAPI(!isTriviaEnabled);
     setIsTriviaEnabled(!isTriviaEnabled);
-    await toggleTriviaSettingAPI();
     await fetchOrgSettingsAPI();
   };
 

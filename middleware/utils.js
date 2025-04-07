@@ -26,52 +26,11 @@ export const getFridaysOfNextMonth = (
   }
 
   while (date.getMonth() === month) {
-    fridays.push(new Date(year, month, date.getDate(), 0, 0, 0, 0));
+    fridays.push(new Date(Date.UTC(year, month, date.getDate())));
     date.setDate(date.getDate() + 7);
   }
 
   return fridays;
-};
-
-// ----------------------------------
-
-export const getTodayDate = () => {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  return today;
-};
-
-export const getNextFridayDate = () => {
-  const today = new Date();
-  const dayOfWeek = today.getDay();
-  const daysUntilFriday = (5 - dayOfWeek + 7) % 7 || 7;
-
-  const nextFriday = new Date(today);
-  nextFriday.setDate(today.getDate() + daysUntilFriday);
-  nextFriday.setHours(0, 0, 0, 0);
-
-  return nextFriday;
-};
-
-export const getMonthAndYear = () => {
-  const today = new Date();
-  const month = today.getMonth();
-  const year = today.getFullYear();
-  return [month, year];
-};
-
-export const getPreviousMonthAndYear = () => {
-  const today = new Date();
-  let pMonth = today.getMonth() - 1;
-  let pYear = today.getFullYear();
-
-  if (pMonth < 0) {
-    pMonth = 11;
-    pYear -= 1;
-  }
-
-  return [pMonth, pYear];
 };
 
 export const mergeUserAnswersAndCorrectAnswers = (
@@ -105,5 +64,13 @@ export const getMonth = (month) => {
     'Nov',
     'Dec',
   ];
+
   return months[month];
+};
+
+export const getMonthAndYear = () => {
+  const today = new Date();
+  const month = today.getUTCMonth();
+  const year = today.getUTCFullYear();
+  return [month, year];
 };
