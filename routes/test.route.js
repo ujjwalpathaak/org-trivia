@@ -1,12 +1,8 @@
 import express from 'express';
 
-import {
-  cleanUpWeeklyQuizController,
-  generateCAnITQuestionsController,
-  makeWeeklyQuizLiveController,
-} from '../controllers/cron.test.controller.js';
-import { scheduleQuizzesJob } from '../services/question.service.js';
-import { resetLeaderboardController } from '../controllers/leaderboard.controller.js';
+import { cleanUpWeeklyQuizController, makeWeeklyQuizLiveController } from '../controllers/quiz.controller.js';
+import { generateCAnITQuestionsController, scheduleQuizzesJobController } from '../controllers/question.controller.js';
+import { resetLeaderboardController } from '../controllers/org.controller.js';
 
 export const testRouter = express.Router();
 
@@ -19,6 +15,6 @@ testRouter.post(
   generateCAnITQuestionsController,
 );
 
-testRouter.get('/test/scheduleQuizzesJob', scheduleQuizzesJob);
+testRouter.get('/test/schedule-quizzes', scheduleQuizzesJobController);
 
 testRouter.post('/test/reset-leaderboard', resetLeaderboardController);

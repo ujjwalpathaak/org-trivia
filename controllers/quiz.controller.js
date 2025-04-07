@@ -29,16 +29,7 @@ export const getQuizStatusController = async (req, res, next) => {
   }
 };
 
-export const getWeeklyQuizController = async (req, res, next) => {
-  try {
-    const { quizId } = req.params;
-    const quiz = await getWeeklyQuizService(quizId);
-    res.status(200).json(quiz);
-  } catch (error) {
-    next(error);
-  }
-};
-
+// test controller
 export const makeWeeklyQuizLiveController = async (req, res, next) => {
   try {
     const result = await makeWeeklyQuizLiveService();
@@ -48,6 +39,7 @@ export const makeWeeklyQuizLiveController = async (req, res, next) => {
   }
 };
 
+// test controller
 export const cleanUpWeeklyQuizController = async (req, res, next) => {
   try {
     const result = await cleanUpWeeklyQuizService();
@@ -78,7 +70,7 @@ export const getScheduledQuizzesController = async (req, res, next) => {
   }
 };
 
-export const getLiveQuizQuestionsController = async (req, res, next) => {
+export const getWeeklyQuizLiveQuestionsController = async (req, res, next) => {
   try {
     const { orgId } = req.data;
     if (!orgId) {
@@ -109,24 +101,28 @@ export const editQuizQuestionsController = async (req, res, next) => {
   }
 };
 
-export const handleLambdaCallbackController = async (req, res, next) => {
+export const submitQuizAnswersController = async (req, res, next) => {
   try {
-    const { category, quizId, file, questions, orgId, newsTimeline } = req.body;
-    if (!questions || !orgId || !category) {
-      next(new Error('Invalid request body'));
-      return;
+    const { answers, quizId } = req.body;
+    const { employeeId, orgId } = req.data;
+    if (!answers || !employeeId || !orgId || !quizId) {
+      return res.status(400).json({ message: 'Required fields not present' });
     }
 
-    await addLambdaCallbackQuestions(
-      questions,
-      category,
+    const data = await submitWeeklyQuizAnswersService(
+      answers,
+      employeeId,
       orgId,
       quizId,
-      file,
-      newsTimeline,
     );
 
-    res.status(200).json({ message: 'Scheduled new questions' });
+    if (!data.success) {
+      return res.status(400).json({
+        message: data.message,
+      });
+    }
+
+    res.status(200).json(data);
   } catch (error) {
     next(error);
   }

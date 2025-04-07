@@ -32,7 +32,6 @@ export const getEmployeePastResultsController = async (req, res, next) => {
   }
 };
 
-
 export const getEmployeeSubmittedQuestionsController = async (req, res, next) => {
   try {
     const { employeeId } = req.data;

@@ -3,12 +3,13 @@ import express from 'express';
 import {
   getAllOrgNamesController,
   getOrgAnalyticsController,
+  getOrgLeaderboardController,
   getOrgSettingsController,
+  resetLeaderboardController,
   saveOrgSettingsController,
   toggleOrgTriviaSettingController,
 } from '../controllers/org.controller.js';
 import { checkRole, protectRoute } from '../middleware/auth.middleware.js';
-import { getOrgLeaderboardController } from '../controllers/leaderboard.controller.js';
 
 export const orgRouter = express.Router();
 

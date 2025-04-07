@@ -3,8 +3,8 @@ import { checkRole, protectRoute } from '../middleware/auth.middleware.js';
 import {
   createNewQuestionController,
   getScheduledQuizQuestionsController,
+  handleLambdaCallbackController,
 } from '../controllers/question.controller.js';
-import { handleLambdaCallbackController } from '../controllers/quiz.controller.js';
 
 export const questionRouter = express.Router();
 

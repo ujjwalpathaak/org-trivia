@@ -1,6 +1,7 @@
 import {
   getWeeklyQuizQuestions,
   saveQuestion,
+  scheduleQuizzesJob,
   validateEmployeeQuestionSubmission,
 } from '../services/question.service.js';
 
@@ -42,21 +43,45 @@ export const getScheduledQuizQuestionsController = async (req, res, next) => {
   }
 };
 
-// export const approveWeeklyQuizQuestionsController = async (req, res, next) => {
-//   try {
-//     const { orgId } = req.data;
-//     const { questions, questionsToDelete } = req.body;
-//     if (!orgId || !questions) {
-//       return res.status(400).json({ message: 'Missing required fields' });
-//     }
+export const handleLambdaCallbackController = async (req, res, next) => {
+  try {
+    const { category, quizId, file, questions, orgId, newsTimeline } = req.body;
+    if (!questions || !orgId || !category) {
+      next(new Error('Invalid request body'));
+      return;
+    }
 
-//     await approveWeeklyQuizQuestionsService(
-//       questions,
-//       questionsToDelete,
-//       orgId,
-//     );
-//     res.status(200).json({ message: 'Questions marked as approved' });
-//   } catch (error) {
-//     next(error);
-//   }
-// };
+    await addLambdaCallbackQuestions(
+      questions,
+      category,
+      orgId,
+      quizId,
+      file,
+      newsTimeline,
+    );
+
+    res.status(200).json({ message: 'Scheduled new questions' });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// test controller
+export const generateCAnITQuestionsController = async (req, res, next) => {
+  try {
+    await generateCAnITQuestionsService();
+    res.status(200).json({ message: 'CAnIT questions generated successfully' });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// test controller
+export const scheduleQuizzesJobController = async (req, res, next) => {
+  try {
+    await scheduleQuizzesJob();
+    res.status(200).json({ message: 'Quizzes Scheduled successfully' });
+  } catch (error) {
+    next(error);
+  }
+};
