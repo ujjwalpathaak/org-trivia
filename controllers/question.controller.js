@@ -4,7 +4,7 @@ import {
   validateEmployeeQuestionSubmission,
 } from '../services/question.service.js';
 
-export const addQuestionController = async (req, res, next) => {
+export const createNewQuestionController = async (req, res, next) => {
   try {
     const question = req.body;
     const { employeeId } = req.data;
@@ -24,7 +24,7 @@ export const addQuestionController = async (req, res, next) => {
   }
 };
 
-export const getWeeklyQuizQuestionsController = async (req, res, next) => {
+export const getScheduledQuizQuestionsController = async (req, res, next) => {
   try {
     const { quizId } = req.params;
     const { orgId } = req.data;

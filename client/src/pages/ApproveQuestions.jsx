@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { useParams, useNavigate } from 'react-router-dom';
-import { fetchQuizDetailsAPI, editWeeklyQuizAPI } from '../api.js';
+import { fetchScheduledQuizQuestionsAPI, editWeeklyQuizAPI } from '../api.js';
 
 function numToAlpha(num) {
   let alpha = '';
@@ -194,7 +194,7 @@ function App() {
   useEffect(() => {
     const getQuestionsToApproveFunc = async () => {
       try {
-        const response = await fetchQuizDetailsAPI(quizId);
+        const response = await fetchScheduledQuizQuestionsAPI(quizId);
         if (response.status === 400) {
           toast.info('No questions found');
           navigate('/dashboard');

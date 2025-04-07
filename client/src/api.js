@@ -1,71 +1,67 @@
 import { fetchWithAuth } from './utils';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+const token = localStorage.getItem('token');
 
-const getToken = () => localStorage.getItem('token');
-
-const handleResponse = async (response, fallbackMessage = 'Something went wrong') => {
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message || fallbackMessage);
-  }
-  return await response.json();
-};
-
-const fetchWithToken = async (url, options = {}, fallbackMessage) => {
-  const token = getToken();
-  const headers = {
-    'Content-Type': 'application/json',
-    Authorization: `Bearer ${token}`,
-    ...options.headers,
-  };
-
-  const response = await fetch(url, {
-    ...options,
-    headers,
-  });
-
-  return await handleResponse(response, fallbackMessage);
-};
+const getAuthHeaders = () => ({
+  'Content-Type': 'application/json',
+  Authorization: `Bearer ${token}`,
+});
 
 export const loginRequest = async (formData) => {
-  return await fetch(`${BACKEND_URL}/auth/login`, {
+  const response = await fetch(`${BACKEND_URL}/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(formData),
   });
+  return response;
 };
 
 export const registerRequest = async (formData) => {
-  return await fetch(`${BACKEND_URL}/auth/register`, {
+  const response = await fetch(`${BACKEND_URL}/auth/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(formData),
   });
+  return response;
 };
 
+// to merge: employee/dashboard
 export const fetchSubmittedQuestionsAPI = async (pageNumber = 0, pageSize = 10) => {
-  return await fetchWithToken(
+  const response = await fetch(
     `${BACKEND_URL}/employee/questions/submitted?page=${pageNumber}&size=${pageSize}`,
-    { method: 'GET' },
-    'Failed to fetch submitted questions'
+    {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    }
   );
+
+  if (!response.ok) throw new Error('Network response was not ok');
+  return await response.json();
 };
 
+// to merge: employee/dashboard
 export const fetchEmployeeQuizResultsAPI = async (pageNumber = 0, pageSize = 10) => {
-  return await fetchWithToken(
-    `${BACKEND_URL}/result/past?page=${pageNumber}&size=${pageSize}`,
-    { method: 'GET' },
-    'Failed to fetch quiz results'
+  const response = await fetch(
+    `${BACKEND_URL}employee/results/past?page=${pageNumber}&size=${pageSize}`,
+    {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    }
   );
+
+  if (!response.ok) throw new Error('Network response was not ok');
+  return await response.json();
 };
 
+// to merge: admin/dashboard
 export const getOrgAnalyticsAPI = async () => {
   return await fetchWithAuth(`${BACKEND_URL}/org/analytics`, {
     method: 'GET',
   });
 };
 
+// to merge: employee/dashboard
 export const getEmployeeDetailsAPI = async () => {
   return await fetchWithAuth(`${BACKEND_URL}/employee`, {
     method: 'GET',
@@ -82,14 +78,14 @@ export const fetchAllOrganizations = async () => {
 
 export const createQuestionAPI = async (question) => {
   try {
-    return await fetchWithToken(
-      `${BACKEND_URL}/question`,
-      {
-        method: 'POST',
-        body: JSON.stringify(question),
-      },
-      'Failed to create question'
-    );
+    const response = await fetch(`${BACKEND_URL}/question`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(question),
+    });
+
+    if (!response.ok) throw new Error((await response.json()).message || 'Failed to create question');
+    return await response.json();
   } catch (error) {
     return { success: false, error: error.message };
   }
@@ -97,28 +93,26 @@ export const createQuestionAPI = async (question) => {
 
 export const saveOrgSettings = async (newGenreOrder, changedGenres, companyCurrentAffairsTimeline) => {
   try {
-    return await fetchWithToken(
-      `${BACKEND_URL}/org/settings/save`,
-      {
-        method: 'POST',
-        body: JSON.stringify({ newGenreOrder, changedGenres, companyCurrentAffairsTimeline }),
-      },
-      'Failed to save organization settings'
-    );
+    const response = await fetch(`${BACKEND_URL}/org/settings/save`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ newGenreOrder, changedGenres, companyCurrentAffairsTimeline }),
+    });
+
+    if (!response.ok) throw new Error((await response.json()).message || 'Failed to save genre settings');
+    return await response.json();
   } catch (error) {
     return { success: false, error: error.message };
   }
 };
 
-export const fetchQuizDetailsAPI = async (quizId) => {
+export const fetchScheduledQuizQuestionsAPI = async (quizId) => {
   try {
     const response = await fetch(`${BACKEND_URL}/question/scheduled/quiz/${quizId}`, {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${getToken()}`,
-      },
+      headers: getAuthHeaders(),
     });
+
     return { status: response.status, data: await response.json() };
   } catch (error) {
     return { success: false, error: error.message };
@@ -127,11 +121,13 @@ export const fetchQuizDetailsAPI = async (quizId) => {
 
 export const fetchLiveQuizQuestionsAPI = async () => {
   try {
-    return await fetchWithToken(
-      `${BACKEND_URL}/quiz/live/questions`,
-      { method: 'GET' },
-      'Failed to fetch live quiz questions'
-    );
+    const response = await fetch(`${BACKEND_URL}/quiz/live/questions`, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
+
+    if (!response.ok) throw new Error((await response.json()).message || 'Failed to fetch live questions');
+    return await response.json();
   } catch (error) {
     return { success: false, error: error.message };
   }
@@ -139,11 +135,13 @@ export const fetchLiveQuizQuestionsAPI = async () => {
 
 export const fetchOrgSettingsAPI = async () => {
   try {
-    return await fetchWithToken(
-      `${BACKEND_URL}/org/settings`,
-      { method: 'GET' },
-      'Failed to fetch organization settings'
-    );
+    const response = await fetch(`${BACKEND_URL}/org/settings`, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
+
+    if (!response.ok) throw new Error((await response.json()).message || 'Failed to fetch org settings');
+    return await response.json();
   } catch (error) {
     return { success: false, error: error.message };
   }
@@ -151,11 +149,13 @@ export const fetchOrgSettingsAPI = async () => {
 
 export const toggleTriviaSettingAPI = async () => {
   try {
-    return await fetchWithToken(
-      `${BACKEND_URL}/org/settings/trivia/toggle`,
-      { method: 'PATCH' },
-      'Failed to toggle trivia setting'
-    );
+    const response = await fetch(`${BACKEND_URL}/org/settings/trivia/toggle`, {
+      method: 'PATCH',
+      headers: getAuthHeaders(),
+    });
+
+    if (!response.ok) throw new Error((await response.json()).message || 'Failed to toggle trivia');
+    return await response.json();
   } catch (error) {
     return { success: false, error: error.message };
   }
@@ -163,14 +163,14 @@ export const toggleTriviaSettingAPI = async () => {
 
 export const editWeeklyQuizAPI = async (questions, questionsToDelete) => {
   try {
-    return await fetchWithToken(
-      `${BACKEND_URL}/quiz/questions`,
-      {
-        method: 'POST',
-        body: JSON.stringify({ questions, questionsToDelete }),
-      },
-      'Failed to edit weekly quiz'
-    );
+    const response = await fetch(`${BACKEND_URL}/quiz/questions`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ questions, questionsToDelete }),
+    });
+
+    if (!response.ok) throw new Error((await response.json()).message || 'Failed to edit quiz');
+    return await response.json();
   } catch (error) {
     return { success: false, error: error.message };
   }
@@ -178,26 +178,29 @@ export const editWeeklyQuizAPI = async (questions, questionsToDelete) => {
 
 export const submitQuizAnswersAPI = async (answers, quizId) => {
   try {
-    return await fetchWithToken(
-      `${BACKEND_URL}/quiz/submit`,
-      {
-        method: 'POST',
-        body: JSON.stringify({ answers, quizId }),
-      },
-      'Failed to submit quiz answers'
-    );
+    const response = await fetch(`${BACKEND_URL}/quiz/submit`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ answers, quizId }),
+    });
+
+    if (!response.ok) throw new Error((await response.json()).message || 'Failed to submit answers');
+    return await response.json();
   } catch (error) {
     return { success: false, error: error.message };
   }
 };
 
+// to merge: admin/dashboard & employee/dashboard
 export const fetchLeaderboardAPI = async (month, year) => {
   try {
-    return await fetchWithToken(
-      `${BACKEND_URL}/leaderboard?month=${month}&year=${year}`,
-      { method: 'GET' },
-      'Failed to fetch leaderboard'
-    );
+    const response = await fetch(`${BACKEND_URL}/org/leaderboard?month=${month}&year=${year}`, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
+
+    if (!response.ok) throw new Error((await response.json()).message || 'Failed to fetch leaderboard');
+    return await response.json();
   } catch (error) {
     return { success: false, error: error.message };
   }
@@ -205,35 +208,43 @@ export const fetchLeaderboardAPI = async (month, year) => {
 
 export const cancelLiveQuizAPI = async (quizId) => {
   try {
-    return await fetchWithToken(
-      `${BACKEND_URL}/quiz/${quizId}/cancel`,
-      { method: 'PATCH' },
-      'Failed to cancel live quiz'
-    );
+    const response = await fetch(`${BACKEND_URL}/quiz/${quizId}/cancel`, {
+      method: 'PATCH',
+      headers: getAuthHeaders(),
+    });
+
+    if (!response.ok) throw new Error((await response.json()).message || 'Failed to cancel quiz');
+    return await response.json();
   } catch (error) {
     return { success: false, error: error.message };
   }
 };
 
+// to merge: admin/dashboard
 export const fetchScheduledQuizzesAPI = async (month, year) => {
   try {
-    return await fetchWithToken(
-      `${BACKEND_URL}/quiz/scheduled?month=${month}&year=${year}`,
-      { method: 'GET' },
-      'Failed to fetch scheduled quizzes'
-    );
+    const response = await fetch(`${BACKEND_URL}/quiz/scheduled?month=${month}&year=${year}`, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
+
+    if (!response.ok) throw new Error((await response.json()).message || 'Failed to fetch scheduled quizzes');
+    return await response.json();
   } catch (error) {
     return { success: false, error: error.message };
   }
 };
 
+// to merge: employee/dashboard
 export const getWeeklyQuizStatusAPI = async () => {
   try {
-    return await fetchWithToken(
-      `${BACKEND_URL}/quiz/status`,
-      { method: 'GET' },
-      'Failed to fetch weekly quiz status'
-    );
+    const response = await fetch(`${BACKEND_URL}/quiz/status`, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
+
+    if (!response.ok) throw new Error((await response.json()).message || 'Failed to get status');
+    return await response.json();
   } catch (error) {
     return { success: false, error: error.message };
   }

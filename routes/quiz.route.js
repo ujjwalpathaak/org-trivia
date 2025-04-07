@@ -2,14 +2,14 @@ import express from 'express';
 
 import {
   cancelLiveQuizController,
-  editWeeklyQuizQuestionsController,
+  editQuizQuestionsController,
   getScheduledQuizzesController,
-  getWeeklyQuizLiveQuestionsController,
-  getWeeklyQuizStatusController,
+  getLiveQuizQuestionsController,
+  getQuizStatusController,
   handleLambdaCallbackController,
 } from '../controllers/quiz.controller.js';
 import { checkRole, protectRoute } from '../middleware/auth.middleware.js';
-import { submitWeeklyQuizAnswersController } from '../controllers/result.controller.js';
+import { submitQuizAnswersController } from '../controllers/result.controller.js';
 
 export const quizRouter = express.Router();
 
@@ -17,10 +17,8 @@ quizRouter.get(
   '/status',
   protectRoute,
   checkRole('Employee'),
-  getWeeklyQuizStatusController,
+  getQuizStatusController,
 );
-
-quizRouter.post('/weekly/lambda/callback', handleLambdaCallbackController);
 
 quizRouter.patch(
   '/:quizId/cancel',
@@ -33,7 +31,7 @@ quizRouter.patch(
   '/questions',
   protectRoute,
   checkRole('Admin'),
-  editWeeklyQuizQuestionsController,
+  editQuizQuestionsController,
 );
 
 quizRouter.get(
@@ -47,12 +45,12 @@ quizRouter.get(
   '/submit',
   protectRoute,
   checkRole('Admin'),
-  submitWeeklyQuizAnswersController,
+  submitQuizAnswersController,
 );
 
 quizRouter.get(
   '/live/questions',
   protectRoute,
   checkRole('Employee'),
-  getWeeklyQuizLiveQuestionsController,
+  getLiveQuizQuestionsController,
 );

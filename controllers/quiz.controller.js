@@ -12,7 +12,7 @@ import {
   makeWeeklyQuizLiveService,
 } from '../services/quiz.service.js';
 
-export const getWeeklyQuizStatusController = async (req, res, next) => {
+export const getQuizStatusController = async (req, res, next) => {
   try {
     const { orgId, employeeId } = req.data;
     if (!orgId || !employeeId)
@@ -78,7 +78,7 @@ export const getScheduledQuizzesController = async (req, res, next) => {
   }
 };
 
-export const getWeeklyQuizLiveQuestionsController = async (req, res, next) => {
+export const getLiveQuizQuestionsController = async (req, res, next) => {
   try {
     const { orgId } = req.data;
     if (!orgId) {
@@ -93,7 +93,7 @@ export const getWeeklyQuizLiveQuestionsController = async (req, res, next) => {
   }
 };
 
-export const editWeeklyQuizQuestionsController = async (req, res, next) => {
+export const editQuizQuestionsController = async (req, res, next) => {
   try {
     const { orgId } = req.data;
     const { questions, questionsToDelete } = req.body;

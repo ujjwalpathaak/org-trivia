@@ -5,7 +5,7 @@ import {
   resetLeaderboardService,
 } from '../services/leaderboard.service.js';
 
-export const getLeaderboardByOrgController = async (req, res, next) => {
+export const getOrgLeaderboardController = async (req, res, next) => {
   try {
     const { month, year } = req.query;
     const { orgId } = req.data;

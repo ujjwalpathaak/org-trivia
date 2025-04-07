@@ -1,11 +1,10 @@
 import express from 'express';
-
-import {
-  addQuestionController,
-  getWeeklyQuizQuestionsController,
-} from '../controllers/question.controller.js';
 import { checkRole, protectRoute } from '../middleware/auth.middleware.js';
-import { scheduleQuizzesJob } from '../services/question.service.js';
+import {
+  createNewQuestionController,
+  getScheduledQuizQuestionsController,
+} from '../controllers/question.controller.js';
+import { handleLambdaCallbackController } from '../controllers/quiz.controller.js';
 
 export const questionRouter = express.Router();
 
@@ -13,14 +12,14 @@ questionRouter.post(
   '/',
   protectRoute,
   checkRole('Employee'),
-  addQuestionController,
+  createNewQuestionController,
 );
 
 questionRouter.get(
   '/scheduled/quiz/:quizId',
   protectRoute,
   checkRole('Admin'),
-  getWeeklyQuizQuestionsController,
+  getScheduledQuizQuestionsController,
 );
 
-questionRouter.get('/test/scheduleQuizzesJob', scheduleQuizzesJob);
+questionRouter.post('/new/HRD', handleLambdaCallbackController);

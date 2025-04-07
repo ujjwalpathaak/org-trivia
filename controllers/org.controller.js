@@ -6,7 +6,7 @@ import {
   toggleTriviaService,
 } from '../services/org.service.js';
 
-export const saveNewSettingsController = async (req, res, next) => {
+export const saveOrgSettingsController = async (req, res, next) => {
   try {
     const { orgId } = req.data;
     const { newGenreOrder, changedGenres, companyCurrentAffairsTimeline } =
@@ -23,7 +23,7 @@ export const saveNewSettingsController = async (req, res, next) => {
   }
 };
 
-export const getSettingsController = async (req, res, next) => {
+export const getOrgSettingsController = async (req, res, next) => {
   try {
     const { orgId } = req.data;
     const settings = await getSettingsService(orgId);
@@ -33,7 +33,7 @@ export const getSettingsController = async (req, res, next) => {
   }
 };
 
-export const toggleTriviaController = async (req, res, next) => {
+export const toggleOrgTriviaSettingController = async (req, res, next) => {
   try {
     const { orgId } = req.data;
     const { isEnabled } = req.body;
@@ -53,7 +53,7 @@ export const getAllOrgNamesController = async (req, res, next) => {
   }
 };
 
-export const getAnalyticsController = async (req, res, next) => {
+export const getOrgAnalyticsController = async (req, res, next) => {
   try {
     const { orgId } = req.data;
     const analytics = await getAnalyticsService(orgId);

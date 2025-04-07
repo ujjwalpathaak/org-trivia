@@ -2,12 +2,13 @@ import express from 'express';
 
 import {
   getAllOrgNamesController,
-  getAnalyticsController,
-  getSettingsController,
-  saveNewSettingsController,
-  toggleTriviaController,
+  getOrgAnalyticsController,
+  getOrgSettingsController,
+  saveOrgSettingsController,
+  toggleOrgTriviaSettingController,
 } from '../controllers/org.controller.js';
 import { checkRole, protectRoute } from '../middleware/auth.middleware.js';
+import { getOrgLeaderboardController } from '../controllers/leaderboard.controller.js';
 
 export const orgRouter = express.Router();
 
@@ -17,26 +18,32 @@ orgRouter.patch(
   '/settings/trivia/toggle',
   protectRoute,
   checkRole('Admin'),
-  toggleTriviaController,
+  toggleOrgTriviaSettingController,
 );
 
 orgRouter.get(
   '/settings',
   protectRoute,
   checkRole('Admin'),
-  getSettingsController,
+  getOrgSettingsController,
 );
 
 orgRouter.post(
   '/settings/save',
   protectRoute,
   checkRole('Admin'),
-  saveNewSettingsController,
+  saveOrgSettingsController,
 );
 
 orgRouter.get(
   '/analytics',
   protectRoute,
   checkRole('Admin'),
-  getAnalyticsController,
+  getOrgAnalyticsController,
+);
+
+orgRouter.get(
+  '/leaderboard',
+  protectRoute,
+  getOrgLeaderboardController,
 );

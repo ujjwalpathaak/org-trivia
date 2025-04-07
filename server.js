@@ -26,7 +26,7 @@ app.use(cors({ origin: ALLOWED_ORIGINS }));
 connectDatabase();
 isProductionServer && startJobs();
 
-app.use('/', router);
+app.use('/api/v1', router);
 
 app.use(logService);
 
