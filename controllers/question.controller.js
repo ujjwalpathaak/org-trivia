@@ -30,10 +30,10 @@ export const getScheduledQuizQuestionsController = async (req, res, next) => {
     const { quizId } = req.params;
     const { orgId } = req.data;
     if (!quizId) {
-      return res.status(400).json({ message: 'Missing required fields' });
+      return res.status(400).json({ message: 'Missing quizId' });
     }
     if (!orgId) {
-      return res.status(400).json({ message: 'Missing required fields' });
+      return res.status(400).json({ message: 'Missing orgId' });
     }
 
     const weeklyQuizQuestions = await getWeeklyQuizQuestions(orgId, quizId);

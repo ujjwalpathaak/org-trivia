@@ -9,8 +9,8 @@ import {
 export const resetLeaderboardController = async (req, res, next) => {
   try {
     const { orgId } = req.data;
-    if (!orgId || !ObjectId.isValid(orgId)) {
-      return res.status(400).json({ message: 'Invalid or missing orgId' });
+    if (!orgId) {
+      return res.status(400).json({ message: 'Missing orgId' });
     }
     await resetLeaderboardService(orgId);
     res.status(200).json({ message: 'Leaderboard reset successfully' });
@@ -24,8 +24,8 @@ export const getOrgLeaderboardController = async (req, res, next) => {
   try {
     const { month, year } = req.query;
     const { orgId } = req.data;
-    if (!orgId || !ObjectId.isValid(orgId)) {
-      return res.status(400).json({ message: 'Invalid or missing orgId' });
+    if (!orgId) {
+      return res.status(400).json({ message: 'Missing orgId' });
     }
     const leaderboard = await getLeaderboardByOrgService(orgId, month, year);
     res.status(200).json(leaderboard);
@@ -38,6 +38,9 @@ export const getOrgLeaderboardController = async (req, res, next) => {
 export const saveOrgSettingsController = async (req, res, next) => {
   try {
     const { orgId } = req.data;
+    if (!orgId) {
+      return res.status(400).json({ message: 'Missing orgId' });
+    }
     const { newGenreOrder, changedGenres, companyCurrentAffairsTimeline } =
       req.body;
     await saveSettingsService(
@@ -55,6 +58,9 @@ export const saveOrgSettingsController = async (req, res, next) => {
 export const getOrgSettingsController = async (req, res, next) => {
   try {
     const { orgId } = req.data;
+    if (!orgId) {
+      return res.status(400).json({ message: 'Missing orgId' });
+    }
     const settings = await getSettingsService(orgId);
     res.json(settings);
   } catch (error) {
@@ -65,6 +71,9 @@ export const getOrgSettingsController = async (req, res, next) => {
 export const toggleOrgTriviaSettingController = async (req, res, next) => {
   try {
     const { orgId } = req.data;
+    if (!orgId) {
+      return res.status(400).json({ message: 'Missing orgId' });
+    }
     const { isEnabled } = req.body;
     await toggleTriviaService(orgId, isEnabled);
     res.json({ message: 'Trivia settings updated successfully' });
@@ -85,6 +94,9 @@ export const getAllOrgNamesController = async (req, res, next) => {
 export const getOrgAnalyticsController = async (req, res, next) => {
   try {
     const { orgId } = req.data;
+    if (!orgId) {
+      return res.status(400).json({ message: 'Missing orgId' });
+    }
     const analytics = await getAnalyticsService(orgId);
     res.json(analytics);
   } catch (error) {

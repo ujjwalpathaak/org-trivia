@@ -8,7 +8,7 @@ export const getEmployeeDetailsController = async (req, res, next) => {
   try {
     const { employeeId } = req.data;
     if (!employeeId) {
-      return res.status(400).json({ message: 'Missing required fields' });
+      return res.status(400).json({ message: 'Missing employeeId' });
     }
     const employeeDetails = await fetchEmployeeDetails(employeeId);
     res.status(200).json(employeeDetails);
@@ -37,7 +37,7 @@ export const getEmployeeSubmittedQuestionsController = async (req, res, next) =>
     const { employeeId } = req.data;
     const { page = 0, size = 10 } = req.query;
     if (!employeeId) {
-      return res.status(400).json({ message: 'Missing required fields' });
+      return res.status(400).json({ message: 'Missing employeeId' });
     }
 
     const questions = await getSubmittedQuestionsService(

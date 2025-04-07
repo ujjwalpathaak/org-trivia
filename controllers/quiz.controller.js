@@ -1,5 +1,4 @@
 import {
-  addLambdaCallbackQuestions,
   editWeeklyQuizQuestionsService,
   getWeeklyQuizLiveQuestions,
 } from '../services/question.service.js';
@@ -7,7 +6,6 @@ import {
   cancelLiveQuizService,
   cleanUpWeeklyQuizService,
   getScheduledQuizzesService,
-  getWeeklyQuizService,
   getWeeklyQuizStatusService,
   makeWeeklyQuizLiveService,
 } from '../services/quiz.service.js';
