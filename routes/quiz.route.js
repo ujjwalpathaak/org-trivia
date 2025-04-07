@@ -2,7 +2,6 @@ import express from 'express';
 
 import {
   cancelLiveQuizController,
-  editQuizQuestionsController,
   getScheduledQuizzesController,
   getWeeklyQuizLiveQuestionsController,
   getQuizStatusController,
@@ -24,13 +23,6 @@ quizRouter.patch(
   protectRoute,
   checkRole('Admin'),
   cancelLiveQuizController,
-);
-
-quizRouter.patch(
-  '/questions',
-  protectRoute,
-  checkRole('Admin'),
-  editQuizQuestionsController,
 );
 
 quizRouter.get(

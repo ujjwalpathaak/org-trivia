@@ -163,8 +163,8 @@ export const toggleTriviaSettingAPI = async () => {
 
 export const editWeeklyQuizAPI = async (questions, questionsToDelete) => {
   try {
-    const response = await fetch(`${BACKEND_URL}/quiz/questions`, {
-      method: 'POST',
+    const response = await fetch(`${BACKEND_URL}/question/quiz`, {
+      method: 'PATCH',
       headers: getAuthHeaders(),
       body: JSON.stringify({ questions, questionsToDelete }),
     });

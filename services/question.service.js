@@ -385,14 +385,6 @@ export async function getWeeklyQuizQuestions(orgId, quizId) {
   };
 }
 
-export async function getWeeklyQuizLiveQuestions(orgId, quizGenre) {
-  const questions = await getLiveQuizQuestionsByOrgId(orgId);
-  return {
-    weeklyQuizQuestions: questions || [],
-    quizId: questions[0]?.quizId || null,
-  };
-}
-
 export async function startHRPWorkflow(orgId, quizId) {
   const questions = await fetchHRPQuestions(orgId);
   await pushQuestionsInQuiz(questions, orgId, quizId, 'HRP');

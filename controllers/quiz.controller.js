@@ -1,13 +1,11 @@
 import {
-  editWeeklyQuizQuestionsService,
-  getWeeklyQuizLiveQuestions,
-} from '../services/question.service.js';
-import {
   cancelLiveQuizService,
   cleanUpWeeklyQuizService,
   getScheduledQuizzesService,
   getWeeklyQuizStatusService,
+  submitWeeklyQuizAnswersService,
   makeWeeklyQuizLiveService,
+  getWeeklyQuizLiveQuestions,
 } from '../services/quiz.service.js';
 
 export const getQuizStatusController = async (req, res, next) => {
@@ -78,22 +76,6 @@ export const getWeeklyQuizLiveQuestionsController = async (req, res, next) => {
     const weeklyQuizQuestions = await getWeeklyQuizLiveQuestions(orgId);
 
     res.status(200).json(weeklyQuizQuestions);
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const editQuizQuestionsController = async (req, res, next) => {
-  try {
-    const { orgId } = req.data;
-    const { questions, questionsToDelete } = req.body;
-    if (!orgId || !questions) {
-      return res.status(400).json({ message: 'Missing required fields' });
-    }
-
-    await editWeeklyQuizQuestionsService(questions, questionsToDelete, orgId);
-
-    res.status(200).json({ message: 'Questions marked as approved' });
   } catch (error) {
     next(error);
   }

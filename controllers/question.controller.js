@@ -1,9 +1,28 @@
 import {
+  addLambdaCallbackQuestions,
+  editWeeklyQuizQuestionsService,
+  generateCAnITQuestionsService,
   getWeeklyQuizQuestions,
   saveQuestion,
   scheduleQuizzesJob,
   validateEmployeeQuestionSubmission,
 } from '../services/question.service.js';
+
+export const editQuizQuestionsController = async (req, res, next) => {
+  try {
+    const { orgId } = req.data;
+    const { questions, questionsToDelete } = req.body;
+    if (!orgId || !questions) {
+      return res.status(400).json({ message: 'Missing required fields' });
+    }
+
+    await editWeeklyQuizQuestionsService(questions, questionsToDelete, orgId);
+
+    res.status(200).json({ message: 'Questions marked as approved' });
+  } catch (error) {
+    next(error);
+  }
+};
 
 export const createNewQuestionController = async (req, res, next) => {
   try {

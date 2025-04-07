@@ -2,6 +2,7 @@ import express from 'express';
 import { checkRole, protectRoute } from '../middleware/auth.middleware.js';
 import {
   createNewQuestionController,
+  editQuizQuestionsController,
   getScheduledQuizQuestionsController,
   handleLambdaCallbackController,
 } from '../controllers/question.controller.js';
@@ -14,6 +15,14 @@ questionRouter.post(
   checkRole('Employee'),
   createNewQuestionController,
 );
+
+questionRouter.patch(
+  '/quiz',
+  protectRoute,
+  checkRole('Admin'),
+  editQuizQuestionsController,
+);
+
 
 questionRouter.get(
   '/scheduled/quiz/:quizId',

@@ -4,6 +4,8 @@ import {
   getSettingsService,
   saveSettingsService,
   toggleTriviaService,
+  getLeaderboardByOrgService,
+  resetLeaderboardService
 } from '../services/org.service.js';
 
 export const resetLeaderboardController = async (req, res, next) => {
@@ -41,15 +43,9 @@ export const saveOrgSettingsController = async (req, res, next) => {
     if (!orgId) {
       return res.status(400).json({ message: 'Missing orgId' });
     }
-    const { newGenreOrder, changedGenres, companyCurrentAffairsTimeline } =
-      req.body;
-    await saveSettingsService(
-      orgId,
-      newGenreOrder,
-      changedGenres,
-      companyCurrentAffairsTimeline,
-    );
-    res.json({ message: 'Genre settings updated successfully' });
+    const { newGenreOrder, changedGenres, companyCurrentAffairsTimeline } = req.body;
+    await saveSettingsService(orgId, newGenreOrder, changedGenres, companyCurrentAffairsTimeline);
+    res.status(200).json({ message: 'Genre settings updated successfully' });
   } catch (error) {
     next(error);
   }
@@ -62,7 +58,7 @@ export const getOrgSettingsController = async (req, res, next) => {
       return res.status(400).json({ message: 'Missing orgId' });
     }
     const settings = await getSettingsService(orgId);
-    res.json(settings);
+    res.status(200).json(settings);
   } catch (error) {
     next(error);
   }
@@ -76,7 +72,7 @@ export const toggleOrgTriviaSettingController = async (req, res, next) => {
     }
     const { isEnabled } = req.body;
     await toggleTriviaService(orgId, isEnabled);
-    res.json({ message: 'Trivia settings updated successfully' });
+    res.status(200).json({ message: 'Trivia settings updated successfully' });
   } catch (error) {
     next(error);
   }
@@ -85,7 +81,7 @@ export const toggleOrgTriviaSettingController = async (req, res, next) => {
 export const getAllOrgNamesController = async (req, res, next) => {
   try {
     const orgs = await getAllOrgNamesService();
-    res.json(orgs);
+    res.status(200).json(orgs);
   } catch (error) {
     next(error);
   }
@@ -98,7 +94,7 @@ export const getOrgAnalyticsController = async (req, res, next) => {
       return res.status(400).json({ message: 'Missing orgId' });
     }
     const analytics = await getAnalyticsService(orgId);
-    res.json(analytics);
+    res.status(200).json(analytics);
   } catch (error) {
     next(error);
   }
