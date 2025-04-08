@@ -45,8 +45,9 @@ const categoryMap = {
 //     { arrayFilters: [{ 'elem.questionId': { $in: questionIds } }] },
 //   );
 // };
+// refactoredQuestions, genre, orgId
 
-export const pushQuestionsInOrgRepo = async (question, orgId) => {
+export const pushNewQuestionInOrg = async (question, orgId) => {
   const questionField = categoryMap[question.category];
   if (!questionField) throw new Error('Invalid question category');
 

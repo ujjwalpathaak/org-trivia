@@ -1,6 +1,7 @@
 import {
   fetchNewCAnITQuestions,
   fetchNewPnAQuestions,
+  generateNewHRPQuestions,
 } from '../api/lambda.api.js';
 
 import {
@@ -13,7 +14,6 @@ import { getFridaysOfNextMonth } from '../middleware/utils.js';
 import { addSubmittedQuestion } from '../repositories/employee.repository.js';
 
 import {
-  pushQuestionsInOrgRepo,
   fetchExtraAIQuestions,
   fetchExtraEmployeeQuestions,
   fetchHRPQuestions,
@@ -25,7 +25,9 @@ import {
   makeGenreUnavailable,
   removeAllQuestionsPnAFromOrg,
   setNextQuestionGenre,
-  getPnAQuestionsLeft
+  getPnAQuestionsLeft,
+  pushNewQuestionInOrg,
+  pushQuestionsInOrg
 } from '../repositories/org.repository.js';
 
 import {
@@ -119,8 +121,6 @@ const startQuestionGenerationWorkflow = async (genre, org, quiz) => {
   const { _id: quizId } = quiz;
   const { _id: orgId, name: orgName } = org;
 
-  console.log(genre)
-
   switch (genre) {
     case 'PnA':
       console.log(`[${orgName}] Starting PnA workflow`);
@@ -176,7 +176,7 @@ const addQuestionstoOrg = async (questions, genre, orgId, file) => {
     ...(file && { file: file }),
   }));
 
-  return await pushQuestionsInOrgRepo(refactoredQuestions, genre, orgId);
+  return await pushQuestionsInOrg(refactoredQuestions, genre, orgId);
 };
 
 const pushQuestionsToDatabase = async (questions, category) => {
@@ -217,7 +217,16 @@ export const addNewHRPQuestionsCallbackService = async (
   file,
 ) => {
   let questions = await pushQuestionsToDatabase(newQuestions, 'HRP');
+  if(questions.length >= HRP_QUESTIONS_PER_QUIZ) {
+    await makeGenreUnavailable(orgId, 'HRP');
+  }
+
   await addQuestionstoOrg(questions, 'HRP', orgId, file);
+}
+
+export const generateNewHRPQuestionsCallbackService = async (fileName, orgId) => {
+  await generateNewHRPQuestions(fileName, orgId);
+  return {message: 'HRP questions generated successfully'}
 }
 
 export const validateEmployeeQuestionSubmission = (question) => {
@@ -281,7 +290,7 @@ export async function createNewQuestionService(newQuestionData, employeeId) {
   const newQuestion = await createNewQuestion(newQuestionData);
   if (!newQuestion) throw new Error('Failed to create question');
 
-  const added = await pushQuestionsInOrgRepo(newQuestion, orgId);
+  const added = await pushNewQuestionInOrg(newQuestion, orgId);
   if (!added) throw new Error('Failed to add question to org');
 
   await addSubmittedQuestion(newQuestion._id, employeeId);

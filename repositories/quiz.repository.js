@@ -96,18 +96,11 @@ export const cancelLiveQuiz = async (quizId) => {
   );
 };
 
-export const getScheduledQuizzes = (orgId, date = new Date()) => {
-  const monthStart = new Date(date.getFullYear(), date.getMonth() - 1);
-  const monthEnd = new Date(date.getFullYear(), date.getMonth() + 1, 0);
-  const startDate = new Date(monthStart);
-  const endDate = new Date(monthEnd);
-  startDate.setHours(0, 0, 0, 0);
-  endDate.setHours(0, 0, 0, 0);
-
+export const getScheduledQuizzes = (orgId, startDate, endDate) => {
   return Quiz.find({
     orgId: new ObjectId(orgId),
     scheduledDate: { $gte: startDate, $lte: endDate },
-    status: { $in: ['upcoming', 'scheduled', 'live'] },
+    // status: { $in: ['upcoming', 'scheduled', 'live'] },
   }).sort({
     scheduledDate: 1,
   });

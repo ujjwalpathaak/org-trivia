@@ -6,6 +6,7 @@ import {
   createNewQuestionService,
   scheduleNextMonthQuizzesJob,
   validateEmployeeQuestionSubmission,
+  generateNewHRPQuestionsCallbackService,
 } from '../services/question.service.js';
 
 export const editQuizQuestionsController = async (req, res, next) => {
@@ -65,12 +66,30 @@ export const getScheduledQuizQuestionsController = async (req, res, next) => {
 export const addNewHRPQuestionsCallbackController = async (req, res, next) => {
   try {
     const { file, questions, orgId } = req.body;
+
     if (!questions || !orgId) {
       next(new Error('Invalid request body'));
       return;
     }
 
     await addNewHRPQuestionsCallbackService(questions, orgId, file);
+
+    res.status(200).json({ message: 'Scheduled new questions' });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const generateNewHRPQuestionsCallbackController = async (req, res, next) => {
+  try {
+    const { fileName } = req.body;
+    const { orgId } = req.data;
+    if (!fileName) {
+      next(new Error('Invalid request body'));
+      return;
+    }
+
+    await generateNewHRPQuestionsCallbackService(fileName, orgId);
 
     res.status(200).json({ message: 'Scheduled new questions' });
   } catch (error) {

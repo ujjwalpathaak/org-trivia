@@ -231,10 +231,58 @@ export const cancelLiveQuizAPI = async (quizId) => {
   }
 };
 
+export const fetchPresignedUrl = async (file) => {
+  try {
+      const presignedRes = await fetch(`${BACKEND_URL}/upload/get-presigned-url`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          fileName: file.name,
+          fileType: file.type,
+        }),
+      });
+
+      return await presignedRes.json();
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+};
+
+export const startHRPQuestionGeneration = async (fileName) => {
+  try {
+    await fetch(`${BACKEND_URL}/question/generate/HRP`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ fileName: fileName }),
+    });
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+};
+
+export const uploadFileToS3 = async (uploadUrl, file) => {
+  try {
+    const res = await fetch(uploadUrl, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': file.type,
+      },
+      body: file,
+    });
+
+    if (!res.ok) throw new Error('Failed to upload file to S3');
+
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+};
+
 // to merge: admin/dashboard
 export const fetchScheduledQuizzesAPI = async (month, year) => {
   try {
-    const response = await fetch(`${BACKEND_URL}/quiz/scheduled`, {
+    const response = await fetch(`${BACKEND_URL}/quiz/scheduled?month=${month}&year=${year}`, {
       method: 'GET',
       headers: getAuthHeaders(),
     });

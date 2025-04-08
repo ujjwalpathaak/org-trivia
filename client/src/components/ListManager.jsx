@@ -274,7 +274,7 @@ export default function ListManager({
                       if (quiz.status === 'scheduled' || quiz.status === 'upcoming') {
                         bgColor = 'bg-slate-100';
                       } else if (quiz.status === 'expired') {
-                        bgColor = 'bg-red-100';
+                        bgColor = 'bg-slate-300';
                       }
                       return (
                         <div key={index} className="flex">
@@ -345,16 +345,24 @@ export default function ListManager({
                               </>
                             ) : (
                               <>
-                                <span className="text-sm text-green-700">
-                                  {quiz.genre} is live!
-                                </span>
-                                <button
-                                  onClick={() => handleCancelQuiz(quiz)}
-                                  className="text-xs m-auto hover:p-2 hover:rounded-full hover:bg-red-700 hover:text-red-500 text-red-700"
-                                  title="Cancel Quiz"
-                                >
-                                  Cancel Quiz
-                                </button>
+                                {quiz.status === 'live' ? (
+                                  <>
+                                    <span className="text-sm text-green-700">
+                                      {quiz.genre} is live!
+                                    </span>
+                                    <button
+                                      onClick={() => handleCancelQuiz(quiz)}
+                                      className="text-xs m-auto hover:p-2 hover:rounded-full hover:bg-red-700 hover:text-red-500 text-red-700"
+                                      title="Cancel Quiz"
+                                    >
+                                      Cancel Quiz
+                                    </button>
+                                  </>
+                                ) : (
+                                  <span className="text-xs text-slate-400">
+                                    {quiz.genre} has been conducted
+                                  </span>
+                                )}
                               </>
                             )}
                           </div>

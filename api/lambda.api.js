@@ -42,3 +42,20 @@ export const fetchNewPnAQuestions = async (orgName) => {
   const questions = await response.json();
   return questions;
 };
+
+export const generateNewHRPQuestions = async (fileName, orgId) => {
+  const response = await fetch(API_GATEWAY_URL + '/generateHRD_Questions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      filePath: fileName,
+      orgId: orgId,
+      callbackUrl: 'https://641b-122-187-121-22.ngrok-free.app'
+    }),
+  });
+
+  const questions = await response.json();
+  return questions;
+};

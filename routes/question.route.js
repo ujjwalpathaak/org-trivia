@@ -30,5 +30,3 @@ questionRouter.get(
   checkRole('Admin'),
   getScheduledQuizQuestionsController,
 );
-
-questionRouter.post('/new/HRD', addNewHRPQuestionsCallbackController);

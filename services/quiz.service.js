@@ -14,7 +14,7 @@ import {
 
 import { updateLeaderboard } from '../repositories/leaderboard.respository.js';
 
-import { getCorrectWeeklyQuizAnswers } from '../repositories/question.repository.js';
+import { dropWeeklyQuestionForExpiredQuizzes, getCorrectWeeklyQuizAnswers } from '../repositories/question.repository.js';
 
 import {
   cancelLiveQuiz,
@@ -80,8 +80,15 @@ export const cleanUpQuizzesService = async () => {
   return { message: 'Cleaned up weekly quiz.' };
 };
 
-export const getScheduledQuizzesService = async (orgId, month, year) => {
-  return await getScheduledQuizzes(orgId, month, year);
+export const getScheduledQuizzesService = async (
+  orgId,
+  month = new Date().getUTCMonth(),
+  year = new Date().getUTCFullYear()
+) => {
+  const startDate = new Date(Date.UTC(year, month, 1, 0, 0, 0, 0));
+  const endDate = new Date(Date.UTC(year, month + 1, 0, 23, 59, 59, 999));
+
+  return await getScheduledQuizzes(orgId, startDate, endDate);
 };
 
 const calculateWeeklyQuizScore = (userAnswers, correctAnswers) => {

@@ -59,7 +59,7 @@ export const getScheduledQuizzesController = async (req, res, next) => {
   try {
     const { month, year } = req.query;
     const { orgId } = req.data;
-    const quizzes = await getScheduledQuizzesService(orgId, month, year);
+    const quizzes = await getScheduledQuizzesService(orgId, parseInt(month), parseInt(year));
     res.status(200).json(quizzes);
   } catch (error) {
     next(error);
