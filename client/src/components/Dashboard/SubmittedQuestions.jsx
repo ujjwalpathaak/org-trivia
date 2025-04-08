@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { fetchSubmittedQuestionsAPI } from '../../api'; // Update this with the correct API import
+import { fetchSubmittedQuestionsAPI } from '../../api';
 
 const SubmittedQuestions = ({ setIsSubmittedQuestionOpen }) => {
   const [pageNumber, setPageNumber] = useState(0);
   const [submittedQuestions, setSubmittedQuestions] = useState([]);
   const [totalPages, setTotalPages] = useState(0);
-  const [cachedPages, setCachedPages] = useState({}); // Cache object to store previously fetched pages
+  const [cachedPages, setCachedPages] = useState({});
   const [error, setError] = useState(null);
   const pageSize = 3;
 
   useEffect(() => {
     if (cachedPages[pageNumber]) {
-      setSubmittedQuestions(cachedPages[pageNumber]); // Use cached data if available
+      setSubmittedQuestions(cachedPages[pageNumber]);
       return;
     }
 
@@ -23,7 +23,7 @@ const SubmittedQuestions = ({ setIsSubmittedQuestionOpen }) => {
           setTotalPages(Math.max(1, Math.ceil(response.total / pageSize)));
           setCachedPages((prevCache) => ({
             ...prevCache,
-            [pageNumber]: response.data, // Cache the response for this page
+            [pageNumber]: response.data,
           }));
         } else {
           throw new Error('Invalid response format');

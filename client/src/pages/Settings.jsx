@@ -62,7 +62,6 @@ const Settings = () => {
       ...prevDate,
       year: Number(e.target.value),
     }));
-    setIsSaved(false);
   };
 
   return (

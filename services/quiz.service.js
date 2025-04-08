@@ -31,20 +31,26 @@ import {
   submitWeeklyQuizAnswers,
 } from '../repositories/result.repository.js';
 
-export const getWeeklyQuizStatusService = async (orgId, employeeId) => {
+export const getWeeklyQuizStatusService = async (orgId, employeeId, date) => {
+  const today = date ? new Date(date) : new Date();
+  today.setUTCHours(0, 0, 0, 0);
+
   const [quiz, employee] = await Promise.all([
-    getQuizStatus(orgId),
+    getQuizStatus(orgId, today),
     isWeeklyQuizGiven(employeeId),
   ]);
+  console.log(quiz)
+
+  if(!quiz) return {status: -1, genre: 'No Quiz Scheduled Today'};
 
   if (quiz?.status === 'cancelled') {
-    return 0; // cancelled
+    return {status: 0, genre: quiz.genre}; // cancelled
   } else if (quiz?.status === 'live' && !employee.quizGiven) {
-    return 1; // live
+    return {status: 1, genre: quiz.genre}; // live
   } else if (quiz?.status === 'live' && employee.quizGiven) {
-    return 2; // already given
+    return {status: 2, genre: quiz.genre}; // already given
   } else {
-    return 3; // upcoming
+    return {status: 3, genre: quiz.genre}; // upcoming
   }
 };
 
@@ -62,10 +68,16 @@ export async function getWeeklyQuizLiveQuestionsService(orgId, quizGenre) {
   };
 }
 
-export const makeQuizLiveService = async () => {
-  await makeQuizLive();
+export const makeQuizLiveService = async (date) => {
+  date = date ? new Date(date) : new Date();
+
+  date.setUTCHours(0, 0, 0, 0);
+
+  await makeQuizLive(date);
   return { message: 'All weekly quizzes are live' };
 };
+
+
 
 // change
 export const cleanUpQuizzesService = async () => {

@@ -32,10 +32,10 @@ quizRouter.get(
   getScheduledQuizzesController,
 );
 
-quizRouter.get(
+quizRouter.post(
   '/submit',
   protectRoute,
-  checkRole('Admin'),
+  checkRole('Employee'),
   submitQuizAnswersController,
 );
 

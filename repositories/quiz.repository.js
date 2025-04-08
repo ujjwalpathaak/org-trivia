@@ -71,13 +71,13 @@ export const getLiveQuizQuestionsByOrgId = (orgId) => {
   ]);
 };
 
-export const getQuizStatus = (orgId) => {
+export const getQuizStatus = (orgId, date) => {
   return Quiz.findOne(
     {
       orgId: new ObjectId(orgId),
-      $or: [{ status: 'live' }, { status: 'cancelled' }],
+      scheduledDate: date,
     },
-    { status: 1, _id: 0 },
+    { genre: 1, status: 1, _id: 0 },
   );
 };
 
@@ -216,8 +216,7 @@ export const scheduleNewWeeklyQuiz = (orgId, date, genre) => {
   });
 };
 
-export const makeQuizLive = async (date = new Date()) => {
-  date.setHours(0, 0, 0, 0);
+export const makeQuizLive = async (date) => {
 
   return Quiz.bulkWrite([
     {

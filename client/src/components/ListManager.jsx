@@ -275,6 +275,8 @@ export default function ListManager({
                         bgColor = 'bg-slate-100';
                       } else if (quiz.status === 'expired') {
                         bgColor = 'bg-slate-300';
+                      } else if (quiz.status === 'cancelled') {
+                        bgColor = 'bg-red-100';
                       }
                       return (
                         <div key={index} className="flex">
@@ -334,11 +336,7 @@ export default function ListManager({
                                   <div className="flex items-center">
                                     <span className="text-xs text-slate-400">
                                       Ready on{' '}
-                                      {new Date(
-                                        new Date(quiz.scheduledDate).setDate(
-                                          new Date(quiz.scheduledDate).getDate() - 1
-                                        )
-                                      ).toDateString()}
+                                      {new Date(quiz.questionGenerationDate).toDateString()}
                                     </span>
                                   </div>
                                 )}
@@ -358,9 +356,13 @@ export default function ListManager({
                                       Cancel Quiz
                                     </button>
                                   </>
-                                ) : (
+                                ) : quiz.status === 'cancelled' ? (
                                   <span className="text-xs text-slate-400">
-                                    {quiz.genre} has been conducted
+                                    {quiz.genre} has been cancelled
+                                  </span>
+                                ) : (
+                                  <span className="text-xs text-yellow-600">
+                                    {quiz.genre} is upcoming
                                   </span>
                                 )}
                               </>

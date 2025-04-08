@@ -510,3 +510,5 @@ POST request on /question/add/HRP at 1744102568889
 POST request on /question/add/HRP at 1744102570336
 POST request on /question/add/HRP at 1744102571876
 GET request on /question/add/HRP at 1744102601407
+HEAD request on / at 1744105875293
+HEAD request on / at 1744134193304

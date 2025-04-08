@@ -8,7 +8,7 @@ import { useAuth } from '../../context/auth.context';
 
 const EmployeeDashboard = () => {
   const { data } = useAuth();
-  const [quizStatus, setQuizStatus] = useState(3);
+  const [quizStatus, setQuizStatus] = useState({ status: -1, genre: 'No Quiz Scheduled Today' });
   const [resumeQuiz, setResumeQuiz] = useState(false);
   const [isQuestionMakerOpen, setIsQuestionMakerOpen] = useState(false);
   const [isPastQuizViewerOpen, setIsPastQuizViewerOpen] = useState(false);
@@ -16,6 +16,7 @@ const EmployeeDashboard = () => {
   const [isBadgeViewerOpen, setIsBadgeViewerOpen] = useState(false);
   const [details, setDetails] = useState({});
   const [isQuizOpen, setIsQuizOpen] = useState(false);
+  const [date, setDate] = useState(() => new Date(new Date().setUTCHours(0, 0, 0, 0)));
 
   useEffect(() => {
     const getIsQuizAttempting = async () => {
@@ -48,7 +49,8 @@ const EmployeeDashboard = () => {
   useEffect(() => {
     const fetchWeeklyQuizStatus = async () => {
       try {
-        const status = await getWeeklyQuizStatusAPI();
+        const status = await getWeeklyQuizStatusAPI(date);
+        console.log(status);
         setQuizStatus(status);
       } catch (error) {
         console.error('Error checking quiz status:', error);
@@ -57,7 +59,7 @@ const EmployeeDashboard = () => {
     };
 
     fetchWeeklyQuizStatus();
-  }, []);
+  }, [date]);
 
   return (
     <div className="min-h-[93vh] flex justify-center bg-[#f0f2f5]">
@@ -91,6 +93,8 @@ const EmployeeDashboard = () => {
           isQuizOpen={isQuizOpen}
           setIsQuizOpen={setIsQuizOpen}
           quizStatus={quizStatus}
+          setDate={setDate}
+          date={date}
           resumeQuiz={resumeQuiz}
           details={details}
           daysUntilNextFriday={daysUntilNextFriday}

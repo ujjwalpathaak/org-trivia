@@ -296,9 +296,9 @@ export const fetchScheduledQuizzesAPI = async (month, year) => {
 };
 
 // to merge: employee/dashboard
-export const getWeeklyQuizStatusAPI = async () => {
+export const getWeeklyQuizStatusAPI = async (date) => {
   try {
-    const response = await fetch(`${BACKEND_URL}/quiz/status`, {
+    const response = await fetch(`${BACKEND_URL}/quiz/status?date=${date}`, {
       method: 'GET',
       headers: getAuthHeaders(),
     });

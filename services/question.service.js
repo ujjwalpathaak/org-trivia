@@ -124,7 +124,7 @@ const startQuestionGenerationWorkflow = async (genre, org, quiz) => {
   switch (genre) {
     case 'PnA':
       console.log(`[${orgName}] Starting PnA workflow`);
-      // await startPnAWorkflow(orgName, orgId, quizId);
+      await startPnAWorkflow(orgName, orgId, quizId);
       break;
 
     case 'CAnIT':
@@ -144,7 +144,7 @@ const startQuestionGenerationWorkflow = async (genre, org, quiz) => {
           );
           return;
         }
-        // await startHRPWorkflow(orgId, quizId);
+        await startHRPWorkflow(orgId, quizId);
       } else {
         console.warn(`[${orgName}] HRP genre is not available`);
       }

@@ -10,6 +10,7 @@ import {
 
 export const getQuizStatusController = async (req, res, next) => {
   try {
+    const { date } = req.query;
     const { orgId, employeeId } = req.data;
     if (!orgId || !employeeId)
       return res.status(404).json({ message: 'Missing organizationId' });
@@ -17,6 +18,7 @@ export const getQuizStatusController = async (req, res, next) => {
     const weeklyQuizStatus = await getWeeklyQuizStatusService(
       orgId,
       employeeId,
+      date
     );
 
     res.status(200).json(weeklyQuizStatus);
@@ -28,7 +30,8 @@ export const getQuizStatusController = async (req, res, next) => {
 // test controller
 export const makeQuizLiveController = async (req, res, next) => {
   try {
-    const result = await makeQuizLiveService();
+    const { date } = req.query;
+    const result = await makeQuizLiveService(date);
     res.status(200).json(result);
   } catch (error) {
     next(error);

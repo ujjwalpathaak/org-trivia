@@ -7,7 +7,7 @@ const Dashboard = () => {
   const { data } = useAuth();
 
   return (
-    <div className="font-black flex flex-col justify-center items-center">
+    <div className="bg-[#f0f2f5] font-black flex flex-col justify-center items-center">
       {data?.role === 'Employee' ? <EmployeeDashboard /> : <AdminDashboard />}
     </div>
   );
