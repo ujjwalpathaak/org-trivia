@@ -58,47 +58,46 @@ export const rollbackLeaderboardScores = async (quizId, date) => {
   return Leaderboard.aggregate([
     {
       $match: {
-        quizId: new ObjectId(quizId)
-      }
+        quizId: new ObjectId(quizId),
+      },
     },
     {
       $lookup: {
-        from: "leaderboards",
-        localField: "employeeId",
-        foreignField: "employeeId",
-        as: "leaderboard"
-      }
+        from: 'leaderboards',
+        localField: 'employeeId',
+        foreignField: 'employeeId',
+        as: 'leaderboard',
+      },
     },
-    { $unwind: "$leaderboard" },
+    { $unwind: '$leaderboard' },
     {
       $match: {
-        "leaderboard.month": month,
-        "leaderboard.year": year
-      }
+        'leaderboard.month': month,
+        'leaderboard.year': year,
+      },
     },
     {
       $addFields: {
-        "leaderboard.totalScore": {
+        'leaderboard.totalScore': {
           $subtract: [
-            { $ifNull: ["$leaderboard.totalScore", 0] },
-            { $ifNull: ["$score", 0] }
-          ]
-        }
-      }
+            { $ifNull: ['$leaderboard.totalScore', 0] },
+            { $ifNull: ['$score', 0] },
+          ],
+        },
+      },
     },
     {
-      $replaceRoot: { newRoot: "$leaderboard" }
+      $replaceRoot: { newRoot: '$leaderboard' },
     },
     {
       $merge: {
-        into: "leaderboards",
-        on: "_id",
-        whenMatched: "merge",
-        whenNotMatched: "discard"
-      }
-    }
-  ]
-  );
+        into: 'leaderboards',
+        on: '_id',
+        whenMatched: 'merge',
+        whenNotMatched: 'discard',
+      },
+    },
+  ]);
 };
 
 export const getLeaderboardByOrg = async (orgId, month, year) => {

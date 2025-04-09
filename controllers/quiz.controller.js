@@ -20,7 +20,7 @@ export const getQuizStatusController = async (req, res, next) => {
     const weeklyQuizStatus = await getWeeklyQuizStatusService(
       orgId,
       employeeId,
-      date
+      date,
     );
 
     res.status(200).json(weeklyQuizStatus);
@@ -62,8 +62,9 @@ export const allowScheduledQuizController = async (req, res, next) => {
 
 export const cancelLiveQuizController = async (req, res, next) => {
   try {
+    const { orgId } = req.data;
     const { quizId } = req.params;
-    const result = await cancelLiveQuizService(quizId);
+    const result = await cancelLiveQuizService(quizId, orgId);
     res.status(200).json(result);
   } catch (error) {
     next(error);
@@ -73,7 +74,8 @@ export const cancelLiveQuizController = async (req, res, next) => {
 export const cancelScheduledQuizController = async (req, res, next) => {
   try {
     const { quizId } = req.params;
-    const result = await cancelScheduledQuizSerivce(quizId);
+    const { orgId } = req.data;
+    const result = await cancelScheduledQuizSerivce(quizId, orgId);
     res.status(200).json(result);
   } catch (error) {
     next(error);
@@ -84,7 +86,11 @@ export const getScheduledQuizzesController = async (req, res, next) => {
   try {
     const { month, year } = req.query;
     const { orgId } = req.data;
-    const quizzes = await getScheduledQuizzesService(orgId, parseInt(month), parseInt(year));
+    const quizzes = await getScheduledQuizzesService(
+      orgId,
+      parseInt(month),
+      parseInt(year),
+    );
     res.status(200).json(quizzes);
   } catch (error) {
     next(error);

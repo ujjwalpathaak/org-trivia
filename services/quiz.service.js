@@ -1,21 +1,23 @@
 import { dbConnection } from '../Database.js';
-
 import {
   getMonthAndYear,
   mergeUserAnswersAndCorrectAnswers,
 } from '../middleware/utils.js';
-
 import {
   awardStreakBadges,
   isWeeklyQuizGiven,
   updateEmployeeStreaksAndMarkAllEmployeesAsQuizNotGiven,
   updateWeeklyQuizScore,
 } from '../repositories/employee.repository.js';
-
-import { rollbackLeaderboardScores, updateLeaderboard } from '../repositories/leaderboard.respository.js';
-
-import { dropWeeklyQuestionForExpiredQuizzes, getCorrectWeeklyQuizAnswers } from '../repositories/question.repository.js';
-
+import {
+  rollbackLeaderboardScores,
+  updateLeaderboard,
+} from '../repositories/leaderboard.respository.js';
+import { changeOrgQuestionsState } from '../repositories/org.repository.js';
+import {
+  dropWeeklyQuestionForExpiredQuizzes,
+  getCorrectWeeklyQuizAnswers,
+} from '../repositories/question.repository.js';
 import {
   allowScheduledQuiz,
   cancelLiveQuiz,
@@ -27,7 +29,6 @@ import {
   makeQuizLive,
   markAllLiveQuizAsExpired,
 } from '../repositories/quiz.repository.js';
-
 import {
   rollbackWeeklyQuizScores,
   submitWeeklyQuizAnswers,
@@ -42,30 +43,36 @@ export const getWeeklyQuizStatusService = async (orgId, employeeId, date) => {
     isWeeklyQuizGiven(employeeId),
   ]);
 
-  if(!quiz) return {status: -1, genre: 'No Quiz Scheduled Today'};
+  if (!quiz) return { status: -1, genre: 'No Quiz Scheduled Today' };
 
   if (quiz?.status === 'cancelled') {
-    return {status: 0, genre: quiz.genre}; // cancelled
+    return { status: 0, genre: quiz.genre }; // cancelled
   } else if (quiz?.status === 'expired') {
-    return {status: 4, genre: quiz.genre}; // expired
+    return { status: 4, genre: quiz.genre }; // expired
   } else if (quiz?.status === 'live' && !employee.quizGiven) {
-    return {status: 1, genre: quiz.genre}; // live
+    return { status: 1, genre: quiz.genre }; // live
   } else if (quiz?.status === 'live' && employee.quizGiven) {
-    return {status: 2, genre: quiz.genre}; // already given
+    return { status: 2, genre: quiz.genre }; // already given
   } else {
-    return {status: 3, genre: quiz.genre}; // upcoming
+    return { status: 3, genre: quiz.genre }; // upcoming
   }
 };
 
-export const cancelScheduledQuizSerivce = async (quizId) => {
-  await cancelScheduledQuiz(quizId);
+export const cancelScheduledQuizSerivce = async (quizId, orgId) => {
+  const quiz = await cancelScheduledQuiz(quizId);
+  await changeOrgQuestionsState(quiz.genre, orgId, 0);
+
   return { message: 'Live quiz cancelled' };
 };
 
-export const cancelLiveQuizService = async (quizId) => {
+export const cancelLiveQuizService = async (quizId, orgId) => {
   const quiz = await cancelLiveQuiz(quizId);
-  await rollbackWeeklyQuizScores(quizId);
-  await rollbackLeaderboardScores(quizId, quiz.scheduledDate);
+
+  Promise.all([
+    await changeOrgQuestionsState(quiz.genre, orgId, 2),
+    await rollbackWeeklyQuizScores(quizId),
+    await rollbackLeaderboardScores(quizId, quiz.scheduledDate),
+  ]);
 
   return { message: 'Live quiz cancelled' };
 };
@@ -108,7 +115,7 @@ export const cleanUpQuizzesService = async () => {
 export const getScheduledQuizzesService = async (
   orgId,
   month = new Date().getUTCMonth(),
-  year = new Date().getUTCFullYear()
+  year = new Date().getUTCFullYear(),
 ) => {
   const startDate = new Date(Date.UTC(year, month, 1, 0, 0, 0, 0));
   const endDate = new Date(Date.UTC(year, month + 1, 0, 23, 59, 59, 999));

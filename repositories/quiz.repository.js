@@ -82,9 +82,10 @@ export const getQuizStatus = (orgId, date) => {
 };
 
 export const cancelScheduledQuiz = async (quizId) => {
-  return Quiz.updateOne(
+  return Quiz.findOneAndUpdate(
     { _id: new ObjectId(quizId) },
     { $set: { status: 'cancelled' } },
+    { returnDocument: 'after' },
   );
 };
 
@@ -92,7 +93,7 @@ export const cancelLiveQuiz = async (quizId) => {
   return Quiz.findOneAndUpdate(
     { _id: new ObjectId(quizId), status: 'live' },
     { $set: { status: 'expired' } },
-    { returnDocument: 'after' }
+    { returnDocument: 'after' },
   );
 };
 
@@ -180,19 +181,15 @@ export const getCAnITQuizzesScheduledNext = () => {
 export const getCAnITQuizzesScheduledTomm = () => {
   const today = new Date();
 
-  const todayInUTCFormat = new Date(Date.UTC(
-    today.getUTCFullYear(),
-    today.getUTCMonth(),
-    today.getUTCDate()
-  ));
+  const todayInUTCFormat = new Date(
+    Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate()),
+  );
 
-  return Quiz.find(
-    {
-      genre: 'CAnIT',
-      status: 'upcoming',
-      questionGenerationDate: todayInUTCFormat
-    }
-  )
+  return Quiz.find({
+    genre: 'CAnIT',
+    status: 'upcoming',
+    questionGenerationDate: todayInUTCFormat,
+  });
 };
 
 export const scheduleNewWeeklyQuiz = (orgId, date, genre) => {
@@ -205,7 +202,6 @@ export const scheduleNewWeeklyQuiz = (orgId, date, genre) => {
 };
 
 export const makeQuizLive = async (date) => {
-
   return Quiz.bulkWrite([
     {
       updateMany: {
@@ -230,11 +226,11 @@ export const makeQuizLive = async (date) => {
 
 export const markAllLiveQuizAsExpired = async () => {
   const liveQuizzes = await Quiz.find({ status: 'live' }, { _id: 1 }).lean();
-  const quizIds = liveQuizzes.map(q => q._id);
+  const quizIds = liveQuizzes.map((q) => q._id);
 
   await Quiz.updateMany(
     { _id: { $in: quizIds } },
-    { $set: { status: 'expired' } }
+    { $set: { status: 'expired' } },
   );
 
   return quizIds;
@@ -261,6 +257,10 @@ export const updateQuizStatus = (quizId, status) => {
 export const getLiveQuizByEmployeeId = async (employeeId) => {
   const result = await findResultByQuizId(employeeId);
   return result?.quizId;
+};
+
+export const getQuizByQuizId = (quizId) => {
+  return Quiz.findOne({ _id: new ObjectId(quizId) });
 };
 
 export const changeQuizGenre = async (newGenre, quizId) => {

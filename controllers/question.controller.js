@@ -1,12 +1,12 @@
 import {
   addNewHRPQuestionsCallbackService,
+  createNewQuestionService,
   editQuizQuestionsService,
   generateCAnITQuestionsService,
+  generateNewHRPQuestionsCallbackService,
   getWeeklyQuizQuestions,
-  createNewQuestionService,
   scheduleNextMonthQuizzesJob,
   validateEmployeeQuestionSubmission,
-  generateNewHRPQuestionsCallbackService,
 } from '../services/question.service.js';
 
 export const editQuizQuestionsController = async (req, res, next) => {
@@ -33,7 +33,10 @@ export const createNewQuestionController = async (req, res, next) => {
       return res.status(400).json(errors);
     }
 
-    const isQuestionAdded = await createNewQuestionService(question, employeeId);
+    const isQuestionAdded = await createNewQuestionService(
+      question,
+      employeeId,
+    );
     if (!isQuestionAdded) {
       return res.status(404).json({ message: 'Not able to save question' });
     }
@@ -79,7 +82,11 @@ export const addNewHRPQuestionsCallbackController = async (req, res, next) => {
   }
 };
 
-export const generateNewHRPQuestionsCallbackController = async (req, res, next) => {
+export const generateNewHRPQuestionsCallbackController = async (
+  req,
+  res,
+  next,
+) => {
   try {
     const { fileName } = req.body;
     const { orgId } = req.data;

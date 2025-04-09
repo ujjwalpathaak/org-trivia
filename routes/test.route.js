@@ -16,10 +16,7 @@ testRouter.post('/clean-quizzes', cleanUpQuizzesController);
 
 testRouter.post('/make-quizzes-live', makeQuizLiveController);
 
-testRouter.post(
-  '/generate-CAnIT-questions',
-  generateCAnITQuestionsController,
-);
+testRouter.post('/generate-CAnIT-questions', generateCAnITQuestionsController);
 
 testRouter.get('/schedule-quizzes', scheduleQuizzesJobController);
 

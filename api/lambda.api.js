@@ -52,7 +52,7 @@ export const generateNewHRPQuestions = async (fileName, orgId) => {
     body: JSON.stringify({
       filePath: fileName,
       orgId: orgId,
-      callbackUrl: 'https://641b-122-187-121-22.ngrok-free.app'
+      callbackUrl: 'https://641b-122-187-121-22.ngrok-free.app',
     }),
   });
 

@@ -1,16 +1,12 @@
-import express from 'express';
-import { config } from 'dotenv';
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import { config } from 'dotenv';
+import express from 'express';
 
 config();
 
-const {
-  AWS_ACCESS_KEY_ID,
-  AWS_SECRET_ACCESS_KEY,
-  S3_BUCKET,
-  AWS_REGION,
-} = process.env;
+const { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, S3_BUCKET, AWS_REGION } =
+  process.env;
 
 const s3Client = new S3Client({
   region: AWS_REGION,

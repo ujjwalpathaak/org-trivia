@@ -2,7 +2,6 @@ import {
   getEmployeeDetails,
   getSubmittedQuestions,
 } from '../repositories/employee.repository.js';
-
 import { getEmployeePastResults } from '../repositories/result.repository.js';
 
 export const getEmployeeDetailsService = async (employeeId) => {

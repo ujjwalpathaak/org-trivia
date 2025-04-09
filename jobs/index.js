@@ -1,9 +1,12 @@
 import cron from 'node-cron';
 
-import { scheduleNextMonthQuizzesJob } from '../services/question.service.js';
-import { cleanUpQuizzesController, makeQuizLiveController } from '../controllers/quiz.controller.js';
 import { resetLeaderboardController } from '../controllers/org.controller.js';
 import { generateCAnITQuestionsController } from '../controllers/question.controller.js';
+import {
+  cleanUpQuizzesController,
+  makeQuizLiveController,
+} from '../controllers/quiz.controller.js';
+import { scheduleNextMonthQuizzesJob } from '../services/question.service.js';
 
 function isTodayAfterLastFriday() {
   const now = new Date();
@@ -13,7 +16,8 @@ function isTodayAfterLastFriday() {
   const lastDay = new Date(Date.UTC(year, month + 1, 0));
   let lastFriday = new Date(lastDay);
 
-  while (lastFriday.getUTCDay() !== 5) { // 5 = Friday
+  while (lastFriday.getUTCDay() !== 5) {
+    // 5 = Friday
     lastFriday.setUTCDate(lastFriday.getUTCDate() - 1);
   }
 
@@ -34,7 +38,9 @@ const scheduleNextMonthQuizzes = cron.schedule(
       console.log('Running Scheduled Task: Schedule Next Month Quizzes...');
       await scheduleNextMonthQuizzesJob();
     } else {
-      console.log('ScheduleNextMonthQuizzes: Skipping today. Not the day after last Friday.');
+      console.log(
+        'ScheduleNextMonthQuizzes: Skipping today. Not the day after last Friday.',
+      );
     }
   },
   { scheduled: true, timezone: 'UTC' },
@@ -74,7 +80,9 @@ const leaderboardResetJobCron = cron.schedule(
       console.log('Running Scheduled Task: Reset Leaderboard...');
       await resetLeaderboardController();
     } else {
-      console.log('LeaderboardReset: Skipping today. Not the day after last Friday.');
+      console.log(
+        'LeaderboardReset: Skipping today. Not the day after last Friday.',
+      );
     }
   },
   { scheduled: true, timezone: 'UTC' },

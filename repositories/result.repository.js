@@ -26,8 +26,6 @@ export const submitWeeklyQuizAnswers = async (
 };
 
 export const rollbackWeeklyQuizScores = async (quizId) => {
-
-
   await Result.aggregate([
     {
       $match: {

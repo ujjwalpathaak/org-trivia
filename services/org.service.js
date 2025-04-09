@@ -1,11 +1,9 @@
 import { getValue, setValue } from '../Redis.js';
-
 import {
   getLeaderboardByOrg,
   getLeaderboardYearBoundary,
   resetLeaderboard,
 } from '../repositories/leaderboard.respository.js';
-
 import {
   changeCompanyCurrentAffairsTimeline,
   changeGenreSettings,
@@ -14,8 +12,8 @@ import {
   getOrgSettings,
   toggleTrivia,
 } from '../repositories/org.repository.js';
-
 import { changeQuizGenre } from '../repositories/quiz.repository.js';
+import { changeQuizGenreWorkflow } from './question.service.js';
 
 export const saveSettingsService = async (
   orgId,
@@ -23,16 +21,13 @@ export const saveSettingsService = async (
   changedGenres,
   companyCurrentAffairsTimeline,
 ) => {
-  await Promise.all(
-    changedGenres.map(async (genre) => {
-      return await changeQuizGenre(genre.newGenre, genre.quizId);
-    }),
-  );
   await changeCompanyCurrentAffairsTimeline(
     orgId,
     companyCurrentAffairsTimeline,
   );
   await changeGenreSettings(newGenreOrder, orgId);
+  await changeQuizGenreWorkflow(changedGenres, orgId);
+
   return { message: 'Settings saved successfully' };
 };
 

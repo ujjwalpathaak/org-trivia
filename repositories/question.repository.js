@@ -76,8 +76,8 @@ export const getWeeklyQuizLiveQuestions = async (orgId) => {
 };
 
 export const dropWeeklyQuestionForExpiredQuizzes = async (quizIds) => {
-  const objectIds = quizIds.map(id => new ObjectId(id));
-  
+  const objectIds = quizIds.map((id) => new ObjectId(id));
+
   return WeeklyQuestion.deleteMany({
     quizId: { $in: objectIds },
   });
@@ -134,24 +134,27 @@ export const getQuestionsByIds = async (ids, page, size) => {
     .lean();
 };
 
-
 export const replaceQuizQuestions = async (idsToAdd, idsToRemove, quizId) => {
-  const { orgId, genre, questions } = await WeeklyQuestion.findOne({ quizId: new ObjectId(quizId) })
+  const { orgId, genre, questions } = await WeeklyQuestion.findOne({
+    quizId: new ObjectId(quizId),
+  })
     .select('questions orgId genre')
     .lean();
 
-  let updatedQuestions = questions.map(q => new ObjectId(q));
+  let updatedQuestions = questions.map((q) => new ObjectId(q));
 
-  updatedQuestions.push(...idsToAdd.map(id => new ObjectId(id)));
+  updatedQuestions.push(...idsToAdd.map((id) => new ObjectId(id)));
 
-  updatedQuestions = updatedQuestions.filter(q => !idsToRemove.includes(q.toString()));
+  updatedQuestions = updatedQuestions.filter(
+    (q) => !idsToRemove.includes(q.toString()),
+  );
 
   await WeeklyQuestion.updateOne(
     { quizId: new ObjectId(quizId) },
-    { $set: { questions: updatedQuestions } }
+    { $set: { questions: updatedQuestions } },
   );
 
-  return {orgId, genre};
+  return { orgId, genre };
 };
 
 export const editQuizQuestions = async (questionsToEdit) => {
@@ -219,11 +222,11 @@ export const getCorrectWeeklyQuizAnswers = async (quizId) => {
   ]);
 };
 
-export const removeQuestionsPnAFromDatabase = async (questionsToRemove) => {
-  return Question.deleteMany({
-    _id: { $in: questionsToRemove },
-  });
-};
+// export const removeQuestionsPnAFromDatabase = async (questionsToRemove) => {
+//   return Question.deleteMany({
+//     _id: { $in: questionsToRemove },
+//   });
+// };
 
 export const saveWeeklyQuiz = async (orgId, quizId, weeklyQuiz, genre) => {
   if (weeklyQuiz.questions.length > 0) {

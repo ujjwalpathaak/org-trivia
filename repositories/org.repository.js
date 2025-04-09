@@ -57,6 +57,20 @@ export const setNextQuestionGenre = async (orgId, currentGenreIndex) => {
   return true;
 };
 
+export const changeOrgQuestionsState = async (genre, orgId, state) => {
+  const questionField = categoryMap[genre];
+  return Org.update(
+    {
+      _id: new ObjectId(orgId),
+    },
+    {
+      $set: {
+        [`${questionField}.$[].state`]: state,
+      },
+    },
+  );
+};
+
 export const changeCompanyCurrentAffairsTimeline = async (
   orgId,
   companyCurrentAffairsTimeline,
@@ -174,15 +188,15 @@ export const updateQuestionsStatus = async (orgId, idsToUpdate, genre) => {
   ]);
 };
 
-export const removeAllQuestionsPnAFromOrg = async (orgId) => {
-  const questionsToRemove = await Org.findById(orgId, 'questionsPnA');
-  await Org.updateOne(
-    { _id: new ObjectId(orgId) },
-    { $set: { questionsPnA: [] } },
-  );
+// export const removeAllQuestionsPnAFromOrg = async (orgId) => {
+//   const questionsToRemove = await Org.findById(orgId, 'questionsPnA');
+//   await Org.updateOne(
+//     { _id: new ObjectId(orgId) },
+//     { $set: { questionsPnA: [] } },
+//   );
 
-  return questionsToRemove.questionsPnA.map((q) => q.questionId);
-};
+//   return questionsToRemove.questionsPnA.map((q) => q.questionId);
+// };
 
 export const fetchPnAQuestions = async (orgId) => {
   return Org.aggregate([
@@ -328,19 +342,30 @@ export const getExtraQuestionsCount = async (orgId, genre) => {
   });
 };
 
-export const changeQuestionsState = async (idsToAdd, idsToRemove, orgId, genre) => {
+export const changeQuestionsState = async (
+  idsToAdd,
+  idsToRemove,
+  orgId,
+  genre,
+) => {
   const questionField = categoryMap[genre];
 
   const operations = [
     ...idsToAdd.map((id) => ({
       updateOne: {
-        filter: { _id: new ObjectId(orgId), [`${questionField}.questionId`]: new ObjectId(id) },
+        filter: {
+          _id: new ObjectId(orgId),
+          [`${questionField}.questionId`]: new ObjectId(id),
+        },
         update: { $set: { [`${questionField}.$.state`]: 1 } },
       },
     })),
     ...idsToRemove.map((id) => ({
       updateOne: {
-        filter: { _id: new ObjectId(orgId), [`${questionField}.questionId`]: new ObjectId(id) },
+        filter: {
+          _id: new ObjectId(orgId),
+          [`${questionField}.questionId`]: new ObjectId(id),
+        },
         update: { $set: { [`${questionField}.$.state`]: 0 } },
       },
     })),

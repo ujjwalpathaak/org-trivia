@@ -26,6 +26,7 @@ export default function ListManager({
   date,
 }) {
   const navigate = useNavigate();
+  const [newGenreOrder, setNewGenreOrder] = useState([]);
   const [changedGenres, setChangedGenres] = useState([]);
   const [companyCurrentAffairsTimeline, setCompanyCurrentAffairsTimeline] = useState(
     settings.companyCurrentAffairsTimeline
@@ -64,7 +65,6 @@ export default function ListManager({
       })),
     [selectedGenre, allItems]
   );
-  // const initialQuizItems = [];
   const initialQuizItems = useMemo(() => {
     if (!Array.isArray(quizzes)) {
       return [];

@@ -98,6 +98,7 @@ export const saveOrgSettings = async (
   companyCurrentAffairsTimeline
 ) => {
   try {
+    console.log(newGenreOrder, changedGenres, companyCurrentAffairsTimeline);
     const response = await fetch(`${BACKEND_URL}/org/settings/save`, {
       method: 'POST',
       headers: getAuthHeaders(),
@@ -261,18 +262,18 @@ export const allowScheduledQuizAPI = async (quizId) => {
 
 export const fetchPresignedUrl = async (file) => {
   try {
-      const presignedRes = await fetch(`${BACKEND_URL}/upload/get-presigned-url`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          fileName: file.name,
-          fileType: file.type,
-        }),
-      });
+    const presignedRes = await fetch(`${BACKEND_URL}/upload/get-presigned-url`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        fileName: file.name,
+        fileType: file.type,
+      }),
+    });
 
-      return await presignedRes.json();
+    return await presignedRes.json();
   } catch (error) {
     return { success: false, error: error.message };
   }
@@ -301,7 +302,6 @@ export const uploadFileToS3 = async (uploadUrl, file) => {
     });
 
     if (!res.ok) throw new Error('Failed to upload file to S3');
-
   } catch (error) {
     return { success: false, error: error.message };
   }

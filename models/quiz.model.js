@@ -37,11 +37,13 @@ quizSchema.pre('save', function (next) {
   if (this.genre === 'CAnIT' && this.scheduledDate) {
     const scheduled = new Date(this.scheduledDate);
     scheduled.setUTCDate(scheduled.getUTCDate() - 1);
-    this.questionGenerationDate = new Date(Date.UTC(
-      scheduled.getUTCFullYear(),
-      scheduled.getUTCMonth(),
-      scheduled.getUTCDate()
-    ));
+    this.questionGenerationDate = new Date(
+      Date.UTC(
+        scheduled.getUTCFullYear(),
+        scheduled.getUTCMonth(),
+        scheduled.getUTCDate(),
+      ),
+    );
   } else {
     this.questionGenerationDate = null;
   }
