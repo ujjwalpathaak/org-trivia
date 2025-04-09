@@ -11,7 +11,7 @@ const Settings = () => {
   const [date, setDate] = useState(() => {
     const today = new Date();
     return {
-      month: today.getUTCMonth(),
+      month: today.getUTCMonth() + 1,
       year: today.getUTCFullYear(),
     };
   });
@@ -88,26 +88,6 @@ const Settings = () => {
             </button>
           </div>
           <hr></hr>
-          <div className="flex items-center justify-between mb-4">
-            <label className="font-medium text-gray-700">Select Month</label>
-            <select className="p-2 rounded-md" value={date.month} onChange={handleMonthChange}>
-              {Array.from({ length: 12 }, (_, i) => (
-                <option key={i} value={i}>
-                  {new Date(0, i).toLocaleString('default', { month: 'long' })}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="flex items-center justify-between mb-4">
-            <label className="font-medium text-gray-700">Select Year</label>
-            <select className="p-2 rounded-md" value={date.year} onChange={handleYearChange}>
-              {Array.from({ length: 10 }, (_, i) => (
-                <option key={i} value={new Date().getUTCFullYear() - 5 + i}>
-                  {new Date().getUTCFullYear() - 5 + i}
-                </option>
-              ))}
-            </select>
-          </div>
           {quizzes && isTriviaEnabled && settings && (
             <ListManager
               settings={settings}
@@ -115,10 +95,13 @@ const Settings = () => {
               setIsSaved={setIsSaved}
               selectedGenre={settings.selectedGenre}
               questionCountStatus={questionCountStatus}
+              handleYearChange={handleYearChange}
               quizzes={quizzes}
               setQuizzes={setQuizzes}
+              date={date}
               selectedMonth={date.month}
               selectedYear={date.year}
+              handleMonthChange={handleMonthChange}
             />
           )}
         </div>

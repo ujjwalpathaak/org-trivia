@@ -170,12 +170,12 @@ export const toggleTriviaSettingAPI = async (isEnabled) => {
   }
 };
 
-export const editWeeklyQuizAPI = async (questions, questionsToDelete) => {
+export const editWeeklyQuizAPI = async (questions, replaceQuestions, quizId) => {
   try {
     const response = await fetch(`${BACKEND_URL}/question/quiz`, {
       method: 'PATCH',
       headers: getAuthHeaders(),
-      body: JSON.stringify({ questions, questionsToDelete }),
+      body: JSON.stringify({ questions, replaceQuestions, quizId }),
     });
 
     if (!response.ok) throw new Error((await response.json()).message || 'Failed to edit quiz');
@@ -219,12 +219,40 @@ export const fetchLeaderboardAPI = async (month, year) => {
 
 export const cancelLiveQuizAPI = async (quizId) => {
   try {
-    const response = await fetch(`${BACKEND_URL}/quiz/${quizId}/cancel`, {
+    const response = await fetch(`${BACKEND_URL}/quiz/live/${quizId}/cancel`, {
       method: 'PATCH',
       headers: getAuthHeaders(),
     });
 
     if (!response.ok) throw new Error((await response.json()).message || 'Failed to cancel quiz');
+    return await response.json();
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+};
+
+export const cancelScheduledQuizAPI = async (quizId) => {
+  try {
+    const response = await fetch(`${BACKEND_URL}/quiz/scheduled/${quizId}/cancel`, {
+      method: 'PATCH',
+      headers: getAuthHeaders(),
+    });
+
+    if (!response.ok) throw new Error((await response.json()).message || 'Failed to cancel quiz');
+    return await response.json();
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+};
+
+export const allowScheduledQuizAPI = async (quizId) => {
+  try {
+    const response = await fetch(`${BACKEND_URL}/quiz/scheduled/${quizId}/allow`, {
+      method: 'PATCH',
+      headers: getAuthHeaders(),
+    });
+
+    if (!response.ok) throw new Error((await response.json()).message || 'Failed to allow quiz');
     return await response.json();
   } catch (error) {
     return { success: false, error: error.message };

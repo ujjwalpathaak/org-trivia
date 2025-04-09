@@ -4,18 +4,26 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import { CircleAlert, GripHorizontal } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { cancelLiveQuizAPI, saveOrgSettings } from '../api';
+import {
+  allowScheduledQuizAPI,
+  cancelLiveQuizAPI,
+  cancelScheduledQuizAPI,
+  saveOrgSettings,
+} from '../api';
 
 const ItemType = 'GENRE';
 
 export default function ListManager({
   settings,
   isSaved,
+  handleMonthChange,
+  handleYearChange,
   setIsSaved,
   selectedGenre,
   questionCountStatus,
   quizzes,
   setQuizzes,
+  date,
 }) {
   const navigate = useNavigate();
   const [changedGenres, setChangedGenres] = useState([]);
@@ -112,10 +120,19 @@ export default function ListManager({
     [setIsSaved]
   );
 
-  const handleCancelQuiz = async (quiz) => {
+  const handleCancelLiveQuiz = async (quiz) => {
     const respones = await cancelLiveQuizAPI(quiz._id);
-    // if (respones.status === 200) {
+    toast.error('Live Quiz cancelled');
+  };
+
+  const handleCancelScheduledQuiz = async (quiz) => {
+    const respones = await cancelScheduledQuizAPI(quiz._id);
     toast.error('Quiz cancelled');
+  };
+
+  const handleAllowQuiz = async (quiz) => {
+    const respones = await allowScheduledQuizAPI(quiz._id);
+    toast.success('Quiz Allowed');
   };
 
   const handleSaveChanges = useCallback(async () => {
@@ -254,8 +271,27 @@ export default function ListManager({
               </div>
             </ul>
           </div>
+          <hr></hr>
           <div className="mt-5">
-            <h3 className="font-semibold mr-2 text-gray-800">Upcoming Quizzes</h3>
+            <div className="gap-2 flex flex justify-between">
+              <h3 className="font-semibold mr-2 text-gray-800">Upcoming Quizzes</h3>
+              <div className="flex gap-2">
+                <select className="p-2 rounded-md" value={date.month} onChange={handleMonthChange}>
+                  {Array.from({ length: 12 }, (_, i) => (
+                    <option key={i} value={i}>
+                      {new Date(0, i).toLocaleString('default', { month: 'long' })}
+                    </option>
+                  ))}
+                </select>
+                <select className="p-2 rounded-md" value={date.year} onChange={handleYearChange}>
+                  {Array.from({ length: 10 }, (_, i) => (
+                    <option key={i} value={new Date().getUTCFullYear() - 5 + i}>
+                      {new Date().getUTCFullYear() - 5 + i}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
             <ul className="space-y-3 mt-4">
               {quizzes.length === 0 && (
                 <li className="bg-gray-50 rounded-lg p-4 text-gray-500 text-center">
@@ -320,24 +356,39 @@ export default function ListManager({
                                 )}
                                 {quiz.status === 'scheduled' && (
                                   <div className="flex items-center">
-                                    <span className="text-xs italic text-green-700">
-                                      questions ready
-                                    </span>
+                                    {/* <span className="text-xs italic text-green-700"></span>
                                     <button
                                       onClick={() => handleEditQuestions(quiz)}
                                       className="ml-2 text-sm text-blue-500 hover:text-blue-600 hover:scale-110 transition-all"
                                       title="Edit questions"
                                     >
-                                      ✏️
+                                      edit questions
+                                    </button> */}
+                                    <button
+                                      onClick={() => handleEditQuestions(quiz)}
+                                      className="text-xs m-auto hover:underline hover:text-green-500 text-green-700"
+                                      title="Cancel Quiz"
+                                    >
+                                      Edit Questions
                                     </button>
                                   </div>
                                 )}
                                 {quiz.status !== 'scheduled' && quiz.genre === 'CAnIT' && (
                                   <div className="flex items-center">
                                     <span className="text-xs text-slate-400">
-                                      Ready on{' '}
                                       {new Date(quiz.questionGenerationDate).toDateString()}
                                     </span>
+                                  </div>
+                                )}
+                                {quiz.status !== 'cancelled' && (
+                                  <div className="flex items-center">
+                                    <button
+                                      onClick={() => handleCancelScheduledQuiz(quiz)}
+                                      className="text-xs m-auto hover:underline hover:text-red-500 text-red-700"
+                                      title="Cancel Quiz"
+                                    >
+                                      Cancel Quiz
+                                    </button>
                                   </div>
                                 )}
                               </>
@@ -349,7 +400,7 @@ export default function ListManager({
                                       {quiz.genre} is live!
                                     </span>
                                     <button
-                                      onClick={() => handleCancelQuiz(quiz)}
+                                      onClick={() => handleCancelLiveQuiz(quiz)}
                                       className="text-xs m-auto hover:p-2 hover:rounded-full hover:bg-red-700 hover:text-red-500 text-red-700"
                                       title="Cancel Quiz"
                                     >
@@ -357,9 +408,34 @@ export default function ListManager({
                                     </button>
                                   </>
                                 ) : quiz.status === 'cancelled' ? (
-                                  <span className="text-xs text-slate-400">
-                                    {quiz.genre} has been cancelled
-                                  </span>
+                                  <>
+                                    <select
+                                      disabled
+                                      value={quiz.genre || ''}
+                                      className="text-gray-700 bg-white border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                      onChange={(e) => handleGenreChange(e, quiz)}
+                                    >
+                                      {allItems.map((item) => (
+                                        <option
+                                          key={item.value}
+                                          value={item.value}
+                                          className="bg-gray-100 text-black"
+                                        >
+                                          {item.key}
+                                        </option>
+                                      ))}
+                                    </select>
+                                    <span className="text-xs text-slate-400">Quiz Cancelled</span>
+                                    <button
+                                      onClick={() => handleAllowQuiz(quiz)}
+                                      className="text-xs hover:underline hover:text-green-500 text-green-700"
+                                      title="Allow Quiz"
+                                    >
+                                      Allow Quiz
+                                    </button>
+                                  </>
+                                ) : quiz.status === 'expired' ? (
+                                  <span className="text-xs text-red-500">Quiz Expired</span>
                                 ) : (
                                   <span className="text-xs text-yellow-600">
                                     {quiz.genre} is upcoming

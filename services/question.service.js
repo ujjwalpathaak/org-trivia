@@ -27,7 +27,8 @@ import {
   setNextQuestionGenre,
   getPnAQuestionsLeft,
   pushNewQuestionInOrg,
-  pushQuestionsInOrg
+  pushQuestionsInOrg,
+  changeQuestionsState
 } from '../repositories/org.repository.js';
 
 import {
@@ -38,6 +39,7 @@ import {
   removeQuestionsPnAFromDatabase,
   createNewQuestion,
   saveWeeklyQuiz,
+  replaceQuizQuestions,
 } from '../repositories/question.repository.js';
 
 import {
@@ -162,6 +164,7 @@ const addQuestionsToQuiz = async (questions, orgId, quizId, genre) => {
     questions: questionIds,
     quizId: quizId,
     orgId: orgId,
+    genre: genre
   };
 
   return await saveWeeklyQuiz(orgId, quizId, data, genre);
@@ -253,10 +256,18 @@ export const validateEmployeeQuestionSubmission = (question) => {
 
 export const editQuizQuestionsService = async (
   questionsToEdit,
-  questionsToDelete,
-  orgId
+  replaceQuestions,
+  quizId
 ) => {
-  await editQuizQuestions(questionsToEdit);
+  if(questionsToEdit.length > 0) await editQuizQuestions(questionsToEdit);
+  if(replaceQuestions.length > 0){
+    const idsToAdd = replaceQuestions.map(pair => pair[1]);
+    const idsToRemove = replaceQuestions.map(pair => pair[0]);
+    
+    const {orgId, genre} = await replaceQuizQuestions(idsToAdd, idsToRemove, quizId);
+
+    await changeQuestionsState(idsToAdd, idsToRemove, orgId, genre);
+  }
 
   return { message: 'Questions Edited.' };
 };
@@ -299,7 +310,10 @@ export async function createNewQuestionService(newQuestionData, employeeId) {
 }
 
 export const generateCAnITQuestionsService = async () => {
+  // development
   const quizzes = await getCAnITQuizzesScheduledNext();
+  
+  // production
   // const quizzes = await getCAnITQuizzesScheduledTomm();
   const orgIds = quizzes.map((quiz) => quiz.orgId);
   const dropdowns = await getOrgCAnITDropdownValue(orgIds);

@@ -188,6 +188,7 @@ function App() {
   const [empQuestions, setEmpQuestions] = useState([]);
   const [selectedQuestionIndex, setSelectedQuestionIndex] = useState(null);
   const [editedQuestions, setEditedQuestions] = useState([]);
+  const [replaceQuestions, setReplaceQuestions] = useState([]);
   const { quizId } = useParams();
   const navigate = useNavigate();
 
@@ -227,7 +228,10 @@ function App() {
       setEmpQuestions(empQuestions.filter((q) => q !== newQuestion));
     }
 
-    setEditedQuestions((prev) => [...prev, newQuestion.question]);
+    setReplaceQuestions((prev) => {
+      return [...prev, [questions[index]._id, newQuestion._id]];
+    });
+
     toast.success('Question replaced successfully');
   };
 
@@ -277,13 +281,8 @@ function App() {
   };
 
   const handleApproveQuiz = async () => {
-    if (editedQuestions.length === 0) {
-      toast.info('No changes detected');
-      return;
-    }
-
     try {
-      await editWeeklyQuizAPI(editedQuestions);
+      await editWeeklyQuizAPI(editedQuestions, replaceQuestions, quizId);
       toast.success('Quiz updated successfully');
       navigate('/dashboard');
     } catch (error) {

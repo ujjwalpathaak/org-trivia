@@ -72,13 +72,15 @@ export const getWeeklyQuizScheduledQuestions = async (orgId, quizId) => {
 };
 
 export const getWeeklyQuizLiveQuestions = async (orgId) => {
-  // only if quiz is live
   return await WeeklyQuestion.find({ orgId }).select('-question.answer').lean();
 };
 
-// change
-export const dropWeeklyQuestionForExpiredQuizzes = async () => {
-  return await WeeklyQuestion.deleteMany();
+export const dropWeeklyQuestionForExpiredQuizzes = async (quizIds) => {
+  const objectIds = quizIds.map(id => new ObjectId(id));
+  
+  return WeeklyQuestion.deleteMany({
+    quizId: { $in: objectIds },
+  });
 };
 
 export const getCAnITQuestionsInTimeline = async (orgId, newsTimelineStart) => {
@@ -132,6 +134,26 @@ export const getQuestionsByIds = async (ids, page, size) => {
     .lean();
 };
 
+
+export const replaceQuizQuestions = async (idsToAdd, idsToRemove, quizId) => {
+  const { orgId, genre, questions } = await WeeklyQuestion.findOne({ quizId: new ObjectId(quizId) })
+    .select('questions orgId genre')
+    .lean();
+
+  let updatedQuestions = questions.map(q => new ObjectId(q));
+
+  updatedQuestions.push(...idsToAdd.map(id => new ObjectId(id)));
+
+  updatedQuestions = updatedQuestions.filter(q => !idsToRemove.includes(q.toString()));
+
+  await WeeklyQuestion.updateOne(
+    { quizId: new ObjectId(quizId) },
+    { $set: { questions: updatedQuestions } }
+  );
+
+  return {orgId, genre};
+};
+
 export const editQuizQuestions = async (questionsToEdit) => {
   if (!Array.isArray(questionsToEdit) || questionsToEdit.length === 0) {
     throw new Error(
@@ -142,7 +164,7 @@ export const editQuizQuestions = async (questionsToEdit) => {
   const bulkOps = questionsToEdit.map(({ _id, ...rest }) => {
     return {
       updateOne: {
-        filter: { _id: new ObjectId(_id) }, // Correct filter format
+        filter: { _id: new ObjectId(_id) },
         update: { $set: rest },
       },
     };
@@ -155,22 +177,6 @@ export const editQuizQuestions = async (questionsToEdit) => {
     throw new Error('Failed to update quiz questions.');
   }
 };
-
-// export const updateWeeklyQuestionsStatusToApproved = async (
-//   ids,
-//   employeeQuestionsToAdd,
-//   idsOfQuestionsToDelete,
-// ) => {
-//   await WeeklyQuestion.deleteMany({
-//     'question._id': { $in: idsOfQuestionsToDelete },
-//   });
-//   await WeeklyQuestion.insertMany(employeeQuestionsToAdd);
-//   return await WeeklyQuestion.updateMany(
-//     { 'question._id': { $in: ids } },
-//     { $set: { isApproved: true } },
-//     { multi: true },
-//   );
-// };
 
 export const getCorrectWeeklyQuizAnswers = async (quizId) => {
   return await WeeklyQuestion.aggregate([

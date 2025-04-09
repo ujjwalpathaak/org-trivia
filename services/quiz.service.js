@@ -12,18 +12,20 @@ import {
   updateWeeklyQuizScore,
 } from '../repositories/employee.repository.js';
 
-import { updateLeaderboard } from '../repositories/leaderboard.respository.js';
+import { rollbackLeaderboardScores, updateLeaderboard } from '../repositories/leaderboard.respository.js';
 
 import { dropWeeklyQuestionForExpiredQuizzes, getCorrectWeeklyQuizAnswers } from '../repositories/question.repository.js';
 
 import {
+  allowScheduledQuiz,
   cancelLiveQuiz,
+  cancelScheduledQuiz,
   findLiveQuizByOrgId,
   getLiveQuizQuestionsByOrgId,
   getQuizStatus,
   getScheduledQuizzes,
   makeQuizLive,
-  markAllQuizAsExpired,
+  markAllLiveQuizAsExpired,
 } from '../repositories/quiz.repository.js';
 
 import {
@@ -39,12 +41,13 @@ export const getWeeklyQuizStatusService = async (orgId, employeeId, date) => {
     getQuizStatus(orgId, today),
     isWeeklyQuizGiven(employeeId),
   ]);
-  console.log(quiz)
 
   if(!quiz) return {status: -1, genre: 'No Quiz Scheduled Today'};
 
   if (quiz?.status === 'cancelled') {
     return {status: 0, genre: quiz.genre}; // cancelled
+  } else if (quiz?.status === 'expired') {
+    return {status: 4, genre: quiz.genre}; // expired
   } else if (quiz?.status === 'live' && !employee.quizGiven) {
     return {status: 1, genre: quiz.genre}; // live
   } else if (quiz?.status === 'live' && employee.quizGiven) {
@@ -54,10 +57,22 @@ export const getWeeklyQuizStatusService = async (orgId, employeeId, date) => {
   }
 };
 
-export const cancelLiveQuizService = async (quizId) => {
-  await cancelLiveQuiz(quizId);
-  await rollbackWeeklyQuizScores(quizId);
+export const cancelScheduledQuizSerivce = async (quizId) => {
+  await cancelScheduledQuiz(quizId);
   return { message: 'Live quiz cancelled' };
+};
+
+export const cancelLiveQuizService = async (quizId) => {
+  const quiz = await cancelLiveQuiz(quizId);
+  await rollbackWeeklyQuizScores(quizId);
+  await rollbackLeaderboardScores(quizId, quiz.scheduledDate);
+
+  return { message: 'Live quiz cancelled' };
+};
+
+export const allowScheduledQuizSerivce = async (quizId) => {
+  await allowScheduledQuiz(quizId);
+  return { message: 'Quiz scheduled' };
 };
 
 export async function getWeeklyQuizLiveQuestionsService(orgId, quizGenre) {
@@ -77,14 +92,12 @@ export const makeQuizLiveService = async (date) => {
   return { message: 'All weekly quizzes are live' };
 };
 
-
-
-// change
 export const cleanUpQuizzesService = async () => {
+  const quizIds = await markAllLiveQuizAsExpired();
+
   await Promise.all([
-    markAllQuizAsExpired(),
     updateEmployeeStreaksAndMarkAllEmployeesAsQuizNotGiven(),
-    dropWeeklyQuestionForExpiredQuizzes(),
+    dropWeeklyQuestionForExpiredQuizzes(quizIds),
   ]);
 
   await awardStreakBadges();

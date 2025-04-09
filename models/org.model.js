@@ -79,13 +79,13 @@ const orgSchema = new mongoose.Schema({
       unavailableGenre: {
         type: [String],
         default: ['PnA', 'HRP', 'CAnIT'],
-        set: (arr) => [...new Set(arr ?? [])], // Ensure it's an array
+        set: (arr) => [...new Set(arr ?? [])],
       },
       selectedGenre: {
         type: [String],
         default: ['PnA', 'HRP', 'CAnIT'],
         set: function (arr) {
-          const unavailable = this?.settings?.unavailableGenre ?? []; // Ensure unavailableGenre is defined
+          const unavailable = this?.settings?.unavailableGenre ?? [];
           return (arr ?? []).filter((genre) => !unavailable.includes(genre));
         },
       },

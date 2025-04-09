@@ -50,7 +50,6 @@ const EmployeeDashboard = () => {
     const fetchWeeklyQuizStatus = async () => {
       try {
         const status = await getWeeklyQuizStatusAPI(date);
-        console.log(status);
         setQuizStatus(status);
       } catch (error) {
         console.error('Error checking quiz status:', error);

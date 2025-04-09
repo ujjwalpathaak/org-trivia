@@ -81,18 +81,25 @@ export const getQuizStatus = (orgId, date) => {
   );
 };
 
-// export const lastQuizByGenre = (orgId, genre) => {
-//   return Quiz.findOne(
-//     { orgId: new ObjectId(orgId), genre: genre },
-//     { sort: { scheduledDate: -1 } },
-//     { limit: 1 },
-//   );
-// };
+export const cancelScheduledQuiz = async (quizId) => {
+  return Quiz.updateOne(
+    { _id: new ObjectId(quizId) },
+    { $set: { status: 'cancelled' } },
+  );
+};
 
 export const cancelLiveQuiz = async (quizId) => {
-  return Quiz.updateOne(
+  return Quiz.findOneAndUpdate(
     { _id: new ObjectId(quizId), status: 'live' },
-    { $set: { status: 'cancelled' } },
+    { $set: { status: 'expired' } },
+    { returnDocument: 'after' }
+  );
+};
+
+export const allowScheduledQuiz = async (quizId) => {
+  return Quiz.updateOne(
+    { _id: new ObjectId(quizId), status: 'cancelled' },
+    { $set: { status: 'scheduled' } },
   );
 };
 
@@ -100,29 +107,10 @@ export const getScheduledQuizzes = (orgId, startDate, endDate) => {
   return Quiz.find({
     orgId: new ObjectId(orgId),
     scheduledDate: { $gte: startDate, $lte: endDate },
-    // status: { $in: ['upcoming', 'scheduled', 'live'] },
   }).sort({
     scheduledDate: 1,
   });
 };
-
-// export const getCAnITQuizzesScheduledTomm = (genre) => {
-//   const tomorrow = new Date();
-//   tomorrow.setDate(tomorrow.getDate() + 1);
-//   tomorrow.setHours(0, 0, 0, 0);
-
-//   const dayAfterTomorrow = new Date(tomorrow);
-//   dayAfterTomorrow.setDate(tomorrow.getDate() + 1);
-
-//   return Quiz.find({
-//     genre: genre || "CAnIT",
-//     status: "upcoming",
-//     scheduledDate: {
-//       $gte: tomorrow,
-//       $lt: dayAfterTomorrow,
-//     },
-//   });
-// };
 
 export const lastQuizByGenre = () => {
   return Quiz.aggregate([
@@ -240,17 +228,17 @@ export const makeQuizLive = async (date) => {
   ]);
 };
 
-// change
-export const markAllQuizAsExpired = () => {
-  return Quiz.updateMany({}, { $set: { status: 'expired' } });
-};
+export const markAllLiveQuizAsExpired = async () => {
+  const liveQuizzes = await Quiz.find({ status: 'live' }, { _id: 1 }).lean();
+  const quizIds = liveQuizzes.map(q => q._id);
 
-// export const updateQuizStatusToApproved = (quizId) => {
-//   return Quiz.updateMany(
-//     { _id: new ObjectId(quizId) },
-//     { $set: { status: 'approved' } },
-//   );
-// };
+  await Quiz.updateMany(
+    { _id: { $in: quizIds } },
+    { $set: { status: 'expired' } }
+  );
+
+  return quizIds;
+};
 
 export const getUpcomingWeeklyQuiz = (orgId) => {
   return Quiz.findOne({

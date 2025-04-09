@@ -1,7 +1,9 @@
 import express from 'express';
 
 import {
+  allowScheduledQuizController,
   cancelLiveQuizController,
+  cancelScheduledQuizController,
   getQuizStatusController,
   getScheduledQuizzesController,
   getWeeklyQuizLiveQuestionsController,
@@ -19,10 +21,24 @@ quizRouter.get(
 );
 
 quizRouter.patch(
-  '/:quizId/cancel',
+  '/live/:quizId/cancel',
   protectRoute,
   checkRole('Admin'),
   cancelLiveQuizController,
+);
+
+quizRouter.patch(
+  '/scheduled/:quizId/cancel',
+  protectRoute,
+  checkRole('Admin'),
+  cancelScheduledQuizController,
+);
+
+quizRouter.patch(
+  '/scheduled/:quizId/allow',
+  protectRoute,
+  checkRole('Admin'),
+  allowScheduledQuizController,
 );
 
 quizRouter.get(

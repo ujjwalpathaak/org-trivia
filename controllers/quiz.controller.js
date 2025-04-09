@@ -1,5 +1,7 @@
 import {
+  allowScheduledQuizSerivce,
   cancelLiveQuizService,
+  cancelScheduledQuizSerivce,
   cleanUpQuizzesService,
   getScheduledQuizzesService,
   getWeeklyQuizLiveQuestionsService,
@@ -48,10 +50,30 @@ export const cleanUpQuizzesController = async (req, res, next) => {
   }
 };
 
+export const allowScheduledQuizController = async (req, res, next) => {
+  try {
+    const { quizId } = req.params;
+    const result = await allowScheduledQuizSerivce(quizId);
+    res.status(200).json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const cancelLiveQuizController = async (req, res, next) => {
   try {
     const { quizId } = req.params;
     const result = await cancelLiveQuizService(quizId);
+    res.status(200).json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const cancelScheduledQuizController = async (req, res, next) => {
+  try {
+    const { quizId } = req.params;
+    const result = await cancelScheduledQuizSerivce(quizId);
     res.status(200).json(result);
   } catch (error) {
     next(error);

@@ -11,13 +11,12 @@ import {
 
 export const editQuizQuestionsController = async (req, res, next) => {
   try {
-    const { orgId } = req.data;
-    const { questions, questionsToDelete } = req.body;
-    if (!orgId || !questions) {
+    const { questions, replaceQuestions, quizId } = req.body;
+    if (!quizId) {
       return res.status(400).json({ message: 'Missing required fields' });
     }
 
-    await editQuizQuestionsService(questions, questionsToDelete, orgId);
+    await editQuizQuestionsService(questions, replaceQuestions, quizId);
 
     res.status(200).json({ message: 'Questions marked as approved' });
   } catch (error) {

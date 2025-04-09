@@ -20,33 +20,6 @@ const categoryMap = {
   HRP: 'questionsHRP',
 };
 
-// export const updateQuestionsStatusInOrgToUsed = async (
-//   orgId,
-//   category,
-//   questionIds,
-//   idsOfQuestionsToDelete,
-// ) => {
-//   const questionField = categoryMap[category];
-//   if (!questionField) throw new Error('Invalid category');
-
-//   await Question.deleteMany({ _id: { $in: idsOfQuestionsToDelete } });
-//   await Org.updateMany(
-//     { _id: new ObjectId(orgId) },
-//     {
-//       $pull: {
-//         [questionField]: { questionId: { $in: idsOfQuestionsToDelete } },
-//       },
-//     },
-//   );
-
-//   return Org.updateMany(
-//     { _id: new ObjectId(orgId) },
-//     { $set: { [`${questionField}.$[elem].isUsed`]: true } },
-//     { arrayFilters: [{ 'elem.questionId': { $in: questionIds } }] },
-//   );
-// };
-// refactoredQuestions, genre, orgId
-
 export const pushNewQuestionInOrg = async (question, orgId) => {
   const questionField = categoryMap[question.category];
   if (!questionField) throw new Error('Invalid question category');
@@ -291,13 +264,6 @@ export const getPnAQuestionsLeft = async (orgId) => {
   ]);
 };
 
-// export const HRPQuestionsCount = async (orgId) => {
-//   return Org.countDocuments({
-//     _id: new ObjectId(orgId),
-//     'questionsHRP.state': 0,
-//   });
-// };
-
 export const HRPQuestionsCount = async (orgId) => {
   const HRDquestions = await Org.aggregate([
     {
@@ -360,6 +326,27 @@ export const getExtraQuestionsCount = async (orgId, genre) => {
     _id: new ObjectId(orgId),
     [`${questionField}.isUsed`]: false,
   });
+};
+
+export const changeQuestionsState = async (idsToAdd, idsToRemove, orgId, genre) => {
+  const questionField = categoryMap[genre];
+
+  const operations = [
+    ...idsToAdd.map((id) => ({
+      updateOne: {
+        filter: { _id: new ObjectId(orgId), [`${questionField}.questionId`]: new ObjectId(id) },
+        update: { $set: { [`${questionField}.$.state`]: 1 } },
+      },
+    })),
+    ...idsToRemove.map((id) => ({
+      updateOne: {
+        filter: { _id: new ObjectId(orgId), [`${questionField}.questionId`]: new ObjectId(id) },
+        update: { $set: { [`${questionField}.$.state`]: 0 } },
+      },
+    })),
+  ];
+
+  return Org.bulkWrite(operations);
 };
 
 export const makeGenreUnavailable = async (orgId, genre) => {

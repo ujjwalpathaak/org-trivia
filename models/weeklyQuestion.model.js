@@ -10,7 +10,7 @@ const weeklyQuestionSchema = new mongoose.Schema(
     questions: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Question', // Assuming 'Question' is the model name
+        ref: 'Question',
         required: true,
       },
     ],
@@ -20,8 +20,13 @@ const weeklyQuestionSchema = new mongoose.Schema(
       immutable: true,
       required: true,
     },
+    genre: {
+      type: String,
+      enum: ['CAnIT', 'HRP', 'PnA'],
+      required: true,
+    },
   },
-  { timestamps: true }, // Adds createdAt and updatedAt fields
+  { timestamps: false },
 );
 
 const WeeklyQuestion = mongoose.model('WeeklyQuestion', weeklyQuestionSchema);
