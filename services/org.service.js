@@ -14,6 +14,14 @@ import {
 } from '../repositories/org.repository.js';
 import { changeQuizGenreWorkflow } from './question.service.js';
 
+/**
+ * Saves organization settings including genre order and company current affairs timeline
+ * @param {string} orgId - The ID of the organization
+ * @param {Array} newGenreOrder - New order of genres
+ * @param {Array} changedGenres - List of genres that have been changed
+ * @param {string} companyCurrentAffairsTimeline - Timeline setting for company current affairs
+ * @returns {Promise<Object>} Response object containing status and message
+ */
 export const saveSettingsService = async (
   orgId,
   newGenreOrder,

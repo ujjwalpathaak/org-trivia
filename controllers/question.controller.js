@@ -9,6 +9,17 @@ import {
   validateEmployeeQuestionSubmission,
 } from '../services/question.service.js';
 
+/**
+ * Edits questions for a specific quiz
+ * @param {Object} req - Express request object
+ * @param {Object} req.body - Request body
+ * @param {Array} req.body.questions - Array of questions to edit
+ * @param {Array} req.body.replaceQuestions - Array of [oldId, newId] pairs for replacement
+ * @param {string} req.body.quizId - Quiz ID
+ * @param {Object} res - Express response object
+ * @param {Function} next - Express next middleware function
+ * @returns {Promise<void>}
+ */
 export const editQuizQuestionsController = async (req, res, next) => {
   try {
     const { questions, replaceQuestions, quizId } = req.body;
@@ -24,6 +35,16 @@ export const editQuizQuestionsController = async (req, res, next) => {
   }
 };
 
+/**
+ * Creates a new question submitted by an employee
+ * @param {Object} req - Express request object
+ * @param {Object} req.body - Question data
+ * @param {Object} req.data - Request data containing employeeId
+ * @param {string} req.data.employeeId - Employee ID who created the question
+ * @param {Object} res - Express response object
+ * @param {Function} next - Express next middleware function
+ * @returns {Promise<void>}
+ */
 export const createNewQuestionController = async (req, res, next) => {
   try {
     const question = req.body;
@@ -47,6 +68,17 @@ export const createNewQuestionController = async (req, res, next) => {
   }
 };
 
+/**
+ * Gets questions for a scheduled quiz
+ * @param {Object} req - Express request object
+ * @param {Object} req.params - URL parameters
+ * @param {string} req.params.quizId - Quiz ID
+ * @param {Object} req.data - Request data containing orgId
+ * @param {string} req.data.orgId - Organization ID
+ * @param {Object} res - Express response object
+ * @param {Function} next - Express next middleware function
+ * @returns {Promise<void>}
+ */
 export const getScheduledQuizQuestionsController = async (req, res, next) => {
   try {
     const { quizId } = req.params;
@@ -65,6 +97,17 @@ export const getScheduledQuizQuestionsController = async (req, res, next) => {
   }
 };
 
+/**
+ * Callback controller for adding new HRP questions
+ * @param {Object} req - Express request object
+ * @param {Object} req.body - Request body
+ * @param {Object} req.body.file - File object containing HRP data
+ * @param {Array} req.body.questions - Array of new HRP questions
+ * @param {string} req.body.orgId - Organization ID
+ * @param {Object} res - Express response object
+ * @param {Function} next - Express next middleware function
+ * @returns {Promise<void>}
+ */
 export const addNewHRPQuestionsCallbackController = async (req, res, next) => {
   try {
     const { file, questions, orgId } = req.body;
@@ -82,6 +125,17 @@ export const addNewHRPQuestionsCallbackController = async (req, res, next) => {
   }
 };
 
+/**
+ * Callback controller for generating new HRP questions
+ * @param {Object} req - Express request object
+ * @param {Object} req.body - Request body
+ * @param {string} req.body.fileName - Name of the file containing HRP data
+ * @param {Object} req.data - Request data containing orgId
+ * @param {string} req.data.orgId - Organization ID
+ * @param {Object} res - Express response object
+ * @param {Function} next - Express next middleware function
+ * @returns {Promise<void>}
+ */
 export const generateNewHRPQuestionsCallbackController = async (
   req,
   res,
@@ -103,7 +157,13 @@ export const generateNewHRPQuestionsCallbackController = async (
   }
 };
 
-// test controller
+/**
+ * Test controller for generating CAnIT questions
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @param {Function} next - Express next middleware function
+ * @returns {Promise<void>}
+ */
 export const generateCAnITQuestionsController = async (req, res, next) => {
   try {
     await generateCAnITQuestionsService();
@@ -113,7 +173,13 @@ export const generateCAnITQuestionsController = async (req, res, next) => {
   }
 };
 
-// test controller
+/**
+ * Test controller for scheduling quizzes for the next month
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @param {Function} next - Express next middleware function
+ * @returns {Promise<void>}
+ */
 export const scheduleQuizzesJobController = async (req, res, next) => {
   try {
     const response = await scheduleNextMonthQuizzesJob();

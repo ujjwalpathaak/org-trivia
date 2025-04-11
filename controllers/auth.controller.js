@@ -1,5 +1,18 @@
 import { loginUser, registerUser } from '../services/auth.service.js';
 
+/**
+ * Registers a new user
+ * @param {Object} req - Express request object
+ * @param {Object} req.body - Request body
+ * @param {boolean} [req.body.isAdmin] - Whether the user is an admin
+ * @param {string} req.body.email - User's email
+ * @param {string} req.body.password - User's password
+ * @param {string} req.body.name - User's name
+ * @param {Object} req.body.org - Organization object
+ * @param {Object} res - Express response object
+ * @param {Function} next - Express next middleware function
+ * @returns {Promise<void>}
+ */
 export const registerController = async (req, res, next) => {
   try {
     const { isAdmin, email, password, name, org } = req.body;
@@ -18,6 +31,16 @@ export const registerController = async (req, res, next) => {
   }
 };
 
+/**
+ * Logs in a user
+ * @param {Object} req - Express request object
+ * @param {Object} req.body - Request body
+ * @param {string} req.body.email - User's email
+ * @param {string} req.body.password - User's password
+ * @param {Object} res - Express response object
+ * @param {Function} next - Express next middleware function
+ * @returns {Promise<void>}
+ */
 export const loginController = async (req, res, next) => {
   try {
     const { email, password } = req.body;

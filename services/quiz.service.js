@@ -34,6 +34,13 @@ import {
   submitWeeklyQuizAnswers,
 } from '../repositories/result.repository.js';
 
+/**
+ * Gets the status of a weekly quiz for an employee
+ * @param {string} orgId - The ID of the organization
+ * @param {string} employeeId - The ID of the employee
+ * @param {Date} date - The date to check the quiz status for
+ * @returns {Promise<Object>} Object containing quiz status information
+ */
 export const getWeeklyQuizStatusService = async (orgId, employeeId, date) => {
   const today = date ? new Date(date) : new Date();
   today.setUTCHours(0, 0, 0, 0);
@@ -58,6 +65,12 @@ export const getWeeklyQuizStatusService = async (orgId, employeeId, date) => {
   }
 };
 
+/**
+ * Cancels a scheduled quiz
+ * @param {string} quizId - The ID of the quiz to cancel
+ * @param {string} orgId - The ID of the organization
+ * @returns {Promise<Object>} Response object containing status and message
+ */
 export const cancelScheduledQuizSerivce = async (quizId, orgId) => {
   const quiz = await cancelScheduledQuiz(quizId);
   await changeOrgQuestionsState(quiz.genre, orgId, 0);
@@ -65,6 +78,12 @@ export const cancelScheduledQuizSerivce = async (quizId, orgId) => {
   return { message: 'Live quiz cancelled' };
 };
 
+/**
+ * Cancels a live quiz
+ * @param {string} quizId - The ID of the quiz to cancel
+ * @param {string} orgId - The ID of the organization
+ * @returns {Promise<Object>} Response object containing status and message
+ */
 export const cancelLiveQuizService = async (quizId, orgId) => {
   const quiz = await cancelLiveQuiz(quizId);
 
@@ -77,11 +96,21 @@ export const cancelLiveQuizService = async (quizId, orgId) => {
   return { message: 'Live quiz cancelled' };
 };
 
+/**
+ * Allows a scheduled quiz to proceed
+ * @param {string} quizId - The ID of the quiz to allow
+ * @returns {Promise<Object>} Response object containing status and message
+ */
 export const allowScheduledQuizSerivce = async (quizId) => {
   await allowScheduledQuiz(quizId);
   return { message: 'Quiz scheduled' };
 };
 
+/**
+ * Gets the live questions for a weekly quiz
+ * @param {string} orgId - The ID of the organization
+ * @returns {Promise<Array>} Array of quiz questions
+ */
 export async function getWeeklyQuizLiveQuestionsService(orgId) {
   const questions = await getLiveQuizQuestionsByOrgId(orgId);
   return {
@@ -90,6 +119,11 @@ export async function getWeeklyQuizLiveQuestionsService(orgId) {
   };
 }
 
+/**
+ * Makes a quiz live
+ * @param {Date} date - The date to make the quiz live for
+ * @returns {Promise<Object>} Response object containing status and message
+ */
 export const makeQuizLiveService = async (date) => {
   date = date ? new Date(date) : new Date();
 
@@ -99,6 +133,10 @@ export const makeQuizLiveService = async (date) => {
   return { message: 'All weekly quizzes are live' };
 };
 
+/**
+ * Cleans up expired quizzes and updates related data
+ * @returns {Promise<void>}
+ */
 export const cleanUpQuizzesService = async () => {
   const quizIds = await markAllLiveQuizAsExpired();
 
@@ -112,6 +150,13 @@ export const cleanUpQuizzesService = async () => {
   return { message: 'Cleaned up weekly quiz.' };
 };
 
+/**
+ * Gets all scheduled quizzes for an organization
+ * @param {string} orgId - The ID of the organization
+ * @param {number} month - The month to get quizzes for (0-11)
+ * @param {number} year - The year to get quizzes for
+ * @returns {Promise<Array>} Array of scheduled quizzes
+ */
 export const getScheduledQuizzesService = async (
   orgId,
   month = new Date().getUTCMonth(),
@@ -123,6 +168,12 @@ export const getScheduledQuizzesService = async (
   return await getScheduledQuizzes(orgId, startDate, endDate);
 };
 
+/**
+ * Calculates the score for a weekly quiz
+ * @param {Array} userAnswers - Array of answers submitted by the user
+ * @param {Array} correctAnswers - Array of correct answers
+ * @returns {Object} Object containing score and points
+ */
 const calculateWeeklyQuizScore = (userAnswers, correctAnswers) => {
   const correctAnswerMap = new Map(
     correctAnswers.map(({ _id, answer }) => [_id.toString(), answer]),
@@ -135,6 +186,14 @@ const calculateWeeklyQuizScore = (userAnswers, correctAnswers) => {
   );
 };
 
+/**
+ * Submits answers for a weekly quiz
+ * @param {Array} userAnswers - Array of answers submitted by the user
+ * @param {string} employeeId - The ID of the employee
+ * @param {string} orgId - The ID of the organization
+ * @param {string} quizId - The ID of the quiz
+ * @returns {Promise<Object>} Response object containing status and message
+ */
 export const submitWeeklyQuizAnswersService = async (
   userAnswers,
   employeeId,

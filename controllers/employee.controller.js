@@ -4,6 +4,15 @@ import {
   getSubmittedQuestionsService,
 } from '../services/employee.service.js';
 
+/**
+ * Gets detailed information about an employee
+ * @param {Object} req - Express request object
+ * @param {Object} req.data - Request data containing employeeId
+ * @param {string} req.data.employeeId - Employee ID
+ * @param {Object} res - Express response object
+ * @param {Function} next - Express next middleware function
+ * @returns {Promise<void>}
+ */
 export const getEmployeeDetailsController = async (req, res, next) => {
   try {
     const { employeeId } = req.data;
@@ -20,6 +29,18 @@ export const getEmployeeDetailsController = async (req, res, next) => {
   }
 };
 
+/**
+ * Gets past quiz results for an employee with pagination
+ * @param {Object} req - Express request object
+ * @param {Object} req.query - Query parameters
+ * @param {number} [req.query.page=0] - Page number for pagination
+ * @param {number} [req.query.size=10] - Number of results per page
+ * @param {Object} req.data - Request data containing employeeId
+ * @param {string} req.data.employeeId - Employee ID
+ * @param {Object} res - Express response object
+ * @param {Function} next - Express next middleware function
+ * @returns {Promise<void>}
+ */
 export const getEmployeePastResultsController = async (req, res, next) => {
   try {
     const { page = 0, size = 10 } = req.query;
@@ -44,6 +65,18 @@ export const getEmployeePastResultsController = async (req, res, next) => {
   }
 };
 
+/**
+ * Gets questions submitted by an employee with pagination
+ * @param {Object} req - Express request object
+ * @param {Object} req.query - Query parameters
+ * @param {number} [req.query.page=0] - Page number for pagination
+ * @param {number} [req.query.size=10] - Number of results per page
+ * @param {Object} req.data - Request data containing employeeId
+ * @param {string} req.data.employeeId - Employee ID
+ * @param {Object} res - Express response object
+ * @param {Function} next - Express next middleware function
+ * @returns {Promise<void>}
+ */
 export const getEmployeeSubmittedQuestionsController = async (
   req,
   res,

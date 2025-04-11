@@ -5,10 +5,19 @@ import Employee from '../models/employee.model.js';
 import { findBadgeByStreak } from './badge.repository.js';
 import { getQuestionsByIds } from './question.repository.js';
 
+/**
+ * Checks if an employee has given the weekly quiz
+ * @param {string} employeeId - The ID of the employee
+ * @returns {Promise<Object|null>} Employee document with quizGiven field or null if not found
+ */
 export const isWeeklyQuizGiven = async (employeeId) => {
   return Employee.findById(employeeId, 'quizGiven');
 };
 
+/**
+ * Awards streak badges to employees based on their streak duration
+ * @returns {Promise<void>}
+ */
 export const awardStreakBadges = async () => {
   const [
     quater_year_streak_employees,
@@ -60,6 +69,10 @@ export const awardStreakBadges = async () => {
   ]);
 };
 
+/**
+ * Updates employee streaks and marks all employees as not having given the quiz
+ * @returns {Promise<Object>} Result of the bulk write operation
+ */
 export const updateEmployeeStreaksAndMarkAllEmployeesAsQuizNotGiven =
   async () => {
     await Employee.bulkWrite([
@@ -79,6 +92,12 @@ export const updateEmployeeStreaksAndMarkAllEmployeesAsQuizNotGiven =
     ]);
   };
 
+/**
+ * Adds a submitted question to an employee's record
+ * @param {string} questionId - The ID of the question
+ * @param {string} employeeId - The ID of the employee
+ * @returns {Promise<Object>} Result of the update operation
+ */
 export const addSubmittedQuestion = async (questionId, employeeId) => {
   return Employee.updateOne(
     { _id: new ObjectId(employeeId) },
@@ -86,6 +105,13 @@ export const addSubmittedQuestion = async (questionId, employeeId) => {
   );
 };
 
+/**
+ * Updates an employee's weekly quiz score
+ * @param {string} employeeId - The ID of the employee
+ * @param {number} points - Points to add to the score
+ * @param {Object} session - MongoDB session for transaction support
+ * @returns {Promise<Object|boolean>} Score update result or false if quiz already given
+ */
 export const updateWeeklyQuizScore = async (employeeId, points, session) => {
   const employee = await Employee.findById(employeeId, 'streak quizGiven');
   if (employee.quizGiven) return false;
@@ -99,6 +125,14 @@ export const updateWeeklyQuizScore = async (employeeId, points, session) => {
   return { score: points };
 };
 
+/**
+ * Adds a badge to an employee's record
+ * @param {string} employeeId - The ID of the employee
+ * @param {string} badgeId - The ID of the badge
+ * @param {number} month - The month the badge was earned
+ * @param {number} year - The year the badge was earned
+ * @returns {Promise<Object>} Result of the update operation
+ */
 export const addBadgesToEmployees = async (
   employeeId,
   badgeId,
@@ -115,10 +149,21 @@ export const addBadgesToEmployees = async (
   );
 };
 
+/**
+ * Resets all employees' scores and streaks to zero
+ * @returns {Promise<Object>} Result of the update operation
+ */
 export const resetAllEmployeesScores = async () => {
   return Employee.updateMany({}, { $set: { score: 0, streak: 0 } });
 };
 
+/**
+ * Gets questions submitted by an employee with pagination
+ * @param {string} employeeId - The ID of the employee
+ * @param {number} page - Page number for pagination
+ * @param {number} size - Number of results per page
+ * @returns {Promise<Object>} Object containing submitted questions and total count
+ */
 export const getSubmittedQuestions = async (employeeId, page, size) => {
   const questionsIds = await Employee.findById(
     employeeId,
@@ -134,6 +179,11 @@ export const getSubmittedQuestions = async (employeeId, page, size) => {
   return { data: questions, total: questionsIds.submittedQuestions.length };
 };
 
+/**
+ * Gets detailed information about an employee including their badges
+ * @param {string} employeeId - The ID of the employee
+ * @returns {Promise<Object|null>} Employee details with badges or null if not found
+ */
 export const getEmployeeDetails = async (employeeId) => {
   const employee = await Employee.findById(employeeId, '-password').lean();
   if (!employee) return null;

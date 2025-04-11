@@ -3,14 +3,28 @@ import { ObjectId } from 'mongodb';
 import Quiz from '../models/quiz.model.js';
 import { findResultByQuizId } from './result.repository.js';
 
+/**
+ * Finds a live quiz for an organization
+ * @param {string} orgId - The ID of the organization
+ * @returns {Promise<Object|null>} The live quiz document or null if not found
+ */
 export const findLiveQuizByOrgId = (orgId) => {
   return Quiz.findOne({ orgId: new ObjectId(orgId), status: 'live' });
 };
 
+/**
+ * Finds a quiz by its ID
+ * @param {string} quizId - The ID of the quiz
+ * @returns {Promise<Object|null>} The quiz document or null if not found
+ */
 export const findQuiz = (quizId) => {
   return Quiz.findOne({ _id: new ObjectId(quizId) });
 };
 
+/**
+ * Gets live quiz questions for a specific organization
+ * @returns {Promise<Array<Object>>} Array of quiz questions with quiz ID
+ */
 export const getLiveQuizQuestionsByOrgId = () => {
   return Quiz.aggregate([
     {
@@ -71,6 +85,12 @@ export const getLiveQuizQuestionsByOrgId = () => {
   ]);
 };
 
+/**
+ * Gets the status of a quiz for an organization on a specific date
+ * @param {string} orgId - The ID of the organization
+ * @param {Date} date - The date to check
+ * @returns {Promise<Object|null>} Quiz status and genre or null if not found
+ */
 export const getQuizStatus = (orgId, date) => {
   return Quiz.findOne(
     {
@@ -81,6 +101,11 @@ export const getQuizStatus = (orgId, date) => {
   );
 };
 
+/**
+ * Cancels a scheduled quiz
+ * @param {string} quizId - The ID of the quiz to cancel
+ * @returns {Promise<Object|null>} The updated quiz document or null if not found
+ */
 export const cancelScheduledQuiz = async (quizId) => {
   return Quiz.findOneAndUpdate(
     { _id: new ObjectId(quizId) },
@@ -89,6 +114,11 @@ export const cancelScheduledQuiz = async (quizId) => {
   );
 };
 
+/**
+ * Cancels a live quiz
+ * @param {string} quizId - The ID of the quiz to cancel
+ * @returns {Promise<Object|null>} The updated quiz document or null if not found
+ */
 export const cancelLiveQuiz = async (quizId) => {
   return Quiz.findOneAndUpdate(
     { _id: new ObjectId(quizId), status: 'live' },
@@ -97,6 +127,11 @@ export const cancelLiveQuiz = async (quizId) => {
   );
 };
 
+/**
+ * Allows a previously cancelled quiz to be scheduled
+ * @param {string} quizId - The ID of the quiz to allow
+ * @returns {Promise<Object>} Result of the update operation
+ */
 export const allowScheduledQuiz = async (quizId) => {
   return Quiz.updateOne(
     { _id: new ObjectId(quizId), status: 'cancelled' },
@@ -104,6 +139,13 @@ export const allowScheduledQuiz = async (quizId) => {
   );
 };
 
+/**
+ * Gets scheduled quizzes for an organization within a date range
+ * @param {string} orgId - The ID of the organization
+ * @param {Date} startDate - Start of the date range
+ * @param {Date} endDate - End of the date range
+ * @returns {Promise<Array<Object>>} Array of scheduled quiz documents
+ */
 export const getScheduledQuizzes = (orgId, startDate, endDate) => {
   return Quiz.find({
     orgId: new ObjectId(orgId),
@@ -113,6 +155,10 @@ export const getScheduledQuizzes = (orgId, startDate, endDate) => {
   });
 };
 
+/**
+ * Gets the last quiz by genre for each organization
+ * @returns {Promise<Array<Object>>} Array of last quiz information by organization
+ */
 export const lastQuizByGenre = () => {
   return Quiz.aggregate([
     {
@@ -145,7 +191,10 @@ export const lastQuizByGenre = () => {
   ]);
 };
 
-// development
+/**
+ * Gets the next scheduled CAnIT quizzes (development)
+ * @returns {Promise<Array<Object>>} Array of next scheduled CAnIT quizzes
+ */
 export const getCAnITQuizzesScheduledNext = () => {
   return Quiz.aggregate([
     {
@@ -177,7 +226,10 @@ export const getCAnITQuizzesScheduledNext = () => {
   ]);
 };
 
-// production
+/**
+ * Gets CAnIT quizzes scheduled for tomorrow (production)
+ * @returns {Promise<Array<Object>>} Array of tomorrow's scheduled CAnIT quizzes
+ */
 export const getCAnITQuizzesScheduledTomm = () => {
   const today = new Date();
 
@@ -192,6 +244,13 @@ export const getCAnITQuizzesScheduledTomm = () => {
   });
 };
 
+/**
+ * Schedules a new weekly quiz
+ * @param {string} orgId - The ID of the organization
+ * @param {Date} date - The date to schedule the quiz
+ * @param {string} genre - The genre of the quiz
+ * @returns {Promise<Object>} The created quiz document
+ */
 export const scheduleNewWeeklyQuiz = (orgId, date, genre) => {
   return Quiz.create({
     orgId,
@@ -201,6 +260,11 @@ export const scheduleNewWeeklyQuiz = (orgId, date, genre) => {
   });
 };
 
+/**
+ * Makes quizzes live for a specific date
+ * @param {Date} date - The date to make quizzes live
+ * @returns {Promise<Object>} Result of the bulk write operation
+ */
 export const makeQuizLive = async (date) => {
   return Quiz.bulkWrite([
     {
@@ -224,6 +288,10 @@ export const makeQuizLive = async (date) => {
   ]);
 };
 
+/**
+ * Marks all live quizzes as expired
+ * @returns {Promise<Array<string>>} Array of quiz IDs that were marked as expired
+ */
 export const markAllLiveQuizAsExpired = async () => {
   const liveQuizzes = await Quiz.find({ status: 'live' }, { _id: 1 }).lean();
   const quizIds = liveQuizzes.map((q) => q._id);
@@ -236,6 +304,11 @@ export const markAllLiveQuizAsExpired = async () => {
   return quizIds;
 };
 
+/**
+ * Gets the upcoming weekly quiz for an organization
+ * @param {string} orgId - The ID of the organization
+ * @returns {Promise<Object|null>} The upcoming quiz document or null if not found
+ */
 export const getUpcomingWeeklyQuiz = (orgId) => {
   return Quiz.findOne({
     orgId: new ObjectId(orgId),
@@ -243,6 +316,12 @@ export const getUpcomingWeeklyQuiz = (orgId) => {
   });
 };
 
+/**
+ * Updates the status of a quiz
+ * @param {string} quizId - The ID of the quiz
+ * @param {string} status - The new status to set
+ * @returns {Promise<Object>} Result of the update operation
+ */
 export const updateQuizStatus = (quizId, status) => {
   return Quiz.updateOne(
     { _id: new ObjectId(quizId) },
@@ -254,15 +333,31 @@ export const updateQuizStatus = (quizId, status) => {
   );
 };
 
+/**
+ * Gets a live quiz for an employee
+ * @param {string} employeeId - The ID of the employee
+ * @returns {Promise<Object|null>} The live quiz document or null if not found
+ */
 export const getLiveQuizByEmployeeId = async (employeeId) => {
   const result = await findResultByQuizId(employeeId);
   return result?.quizId;
 };
 
+/**
+ * Gets a quiz by its ID
+ * @param {string} quizId - The ID of the quiz
+ * @returns {Promise<Object|null>} The quiz document or null if not found
+ */
 export const getQuizByQuizId = (quizId) => {
   return Quiz.findOne({ _id: new ObjectId(quizId) });
 };
 
+/**
+ * Changes the genre of a quiz
+ * @param {string} newGenre - The new genre to set
+ * @param {string} quizId - The ID of the quiz
+ * @returns {Promise<Object>} Result of the update operation
+ */
 export const changeQuizGenre = async (newGenre, quizId) => {
   return Quiz.updateOne(
     { _id: new ObjectId(quizId), status: 'upcoming' },

@@ -45,6 +45,10 @@ import {
   scheduleNewWeeklyQuiz,
 } from '../repositories/quiz.repository.js';
 
+/**
+ * Schedules quizzes for the next month for all organizations with trivia enabled
+ * @returns {Promise<Object>} Response object containing message
+ */
 export const scheduleNextMonthQuizzesJob = async () => {
   const triviaEnabledOrgs = await getTriviaEnabledOrgs();
 
@@ -58,6 +62,11 @@ export const scheduleNextMonthQuizzesJob = async () => {
   return { message: 'Scheduling started in background' };
 };
 
+/**
+ * Schedules quizzes for a specific organization for the next month
+ * @param {Object} org - Organization object containing settings and ID
+ * @returns {Promise<void>}
+ */
 const scheduleQuizForOrgService = async (org) => {
   const { currentGenre, selectedGenre: allGenres } = org.settings;
   const fridaysOfMonth = getFridaysOfNextMonth();
@@ -89,6 +98,12 @@ const scheduleQuizForOrgService = async (org) => {
   );
 };
 
+/**
+ * Checks if more PnA questions are needed and fetches them if necessary
+ * @param {Object} org - Organization object
+ * @param {Array} scheduledQuizzes - Array of scheduled quizzes
+ * @returns {Promise<void>}
+ */
 const checkIfMorePnAQuestionsNeeded = async (org, scheduledQuizzes) => {
   const orgId = org._id;
   const orgName = org.name;
@@ -115,6 +130,13 @@ const checkIfMorePnAQuestionsNeeded = async (org, scheduledQuizzes) => {
   await addQuestionstoOrg(insertedQuestions, 'PnA', orgId);
 };
 
+/**
+ * Starts the question generation workflow based on the quiz genre
+ * @param {string} genre - The genre of the quiz (PnA, CAnIT, HRP)
+ * @param {Object} org - Organization object
+ * @param {Object} quiz - Quiz object
+ * @returns {Promise<void>}
+ */
 const startQuestionGenerationWorkflow = async (genre, org, quiz) => {
   const { _id: quizId } = quiz;
   const { _id: orgId, name: orgName } = org;
@@ -129,12 +151,12 @@ const startQuestionGenerationWorkflow = async (genre, org, quiz) => {
       console.log(`[${orgName}] Scheduled CAnIT Quiz`);
       break;
 
-    case 'HRP':
+    case 'HRP': {
       console.log(`[${orgName}] Starting HRP workflow`);
-      const isAvailable = await isGenreAvailable(orgId, 'HRP');
+      let isAvailable = await isGenreAvailable(orgId, 'HRP');
 
       if (isAvailable) {
-        const canConduct = await canConductQuizHRP(orgId, quizId);
+        let canConduct = await canConductQuizHRP(orgId, quizId);
         if (!canConduct) {
           await makeGenreUnavailable(orgId, genre);
           // swap will fallback genre
@@ -150,6 +172,7 @@ const startQuestionGenerationWorkflow = async (genre, org, quiz) => {
         console.warn(`[${orgName}] HRP genre is not available`);
       }
       break;
+    }
 
     default:
       console.warn(`[${orgName}] Unknown genre: ${genre}`);
@@ -197,21 +220,45 @@ const pushQuestionsToDatabase = async (questions, category) => {
   return await addQuestions(refactoredQuestions);
 };
 
+/**
+ * Starts the PnA (People and Achievements) question workflow
+ * @param {string} orgId - Organization ID
+ * @param {string} quizId - Quiz ID
+ * @returns {Promise<void>}
+ */
 const startPnAWorkflow = async (orgId, quizId) => {
   const questions = await fetchPnAQuestions(orgId);
   await addQuestionsToQuiz(questions, orgId, quizId, 'PnA');
 };
 
+/**
+ * Checks if an HRP quiz can be conducted based on available questions
+ * @param {string} orgId - Organization ID
+ * @returns {Promise<boolean>} Whether the quiz can be conducted
+ */
 const canConductQuizHRP = async (orgId) => {
   const unusedQuestions = await HRPQuestionsCount(orgId, false);
   return unusedQuestions >= HRP_QUESTIONS_PER_QUIZ;
 };
 
+/**
+ * Starts the HRP (Human Resource Practices) question workflow
+ * @param {string} orgId - Organization ID
+ * @param {string} quizId - Quiz ID
+ * @returns {Promise<void>}
+ */
 const startHRPWorkflow = async (orgId, quizId) => {
   const questions = await fetchHRPQuestions(orgId);
   await addQuestionsToQuiz(questions, orgId, quizId, 'HRP');
 };
 
+/**
+ * Callback service for adding new HRP questions
+ * @param {Array} newQuestions - Array of new HRP questions
+ * @param {string} orgId - Organization ID
+ * @param {Object} file - File object containing HRP data
+ * @returns {Promise<void>}
+ */
 export const addNewHRPQuestionsCallbackService = async (
   newQuestions,
   orgId,
@@ -225,6 +272,12 @@ export const addNewHRPQuestionsCallbackService = async (
   await addQuestionstoOrg(questions, 'HRP', orgId, file);
 };
 
+/**
+ * Callback service for generating new HRP questions
+ * @param {string} fileName - Name of the file containing HRP data
+ * @param {string} orgId - Organization ID
+ * @returns {Promise<Object>} Response containing status message
+ */
 export const generateNewHRPQuestionsCallbackService = async (
   fileName,
   orgId,
@@ -233,6 +286,16 @@ export const generateNewHRPQuestionsCallbackService = async (
   return { message: 'HRP questions generated successfully' };
 };
 
+/**
+ * Validates a question submitted by an employee
+ * @param {Object} question - Question object to validate
+ * @param {string} question.question - The question text
+ * @param {string} question.category - Question category
+ * @param {Object} question.config - Question configuration
+ * @param {string} question.answer - Correct answer
+ * @param {Array} question.options - Array of answer options
+ * @returns {number} Number of validation errors found
+ */
 export const validateEmployeeQuestionSubmission = (question) => {
   const errors = {};
 
@@ -255,6 +318,13 @@ export const validateEmployeeQuestionSubmission = (question) => {
   return Object.keys(errors).length;
 };
 
+/**
+ * Edits questions for a specific quiz
+ * @param {Array} questionsToEdit - Array of questions to edit
+ * @param {Array} replaceQuestions - Array of [oldId, newId] pairs for replacement
+ * @param {string} quizId - Quiz ID
+ * @returns {Promise<Object>} Response containing status message
+ */
 export const editQuizQuestionsService = async (
   questionsToEdit,
   replaceQuestions,
@@ -277,6 +347,15 @@ export const editQuizQuestionsService = async (
   return { message: 'Questions Edited.' };
 };
 
+/**
+ * Workflow for changing quiz genres
+ * @param {Array} changedGenres - Array of genre change objects
+ * @param {string} changedGenres[].quizId - Quiz ID
+ * @param {string} changedGenres[].newGenre - New genre to set
+ * @param {string} orgId - Organization ID
+ * @param {string} orgName - Organization name
+ * @returns {Promise<Object>} Response containing status and any errors
+ */
 export const changeQuizGenreWorkflow = async (
   changedGenres,
   orgId,
@@ -400,6 +479,12 @@ export const changeQuizGenreWorkflow = async (
   };
 };
 
+/**
+ * Gets questions for a weekly quiz including extra questions
+ * @param {string} orgId - Organization ID
+ * @param {string} quizId - Quiz ID
+ * @returns {Promise<Object>} Object containing weekly quiz questions and extra questions
+ */
 export const getWeeklyQuizQuestions = async (orgId, quizId) => {
   const quiz = await findQuiz(quizId);
   const quizGenre = quiz.genre;
@@ -424,6 +509,13 @@ export const getWeeklyQuizQuestions = async (orgId, quizId) => {
   };
 };
 
+/**
+ * Creates a new question and adds it to the organization
+ * @param {Object} newQuestionData - Data for the new question
+ * @param {string} newQuestionData.orgId - Organization ID
+ * @param {string} employeeId - Employee ID who created the question
+ * @returns {Promise<boolean>} Success status
+ */
 export async function createNewQuestionService(newQuestionData, employeeId) {
   const { orgId } = newQuestionData;
   const newQuestion = await createNewQuestion(newQuestionData);
@@ -437,6 +529,10 @@ export async function createNewQuestionService(newQuestionData, employeeId) {
   return true;
 }
 
+/**
+ * Generates new CAnIT (Company and IT) questions for scheduled quizzes
+ * @returns {Promise<Object>} Response containing status message
+ */
 export const generateCAnITQuestionsService = async () => {
   // development
   const quizzes = await getCAnITQuizzesScheduledNext();
