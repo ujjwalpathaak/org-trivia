@@ -136,13 +136,19 @@ export default function ListManager({
   };
 
   const handleSaveChanges = useCallback(async () => {
-    await saveOrgSettings(
+    const response = await saveOrgSettings(
       selectedItems.map((genre) => genre.value),
       changedGenres,
       companyCurrentAffairsTimeline
     );
-    toast.success('New settings saved');
-    setIsSaved(true);
+    if (response.status === 400) {
+      for (const error of response.errors) {
+        toast.error(error.message);
+      }
+    } else {
+      toast.success('New settings saved');
+      setIsSaved(true);
+    }
   }, [selectedItems, changedGenres, companyCurrentAffairsTimeline, setIsSaved]);
 
   const addItem = useCallback(

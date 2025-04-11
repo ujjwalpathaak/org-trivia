@@ -41,13 +41,13 @@ export const saveOrgSettingsController = async (req, res, next) => {
     }
     const { newGenreOrder, changedGenres, companyCurrentAffairsTimeline } =
       req.body;
-    await saveSettingsService(
+    const response = await saveSettingsService(
       orgId,
       newGenreOrder,
       changedGenres,
       companyCurrentAffairsTimeline,
     );
-    res.status(200).json({ message: 'Genre settings updated successfully' });
+    res.json(response);
   } catch (error) {
     next(error);
   }

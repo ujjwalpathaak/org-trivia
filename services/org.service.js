@@ -12,7 +12,6 @@ import {
   getOrgSettings,
   toggleTrivia,
 } from '../repositories/org.repository.js';
-import { changeQuizGenre } from '../repositories/quiz.repository.js';
 import { changeQuizGenreWorkflow } from './question.service.js';
 
 export const saveSettingsService = async (
@@ -21,14 +20,16 @@ export const saveSettingsService = async (
   changedGenres,
   companyCurrentAffairsTimeline,
 ) => {
+  const response = await changeQuizGenreWorkflow(changedGenres, orgId);
+  if (response.status === 400) return response;
+
   await changeCompanyCurrentAffairsTimeline(
     orgId,
     companyCurrentAffairsTimeline,
   );
   await changeGenreSettings(newGenreOrder, orgId);
-  await changeQuizGenreWorkflow(changedGenres, orgId);
 
-  return { message: 'Settings saved successfully' };
+  return { status: 200, message: 'Settings saved successfully' };
 };
 
 export const getSettingsService = async (orgId) => {

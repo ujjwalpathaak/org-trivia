@@ -82,7 +82,7 @@ export const allowScheduledQuizSerivce = async (quizId) => {
   return { message: 'Quiz scheduled' };
 };
 
-export async function getWeeklyQuizLiveQuestionsService(orgId, quizGenre) {
+export async function getWeeklyQuizLiveQuestionsService(orgId) {
   const questions = await getLiveQuizQuestionsByOrgId(orgId);
   return {
     weeklyQuizQuestions: questions || [],

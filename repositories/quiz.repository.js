@@ -11,7 +11,7 @@ export const findQuiz = (quizId) => {
   return Quiz.findOne({ _id: new ObjectId(quizId) });
 };
 
-export const getLiveQuizQuestionsByOrgId = (orgId) => {
+export const getLiveQuizQuestionsByOrgId = () => {
   return Quiz.aggregate([
     {
       $match: {

@@ -136,6 +136,7 @@ const startQuestionGenerationWorkflow = async (genre, org, quiz) => {
         const canConduct = await canConductQuizHRP(orgId, quizId);
         if (!canConduct) {
           await makeGenreUnavailable(orgId, genre);
+          // swap will fallback genre
           console.warn(
             `[${orgName}] HRP quiz not allowed, genre marked unavailable`,
           );
@@ -193,9 +194,8 @@ const pushQuestionsToDatabase = async (questions, category) => {
   return await addQuestions(refactoredQuestions);
 };
 
-const startPnAWorkflow = async (orgName, orgId, quizId) => {
+const startPnAWorkflow = async (orgId, quizId) => {
   const questions = await fetchPnAQuestions(orgId);
-
   await addQuestionsToQuiz(questions, orgId, quizId, 'PnA');
 };
 
@@ -274,39 +274,127 @@ export const editQuizQuestionsService = async (
   return { message: 'Questions Edited.' };
 };
 
-export const changeQuizGenreWorkflow = async (changedGenres, orgId) => {
-  if(changedGenres.length === 0) return;
+export const changeQuizGenreWorkflow = async (
+  changedGenres,
+  orgId,
+  orgName,
+) => {
+  if (changedGenres.length === 0) return;
 
-  // change new genre and free old questions
+  const quizzes = await Promise.all(
+    changedGenres.map((genre) => getQuizByQuizId(genre.quizId)),
+  );
+
+  const errors = [];
+
+  for (let i = 0; i < changedGenres.length; i++) {
+    const genre = changedGenres[i];
+    const quiz = quizzes[i];
+
+    switch (genre.newGenre) {
+      case 'HRP': {
+        const isAvailable = await isGenreAvailable(orgId, 'HRP');
+
+        if (!isAvailable) {
+          errors.push({
+            quizId: genre.quizId,
+            message: `HRP genre is not available for ${new Date(quiz.scheduledDate).toDateString()}`,
+          });
+          break;
+        }
+
+        const canConduct = await canConductQuizHRP(orgId, genre.quizId);
+        if (!canConduct) {
+          await makeGenreUnavailable(orgId, genre);
+          errors.push({
+            quizId: genre.quizId,
+            message: `Cannot conduct HRP genre for ${new Date(quiz.scheduledDate).toDateString()}, it is unavailable now`,
+          });
+        }
+        break;
+      }
+
+      case 'CAnIT': {
+        const quizDate = new Date(quiz.scheduledDate);
+        const today = new Date();
+        today.setUTCHours(0, 0, 0, 0);
+        quizDate.setUTCHours(0, 0, 0, 0);
+
+        const diffInMs = quizDate.getTime() - today.getTime();
+        const daysGap = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
+
+        if (daysGap < 2) {
+          errors.push({
+            quizId: genre.quizId,
+            message: `CAnIT on ${new Date(quiz.scheduledDate).toDateString()} can only be scheduled with at least one day gap`,
+          });
+        }
+        break;
+      }
+
+      default:
+        break;
+    }
+  }
+
+  if (errors.length > 0) {
+    console.error('Validation errors:', errors);
+    return {
+      status: 400,
+      message: 'Validation errors occurred',
+      errors,
+    };
+  }
+
   await Promise.all(
-    changedGenres.map(async (genre) => {
-      const quiz = await getQuizByQuizId(genre.quizId);
-  
+    changedGenres.map(async (genre, idx) => {
+      const quiz = quizzes[idx];
       await Promise.all([
         changeOrgQuestionsState(quiz.genre, orgId, 0),
         changeQuizGenre(genre.newGenre, genre.quizId),
       ]);
-    })
+    }),
   );
 
-  // start particular flow for each genre
-  switch (changedGenres[0].newGenre) {
-    case 'PnA':
-      // enought questions present ?
-      // yes - make quiz and schedule
-      // no - make new questions and schedule
-      await startPnAWorkflow(changedGenres[0].orgName, orgId, changedGenres[0].quizId);
+  for (let i = 0; i < changedGenres.length; i++) {
+    const genre = changedGenres[i];
 
-      break;
-    case 'HRP':
-      await startHRPWorkflow(orgId, changedGenres[0].quizId);
-      break;
-    case 'CAnIT':
-      await generateCAnITQuestionsService();
-      break;
-    default:
-      break;
+    switch (genre.newGenre) {
+      case 'PnA': {
+        const requiredPnACount = PnA_QUESTIONS_PER_QUIZ;
+        const [{ count: availablePnACount = 0 } = {}] =
+          await getPnAQuestionsLeft(orgId);
+        if (availablePnACount > requiredPnACount) {
+          await startPnAWorkflow(orgId, genre.quizId);
+        } else {
+          const { questions: fetchedQuestions } =
+            await fetchNewPnAQuestions(orgName);
+          const insertedQuestions = await pushQuestionsToDatabase(
+            fetchedQuestions,
+            'PnA',
+          );
+          await addQuestionstoOrg(insertedQuestions, 'PnA', orgId);
+        }
+        break;
+      }
+
+      case 'HRP':
+        await startHRPWorkflow(orgId, genre.quizId);
+        break;
+
+      case 'CAnIT':
+        await generateCAnITQuestionsService();
+        break;
+
+      default:
+        break;
+    }
   }
+
+  return {
+    status: 200,
+    message: 'Genre change workflow completed successfully',
+  };
 };
 
 export const getWeeklyQuizQuestions = async (orgId, quizId) => {
@@ -370,7 +458,7 @@ export const generateCAnITQuestionsService = async () => {
 
   const today = new Date();
 
-  for (const { quiz, dropdown, lastQuiz } of combinedData) {
+  for (const { quiz, dropdown } of combinedData) {
     const timelineWeeks = dropdown || 1;
     const newsTimelineStart = new Date(today);
     newsTimelineStart.setDate(today.getDate() - timelineWeeks * 7);

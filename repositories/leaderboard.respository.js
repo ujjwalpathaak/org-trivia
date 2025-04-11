@@ -26,7 +26,7 @@ export const updateLeaderboard = async (
     { upsert: true, session },
   );
 
-export const getLeaderboardYearBoundary = async (orgId) => {
+export const getLeaderboardYearBoundary = async () => {
   return Leaderboard.aggregate([
     {
       $match: {
