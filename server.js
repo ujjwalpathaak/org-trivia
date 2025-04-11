@@ -30,7 +30,8 @@ app.use('/api/v1', router);
 
 app.use(logService);
 
-app.use((err, req, res) => {
+app.use((err, req, res, next) => {
+  console.error(err)
   res.status(500).json({
     success: false,
     message: err.message || 'Something went wrong!',

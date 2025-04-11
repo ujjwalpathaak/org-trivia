@@ -44,13 +44,14 @@ export default function ListManager({
   const getInfo = useCallback(
     (value) => {
       const key = value?.toLowerCase();
-      const questions = questionCountStatus[`${key}_questions`];
-      const required_questions = questionCountStatus[`${key}_questions_required_per_quiz`];
-      if (questions <= required_questions) {
-        if (key === 'hrp') {
-          return `${questions} new questions available. Will start to paraphrase old questions`;
-        }
+      // const questions = questionCountStatus[`${key}_questions`];
+      // const required_questions = questionCountStatus[`${key}_questions_required_per_quiz`];
+      // console.log(questions, required_questions);
+      // if (questions <= required_questions) {
+      if (key === 'hrp') {
+        return `No new questions available.`;
       }
+      // }
       return null;
     },
     [questionCountStatus]
@@ -349,7 +350,7 @@ export default function ListManager({
                                     </option>
                                   ))}
                                 </select>
-                                {getInfo(quiz.genre) && (
+                                {/* {getInfo(quiz.genre) && (
                                   <div className="relative group">
                                     <CircleAlert
                                       width={20}
@@ -359,7 +360,7 @@ export default function ListManager({
                                       {getInfo(quiz.genre)}
                                     </span>
                                   </div>
-                                )}
+                                )} */}
                                 {quiz.status === 'scheduled' && (
                                   <div className="flex items-center">
                                     {/* <span className="text-xs italic text-green-700"></span>

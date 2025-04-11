@@ -122,7 +122,7 @@ const startQuestionGenerationWorkflow = async (genre, org, quiz) => {
   switch (genre) {
     case 'PnA':
       console.log(`[${orgName}] Starting PnA workflow`);
-      await startPnAWorkflow(orgName, orgId, quizId);
+      await startPnAWorkflow(orgId, quizId);
       break;
 
     case 'CAnIT':
@@ -443,6 +443,7 @@ export const generateCAnITQuestionsService = async () => {
 
   // production
   // const quizzes = await getCAnITQuizzesScheduledTomm();
+
   const orgIds = quizzes.map((quiz) => quiz.orgId);
   const dropdowns = await getOrgCAnITDropdownValue(orgIds);
   const lastQuizzes = await lastQuizByGenre();

@@ -21,7 +21,7 @@ export const saveSettingsService = async (
   companyCurrentAffairsTimeline,
 ) => {
   const response = await changeQuizGenreWorkflow(changedGenres, orgId);
-  if (response.status === 400) return response;
+  if (response?.status === 400) return response;
 
   await changeCompanyCurrentAffairsTimeline(
     orgId,
