@@ -4,6 +4,7 @@ import {
   generateNewHRPQuestions,
 } from '../api/lambda.api.js';
 import {
+  FALLBACK_GENRE,
   HRP_QUESTIONS_PER_QUIZ,
   PnA_QUESTIONS_PER_QUIZ,
 } from '../constants.js';
@@ -137,8 +138,10 @@ const startQuestionGenerationWorkflow = async (genre, org, quiz) => {
         if (!canConduct) {
           await makeGenreUnavailable(orgId, genre);
           // swap will fallback genre
+          await changeQuizGenre(FALLBACK_GENRE, quizId);
+          await startQuestionGenerationWorkflow(FALLBACK_GENRE, org, quiz);
           console.warn(
-            `[${orgName}] HRP quiz not allowed, genre marked unavailable`,
+            `[${orgName}] HRP quiz not allowed, genre marked unavailable. ${FALLBACK_GENRE} scheduled instead`,
           );
           return;
         }
