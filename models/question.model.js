@@ -44,6 +44,9 @@ const questionSchema = new mongoose.Schema({
     type: Object,
     default: {},
   },
+},{
+  timestamps: false,
+  versionKey: false,
 });
 
 const Question = mongoose.model('Question', questionSchema);

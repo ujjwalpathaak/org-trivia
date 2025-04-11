@@ -98,6 +98,9 @@ const orgSchema = new mongoose.Schema({
       unavailableGenre: [],
     }),
   },
+},{
+  timestamps: false,
+  versionKey: false,
 });
 
 orgSchema.pre('save', function (next) {

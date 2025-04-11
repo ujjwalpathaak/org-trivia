@@ -53,7 +53,10 @@ const resultSchema = new mongoose.Schema(
       default: [],
     },
   },
-  { timestamps: true, updatedAt: false },
+  {
+    timestamps: false,
+    versionKey: false,
+  },
 );
 
 const Result = mongoose.model('Result', resultSchema);

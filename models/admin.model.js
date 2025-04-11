@@ -29,6 +29,9 @@ const adminSchema = new mongoose.Schema({
     immutable: true,
     required: true,
   },
+},{
+  timestamps: false,
+  versionKey: false,
 });
 
 adminSchema.pre('save', function (next) {

@@ -16,6 +16,9 @@ const badgeSchema = new mongoose.Schema({
     enum: ['3 Months', '6 Months', '1 Year'],
     trim: true,
   },
+},{
+  timestamps: false,
+  versionKey: false,
 });
 
 const Badge = mongoose.model('Badge', badgeSchema);

@@ -20,6 +20,13 @@ const quizSchema = new mongoose.Schema({
     type: Date,
     default: null,
   },
+  questions: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Question',
+      required: true,
+    },
+  ],
   status: {
     type: String,
     enum: ['upcoming', 'scheduled', 'cancelled', 'live', 'expired'],
@@ -31,6 +38,9 @@ const quizSchema = new mongoose.Schema({
     enum: ['PnA', 'CAnIT', 'HRP'],
     required: true,
   },
+},{
+  timestamps: false,
+  versionKey: false,
 });
 
 quizSchema.pre('save', function (next) {
