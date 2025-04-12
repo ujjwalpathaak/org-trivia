@@ -131,6 +131,10 @@ export default function ListManager({
     toast.error('Quiz cancelled');
   };
 
+  const handleApproveEmployeeQuestions = async (quiz) => {
+    navigate(`approve-questions`);
+  };
+
   const handleAllowQuiz = async (quiz) => {
     const respones = await allowScheduledQuizAPI(quiz._id);
     toast.success('Quiz Allowed');
@@ -200,6 +204,16 @@ export default function ListManager({
         </select>
       </div>
       <hr />
+      <div className="flex items-center justify-between">
+        <label className="font-medium text-gray-700">Employee Questions</label>
+        <button
+          onClick={handleApproveEmployeeQuestions}
+          className="bg-slate-100 hover:bg-slate-200 rounded-md p-2"
+        >
+          Approve
+        </button>
+      </div>
+      <hr />
       <DndProvider backend={HTML5Backend}>
         <div className="max-w-2xl mx-auto bg-white rounded-xl">
           {settings.unavailableGenre.length !== 0 && (
@@ -213,7 +227,7 @@ export default function ListManager({
                   >
                     {item}
                     <span className="text-red-400 text-xs px-2 py-1 rounded-md">
-                      ! {getInfo(item)}
+                      {getInfo(item)}
                     </span>
                   </li>
                 ))}

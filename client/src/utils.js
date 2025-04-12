@@ -42,6 +42,10 @@ export const validateQuestionMakerForm = (question) => {
     errors.question = 'Question is required.';
   }
 
+  if (question.question.trim().length <= 50) {
+    errors.question = 'Question must be more than 50 characters.';
+  }
+
   if (!question.category) {
     errors.category = 'Category is required.';
   }

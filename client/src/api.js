@@ -98,7 +98,6 @@ export const saveOrgSettings = async (
   companyCurrentAffairsTimeline
 ) => {
   try {
-    console.log(newGenreOrder, changedGenres, companyCurrentAffairsTimeline);
     const response = await fetch(`${BACKEND_URL}/org/settings/save`, {
       method: 'POST',
       headers: getAuthHeaders(),
@@ -118,6 +117,47 @@ export const fetchScheduledQuizQuestionsAPI = async (quizId) => {
     const response = await fetch(`${BACKEND_URL}/question/scheduled/quiz/${quizId}`, {
       method: 'GET',
       headers: getAuthHeaders(),
+    });
+
+    return { status: response.status, data: await response.json() };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+};
+
+export const fetchEmployeeQuestionsToApproveAPI = async () => {
+  try {
+    const response = await fetch(`${BACKEND_URL}/question/employees/approve`, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
+
+    return { status: response.status, data: await response.json() };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+};
+
+export const approveEmployeeQuestionsAPI = async (selectedQuestions) => {
+  try {
+    const response = await fetch(`${BACKEND_URL}/question/employees/approve`, {
+      method: 'PATCH',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(selectedQuestions),
+    });
+
+    return { status: response.status, data: await response.json() };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+};
+
+export const rejectEmployeeQuestionsAPI = async (selectedQuestions) => {
+  try {
+    const response = await fetch(`${BACKEND_URL}/question/employees/reject`, {
+      method: 'PATCH',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(selectedQuestions),
     });
 
     return { status: response.status, data: await response.json() };
@@ -180,6 +220,21 @@ export const editWeeklyQuizAPI = async (questions, replaceQuestions, quizId) => 
     });
 
     if (!response.ok) throw new Error((await response.json()).message || 'Failed to edit quiz');
+    return await response.json();
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+};
+
+export const editEmployeeQuestionAPI = async (question) => {
+  try {
+    const response = await fetch(`${BACKEND_URL}/employee/question`, {
+      method: 'PATCH',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(question),
+    });
+
+    if (!response.ok) throw new Error((await response.json()).message || 'Failed to edit question');
     return await response.json();
   } catch (error) {
     return { success: false, error: error.message };

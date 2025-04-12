@@ -9,7 +9,7 @@ import {
   PnA_QUESTIONS_PER_QUIZ,
 } from '../constants.js';
 import { getFridaysOfNextMonth } from '../middleware/utils.js';
-import { addSubmittedQuestion } from '../repositories/employee.repository.js';
+import { addSubmittedQuestion, approveEmployeeQuestion, getEmployeeQuestionsToApprove, rejectEmployeeQuestion } from '../repositories/employee.repository.js';
 import {
   changeOrgQuestionsState,
   changeQuestionsState,
@@ -32,9 +32,6 @@ import {
   createNewQuestion,
   editQuizQuestions,
   getCAnITQuestionsInTimeline,
-  getWeeklyQuizScheduledQuestions,
-  replaceQuizQuestions,
-  saveWeeklyQuiz,
 } from '../repositories/question.repository.js';
 import {
   changeQuizGenre,
@@ -42,7 +39,10 @@ import {
   getCAnITQuizzesScheduledNext,
   getQuizByQuizId,
   lastQuizByGenre,
+  saveQuizQuestions,
+  replaceQuizQuestions,
   scheduleNewWeeklyQuiz,
+  getScheduledQuizQuestions,
 } from '../repositories/quiz.repository.js';
 
 /**
@@ -182,14 +182,7 @@ const startQuestionGenerationWorkflow = async (genre, org, quiz) => {
 
 const addQuestionsToQuiz = async (questions, orgId, quizId, genre) => {
   const questionIds = questions.map((curr) => curr._id);
-  const data = {
-    questions: questionIds,
-    quizId: quizId,
-    orgId: orgId,
-    genre: genre,
-  };
-
-  return await saveWeeklyQuiz(orgId, quizId, data, genre);
+  return await saveQuizQuestions(orgId, quizId, questionIds, genre);
 };
 
 const addQuestionstoOrg = async (questions, genre, orgId, file) => {
@@ -284,38 +277,6 @@ export const generateNewHRPQuestionsCallbackService = async (
 ) => {
   await generateNewHRPQuestions(fileName, orgId);
   return { message: 'HRP questions generated successfully' };
-};
-
-/**
- * Validates a question submitted by an employee
- * @param {Object} question - Question object to validate
- * @param {string} question.question - The question text
- * @param {string} question.category - Question category
- * @param {Object} question.config - Question configuration
- * @param {string} question.answer - Correct answer
- * @param {Array} question.options - Array of answer options
- * @returns {number} Number of validation errors found
- */
-export const validateEmployeeQuestionSubmission = (question) => {
-  const errors = {};
-
-  if (!question.question.trim()) {
-    errors.question = 'Question is required.';
-  }
-  if (!question.category) {
-    errors.category = 'Category is required.';
-  }
-  if (question.category === 'PnA' && !question.config.puzzleType) {
-    errors.puzzleType = 'Puzzle type is required for PnA questions.';
-  }
-  if (!question.answer) {
-    errors.answer = 'Answer is required.';
-  }
-  if (!question.options || question.options.length < 4) {
-    errors.options = 'At least 4 options are required.';
-  }
-
-  return Object.keys(errors).length;
 };
 
 /**
@@ -489,7 +450,7 @@ export const getWeeklyQuizQuestions = async (orgId, quizId) => {
   const quiz = await findQuiz(quizId);
   const quizGenre = quiz.genre;
 
-  const weeklyQuizQuestion = await getWeeklyQuizScheduledQuestions(
+  const weeklyQuizQuestion = await getScheduledQuizQuestions(
     orgId,
     quizId,
   );
@@ -507,6 +468,38 @@ export const getWeeklyQuizQuestions = async (orgId, quizId) => {
     extraAIQuestions: extraAIQuestions || [],
     quizId: quizId || null,
   };
+};
+
+export const getEmployeesQuestionsToApproveService = async (orgId) => {
+  return await getEmployeeQuestionsToApprove(orgId);
+};
+
+export const approveEmployeeQuestionsService = async (selectedQuestions) => {
+  console.log('rejectEmployeeQuestionsService', selectedQuestions);
+  const questions = selectedQuestions?.map((question) => ({
+    questionId: question._id,
+    employeeId: question.employeeId
+  }));
+  const mp = {};
+  questions.forEach((q) => {
+    mp[q.employeeId] = [...(mp[q.employeeId] || []), q.questionId];
+  });
+  
+  return await approveEmployeeQuestion(mp);
+};
+
+export const rejectEmployeeQuestionsService = async (selectedQuestions) => {
+  console.log('rejectEmployeeQuestionsService', selectedQuestions);
+  const questions = selectedQuestions?.map((question) => ({
+    questionId: question._id,
+    employeeId: question.employeeId
+  }));
+  const mp = {};
+  questions.forEach((q) => {
+    mp[q.employeeId] = [...(mp[q.employeeId] || []), q.questionId];
+  });
+  
+  return await rejectEmployeeQuestion(mp);
 };
 
 /**

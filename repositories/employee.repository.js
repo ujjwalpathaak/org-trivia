@@ -3,7 +3,7 @@ import { ObjectId } from 'mongodb';
 import { getMonth } from '../middleware/utils.js';
 import Employee from '../models/employee.model.js';
 import { findBadgeByStreak } from './badge.repository.js';
-import { getQuestionsByIds } from './question.repository.js';
+import { getQuestionsByIds, updateQuestion } from './question.repository.js';
 
 /**
  * Checks if an employee has given the weekly quiz
@@ -99,9 +99,13 @@ export const updateEmployeeStreaksAndMarkAllEmployeesAsQuizNotGiven =
  * @returns {Promise<Object>} Result of the update operation
  */
 export const addSubmittedQuestion = async (questionId, employeeId) => {
+  const newQuestion = {
+    questionId: new ObjectId(questionId),
+    state: 'submitted',
+  }
   return Employee.updateOne(
     { _id: new ObjectId(employeeId) },
-    { $push: { submittedQuestions: new ObjectId(questionId) } },
+    { $push: { questions: newQuestion } },
   );
 };
 
@@ -157,6 +161,70 @@ export const resetAllEmployeesScores = async () => {
   return Employee.updateMany({}, { $set: { score: 0, streak: 0 } });
 };
 
+const updateQuestionState = async (mp, newState) => {
+  for (const [employeeId, questionIdsRaw] of Object.entries(mp)) {
+    const questionIds = questionIdsRaw.map(id => new ObjectId(id));
+
+    await Employee.updateOne(
+      { _id: new ObjectId(employeeId) },
+      {
+        $set: {
+          'questions.$[elem].state': newState
+        }
+      },
+      {
+        arrayFilters: [
+          { 'elem.questionId': { $in: questionIds }, 'elem.state': 'submitted' }
+        ]
+      }
+    );
+  }
+};
+
+export const approveEmployeeQuestion = (mp) => updateQuestionState(mp, 'approved');
+export const rejectEmployeeQuestion = (mp) => updateQuestionState(mp, 'rejected');
+
+export const getEmployeeQuestionsToApprove = async (orgId) => {
+  return Employee.aggregate([{
+    $match: {
+      orgId: new ObjectId(orgId)
+    }
+  },
+   {
+     $unwind: {
+       path: '$questions'
+     }
+   },
+   {
+    $match: {
+      "questions.state": 'submitted'
+    }
+  },
+    {
+     $lookup: {
+       from: 'questions',
+       localField: 'questions.questionId',
+       foreignField: '_id',
+       as: 'question'
+     }
+   },
+   {
+     $unwind: {
+       path: '$question'
+     }
+   },
+   {
+    $addFields: {
+      'question.employeeId': '$_id',
+    }
+  },{
+     $replaceRoot: {
+       newRoot: '$question'
+     }
+   }
+   ])
+} 
+
 /**
  * Gets questions submitted by an employee with pagination
  * @param {string} employeeId - The ID of the employee
@@ -165,19 +233,40 @@ export const resetAllEmployeesScores = async () => {
  * @returns {Promise<Object>} Object containing submitted questions and total count
  */
 export const getSubmittedQuestions = async (employeeId, page, size) => {
-  const questionsIds = await Employee.findById(
+  const employee = await Employee.findById(
     employeeId,
-    'submittedQuestions',
+    'questions',
   );
+  const questionsIds = employee.questions.map((q) => q.questionId);
 
   const questions = await getQuestionsByIds(
-    questionsIds.submittedQuestions,
+    questionsIds,
     page,
     size,
   );
 
-  return { data: questions, total: questionsIds.submittedQuestions.length };
+  const questionsWithState = questions.map((question) => {
+    const questionId = question._id.toString();
+    const questionState = employee.questions.find(
+      (q) => q.questionId.toString() === questionId,
+    ).state;
+    return { ...question, state: questionState };
+  }
+  );
+
+  return { data: questionsWithState, total: questionsIds.length };
 };
+
+export const checkEmployeeHasSubmittedThisQuestion = async (
+  employeeId,
+  questionId,
+) => {
+  const employee = await Employee.findById(employeeId, 'questions');
+  const questionIds = employee.questions.map((q) => q.questionId.toString());
+  return questionIds.includes(questionId);
+}
+
+// ------------------------------------------------------------------------
 
 /**
  * Gets detailed information about an employee including their badges
@@ -188,7 +277,7 @@ export const getEmployeeDetails = async (employeeId) => {
   const employee = await Employee.findById(employeeId, '-password').lean();
   if (!employee) return null;
 
-  const badges = await Employee.aggregate([
+  const data = await Employee.aggregate([
     { $match: { _id: new ObjectId(employeeId) } },
     { $unwind: { path: '$badges', preserveNullAndEmptyArrays: true } },
     { $sort: { 'badges.earnedAt': -1 } },
@@ -206,17 +295,29 @@ export const getEmployeeDetails = async (employeeId) => {
         _id: '$_id',
         badges: {
           $push: {
-            badgeDetails: '$badgeDetails',
-            description: '$badges.description',
-            earnedAt: '$badges.earnedAt',
+            $cond: [
+              { $gt: [{ $type: '$badgeDetails._id' }, 'missing'] },
+              {
+                badgeDetails: '$badgeDetails',
+                description: '$description',
+                earnedAt: '$earnedAt',
+              },
+              '$$REMOVE',
+            ],
           },
         },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        badges: 1,
       },
     },
   ]);
 
   return {
     employee,
-    badges: badges[0]?.badges || [],
+    badges: data[0].badges,
   };
 };

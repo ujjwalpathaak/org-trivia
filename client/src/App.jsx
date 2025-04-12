@@ -32,6 +32,15 @@ function App() {
                 }
               />
               <Route
+                path="approve-questions"
+                element={
+                  <ProtectedRoute route="approve-questions">
+                    <ApproveQuestions />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
                 path="approve-questions/:quizId"
                 element={
                   <ProtectedRoute route="approve-questions">

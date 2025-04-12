@@ -40,11 +40,20 @@ export const saveSettingsService = async (
   return { status: 200, message: 'Settings saved successfully' };
 };
 
+/**
+ * Retrieves settings for a specific organization
+ * @param {string} orgId - The ID of the organization
+ * @returns {Promise<Object>} Organization settings object
+ */
 export const getSettingsService = async (orgId) => {
   const settings = await getOrgSettings(orgId);
   return settings;
 };
 
+/**
+ * Retrieves all organization names (from cache if available)
+ * @returns {Promise<Array>} List of organization names
+ */
 export const getAllOrgNamesService = async () => {
   const cache = await getValue('allOrgNames');
   if (cache) {
@@ -53,12 +62,23 @@ export const getAllOrgNamesService = async () => {
   return await getAllOrgNames();
 };
 
+/**
+ * Enables or disables trivia for a specific organization
+ * @param {string} orgId - The ID of the organization
+ * @param {boolean} isEnabled - Whether trivia is enabled or not
+ * @returns {Promise<Object>} Response message
+ */
 export const toggleTriviaService = async (orgId, isEnabled) => {
   await toggleTrivia(orgId, isEnabled);
   await setValue(`org:${orgId}`, null);
   return { message: 'Trivia settings updated successfully' };
 };
 
+/**
+ * Retrieves analytics for a specific organization (from cache if available)
+ * @param {string} orgId - The ID of the organization
+ * @returns {Promise<Object>} Organization analytics object
+ */
 export const getAnalyticsService = async (orgId) => {
   const cache = await getValue(`org:${orgId}:analytics`);
   if (cache) {
@@ -69,6 +89,23 @@ export const getAnalyticsService = async (orgId) => {
   return analytics;
 };
 
+/**
+ * Resets the leaderboard data for all organizations
+ * @returns {Promise<Object>} Response message
+ */
+export const resetLeaderboardService = async () => {
+  await resetLeaderboard();
+  return { message: 'Leaderboard reset successfully' };
+};
+
+/**
+ * Retrieves leaderboard and its year boundary for a specific organization and month/year
+ * Uses cache if available, otherwise fetches from database and sets cache
+ * @param {string} orgId - The ID of the organization
+ * @param {number} month - The month for which leaderboard is needed
+ * @param {number} year - The year for which leaderboard is needed
+ * @returns {Promise<Object>} Object containing leaderboard and year boundary
+ */
 export const getLeaderboardByOrgService = async (orgId, month, year) => {
   const cache = await getValue(`leaderboard:${orgId}:${month}:${year}`);
   const cache2 = await getValue(`yearBoundary:${orgId}:${month}:${year}`);
@@ -94,9 +131,4 @@ export const getLeaderboardByOrgService = async (orgId, month, year) => {
     leaderboard,
     yearBoundary,
   };
-};
-
-export const resetLeaderboardService = async () => {
-  await resetLeaderboard();
-  return { message: 'Leaderboard reset successfully' };
 };

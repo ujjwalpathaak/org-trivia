@@ -1,9 +1,12 @@
 import express from 'express';
 
 import {
+  approveEmployeeQuestionsController,
   createNewQuestionController,
   editQuizQuestionsController,
+  getEmployeeQuestionsToApproveController,
   getScheduledQuizQuestionsController,
+  rejectEmployeeQuestionsController,
 } from '../controllers/question.controller.js';
 import { checkRole, protectRoute } from '../middleware/auth.middleware.js';
 
@@ -28,4 +31,25 @@ questionRouter.get(
   protectRoute,
   checkRole('Admin'),
   getScheduledQuizQuestionsController,
+);
+
+questionRouter.get(
+  '/employees/approve',
+  protectRoute,
+  checkRole('Admin'),
+  getEmployeeQuestionsToApproveController,
+);
+
+questionRouter.patch(
+  '/employees/approve',
+  protectRoute,
+  checkRole('Admin'),
+  approveEmployeeQuestionsController,
+);
+
+questionRouter.patch(
+  '/employees/reject',
+  protectRoute,
+  checkRole('Admin'),
+  rejectEmployeeQuestionsController,
 );

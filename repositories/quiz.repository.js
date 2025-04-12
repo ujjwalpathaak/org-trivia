@@ -2,6 +2,7 @@ import { ObjectId } from 'mongodb';
 
 import Quiz from '../models/quiz.model.js';
 import { findResultByQuizId } from './result.repository.js';
+import { updateQuestionsStatus } from './org.repository.js';
 
 /**
  * Finds a live quiz for an organization
@@ -35,9 +36,9 @@ export const getLiveQuizQuestionsByOrgId = () => {
     },
     {
       $lookup: {
-        from: 'weeklyquestions',
+        from: 'quizzes',
         localField: '_id',
-        foreignField: 'quizId',
+        foreignField: '_id',
         as: 'questions',
       },
     },
@@ -296,12 +297,10 @@ export const markAllLiveQuizAsExpired = async () => {
   const liveQuizzes = await Quiz.find({ status: 'live' }, { _id: 1 }).lean();
   const quizIds = liveQuizzes.map((q) => q._id);
 
-  await Quiz.updateMany(
+  return Quiz.updateMany(
     { _id: { $in: quizIds } },
     { $set: { status: 'expired' } },
   );
-
-  return quizIds;
 };
 
 /**
@@ -322,7 +321,7 @@ export const getUpcomingWeeklyQuiz = (orgId) => {
  * @param {string} status - The new status to set
  * @returns {Promise<Object>} Result of the update operation
  */
-export const updateQuizStatus = (quizId, status) => {
+const updateQuizStatus = (quizId, status) => {
   return Quiz.updateOne(
     { _id: new ObjectId(quizId) },
     {
@@ -363,4 +362,141 @@ export const changeQuizGenre = async (newGenre, quizId) => {
     { _id: new ObjectId(quizId), status: 'upcoming' },
     { $set: { genre: newGenre } },
   );
+};
+
+/**
+ * Saves a weekly quiz with its questions
+ * @param {string} orgId - The ID of the organization
+ * @param {string} quizId - The ID of the quiz
+ * @param {Object} weeklyQuiz - The weekly quiz object to save
+ * @param {string} genre - The genre of the quiz
+ * @returns {Promise<Object|Array>} The saved weekly quiz or empty array
+ */
+export const saveQuizQuestions = async (orgId, quizId, questionIds, genre) => {
+  if (questionIds.length > 0) {
+    await updateQuizStatus(quizId, 'scheduled');
+    await updateQuestionsStatus(orgId, weeklyQuiz.questions, genre);
+    return await Quiz.updateOne(
+      { _id: new ObjectId(quizId) },
+      { $set: { questions: questionIds } },
+    );
+  }
+  return [];
+};
+
+/**
+ * Gets correct answers for a weekly quiz
+ * @param {string} quizId - The ID of the quiz
+ * @returns {Promise<Array<Object>>} Array of questions with their correct answers
+ */
+export const getCorrectQuizAnswers = async (quizId) => {
+  return await Quiz.aggregate([
+    {
+      $match: {
+        _id: new ObjectId(quizId),
+      },
+    },
+    {
+      $unwind: {
+        path: '$questions',
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $lookup: {
+        from: 'questions',
+        localField: 'questions',
+        foreignField: '_id',
+        as: 'question',
+      },
+    },
+    {
+      $unwind: {
+        path: '$question',
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $replaceRoot: {
+        newRoot: '$question',
+      },
+    },
+    {
+      $project: {
+        _id: 1,
+        answer: 1,
+      },
+    },
+  ]);
+};
+
+/**
+ * Replaces questions in a quiz
+ * @param {Array<string>} idsToAdd - Array of question IDs to add
+ * @param {Array<string>} idsToRemove - Array of question IDs to remove
+ * @param {string} quizId - The ID of the quiz
+ * @returns {Promise<Object>} Object containing orgId and genre
+ */
+export const replaceQuizQuestions = async (idsToAdd, idsToRemove, quizId) => {
+  const { orgId, genre, questions } = await Quiz.findOne({
+    _id: new ObjectId(quizId),
+  })
+    .select('questions orgId genre')
+    .lean();
+
+  let updatedQuestions = questions.map((q) => new ObjectId(q));
+
+  updatedQuestions.push(...idsToAdd.map((id) => new ObjectId(id)));
+
+  updatedQuestions = updatedQuestions.filter(
+    (q) => !idsToRemove.includes(q.toString()),
+  );
+
+  await Quiz.updateOne(
+    { _id: new ObjectId(quizId) },
+    { $set: { questions: updatedQuestions } },
+  );
+
+  return { orgId, genre };
+};
+
+/**
+ * Gets scheduled questions for a weekly quiz
+ * @param {string} orgId - The ID of the organization
+ * @param {string} quizId - The ID of the quiz
+ * @returns {Promise<Array<Object>>} Array of question documents
+ */
+export const getScheduledQuizQuestions = async (orgId, quizId) => {
+  return Quiz.aggregate([
+    {
+      $match: {
+        _id: new ObjectId(quizId),
+      },
+    },
+    {
+      $unwind: {
+        path: '$questions',
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $lookup: {
+        from: 'questions',
+        localField: 'questions',
+        foreignField: '_id',
+        as: 'question',
+      },
+    },
+    {
+      $unwind: {
+        path: '$question',
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $replaceRoot: {
+        newRoot: '$question',
+      },
+    },
+  ]);
 };

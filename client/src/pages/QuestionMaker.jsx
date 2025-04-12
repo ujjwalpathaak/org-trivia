@@ -15,7 +15,6 @@ const QuestionMaker = ({ setIsQuestionMakerOpen }) => {
     source: 'Employee',
     orgId: orgId,
     category: '',
-    config: { puzzleType: '', refactor: false },
   });
 
   const [errors, setErrors] = useState({});
@@ -45,7 +44,6 @@ const QuestionMaker = ({ setIsQuestionMakerOpen }) => {
       config: {
         ...prev.config,
         puzzleType: newPuzzleType,
-        refactor: newPuzzleType === 'BloodRelation' || newPuzzleType === 'Direction',
       },
     }));
   };
@@ -75,7 +73,6 @@ const QuestionMaker = ({ setIsQuestionMakerOpen }) => {
       source: 'Employee',
       orgId: orgId,
       category: '',
-      config: { puzzleType: '', refactor: false },
     });
   };
 

@@ -1,12 +1,15 @@
+import { validateEmployeeQuestionSubmission } from '../middleware/utils.js';
 import {
   addNewHRPQuestionsCallbackService,
+  approveEmployeeQuestionsService,
   createNewQuestionService,
   editQuizQuestionsService,
   generateCAnITQuestionsService,
   generateNewHRPQuestionsCallbackService,
+  getEmployeesQuestionsToApproveService,
   getWeeklyQuizQuestions,
+  rejectEmployeeQuestionsService,
   scheduleNextMonthQuizzesJob,
-  validateEmployeeQuestionSubmission,
 } from '../services/question.service.js';
 
 /**
@@ -49,7 +52,7 @@ export const createNewQuestionController = async (req, res, next) => {
   try {
     const question = req.body;
     const { employeeId } = req.data;
-    const errors = await validateEmployeeQuestionSubmission(question);
+    const errors = validateEmployeeQuestionSubmission(question);
     if (errors) {
       return res.status(400).json(errors);
     }
@@ -92,6 +95,52 @@ export const getScheduledQuizQuestionsController = async (req, res, next) => {
 
     const weeklyQuizQuestions = await getWeeklyQuizQuestions(orgId, quizId);
     res.status(200).json(weeklyQuizQuestions);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getEmployeeQuestionsToApproveController = async (req, res, next) => {
+  try {
+    const { orgId } = req.data;
+    if (!orgId) {
+      return res.status(400).json({ message: 'Missing orgId' });
+    }
+
+    const employeeQuestions = await getEmployeesQuestionsToApproveService(orgId);
+    res.status(200).json(employeeQuestions);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const rejectEmployeeQuestionsController = async (req, res, next) => {
+  try {
+    const { orgId } = req.data;
+    const selectedQuestions = req.body;
+
+    if (!orgId) {
+      return res.status(400).json({ message: 'Missing orgId' });
+    }
+
+    const employeeQuestions = await rejectEmployeeQuestionsService(selectedQuestions);
+    res.status(200).json(employeeQuestions);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const approveEmployeeQuestionsController = async (req, res, next) => {
+  try {
+    const { orgId } = req.data;
+    const selectedQuestions = req.body;
+
+    if (!orgId) {
+      return res.status(400).json({ message: 'Missing orgId' });
+    }
+
+    const employeeQuestions = await approveEmployeeQuestionsService(selectedQuestions);
+    res.status(200).json(employeeQuestions);
   } catch (error) {
     next(error);
   }

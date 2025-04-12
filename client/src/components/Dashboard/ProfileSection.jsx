@@ -39,7 +39,7 @@ const ProfileSection = ({
               <div className="flex items-center gap-2 text-gray-700">
                 <Book className="h-5 w-5 text-red-500" />
                 <span className="text-lg font-semibold">
-                  {details?.employee?.submittedQuestions?.length || 0}
+                  {details?.employee?.questions?.length || 0}
                 </span>
               </div>
               <span className="text-sm text-gray-500">Questions</span>

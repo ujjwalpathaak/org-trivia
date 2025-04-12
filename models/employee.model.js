@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-
 const badgeSchema = new mongoose.Schema(
   {
     badgeId: {
@@ -14,7 +13,24 @@ const badgeSchema = new mongoose.Schema(
     },
     earnedAt: {
       type: Date,
-      default: new Date(),
+      default: Date.now,
+      required: true,
+    },
+  },
+  { _id: false },
+);
+
+const questionsSchema = new mongoose.Schema(
+  {
+    questionId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Question',
+      required: true,
+    },
+    state: {
+      type: String,
+      enum: ['submitted', 'approved', 'rejected'],
+      default: 'submitted',
       required: true,
     },
   },
@@ -32,6 +48,7 @@ const employeeSchema = new mongoose.Schema({
     required: true,
     trim: true,
     unique: true,
+    match: [/^\S+@\S+\.\S+$/, 'Please use a valid email address'],
   },
   password: {
     type: String,
@@ -59,6 +76,10 @@ const employeeSchema = new mongoose.Schema({
     type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Question' }],
     default: [],
   },
+  questions: {
+    type: [questionsSchema],
+    default: [],
+  },
   orgId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Org',
@@ -69,8 +90,7 @@ const employeeSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
-},
-{
+}, {
   timestamps: false,
   versionKey: false,
 });

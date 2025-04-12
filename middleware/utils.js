@@ -11,6 +11,32 @@ export const logService = (request, response, next) => {
   });
 };
 
+export const validateEmployeeQuestionSubmission = (question) => {
+  const errors = {};
+  console.log(question.answer)
+
+  if (!question.question.trim()) {
+    errors.question = 'Question is required.';
+  }
+  if (question.question.trim().length <= 50) {
+    errors.question = 'Question must be more than 50 characters.';
+  }
+  if (!question.category) {
+    errors.category = 'Category is required.';
+  }
+  if (question.category === 'PnA' && !question.config.puzzleType) {
+    errors.puzzleType = 'Puzzle type is required for PnA questions.';
+  }
+  if (!question.options || question.options.length < 4) {
+    errors.options = 'At least 4 options are required.';
+  }
+
+
+  return Object.keys(errors).length;
+};
+
+// ---------------------------------------------------------------
+
 export const getFridaysOfNextMonth = (
   year = new Date().getFullYear(),
   month = new Date().getMonth(),

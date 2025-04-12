@@ -23,10 +23,7 @@ const Leaderboard = () => {
         }
         setLeaderboard(data.leaderboard);
         setYears(
-          Array.from(
-            { length: currentYear - data.yearBoundary[0].years + 1 },
-            (_, i) => currentYear - i
-          )
+          Array.from({ length: currentYear - data.yearBoundary + 1 }, (_, i) => currentYear - i)
         );
       } catch (error) {
         console.error('Error fetching leaderboard:', error);
@@ -91,11 +88,9 @@ const Leaderboard = () => {
             <tbody>
               {leaderboard.map((player, index) => (
                 <tr key={index} className="border-t bg-gray-100">
-                  <td className="p-3 font-semibold h-12">
-                    {player.employee.name.length > 0 && `${index + 1}`}
-                  </td>
-                  <td className="p-3">{player.employee.name}</td>
-                  <td className="p-3 text-left font-bold">{player.totalScore}</td>
+                  <td className="p-3 font-semibold h-12">{`${index + 1}`}</td>
+                  <td className="p-3">{player.employee.name || '-'}</td>
+                  <td className="p-3 text-left font-bold">{player.totalScore || '-'}</td>
                 </tr>
               ))}
             </tbody>

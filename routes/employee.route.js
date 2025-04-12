@@ -1,6 +1,7 @@
 import express from 'express';
 
 import {
+  editEmployeeQuestionController,
   getEmployeeDetailsController,
   getEmployeePastResultsController,
   getEmployeeSubmittedQuestionsController,
@@ -21,4 +22,10 @@ employeeRouter.get(
   '/questions/submitted',
   checkRole('Employee'),
   getEmployeeSubmittedQuestionsController,
+);
+
+employeeRouter.patch(
+  '/question',
+  checkRole('Employee'),
+  editEmployeeQuestionController,
 );

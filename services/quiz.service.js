@@ -15,15 +15,12 @@ import {
 } from '../repositories/leaderboard.respository.js';
 import { changeOrgQuestionsState } from '../repositories/org.repository.js';
 import {
-  dropWeeklyQuestionForExpiredQuizzes,
-  getCorrectWeeklyQuizAnswers,
-} from '../repositories/question.repository.js';
-import {
   allowScheduledQuiz,
   cancelLiveQuiz,
   cancelScheduledQuiz,
   findLiveQuizByOrgId,
   getLiveQuizQuestionsByOrgId,
+  getCorrectQuizAnswers,
   getQuizStatus,
   getScheduledQuizzes,
   makeQuizLive,
@@ -138,13 +135,8 @@ export const makeQuizLiveService = async (date) => {
  * @returns {Promise<void>}
  */
 export const cleanUpQuizzesService = async () => {
-  const quizIds = await markAllLiveQuizAsExpired();
-
-  await Promise.all([
-    updateEmployeeStreaksAndMarkAllEmployeesAsQuizNotGiven(),
-    dropWeeklyQuestionForExpiredQuizzes(quizIds),
-  ]);
-
+  await markAllLiveQuizAsExpired();
+  await updateEmployeeStreaksAndMarkAllEmployeesAsQuizNotGiven();
   await awardStreakBadges();
 
   return { message: 'Cleaned up weekly quiz.' };
@@ -204,7 +196,7 @@ export const submitWeeklyQuizAnswersService = async (
   session.startTransaction();
 
   try {
-    const correctAnswers = await getCorrectWeeklyQuizAnswers(quizId);
+    const correctAnswers = await getCorrectQuizAnswers(quizId);
     const points = calculateWeeklyQuizScore(userAnswers, correctAnswers);
     const quiz = await findLiveQuizByOrgId(orgId);
     if (!quiz) {

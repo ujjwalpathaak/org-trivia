@@ -1,7 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { useParams, useNavigate } from 'react-router-dom';
-import { fetchScheduledQuizQuestionsAPI, editWeeklyQuizAPI } from '../api.js';
+import {
+  fetchScheduledQuizQuestionsAPI,
+  editWeeklyQuizAPI,
+  fetchEmployeeQuestionsToApproveAPI,
+  approveEmployeeQuestionsAPI,
+  rejectEmployeeQuestionsAPI,
+} from '../api.js';
 
 function numToAlpha(num) {
   let alpha = '';
@@ -62,41 +68,94 @@ function ExtraQuestions({ aiQuestions, empQuestions, onReplaceQuestion, selected
   );
 }
 
-function QuestionList({ questions, onSelectQuestion, selectedQuestionIndex }) {
+function QuestionList({
+  questions,
+  onSelectQuestion,
+  selectedQuestionIndex,
+  selectedQuestions,
+  onToggleQuestionSelect,
+  employeeApproveMode,
+  selectedCategory,
+  onCategoryChange,
+}) {
+  const categories = [...new Set(questions.map((q) => q.category))].sort();
+
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6 w-2/4">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6">Scheduled Questions</h2>
-      <div className="space-y-2 overflow-auto max-h-[calc(100vh-12rem)]">
+    <div
+      className={`bg-white rounded-xl shadow-lg p-6 ${employeeApproveMode ? 'w-[98%]' : 'w-2/4'}`}
+    >
+      {!employeeApproveMode && (
+        <h2 className="text-2xl font-bold text-gray-800 mb-6">Scheduled Questions</h2>
+      )}
+      {employeeApproveMode && (
+        <h2 className="text-2xl font-bold text-gray-800 mb-6">Select Questions</h2>
+      )}
+
+      <div className="mb-4">
+        <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
+          Filter by Category
+        </label>
+        <select
+          id="category"
+          value={selectedCategory}
+          onChange={(e) => onCategoryChange(e.target.value)}
+          className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+        >
+          <option value="">All Categories</option>
+          {categories.map((category) => (
+            <option key={category} value={category}>
+              {category}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="space-y-2 overflow-auto max-h-[calc(100vh-16rem)]">
         {questions.length === 0 && (
           <span className="italic text-slate-400">No questions found</span>
         )}
-        {questions.map((q, idx) => (
-          <button
-            key={idx}
-            onClick={() => onSelectQuestion(idx)}
-            className={`w-full text-left p-4 rounded-lg shadow-sm hover:shadow-md transition duration-200 border ${
-              selectedQuestionIndex === idx
-                ? 'bg-blue-50 border-blue-300'
-                : 'bg-white border-gray-200'
-            }`}
-          >
-            <div className="font-medium text-gray-800 mb-1">Question {idx + 1}</div>
-            <div className="text-gray-600 text-sm line-clamp-2">{q.question}</div>
-            <div className="text-sm font-bold mt-1 text-gray-500">Options</div>
-            {q?.options?.map((option, index) => {
-              return (
-                <div
-                  key={option}
-                  className={`text-gray-600 text-sm line-clamp-2 ${
-                    option === q.options[q.answer] ? 'font-bold' : ''
-                  }`}
-                >
-                  {`(${numToAlpha(index)}) ${option}`}
+
+        {questions
+          .filter((q) => !selectedCategory || q.category === selectedCategory)
+          .map((q, idx) => (
+            <div key={idx} className="flex items-start gap-2">
+              {employeeApproveMode && (
+                <input
+                  type="checkbox"
+                  checked={selectedQuestions.includes(idx)}
+                  onChange={() => onToggleQuestionSelect(idx)}
+                  className="mt-6"
+                />
+              )}
+              <button
+                onClick={() =>
+                  employeeApproveMode ? onToggleQuestionSelect(idx) : onSelectQuestion(idx)
+                }
+                className={`flex-1 text-left p-4 rounded-lg shadow-sm hover:shadow-md transition duration-200 border ${
+                  selectedQuestionIndex === idx
+                    ? 'bg-blue-50 border-blue-300'
+                    : 'bg-white border-gray-200'
+                }`}
+              >
+                <div className="font-medium text-gray-800 mb-1">Question {idx + 1}</div>
+                <div className="text-gray-600 text-sm line-clamp-2">{q.question}</div>
+                <div className="text-xs text-indigo-600 font-medium mb-2">
+                  Category: {q.category}
                 </div>
-              );
-            })}
-          </button>
-        ))}
+                <div className="text-sm font-bold mt-1 text-gray-500">Options</div>
+                {q?.options?.map((option, index) => (
+                  <div
+                    key={option}
+                    className={`text-gray-600 text-sm line-clamp-2 ${
+                      option === q.options[q.answer] ? 'font-bold' : ''
+                    }`}
+                  >
+                    {`(${numToAlpha(index)}) ${option}`}
+                  </div>
+                ))}
+              </button>
+            </div>
+          ))}
       </div>
     </div>
   );
@@ -108,6 +167,7 @@ function QuestionEditor({
   onQuestionChange,
   onOptionChange,
   onCorrectAnswerChange,
+  employeeApproveMode,
   selectedQuestionIndex,
 }) {
   if (!question) {
@@ -139,6 +199,16 @@ function QuestionEditor({
             <img src={question.image} alt="Question" className="w-[20%] rounded-lg shadow-sm" />
           </div>
         )}
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+          <input
+            type="text"
+            value={question.category}
+            disabled
+            className="w-full p-3 border border-gray-200 rounded-lg bg-gray-50"
+          />
+        </div>
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">Options</label>
@@ -187,10 +257,53 @@ function App() {
   const [aiQuestions, setAiQuestions] = useState([]);
   const [empQuestions, setEmpQuestions] = useState([]);
   const [selectedQuestionIndex, setSelectedQuestionIndex] = useState(null);
+  const [selectedQuestions, setSelectedQuestions] = useState([]);
+  const [selectedQuestionsReject, setSelectedQuestionsReject] = useState([]);
   const [editedQuestions, setEditedQuestions] = useState([]);
   const [replaceQuestions, setReplaceQuestions] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState('');
   const { quizId } = useParams();
+  const employeeApproveMode = quizId === undefined;
   const navigate = useNavigate();
+
+  const handleApproveSelectedQuestions = async () => {
+    if (selectedQuestions.length === 0) {
+      toast.info('Please select questions to approve');
+      return;
+    }
+
+    const updatedQuestions = questions.filter((_, idx) => !selectedQuestions.includes(idx));
+    const questionsToApprove = questions.filter((_, idx) => selectedQuestions.includes(idx));
+    setQuestions(updatedQuestions);
+    await approveEmployeeQuestionsAPI(questionsToApprove);
+    setSelectedQuestions([]);
+
+    toast.success(`${selectedQuestions.length} question(s) approved`);
+  };
+
+  const handleRejectSelectedQuestions = async () => {
+    if (selectedQuestions.length === 0) {
+      toast.info('Please select questions to approve');
+      return;
+    }
+
+    const updatedQuestions = questions.filter((_, idx) => !selectedQuestions.includes(idx));
+    const questionsToReject = questions.filter((_, idx) => selectedQuestions.includes(idx));
+    setQuestions(updatedQuestions);
+    await rejectEmployeeQuestionsAPI(questionsToReject);
+    setSelectedQuestions([]);
+
+    toast.success(`${selectedQuestions.length} question(s) rejected`);
+  };
+
+  const handleToggleQuestionSelect = (index) => {
+    setSelectedQuestions((prev) => {
+      if (prev.includes(index)) {
+        return prev.filter((i) => i !== index);
+      }
+      return [...prev, index];
+    });
+  };
 
   useEffect(() => {
     const getQuestionsToApproveFunc = async () => {
@@ -208,9 +321,23 @@ function App() {
         toast.error('Failed to load questions');
       }
     };
+    const getEmployeeQuestionsToApproveFunc = async () => {
+      try {
+        const response = await fetchEmployeeQuestionsToApproveAPI();
+        console.log(response);
+        if (response.status === 400) {
+          toast.info('No questions found');
+          navigate('/dashboard');
+          return;
+        }
+        setQuestions(response.data);
+      } catch (error) {
+        toast.error('Failed to load questions');
+      }
+    };
 
-    getQuestionsToApproveFunc();
-  }, [quizId, navigate]);
+    employeeApproveMode ? getEmployeeQuestionsToApproveFunc() : getQuestionsToApproveFunc();
+  }, [employeeApproveMode, quizId, navigate]);
 
   const handleReplaceQuestion = (type, newQuestion, index) => {
     if (index === null) {
@@ -293,21 +420,54 @@ function App() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-6">
       <div className="mb-6 flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-800">Question Editor</h1>
-        <div>
-          <button
-            onClick={() => navigate('/dashboard')}
-            className="px-6 py-2 bg-slate-400 text-white rounded-md hover:bg-red-500 transition duration-200 font-medium"
-          >
-            Close
-          </button>
-          <button
-            onClick={handleApproveQuiz}
-            className="px-6 py-2 ml-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition duration-200 font-medium"
-          >
-            Save Changes
-          </button>
-        </div>
+        {employeeApproveMode ? (
+          <>
+            <h1 className="text-3xl font-bold text-gray-800">Approve Questions</h1>
+            <div className="flex items-center gap-4">
+              <span className="text-sm text-gray-600">
+                {selectedQuestions.length} question(s) selected
+              </span>
+              <button
+                onClick={handleApproveSelectedQuestions}
+                className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={selectedQuestions.length === 0}
+              >
+                Approve Selected
+              </button>
+              <button
+                onClick={handleRejectSelectedQuestions}
+                className="px-6 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={selectedQuestions.length === 0}
+              >
+                Reject Selected
+              </button>
+              <button
+                onClick={() => navigate('/dashboard')}
+                className="px-6 py-2 bg-slate-400 text-white rounded-md hover:bg-red-500 transition duration-200 font-medium"
+              >
+                Close
+              </button>
+            </div>
+          </>
+        ) : (
+          <>
+            <h1 className="text-3xl font-bold text-gray-800">Question Editor</h1>
+            <div>
+              <button
+                onClick={() => navigate('/dashboard')}
+                className="px-6 py-2 bg-slate-400 text-white rounded-md hover:bg-red-500 transition duration-200 font-medium"
+              >
+                Close
+              </button>
+              <button
+                onClick={handleApproveQuiz}
+                className="px-6 py-2 ml-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition duration-200 font-medium"
+              >
+                Save Changes
+              </button>
+            </div>
+          </>
+        )}
       </div>
 
       <div className="flex gap-6">
@@ -315,21 +475,32 @@ function App() {
           questions={questions}
           onSelectQuestion={setSelectedQuestionIndex}
           selectedQuestionIndex={selectedQuestionIndex}
+          selectedQuestions={selectedQuestions}
+          onToggleQuestionSelect={handleToggleQuestionSelect}
+          employeeApproveMode={employeeApproveMode}
+          selectedCategory={selectedCategory}
+          onCategoryChange={setSelectedCategory}
         />
-        <QuestionEditor
-          question={selectedQuestionIndex !== null ? questions[selectedQuestionIndex] : null}
-          index={selectedQuestionIndex}
-          onQuestionChange={handleQuestionChange}
-          onOptionChange={handleOptionChange}
-          onCorrectAnswerChange={handleCorrectAnswerChange}
-          selectedQuestionIndex={selectedQuestionIndex}
-        />
-        <ExtraQuestions
-          aiQuestions={aiQuestions}
-          empQuestions={empQuestions}
-          onReplaceQuestion={handleReplaceQuestion}
-          selectedQuestionIndex={selectedQuestionIndex}
-        />
+
+        {!employeeApproveMode && (
+          <QuestionEditor
+            question={selectedQuestionIndex !== null ? questions[selectedQuestionIndex] : null}
+            index={selectedQuestionIndex}
+            onQuestionChange={handleQuestionChange}
+            onOptionChange={handleOptionChange}
+            onCorrectAnswerChange={handleCorrectAnswerChange}
+            selectedQuestionIndex={selectedQuestionIndex}
+            employeeApproveMode={employeeApproveMode}
+          />
+        )}
+        {!employeeApproveMode && (
+          <ExtraQuestions
+            aiQuestions={aiQuestions}
+            empQuestions={empQuestions}
+            onReplaceQuestion={handleReplaceQuestion}
+            selectedQuestionIndex={selectedQuestionIndex}
+          />
+        )}
       </div>
     </div>
   );

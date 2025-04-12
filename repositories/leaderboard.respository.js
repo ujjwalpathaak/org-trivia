@@ -8,6 +8,42 @@ import {
 } from './employee.repository.js';
 
 /**
+ * Gets the year boundary for leaderboard data
+ * @returns {Promise<Array<Object>>} Earliest year in leaderboard data
+ */
+export const getLeaderboardYearBoundary = async () => {
+  const data = await Leaderboard.aggregate([
+   {
+     $match: {
+       orgId: new ObjectId('67c69382f8c3ce19ef544cad'),
+     },
+   },
+   {
+     $group: {
+       _id: '$orgId',
+       years: {
+         $min: '$year',
+       },
+     },
+   },
+   {
+     $project: {
+       _id: 0,
+       years: 1,
+     },
+   },
+ ]);
+
+ if(data.length === 0) {
+   return new Date().getUTCFullYear();
+ }
+
+ return data[0].years;
+};
+
+// --------------------------------------
+
+/**
  * Updates or creates a leaderboard entry for an employee
  * @param {string} orgId - The ID of the organization
  * @param {string} employeeId - The ID of the employee
@@ -36,33 +72,6 @@ export const updateLeaderboard = async (
     { upsert: true, session },
   );
 
-/**
- * Gets the year boundary for leaderboard data
- * @returns {Promise<Array<Object>>} Array containing the earliest year in leaderboard data
- */
-export const getLeaderboardYearBoundary = async () => {
-  return Leaderboard.aggregate([
-    {
-      $match: {
-        orgId: new ObjectId('67c69382f8c3ce19ef544cad'),
-      },
-    },
-    {
-      $group: {
-        _id: '$orgId',
-        years: {
-          $min: '$year',
-        },
-      },
-    },
-    {
-      $project: {
-        _id: 0,
-        years: 1,
-      },
-    },
-  ]);
-};
 
 /**
  * Rolls back leaderboard scores for a specific quiz

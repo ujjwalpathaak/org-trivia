@@ -1,4 +1,6 @@
+import { validateEmployeeQuestionSubmission } from '../middleware/utils.js';
 import {
+  editEmployeeQuestionService,
   getEmployeeDetailsService,
   getEmployeePastResultsService,
   getSubmittedQuestionsService,
@@ -104,3 +106,29 @@ export const getEmployeeSubmittedQuestionsController = async (
     next(error);
   }
 };
+
+export const editEmployeeQuestionController = async (req, res, next) => {
+  try {
+    const question = req.body;
+    const { employeeId } = req.data;
+
+    if (!employeeId) {
+      return res.status(400).json({ message: 'Missing employeeId' });
+    }
+
+    if (!question[0]._id) {
+      return res.status(400).json({ message: 'Missing questionId' });
+    }
+
+    const errors = validateEmployeeQuestionSubmission(question[0]);
+    if (errors) {
+      return res.status(400).json(errors);
+    }
+
+    await editEmployeeQuestionService(employeeId, question[0]);
+
+    res.status(200).json(question);
+  } catch (error) {
+    next(error);
+  }
+}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ListChecks, Calendar, Trophy, TrendingUp, Coins } from 'lucide-react';
+import { ListChecks, Calendar, Trophy, Coins } from 'lucide-react';
 import { fetchEmployeeQuizResultsAPI } from '../../api';
 
 const PastQuizViewer = ({ setIsPastQuizViewerOpen }) => {
@@ -113,35 +113,37 @@ const PastQuizViewer = ({ setIsPastQuizViewerOpen }) => {
           <p className="text-gray-500 text-sm">No past quizzes available.</p>
         )}
 
-        <div className="flex items-center justify-between mt-6">
-          <button
-            onClick={handlePrevPage}
-            disabled={pageNumber === 0}
-            className={`px-4 py-2 rounded-lg font-medium transition-all ${
-              pageNumber === 0
-                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                : 'bg-blue-600 text-white hover:bg-blue-700'
-            }`}
-          >
-            Previous
-          </button>
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between mt-6">
+            <button
+              onClick={handlePrevPage}
+              disabled={pageNumber === 0}
+              className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                pageNumber === 0
+                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  : 'bg-blue-600 text-white hover:bg-blue-700'
+              }`}
+            >
+              Previous
+            </button>
 
-          <span className="text-gray-700 font-semibold">
-            Page <span className="text-blue-600">{pageNumber + 1}</span> of {totalPages}
-          </span>
+            <span className="text-gray-700 font-semibold">
+              Page <span className="text-blue-600">{pageNumber + 1}</span> of {totalPages}
+            </span>
 
-          <button
-            onClick={handleNextPage}
-            disabled={pageNumber === totalPages - 1}
-            className={`px-4 py-2 rounded-lg font-medium transition-all ${
-              pageNumber === totalPages - 1
-                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                : 'bg-blue-600 text-white hover:bg-blue-700'
-            }`}
-          >
-            Next
-          </button>
-        </div>
+            <button
+              onClick={handleNextPage}
+              disabled={pageNumber === totalPages - 1}
+              className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                pageNumber === totalPages - 1
+                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  : 'bg-blue-600 text-white hover:bg-blue-700'
+              }`}
+            >
+              Next
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
