@@ -7,52 +7,36 @@ import {
   resetAllEmployeesScores,
 } from './employee.repository.js';
 
-/**
- * Gets the year boundary for leaderboard data
- * @returns {Promise<Array<Object>>} Earliest year in leaderboard data
- */
 export const getLeaderboardYearBoundary = async () => {
   const data = await Leaderboard.aggregate([
-   {
-     $match: {
-       orgId: new ObjectId('67c69382f8c3ce19ef544cad'),
-     },
-   },
-   {
-     $group: {
-       _id: '$orgId',
-       years: {
-         $min: '$year',
-       },
-     },
-   },
-   {
-     $project: {
-       _id: 0,
-       years: 1,
-     },
-   },
- ]);
+    {
+      $match: {
+        orgId: new ObjectId('67c69382f8c3ce19ef544cad'),
+      },
+    },
+    {
+      $group: {
+        _id: '$orgId',
+        years: {
+          $min: '$year',
+        },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        years: 1,
+      },
+    },
+  ]);
 
- if(data.length === 0) {
-   return new Date().getUTCFullYear();
- }
+  if (data.length === 0) {
+    return new Date().getUTCFullYear();
+  }
 
- return data[0].years;
+  return data[0].years;
 };
 
-// --------------------------------------
-
-/**
- * Updates or creates a leaderboard entry for an employee
- * @param {string} orgId - The ID of the organization
- * @param {string} employeeId - The ID of the employee
- * @param {number} score - The score to add to the total
- * @param {number} month - The month of the leaderboard entry
- * @param {number} year - The year of the leaderboard entry
- * @param {Object} session - MongoDB session for transaction support
- * @returns {Promise<Object>} Result of the update operation
- */
 export const updateLeaderboard = async (
   orgId,
   employeeId,
@@ -72,13 +56,6 @@ export const updateLeaderboard = async (
     { upsert: true, session },
   );
 
-
-/**
- * Rolls back leaderboard scores for a specific quiz
- * @param {string} quizId - The ID of the quiz
- * @param {Date} date - The date of the quiz
- * @returns {Promise<Object>} Result of the aggregation operation
- */
 export const rollbackLeaderboardScores = async (quizId, date) => {
   const newDate = new Date(date);
   const month = newDate.getUTCMonth();
@@ -129,13 +106,6 @@ export const rollbackLeaderboardScores = async (quizId, date) => {
   ]);
 };
 
-/**
- * Gets the top 10 leaderboard entries for an organization
- * @param {string} orgId - The ID of the organization
- * @param {number} month - The month to get leaderboard for
- * @param {number} year - The year to get leaderboard for
- * @returns {Promise<Array<Object>>} Array of top 10 leaderboard entries with employee names
- */
 export const getLeaderboardByOrg = async (orgId, month, year) => {
   return Leaderboard.aggregate([
     {
@@ -161,14 +131,6 @@ export const getLeaderboardByOrg = async (orgId, month, year) => {
   ]);
 };
 
-/**
- * Resets the leaderboard and awards badges to top performers
- * @param {number} month - Current month
- * @param {number} year - Current year
- * @param {number} pMonth - Previous month
- * @param {number} pYear - Previous year
- * @returns {Promise<Object>} Success message
- */
 export const resetLeaderboard = async (month, year, pMonth, pYear) => {
   const topThreePerOrg = await Leaderboard.aggregate([
     { $match: { month: pMonth, year: pYear, totalScore: { $gt: 0 } } },

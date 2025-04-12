@@ -293,7 +293,7 @@ function App() {
     await rejectEmployeeQuestionsAPI(questionsToReject);
     setSelectedQuestions([]);
 
-    toast.success(`${selectedQuestions.length} question(s) rejected`);
+    toast.warn(`${selectedQuestions.length} question(s) rejected`);
   };
 
   const handleToggleQuestionSelect = (index) => {
@@ -324,7 +324,6 @@ function App() {
     const getEmployeeQuestionsToApproveFunc = async () => {
       try {
         const response = await fetchEmployeeQuestionsToApproveAPI();
-        console.log(response);
         if (response.status === 400) {
           toast.info('No questions found');
           navigate('/dashboard');

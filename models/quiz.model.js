@@ -1,47 +1,53 @@
 import mongoose from 'mongoose';
 
-const quizSchema = new mongoose.Schema({
-  orgId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Org',
-    required: true,
-  },
-  scheduledDate: {
-    type: Date,
-    required: true,
-    validate: {
-      validator: function (v) {
-        return v >= new Date().setHours(0, 0, 0, 0);
-      },
-      message: 'Scheduled date must be in the future.',
-    },
-  },
-  questionGenerationDate: {
-    type: Date,
-    default: null,
-  },
-  questions: [
-    {
+const quizSchema = new mongoose.Schema(
+  {
+    orgId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Question',
+      ref: 'Org',
       required: true,
     },
-  ],
-  status: {
-    type: String,
-    enum: ['upcoming', 'scheduled', 'cancelled', 'live', 'expired'],
-    required: true,
-    default: 'scheduled',
+    scheduledDate: {
+      type: Date,
+      required: true,
+      validate: {
+        validator: function (v) {
+          return v >= new Date().setHours(0, 0, 0, 0);
+        },
+        message: 'Scheduled date must be in the future.',
+      },
+    },
+    questionGenerationDate: {
+      type: Date,
+      default: null,
+    },
+    questionGenerationTimeline: {
+      type: Number,
+    },
+    questions: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Question',
+        required: true,
+      },
+    ],
+    status: {
+      type: String,
+      enum: ['upcoming', 'scheduled', 'cancelled', 'live', 'expired'],
+      required: true,
+      default: 'scheduled',
+    },
+    genre: {
+      type: String,
+      enum: ['PnA', 'CAnIT', 'HRP'],
+      required: true,
+    },
   },
-  genre: {
-    type: String,
-    enum: ['PnA', 'CAnIT', 'HRP'],
-    required: true,
+  {
+    timestamps: false,
+    versionKey: false,
   },
-},{
-  timestamps: false,
-  versionKey: false,
-});
+);
 
 quizSchema.pre('save', function (next) {
   if (this.genre === 'CAnIT' && this.scheduledDate) {

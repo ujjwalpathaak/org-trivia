@@ -13,7 +13,6 @@ export const logService = (request, response, next) => {
 
 export const validateEmployeeQuestionSubmission = (question) => {
   const errors = {};
-  console.log(question.answer)
 
   if (!question.question.trim()) {
     errors.question = 'Question is required.';
@@ -30,7 +29,6 @@ export const validateEmployeeQuestionSubmission = (question) => {
   if (!question.options || question.options.length < 4) {
     errors.options = 'At least 4 options are required.';
   }
-
 
   return Object.keys(errors).length;
 };

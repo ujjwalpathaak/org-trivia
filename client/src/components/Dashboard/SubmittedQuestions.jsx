@@ -19,7 +19,6 @@ const SubmittedQuestions = ({ setIsSubmittedQuestionOpen }) => {
     const fetchSubmittedQuestions = async () => {
       try {
         const response = await fetchSubmittedQuestionsAPI(pageNumber, pageSize);
-        console.log(response.data);
         if (response && response.data) {
           setSubmittedQuestions(response.data);
           setTotalPages(Math.max(1, Math.ceil(response.total / pageSize)));

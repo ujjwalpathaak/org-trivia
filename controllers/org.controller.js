@@ -8,13 +8,6 @@ import {
   toggleTriviaService,
 } from '../services/org.service.js';
 
-/**
- * Resets the leaderboard for all organizations
- * @param {Object} req - Express request object
- * @param {Object} res - Express response object
- * @param {Function} next - Express next middleware function
- * @returns {Promise<void>}
- */
 export const resetLeaderboardController = async (req, res, next) => {
   try {
     await resetLeaderboardService();
@@ -25,18 +18,6 @@ export const resetLeaderboardController = async (req, res, next) => {
   }
 };
 
-/**
- * Gets the leaderboard for a specific organization
- * @param {Object} req - Express request object
- * @param {Object} req.query - Query parameters
- * @param {number} req.query.month - Month to get leaderboard for (0-11)
- * @param {number} req.query.year - Year to get leaderboard for
- * @param {Object} req.data - Request data containing orgId
- * @param {string} req.data.orgId - Organization ID
- * @param {Object} res - Express response object
- * @param {Function} next - Express next middleware function
- * @returns {Promise<void>}
- */
 export const getOrgLeaderboardController = async (req, res, next) => {
   try {
     const { month, year } = req.query;
@@ -52,19 +33,6 @@ export const getOrgLeaderboardController = async (req, res, next) => {
   }
 };
 
-/**
- * Saves organization settings
- * @param {Object} req - Express request object
- * @param {Object} req.body - Request body
- * @param {Array} req.body.newGenreOrder - New order of genres
- * @param {Array} req.body.changedGenres - List of genres that have been changed
- * @param {string} req.body.companyCurrentAffairsTimeline - Timeline setting for company current affairs
- * @param {Object} req.data - Request data containing orgId
- * @param {string} req.data.orgId - Organization ID
- * @param {Object} res - Express response object
- * @param {Function} next - Express next middleware function
- * @returns {Promise<void>}
- */
 export const saveOrgSettingsController = async (req, res, next) => {
   try {
     const { orgId } = req.data;
@@ -85,15 +53,6 @@ export const saveOrgSettingsController = async (req, res, next) => {
   }
 };
 
-/**
- * Gets organization settings
- * @param {Object} req - Express request object
- * @param {Object} req.data - Request data containing orgId
- * @param {string} req.data.orgId - Organization ID
- * @param {Object} res - Express response object
- * @param {Function} next - Express next middleware function
- * @returns {Promise<void>}
- */
 export const getOrgSettingsController = async (req, res, next) => {
   try {
     const { orgId } = req.data;
@@ -107,17 +66,6 @@ export const getOrgSettingsController = async (req, res, next) => {
   }
 };
 
-/**
- * Toggles trivia settings for an organization
- * @param {Object} req - Express request object
- * @param {Object} req.body - Request body
- * @param {boolean} req.body.isEnabled - Whether to enable or disable trivia
- * @param {Object} req.data - Request data containing orgId
- * @param {string} req.data.orgId - Organization ID
- * @param {Object} res - Express response object
- * @param {Function} next - Express next middleware function
- * @returns {Promise<void>}
- */
 export const toggleOrgTriviaSettingController = async (req, res, next) => {
   try {
     const { orgId } = req.data;
@@ -132,13 +80,6 @@ export const toggleOrgTriviaSettingController = async (req, res, next) => {
   }
 };
 
-/**
- * Gets names of all organizations
- * @param {Object} req - Express request object
- * @param {Object} res - Express response object
- * @param {Function} next - Express next middleware function
- * @returns {Promise<void>}
- */
 export const getAllOrgNamesController = async (req, res, next) => {
   try {
     const orgs = await getAllOrgNamesService();
@@ -148,15 +89,6 @@ export const getAllOrgNamesController = async (req, res, next) => {
   }
 };
 
-/**
- * Gets analytics for an organization
- * @param {Object} req - Express request object
- * @param {Object} req.data - Request data containing orgId
- * @param {string} req.data.orgId - Organization ID
- * @param {Object} res - Express response object
- * @param {Function} next - Express next middleware function
- * @returns {Promise<void>}
- */
 export const getOrgAnalyticsController = async (req, res, next) => {
   try {
     const { orgId } = req.data;

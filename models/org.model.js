@@ -40,68 +40,71 @@ const questionSchema = new mongoose.Schema(
   { _id: false },
 );
 
-const orgSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-    unique: true,
-  },
-  questionsPnA: {
-    type: [questionSchema],
-    default: [],
-  },
-  questionsHRP: {
-    type: [questionSchema],
-    default: [],
-  },
-  questionsCAnIT: {
-    type: [questionSchema],
-    default: [],
-  },
-  admins: {
-    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Admins' }],
-    default: [],
-  },
-  employees: {
-    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Employees' }],
-    default: [],
-  },
-  settings: {
-    type: {
-      isTriviaEnabled: { type: Boolean, default: false },
-      companyCurrentAffairsTimeline: {
-        type: Number,
-        default: 4,
-        min: 1,
-        max: 4,
-      },
-      currentGenre: { type: Number, default: 0, min: 0, max: 3 },
-      unavailableGenre: {
-        type: [String],
-        default: ['PnA', 'HRP', 'CAnIT'],
-        set: (arr) => [...new Set(arr ?? [])],
-      },
-      selectedGenre: {
-        type: [String],
-        default: ['PnA', 'HRP', 'CAnIT'],
-        set: function (arr) {
-          const unavailable = this?.settings?.unavailableGenre ?? [];
-          return (arr ?? []).filter((genre) => !unavailable.includes(genre));
+const orgSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    questionsPnA: {
+      type: [questionSchema],
+      default: [],
+    },
+    questionsHRP: {
+      type: [questionSchema],
+      default: [],
+    },
+    questionsCAnIT: {
+      type: [questionSchema],
+      default: [],
+    },
+    admins: {
+      type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Admins' }],
+      default: [],
+    },
+    employees: {
+      type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Employees' }],
+      default: [],
+    },
+    settings: {
+      type: {
+        isTriviaEnabled: { type: Boolean, default: false },
+        companyCurrentAffairsTimeline: {
+          type: Number,
+          default: 4,
+          min: 1,
+          max: 4,
+        },
+        currentGenre: { type: Number, default: 0, min: 0, max: 3 },
+        unavailableGenre: {
+          type: [String],
+          default: ['PnA', 'HRP', 'CAnIT'],
+          set: (arr) => [...new Set(arr ?? [])],
+        },
+        selectedGenre: {
+          type: [String],
+          default: ['PnA', 'HRP', 'CAnIT'],
+          set: function (arr) {
+            const unavailable = this?.settings?.unavailableGenre ?? [];
+            return (arr ?? []).filter((genre) => !unavailable.includes(genre));
+          },
         },
       },
+      default: () => ({
+        isTriviaEnabled: true,
+        currentGenre: 0,
+        companyCurrentAffairsTimeline: 3,
+        selectedGenre: ['PnA', 'HRP', 'CAnIT'],
+        unavailableGenre: [],
+      }),
     },
-    default: () => ({
-      isTriviaEnabled: true,
-      currentGenre: 0,
-      companyCurrentAffairsTimeline: 3,
-      selectedGenre: ['PnA', 'HRP', 'CAnIT'],
-      unavailableGenre: [],
-    }),
   },
-},{
-  timestamps: false,
-  versionKey: false,
-});
+  {
+    timestamps: false,
+    versionKey: false,
+  },
+);
 
 orgSchema.pre('save', function (next) {
   this.settings.unavailableGenre = this.settings.unavailableGenre ?? [];

@@ -2,20 +2,11 @@ import { ObjectId } from 'mongodb';
 
 import Org from '../models/org.model.js';
 import Question from '../models/question.model.js';
-/**
- * Creates a new question in the database
- * @param {Object} newQuestion - The question object to create
- * @returns {Promise<Object>} The created question document
- */
+
 export const createNewQuestion = async (newQuestion) => {
   return await new Question(newQuestion).save();
 };
 
-/**
- * Adds multiple new questions to the database, filtering out duplicates
- * @param {Array<Object>} newQuestions - Array of question objects to add
- * @returns {Promise<Array<Object>>} Array of created question documents
- */
 export const addQuestions = async (newQuestions) => {
   const existingQuestions = await Question.find(
     { question: { $in: newQuestions.map((q) => q.question) } },
@@ -34,12 +25,6 @@ export const addQuestions = async (newQuestions) => {
   return await Question.insertMany(filteredQuestions, { ordered: false });
 };
 
-/**
- * Gets CAnIT questions in the timeline for an organization
- * @param {string} orgId - The ID of the organization
- * @param {string} newsTimelineStart - Start date for the timeline
- * @returns {Promise<Array<Object>>} Array of CAnIT questions with organization info
- */
 export const getCAnITQuestionsInTimeline = async (orgId, newsTimelineStart) => {
   return Org.aggregate([
     {
@@ -82,13 +67,6 @@ export const getCAnITQuestionsInTimeline = async (orgId, newsTimelineStart) => {
   ]);
 };
 
-/**
- * Gets questions by their IDs with pagination
- * @param {Array<string>} ids - Array of question IDs
- * @param {number} page - Page number for pagination
- * @param {number} size - Number of results per page
- * @returns {Promise<Array<Object>>} Array of question documents
- */
 export const getQuestionsByIds = async (ids, page, size) => {
   return Question.find({
     _id: { $in: ids },
@@ -109,12 +87,6 @@ export const updateQuestion = async (question) => {
   );
 };
 
-/**
- * Edits multiple questions in bulk
- * @param {Array<Object>} questionsToEdit - Array of question objects with updates
- * @returns {Promise<Object>} Result of the bulk write operation
- * @throws {Error} If input is invalid or update fails
- */
 export const editQuizQuestions = async (questionsToEdit) => {
   if (!Array.isArray(questionsToEdit) || questionsToEdit.length === 0) {
     throw new Error(
@@ -138,9 +110,3 @@ export const editQuizQuestions = async (questionsToEdit) => {
     throw new Error('Failed to update quiz questions.');
   }
 };
-
-// export const removeQuestionsPnAFromDatabase = async (questionsToRemove) => {
-//   return Question.deleteMany({
-//     _id: { $in: questionsToRemove },
-//   });
-// };

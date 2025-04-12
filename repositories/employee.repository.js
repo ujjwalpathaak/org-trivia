@@ -3,21 +3,12 @@ import { ObjectId } from 'mongodb';
 import { getMonth } from '../middleware/utils.js';
 import Employee from '../models/employee.model.js';
 import { findBadgeByStreak } from './badge.repository.js';
-import { getQuestionsByIds, updateQuestion } from './question.repository.js';
+import { getQuestionsByIds } from './question.repository.js';
 
-/**
- * Checks if an employee has given the weekly quiz
- * @param {string} employeeId - The ID of the employee
- * @returns {Promise<Object|null>} Employee document with quizGiven field or null if not found
- */
 export const isWeeklyQuizGiven = async (employeeId) => {
   return Employee.findById(employeeId, 'quizGiven');
 };
 
-/**
- * Awards streak badges to employees based on their streak duration
- * @returns {Promise<void>}
- */
 export const awardStreakBadges = async () => {
   const [
     quater_year_streak_employees,
@@ -69,10 +60,6 @@ export const awardStreakBadges = async () => {
   ]);
 };
 
-/**
- * Updates employee streaks and marks all employees as not having given the quiz
- * @returns {Promise<Object>} Result of the bulk write operation
- */
 export const updateEmployeeStreaksAndMarkAllEmployeesAsQuizNotGiven =
   async () => {
     await Employee.bulkWrite([
@@ -92,30 +79,17 @@ export const updateEmployeeStreaksAndMarkAllEmployeesAsQuizNotGiven =
     ]);
   };
 
-/**
- * Adds a submitted question to an employee's record
- * @param {string} questionId - The ID of the question
- * @param {string} employeeId - The ID of the employee
- * @returns {Promise<Object>} Result of the update operation
- */
 export const addSubmittedQuestion = async (questionId, employeeId) => {
   const newQuestion = {
     questionId: new ObjectId(questionId),
     state: 'submitted',
-  }
+  };
   return Employee.updateOne(
     { _id: new ObjectId(employeeId) },
     { $push: { questions: newQuestion } },
   );
 };
 
-/**
- * Updates an employee's weekly quiz score
- * @param {string} employeeId - The ID of the employee
- * @param {number} points - Points to add to the score
- * @param {Object} session - MongoDB session for transaction support
- * @returns {Promise<Object|boolean>} Score update result or false if quiz already given
- */
 export const updateWeeklyQuizScore = async (employeeId, points, session) => {
   const employee = await Employee.findById(employeeId, 'streak quizGiven');
   if (employee.quizGiven) return false;
@@ -129,14 +103,6 @@ export const updateWeeklyQuizScore = async (employeeId, points, session) => {
   return { score: points };
 };
 
-/**
- * Adds a badge to an employee's record
- * @param {string} employeeId - The ID of the employee
- * @param {string} badgeId - The ID of the badge
- * @param {number} month - The month the badge was earned
- * @param {number} year - The year the badge was earned
- * @returns {Promise<Object>} Result of the update operation
- */
 export const addBadgesToEmployees = async (
   employeeId,
   badgeId,
@@ -153,97 +119,86 @@ export const addBadgesToEmployees = async (
   );
 };
 
-/**
- * Resets all employees' scores and streaks to zero
- * @returns {Promise<Object>} Result of the update operation
- */
 export const resetAllEmployeesScores = async () => {
   return Employee.updateMany({}, { $set: { score: 0, streak: 0 } });
 };
 
 const updateQuestionState = async (mp, newState) => {
   for (const [employeeId, questionIdsRaw] of Object.entries(mp)) {
-    const questionIds = questionIdsRaw.map(id => new ObjectId(id));
+    const questionIds = questionIdsRaw.map((id) => new ObjectId(id));
 
     await Employee.updateOne(
       { _id: new ObjectId(employeeId) },
       {
         $set: {
-          'questions.$[elem].state': newState
-        }
+          'questions.$[elem].state': newState,
+        },
       },
       {
         arrayFilters: [
-          { 'elem.questionId': { $in: questionIds }, 'elem.state': 'submitted' }
-        ]
-      }
+          {
+            'elem.questionId': { $in: questionIds },
+            'elem.state': 'submitted',
+          },
+        ],
+      },
     );
   }
 };
 
-export const approveEmployeeQuestion = (mp) => updateQuestionState(mp, 'approved');
-export const rejectEmployeeQuestion = (mp) => updateQuestionState(mp, 'rejected');
+export const approveEmployeeQuestion = (mp) =>
+  updateQuestionState(mp, 'approved');
+export const rejectEmployeeQuestion = (mp) =>
+  updateQuestionState(mp, 'rejected');
 
 export const getEmployeeQuestionsToApprove = async (orgId) => {
-  return Employee.aggregate([{
-    $match: {
-      orgId: new ObjectId(orgId)
-    }
-  },
-   {
-     $unwind: {
-       path: '$questions'
-     }
-   },
-   {
-    $match: {
-      "questions.state": 'submitted'
-    }
-  },
+  return Employee.aggregate([
     {
-     $lookup: {
-       from: 'questions',
-       localField: 'questions.questionId',
-       foreignField: '_id',
-       as: 'question'
-     }
-   },
-   {
-     $unwind: {
-       path: '$question'
-     }
-   },
-   {
-    $addFields: {
-      'question.employeeId': '$_id',
-    }
-  },{
-     $replaceRoot: {
-       newRoot: '$question'
-     }
-   }
-   ])
-} 
+      $match: {
+        orgId: new ObjectId(orgId),
+      },
+    },
+    {
+      $unwind: {
+        path: '$questions',
+      },
+    },
+    {
+      $match: {
+        'questions.state': 'submitted',
+      },
+    },
+    {
+      $lookup: {
+        from: 'questions',
+        localField: 'questions.questionId',
+        foreignField: '_id',
+        as: 'question',
+      },
+    },
+    {
+      $unwind: {
+        path: '$question',
+      },
+    },
+    {
+      $addFields: {
+        'question.employeeId': '$_id',
+      },
+    },
+    {
+      $replaceRoot: {
+        newRoot: '$question',
+      },
+    },
+  ]);
+};
 
-/**
- * Gets questions submitted by an employee with pagination
- * @param {string} employeeId - The ID of the employee
- * @param {number} page - Page number for pagination
- * @param {number} size - Number of results per page
- * @returns {Promise<Object>} Object containing submitted questions and total count
- */
 export const getSubmittedQuestions = async (employeeId, page, size) => {
-  const employee = await Employee.findById(
-    employeeId,
-    'questions',
-  );
+  const employee = await Employee.findById(employeeId, 'questions');
   const questionsIds = employee.questions.map((q) => q.questionId);
 
-  const questions = await getQuestionsByIds(
-    questionsIds,
-    page,
-    size,
-  );
+  const questions = await getQuestionsByIds(questionsIds, page, size);
 
   const questionsWithState = questions.map((question) => {
     const questionId = question._id.toString();
@@ -251,8 +206,7 @@ export const getSubmittedQuestions = async (employeeId, page, size) => {
       (q) => q.questionId.toString() === questionId,
     ).state;
     return { ...question, state: questionState };
-  }
-  );
+  });
 
   return { data: questionsWithState, total: questionsIds.length };
 };
@@ -264,15 +218,8 @@ export const checkEmployeeHasSubmittedThisQuestion = async (
   const employee = await Employee.findById(employeeId, 'questions');
   const questionIds = employee.questions.map((q) => q.questionId.toString());
   return questionIds.includes(questionId);
-}
+};
 
-// ------------------------------------------------------------------------
-
-/**
- * Gets detailed information about an employee including their badges
- * @param {string} employeeId - The ID of the employee
- * @returns {Promise<Object|null>} Employee details with badges or null if not found
- */
 export const getEmployeeDetails = async (employeeId) => {
   const employee = await Employee.findById(employeeId, '-password').lean();
   if (!employee) return null;

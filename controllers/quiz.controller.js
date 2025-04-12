@@ -10,18 +10,6 @@ import {
   submitWeeklyQuizAnswersService,
 } from '../services/quiz.service.js';
 
-/**
- * Gets the status of a weekly quiz for an employee
- * @param {Object} req - Express request object
- * @param {Object} req.query - Query parameters
- * @param {string} req.query.date - Date to check quiz status for
- * @param {Object} req.data - Request data containing orgId and employeeId
- * @param {string} req.data.orgId - Organization ID
- * @param {string} req.data.employeeId - Employee ID
- * @param {Object} res - Express response object
- * @param {Function} next - Express next middleware function
- * @returns {Promise<void>}
- */
 export const getQuizStatusController = async (req, res, next) => {
   try {
     const { date } = req.query;
@@ -41,15 +29,6 @@ export const getQuizStatusController = async (req, res, next) => {
   }
 };
 
-/**
- * Test controller for making a quiz live
- * @param {Object} req - Express request object
- * @param {Object} req.query - Query parameters
- * @param {string} req.query.date - Date to make quiz live for
- * @param {Object} res - Express response object
- * @param {Function} next - Express next middleware function
- * @returns {Promise<void>}
- */
 export const makeQuizLiveController = async (req, res, next) => {
   try {
     const { date } = req.query;
@@ -60,13 +39,6 @@ export const makeQuizLiveController = async (req, res, next) => {
   }
 };
 
-/**
- * Test controller for cleaning up expired quizzes
- * @param {Object} req - Express request object
- * @param {Object} res - Express response object
- * @param {Function} next - Express next middleware function
- * @returns {Promise<void>}
- */
 export const cleanUpQuizzesController = async (req, res, next) => {
   try {
     const result = await cleanUpQuizzesService();
@@ -76,36 +48,17 @@ export const cleanUpQuizzesController = async (req, res, next) => {
   }
 };
 
-/**
- * Allows a scheduled quiz to proceed
- * @param {Object} req - Express request object
- * @param {Object} req.params - URL parameters
- * @param {string} req.params.quizId - Quiz ID
- * @param {Object} res - Express response object
- * @param {Function} next - Express next middleware function
- * @returns {Promise<void>}
- */
 export const allowScheduledQuizController = async (req, res, next) => {
   try {
+    const { orgId } = req.data;
     const { quizId } = req.params;
-    const result = await allowScheduledQuizSerivce(quizId);
+    const result = await allowScheduledQuizSerivce(quizId, orgId);
     res.status(200).json(result);
   } catch (error) {
     next(error);
   }
 };
 
-/**
- * Cancels a live quiz
- * @param {Object} req - Express request object
- * @param {Object} req.params - URL parameters
- * @param {string} req.params.quizId - Quiz ID
- * @param {Object} req.data - Request data containing orgId
- * @param {string} req.data.orgId - Organization ID
- * @param {Object} res - Express response object
- * @param {Function} next - Express next middleware function
- * @returns {Promise<void>}
- */
 export const cancelLiveQuizController = async (req, res, next) => {
   try {
     const { orgId } = req.data;
@@ -117,17 +70,6 @@ export const cancelLiveQuizController = async (req, res, next) => {
   }
 };
 
-/**
- * Cancels a scheduled quiz
- * @param {Object} req - Express request object
- * @param {Object} req.params - URL parameters
- * @param {string} req.params.quizId - Quiz ID
- * @param {Object} req.data - Request data containing orgId
- * @param {string} req.data.orgId - Organization ID
- * @param {Object} res - Express response object
- * @param {Function} next - Express next middleware function
- * @returns {Promise<void>}
- */
 export const cancelScheduledQuizController = async (req, res, next) => {
   try {
     const { quizId } = req.params;
@@ -139,18 +81,6 @@ export const cancelScheduledQuizController = async (req, res, next) => {
   }
 };
 
-/**
- * Gets all scheduled quizzes for an organization
- * @param {Object} req - Express request object
- * @param {Object} req.query - Query parameters
- * @param {number} req.query.month - Month to get quizzes for (0-11)
- * @param {number} req.query.year - Year to get quizzes for
- * @param {Object} req.data - Request data containing orgId
- * @param {string} req.data.orgId - Organization ID
- * @param {Object} res - Express response object
- * @param {Function} next - Express next middleware function
- * @returns {Promise<void>}
- */
 export const getScheduledQuizzesController = async (req, res, next) => {
   try {
     const { month, year } = req.query;
@@ -166,15 +96,6 @@ export const getScheduledQuizzesController = async (req, res, next) => {
   }
 };
 
-/**
- * Gets live questions for a weekly quiz
- * @param {Object} req - Express request object
- * @param {Object} req.data - Request data containing orgId
- * @param {string} req.data.orgId - Organization ID
- * @param {Object} res - Express response object
- * @param {Function} next - Express next middleware function
- * @returns {Promise<void>}
- */
 export const getWeeklyQuizLiveQuestionsController = async (req, res, next) => {
   try {
     const { orgId } = req.data;
@@ -190,19 +111,6 @@ export const getWeeklyQuizLiveQuestionsController = async (req, res, next) => {
   }
 };
 
-/**
- * Submits answers for a weekly quiz
- * @param {Object} req - Express request object
- * @param {Object} req.body - Request body
- * @param {Array} req.body.answers - Array of answers
- * @param {string} req.body.quizId - Quiz ID
- * @param {Object} req.data - Request data containing employeeId and orgId
- * @param {string} req.data.employeeId - Employee ID
- * @param {string} req.data.orgId - Organization ID
- * @param {Object} res - Express response object
- * @param {Function} next - Express next middleware function
- * @returns {Promise<void>}
- */
 export const submitQuizAnswersController = async (req, res, next) => {
   try {
     const { answers, quizId } = req.body;

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
+import { useRef, useState, useCallback, useMemo } from 'react';
 import { useDrag, useDrop, DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { CircleAlert, GripHorizontal } from 'lucide-react';
@@ -26,7 +26,6 @@ export default function ListManager({
   date,
 }) {
   const navigate = useNavigate();
-  const [newGenreOrder, setNewGenreOrder] = useState([]);
   const [changedGenres, setChangedGenres] = useState([]);
   const [companyCurrentAffairsTimeline, setCompanyCurrentAffairsTimeline] = useState(
     settings.companyCurrentAffairsTimeline
@@ -126,6 +125,12 @@ export default function ListManager({
     toast.error('Live Quiz cancelled');
   };
 
+  const catMap = {
+    PnA: 'Puzzles and Aptitude',
+    CAnIT: 'Company Achievements',
+    HRP: 'HR Policies',
+  };
+
   const handleCancelScheduledQuiz = async (quiz) => {
     const respones = await cancelScheduledQuizAPI(quiz._id);
     toast.error('Quiz cancelled');
@@ -137,6 +142,12 @@ export default function ListManager({
 
   const handleAllowQuiz = async (quiz) => {
     const respones = await allowScheduledQuizAPI(quiz._id);
+    if (respones.status === 400) {
+      for (const error of respones.errors) {
+        toast.error(error.message);
+      }
+      return;
+    }
     toast.success('Quiz Allowed');
   };
 
@@ -225,7 +236,7 @@ export default function ListManager({
                     key={item}
                     className="cursor-not-allowed flex text-slate-500 justify-between items-center bg-gray-100 rounded-lg p-4 hover:bg-gray-100 transition-colors"
                   >
-                    {item}
+                    {catMap[item]}
                     <span className="text-red-400 text-xs px-2 py-1 rounded-md">
                       {getInfo(item)}
                     </span>

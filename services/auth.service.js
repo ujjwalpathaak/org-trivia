@@ -5,17 +5,6 @@ import {
   isPasswordsMatch,
 } from '../repositories/auth.repository.js';
 
-/**
- * Registers a new user (admin or employee) in the system
- * @param {boolean} isAdmin - Whether the user is an admin
- * @param {string} email - User's email address
- * @param {string} password - User's password
- * @param {string} name - User's full name
- * @param {string} orgId - Organization ID the user belongs to
- * @returns {Promise<Object>} Response object containing status and message
- * @returns {number} Response.status - HTTP status code (201 for success, 400 for error)
- * @returns {Object} Response.data - Response data containing success/error message
- */
 export const registerUser = async (isAdmin, email, password, name, orgId) => {
   const user = await getUserByEmail(email);
   if (user) {
@@ -32,14 +21,6 @@ export const registerUser = async (isAdmin, email, password, name, orgId) => {
   };
 };
 
-/**
- * Authenticates a user and generates a JWT token
- * @param {string} email - User's email address
- * @param {string} password - User's password
- * @returns {Promise<Object>} Response object containing status, message and token
- * @returns {number} Response.status - HTTP status code (200 for success, 401/404 for error)
- * @returns {Object} Response.data - Response data containing success/error message and JWT token if successful
- */
 export const loginUser = async (email, password) => {
   const user = await getUserByEmail(email);
   if (!user) {
