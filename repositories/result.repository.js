@@ -25,6 +25,56 @@ export const submitWeeklyQuizAnswers = async (
   return await Result.create([resultDoc], { session });
 };
 
+export const rollbackLeaderboardScores = async (quizId, date) => {
+  const newDate = new Date(date);
+  const month = newDate.getUTCMonth();
+  const year = newDate.getUTCFullYear();
+
+  return Result.aggregate([
+    {
+      $match: {
+        quizId: new ObjectId(quizId),
+      },
+    },
+    {
+      $lookup: {
+        from: 'leaderboards',
+        localField: 'employeeId',
+        foreignField: 'employeeId',
+        as: 'leaderboard',
+      },
+    },
+    { $unwind: '$leaderboard' },
+    {
+      $match: {
+        'leaderboard.month': month,
+        'leaderboard.year': year,
+      },
+    },
+    {
+      $addFields: {
+        'leaderboard.totalScore': {
+          $subtract: [
+            { $ifNull: ['$leaderboard.totalScore', 0] },
+            { $ifNull: ['$score', 0] },
+          ],
+        },
+      },
+    },
+    {
+      $replaceRoot: { newRoot: '$leaderboard' },
+    },
+    {
+      $merge: {
+        into: 'leaderboards',
+        on: '_id',
+        whenMatched: 'merge',
+        whenNotMatched: 'discard',
+      },
+    },
+  ]);
+};
+
 export const rollbackWeeklyQuizScores = async (quizId) => {
   await Result.aggregate([
     {
@@ -70,6 +120,10 @@ export const rollbackWeeklyQuizScores = async (quizId) => {
   ]);
 
   return await Result.deleteMany({ quizId: new ObjectId(quizId) });
+};
+
+export const findOrgResults = async (quizId) => {
+  return Result.find({ quizId: new ObjectId(quizId) });
 };
 
 export const getParticipationByGenre = async (orgId) => {

@@ -1,17 +1,17 @@
-import { fetchWithAuth } from './utils';
+import { fetchWithAuth } from "./utils";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
-const token = localStorage.getItem('token');
+const token = localStorage.getItem("token");
 
 const getAuthHeaders = () => ({
-  'Content-Type': 'application/json',
+  "Content-Type": "application/json",
   Authorization: `Bearer ${token}`,
 });
 
 export const loginRequest = async (formData) => {
   const response = await fetch(`${BACKEND_URL}/auth/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(formData),
   });
   return response;
@@ -19,8 +19,8 @@ export const loginRequest = async (formData) => {
 
 export const registerRequest = async (formData) => {
   const response = await fetch(`${BACKEND_URL}/auth/register`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(formData),
   });
   return response;
@@ -31,12 +31,12 @@ export const fetchSubmittedQuestionsAPI = async (pageNumber = 0, pageSize = 10) 
   const response = await fetch(
     `${BACKEND_URL}/employee/questions/submitted?page=${pageNumber}&size=${pageSize}`,
     {
-      method: 'GET',
+      method: "GET",
       headers: getAuthHeaders(),
     }
   );
 
-  if (!response.ok) throw new Error('Network response was not ok');
+  if (!response.ok) throw new Error("Network response was not ok");
   return await response.json();
 };
 
@@ -45,33 +45,33 @@ export const fetchEmployeeQuizResultsAPI = async (pageNumber = 0, pageSize = 10)
   const response = await fetch(
     `${BACKEND_URL}/employee/results/past?page=${pageNumber}&size=${pageSize}`,
     {
-      method: 'GET',
+      method: "GET",
       headers: getAuthHeaders(),
     }
   );
 
-  if (!response.ok) throw new Error('Network response was not ok');
+  if (!response.ok) throw new Error("Network response was not ok");
   return await response.json();
 };
 
 // to merge: admin/dashboard
 export const getOrgAnalyticsAPI = async () => {
   return await fetchWithAuth(`${BACKEND_URL}/org/analytics`, {
-    method: 'GET',
+    method: "GET",
   });
 };
 
 // to merge: employee/dashboard
 export const getEmployeeDetailsAPI = async () => {
   return await fetchWithAuth(`${BACKEND_URL}/employee`, {
-    method: 'GET',
+    method: "GET",
   });
 };
 
 export const fetchAllOrganizations = async () => {
   const response = await fetch(`${BACKEND_URL}/org`, {
-    method: 'GET',
-    headers: { 'Content-Type': 'application/json' },
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
   });
   return response;
 };
@@ -79,13 +79,13 @@ export const fetchAllOrganizations = async () => {
 export const createQuestionAPI = async (question) => {
   try {
     const response = await fetch(`${BACKEND_URL}/question`, {
-      method: 'POST',
+      method: "POST",
       headers: getAuthHeaders(),
       body: JSON.stringify(question),
     });
 
     if (!response.ok)
-      throw new Error((await response.json()).message || 'Failed to create question');
+      throw new Error((await response.json()).message || "Failed to create question");
     return await response.json();
   } catch (error) {
     return { success: false, error: error.message };
@@ -99,13 +99,13 @@ export const saveOrgSettings = async (
 ) => {
   try {
     const response = await fetch(`${BACKEND_URL}/org/settings/save`, {
-      method: 'POST',
+      method: "POST",
       headers: getAuthHeaders(),
       body: JSON.stringify({ newGenreOrder, changedGenres, companyCurrentAffairsTimeline }),
     });
 
     if (!response.ok)
-      throw new Error((await response.json()).message || 'Failed to save genre settings');
+      throw new Error((await response.json()).message || "Failed to save genre settings");
     return await response.json();
   } catch (error) {
     return { success: false, error: error.message };
@@ -115,7 +115,7 @@ export const saveOrgSettings = async (
 export const fetchScheduledQuizQuestionsAPI = async (quizId) => {
   try {
     const response = await fetch(`${BACKEND_URL}/question/scheduled/quiz/${quizId}`, {
-      method: 'GET',
+      method: "GET",
       headers: getAuthHeaders(),
     });
 
@@ -128,7 +128,7 @@ export const fetchScheduledQuizQuestionsAPI = async (quizId) => {
 export const fetchEmployeeQuestionsToApproveAPI = async () => {
   try {
     const response = await fetch(`${BACKEND_URL}/question/employees/approve`, {
-      method: 'GET',
+      method: "GET",
       headers: getAuthHeaders(),
     });
 
@@ -141,7 +141,7 @@ export const fetchEmployeeQuestionsToApproveAPI = async () => {
 export const approveEmployeeQuestionsAPI = async (selectedQuestions) => {
   try {
     const response = await fetch(`${BACKEND_URL}/question/employees/approve`, {
-      method: 'PATCH',
+      method: "PATCH",
       headers: getAuthHeaders(),
       body: JSON.stringify(selectedQuestions),
     });
@@ -155,7 +155,7 @@ export const approveEmployeeQuestionsAPI = async (selectedQuestions) => {
 export const rejectEmployeeQuestionsAPI = async (selectedQuestions) => {
   try {
     const response = await fetch(`${BACKEND_URL}/question/employees/reject`, {
-      method: 'PATCH',
+      method: "PATCH",
       headers: getAuthHeaders(),
       body: JSON.stringify(selectedQuestions),
     });
@@ -169,12 +169,12 @@ export const rejectEmployeeQuestionsAPI = async (selectedQuestions) => {
 export const fetchLiveQuizQuestionsAPI = async () => {
   try {
     const response = await fetch(`${BACKEND_URL}/quiz/live/questions`, {
-      method: 'GET',
+      method: "GET",
       headers: getAuthHeaders(),
     });
 
     if (!response.ok)
-      throw new Error((await response.json()).message || 'Failed to fetch live questions');
+      throw new Error((await response.json()).message || "Failed to fetch live questions");
     return await response.json();
   } catch (error) {
     return { success: false, error: error.message };
@@ -184,12 +184,12 @@ export const fetchLiveQuizQuestionsAPI = async () => {
 export const fetchOrgSettingsAPI = async () => {
   try {
     const response = await fetch(`${BACKEND_URL}/org/settings`, {
-      method: 'GET',
+      method: "GET",
       headers: getAuthHeaders(),
     });
 
     if (!response.ok)
-      throw new Error((await response.json()).message || 'Failed to fetch org settings');
+      throw new Error((await response.json()).message || "Failed to fetch org settings");
     return await response.json();
   } catch (error) {
     return { success: false, error: error.message };
@@ -199,12 +199,12 @@ export const fetchOrgSettingsAPI = async () => {
 export const toggleTriviaSettingAPI = async (isEnabled) => {
   try {
     const response = await fetch(`${BACKEND_URL}/org/settings/trivia/toggle`, {
-      method: 'PATCH',
+      method: "PATCH",
       headers: getAuthHeaders(),
       body: JSON.stringify({ isEnabled }),
     });
 
-    if (!response.ok) throw new Error((await response.json()).message || 'Failed to toggle trivia');
+    if (!response.ok) throw new Error((await response.json()).message || "Failed to toggle trivia");
     return await response.json();
   } catch (error) {
     return { success: false, error: error.message };
@@ -214,12 +214,12 @@ export const toggleTriviaSettingAPI = async (isEnabled) => {
 export const editWeeklyQuizAPI = async (questions, replaceQuestions, quizId) => {
   try {
     const response = await fetch(`${BACKEND_URL}/question/quiz`, {
-      method: 'PATCH',
+      method: "PATCH",
       headers: getAuthHeaders(),
       body: JSON.stringify({ questions, replaceQuestions, quizId }),
     });
 
-    if (!response.ok) throw new Error((await response.json()).message || 'Failed to edit quiz');
+    if (!response.ok) throw new Error((await response.json()).message || "Failed to edit quiz");
     return await response.json();
   } catch (error) {
     return { success: false, error: error.message };
@@ -229,12 +229,12 @@ export const editWeeklyQuizAPI = async (questions, replaceQuestions, quizId) => 
 export const editEmployeeQuestionAPI = async (question) => {
   try {
     const response = await fetch(`${BACKEND_URL}/employee/question`, {
-      method: 'PATCH',
+      method: "PATCH",
       headers: getAuthHeaders(),
       body: JSON.stringify(question),
     });
 
-    if (!response.ok) throw new Error((await response.json()).message || 'Failed to edit question');
+    if (!response.ok) throw new Error((await response.json()).message || "Failed to edit question");
     return await response.json();
   } catch (error) {
     return { success: false, error: error.message };
@@ -244,13 +244,13 @@ export const editEmployeeQuestionAPI = async (question) => {
 export const submitQuizAnswersAPI = async (answers, quizId) => {
   try {
     const response = await fetch(`${BACKEND_URL}/quiz/submit`, {
-      method: 'POST',
+      method: "POST",
       headers: getAuthHeaders(),
       body: JSON.stringify({ answers, quizId }),
     });
 
     if (!response.ok)
-      throw new Error((await response.json()).message || 'Failed to submit answers');
+      throw new Error((await response.json()).message || "Failed to submit answers");
     return await response.json();
   } catch (error) {
     return { success: false, error: error.message };
@@ -261,54 +261,86 @@ export const submitQuizAnswersAPI = async (answers, quizId) => {
 export const fetchLeaderboardAPI = async (month, year) => {
   try {
     const response = await fetch(`${BACKEND_URL}/org/leaderboard?month=${month}&year=${year}`, {
-      method: 'GET',
+      method: "GET",
       headers: getAuthHeaders(),
     });
 
     if (!response.ok)
-      throw new Error((await response.json()).message || 'Failed to fetch leaderboard');
+      throw new Error((await response.json()).message || "Failed to fetch leaderboard");
     return await response.json();
   } catch (error) {
     return { success: false, error: error.message };
   }
 };
 
-export const cancelLiveQuizAPI = async (quizId) => {
+export const suspendLiveQuizAPI = async (quizId) => {
   try {
-    const response = await fetch(`${BACKEND_URL}/quiz/live/${quizId}/cancel`, {
-      method: 'PATCH',
+    const response = await fetch(`${BACKEND_URL}/quiz/live/${quizId}/suspend`, {
+      method: "PATCH",
       headers: getAuthHeaders(),
     });
 
-    if (!response.ok) throw new Error((await response.json()).message || 'Failed to cancel quiz');
+    if (!response.ok) throw new Error((await response.json()).message || "Failed to suspend quiz");
     return await response.json();
   } catch (error) {
     return { success: false, error: error.message };
   }
 };
 
-export const cancelScheduledQuizAPI = async (quizId) => {
+export const resumeLiveQuizAPI = async (quizId) => {
   try {
-    const response = await fetch(`${BACKEND_URL}/quiz/scheduled/${quizId}/cancel`, {
-      method: 'PATCH',
+    const response = await fetch(`${BACKEND_URL}/quiz/live/${quizId}/resume`, {
+      method: "PATCH",
       headers: getAuthHeaders(),
     });
 
-    if (!response.ok) throw new Error((await response.json()).message || 'Failed to cancel quiz');
+    if (!response.ok) throw new Error((await response.json()).message || "Failed to suspend quiz");
     return await response.json();
   } catch (error) {
     return { success: false, error: error.message };
   }
 };
 
-export const allowScheduledQuizAPI = async (quizId) => {
+export const cancelQuizAPI = async (quizId) => {
   try {
-    const response = await fetch(`${BACKEND_URL}/quiz/scheduled/${quizId}/allow`, {
-      method: 'PATCH',
+    const response = await fetch(`${BACKEND_URL}/quiz/${quizId}/cancel`, {
+      method: "PATCH",
       headers: getAuthHeaders(),
     });
 
-    if (!response.ok) throw new Error((await response.json()).message || 'Failed to allow quiz');
+    if (!response.ok) throw new Error((await response.json()).message || "Failed to cancel quiz");
+    return await response.json();
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+};
+
+export const restoreQuizAPI = async (quizId) => {
+  try {
+    const response = await fetch(`${BACKEND_URL}/quiz/${quizId}/restore`, {
+      method: "PATCH",
+      headers: getAuthHeaders(),
+    });
+
+    if (!response.ok) throw new Error((await response.json()).message || "Failed to allow quiz");
+    return await response.json();
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+};
+
+export const deleteQuestionAPI = async (questionId, quizId, questionGenre) => {
+  try {
+    const response = await fetch(
+      `${BACKEND_URL}/question/delete?questionId=${questionId}&quizId=${quizId}&questionGenre=${questionGenre}`,
+      {
+        method: "DELETE",
+        headers: getAuthHeaders(),
+      }
+    );
+
+    if (!response.ok)
+      throw new Error((await response.json()).message || "Failed to delete question");
     return await response.json();
   } catch (error) {
     return { success: false, error: error.message };
@@ -318,9 +350,9 @@ export const allowScheduledQuizAPI = async (quizId) => {
 export const fetchPresignedUrl = async (file) => {
   try {
     const presignedRes = await fetch(`${BACKEND_URL}/upload/get-presigned-url`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         fileName: file.name,
@@ -337,7 +369,7 @@ export const fetchPresignedUrl = async (file) => {
 export const startHRPQuestionGeneration = async (fileName) => {
   try {
     await fetch(`${BACKEND_URL}/question/generate/HRP`, {
-      method: 'POST',
+      method: "POST",
       headers: getAuthHeaders(),
       body: JSON.stringify({ fileName: fileName }),
     });
@@ -349,14 +381,14 @@ export const startHRPQuestionGeneration = async (fileName) => {
 export const uploadFileToS3 = async (uploadUrl, file) => {
   try {
     const res = await fetch(uploadUrl, {
-      method: 'PUT',
+      method: "PUT",
       headers: {
-        'Content-Type': file.type,
+        "Content-Type": file.type,
       },
       body: file,
     });
 
-    if (!res.ok) throw new Error('Failed to upload file to S3');
+    if (!res.ok) throw new Error("Failed to upload file to S3");
   } catch (error) {
     return { success: false, error: error.message };
   }
@@ -366,12 +398,12 @@ export const uploadFileToS3 = async (uploadUrl, file) => {
 export const fetchScheduledQuizzesAPI = async (month, year) => {
   try {
     const response = await fetch(`${BACKEND_URL}/quiz/scheduled?month=${month}&year=${year}`, {
-      method: 'GET',
+      method: "GET",
       headers: getAuthHeaders(),
     });
 
     if (!response.ok)
-      throw new Error((await response.json()).message || 'Failed to fetch scheduled quizzes');
+      throw new Error((await response.json()).message || "Failed to fetch scheduled quizzes");
     return await response.json();
   } catch (error) {
     return { success: false, error: error.message };
@@ -382,11 +414,11 @@ export const fetchScheduledQuizzesAPI = async (month, year) => {
 export const getWeeklyQuizStatusAPI = async (date) => {
   try {
     const response = await fetch(`${BACKEND_URL}/quiz/status?date=${date}`, {
-      method: 'GET',
+      method: "GET",
       headers: getAuthHeaders(),
     });
 
-    if (!response.ok) throw new Error((await response.json()).message || 'Failed to get status');
+    if (!response.ok) throw new Error((await response.json()).message || "Failed to get status");
     return await response.json();
   } catch (error) {
     return { success: false, error: error.message };

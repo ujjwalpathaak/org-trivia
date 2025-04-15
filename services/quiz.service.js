@@ -3,21 +3,21 @@ import {
   getMonthAndYear,
   mergeUserAnswersAndCorrectAnswers,
 } from '../middleware/utils.js';
+import { getValue, setValue } from '../Redis.js';
 import {
   awardStreakBadges,
   isWeeklyQuizGiven,
+  rollforwardWeeklyQuizScores,
   updateEmployeeStreaksAndMarkAllEmployeesAsQuizNotGiven,
   updateWeeklyQuizScore,
 } from '../repositories/employee.repository.js';
 import {
-  rollbackLeaderboardScores,
+  rollforwardLeaderboardScores,
   updateLeaderboard,
 } from '../repositories/leaderboard.respository.js';
 import { changeOrgQuestionsState } from '../repositories/org.repository.js';
 import {
-  allowScheduledQuiz,
-  cancelLiveQuiz,
-  cancelScheduledQuiz,
+  cancelQuiz,
   findLiveQuizByOrgId,
   getCorrectQuizAnswers,
   getLiveQuizQuestionsByOrgId,
@@ -25,8 +25,13 @@ import {
   getScheduledQuizzes,
   makeQuizLive,
   markAllLiveQuizAsExpired,
+  restoreQuiz,
+  resumeLiveQuiz,
+  suspendLiveQuiz,
 } from '../repositories/quiz.repository.js';
 import {
+  findOrgResults,
+  rollbackLeaderboardScores,
   rollbackWeeklyQuizScores,
   submitWeeklyQuizAnswers,
 } from '../repositories/result.repository.js';
@@ -45,6 +50,8 @@ export const getWeeklyQuizStatusService = async (orgId, employeeId, date) => {
 
   if (quiz?.status === 'cancelled') {
     return { status: 0, genre: quiz.genre }; // cancelled
+  } else if (quiz?.status === 'suspended') {
+    return { status: 5, genre: quiz.genre }; // suspended
   } else if (quiz?.status === 'expired') {
     return { status: 4, genre: quiz.genre }; // expired
   } else if (quiz?.status === 'live' && !employee.quizGiven) {
@@ -56,8 +63,8 @@ export const getWeeklyQuizStatusService = async (orgId, employeeId, date) => {
   }
 };
 
-export const cancelScheduledQuizSerivce = async (quizId, orgId) => {
-  const quiz = await cancelScheduledQuiz(quizId);
+export const cancelQuizService = async (quizId, orgId) => {
+  const quiz = await cancelQuiz(quizId);
   const quizQuestionsCount = quiz.questions.length;
   if (quizQuestionsCount > 0)
     changeOrgQuestionsState(quiz.genre, orgId, 0, quiz.questions);
@@ -65,11 +72,17 @@ export const cancelScheduledQuizSerivce = async (quizId, orgId) => {
   return { message: 'Scheduled Quiz Cancelled' };
 };
 
-export const cancelLiveQuizService = async (quizId, orgId) => {
-  const quiz = await cancelLiveQuiz(quizId);
+export const suspendLiveQuizService = async (quizId, orgId) => {
+  const quiz = await suspendLiveQuiz(quizId);
+  const orgResults = await findOrgResults(quizId);
+  const today = new Date();
+  const endOfDay = new Date(today);
+  endOfDay.setUTCHours(23, 59, 59, 999);
+  const secondsUntilEndOfDay = Math.floor((endOfDay - today) / 1000);
+
+  await setValue(`org:${orgId}:orgResults`, orgResults, secondsUntilEndOfDay);
 
   Promise.all([
-    await changeOrgQuestionsState(quiz.genre, orgId, 2),
     await rollbackWeeklyQuizScores(quizId),
     await rollbackLeaderboardScores(quizId, quiz.scheduledDate),
   ]);
@@ -77,25 +90,35 @@ export const cancelLiveQuizService = async (quizId, orgId) => {
   return { message: 'Live quiz cancelled' };
 };
 
-export const allowScheduledQuizSerivce = async (quizId, orgId) => {
-  const quiz = await allowScheduledQuiz(quizId);
+export const resumeLiveQuizService = async (quizId, orgId) => {
+  await resumeLiveQuiz(quizId);
+
+  const orgResults = await getValue(`org:${orgId}:orgResults`);
+  const unescaped = orgResults.replace(/\\"/g, '"');
+  const orgResultsParsed = JSON.parse(unescaped);
+  const employeeResults = orgResultsParsed.map((result) => {
+    return {
+      employeeId: result.employeeId,
+      points: result.points,
+    };
+  });
+
+  Promise.all([
+    await rollforwardWeeklyQuizScores(employeeResults),
+    await rollforwardLeaderboardScores(employeeResults),
+  ]);
+
+  return { message: 'Live quiz allowed' };
+};
+
+export const restoreQuizService = async (quizId, orgId) => {
+  const quiz = await restoreQuiz(quizId);
   const response = await allowQuizQuestionGenerationWorkflow(quiz, orgId);
   if (response?.status === 400) {
     return response;
   }
   return { message: 'Quiz allowed' };
 };
-
-// /**
-//  * Allows a live quiz to proceed
-//  * @param {string} quizId - The ID of the quiz to allow
-//  * @returns {Promise<Object>} Response object containing status and message
-//  */
-// export const allowLiveQuizSerivce = async (quizId) => {
-//   const quiz = await allowScheduledQuiz(quizId);
-//   // fix make questions again?
-//   return { message: 'Quiz allowed' };
-// };
 
 export async function getWeeklyQuizLiveQuestionsService(orgId) {
   const questions = await getLiveQuizQuestionsByOrgId(orgId);

@@ -3,6 +3,7 @@ import {
   addNewHRPQuestionsCallbackService,
   approveEmployeeQuestionsService,
   createNewQuestionService,
+  deleteQuestionService,
   editQuizQuestionsService,
   generateCAnITQuestionsService,
   generateNewHRPQuestionsCallbackService,
@@ -20,6 +21,22 @@ export const editQuizQuestionsController = async (req, res, next) => {
     }
 
     await editQuizQuestionsService(questions, replaceQuestions, quizId);
+
+    res.status(200).json({ message: 'Questions marked as approved' });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteQuestionController = async (req, res, next) => {
+  try {
+    const { questionId, quizId, questionGenre } = req.query;
+    const { orgId } = req.data;
+    if (!questionId || !orgId) {
+      return res.status(400).json({ message: 'Missing required fields' });
+    }
+
+    await deleteQuestionService(questionId, orgId, quizId, questionGenre);
 
     res.status(200).json({ message: 'Questions marked as approved' });
   } catch (error) {

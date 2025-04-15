@@ -87,6 +87,10 @@ export const updateQuestion = async (question) => {
   );
 };
 
+export const deleteQuestionFromDatabase = async (questionId) => {
+  return Question.deleteOne({ _id: new ObjectId(questionId) });
+};
+
 export const editQuizQuestions = async (questionsToEdit) => {
   if (!Array.isArray(questionsToEdit) || questionsToEdit.length === 0) {
     throw new Error(

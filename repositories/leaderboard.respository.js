@@ -56,56 +56,6 @@ export const updateLeaderboard = async (
     { upsert: true, session },
   );
 
-export const rollbackLeaderboardScores = async (quizId, date) => {
-  const newDate = new Date(date);
-  const month = newDate.getUTCMonth();
-  const year = newDate.getUTCFullYear();
-
-  return Leaderboard.aggregate([
-    {
-      $match: {
-        quizId: new ObjectId(quizId),
-      },
-    },
-    {
-      $lookup: {
-        from: 'leaderboards',
-        localField: 'employeeId',
-        foreignField: 'employeeId',
-        as: 'leaderboard',
-      },
-    },
-    { $unwind: '$leaderboard' },
-    {
-      $match: {
-        'leaderboard.month': month,
-        'leaderboard.year': year,
-      },
-    },
-    {
-      $addFields: {
-        'leaderboard.totalScore': {
-          $subtract: [
-            { $ifNull: ['$leaderboard.totalScore', 0] },
-            { $ifNull: ['$score', 0] },
-          ],
-        },
-      },
-    },
-    {
-      $replaceRoot: { newRoot: '$leaderboard' },
-    },
-    {
-      $merge: {
-        into: 'leaderboards',
-        on: '_id',
-        whenMatched: 'merge',
-        whenNotMatched: 'discard',
-      },
-    },
-  ]);
-};
-
 export const getLeaderboardByOrg = async (orgId, month, year) => {
   return Leaderboard.aggregate([
     {
@@ -129,6 +79,25 @@ export const getLeaderboardByOrg = async (orgId, month, year) => {
     { $unwind: '$employee' },
     { $project: { 'employee.name': 1, totalScore: 1 } },
   ]);
+};
+
+export const rollforwardLeaderboardScores = async (employeeResults) => {
+  const newDate = new Date();
+  const month = newDate.getUTCMonth();
+  const year = newDate.getUTCFullYear();
+
+  for (const result of employeeResults) {
+    await Leaderboard.updateOne(
+      {
+        employeeId: result.employeeId,
+        month,
+        year,
+      },
+      {
+        $inc: { totalScore: result.points },
+      },
+    );
+  }
 };
 
 export const resetLeaderboard = async (month, year, pMonth, pYear) => {

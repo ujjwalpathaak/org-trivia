@@ -1,13 +1,14 @@
 import {
-  allowScheduledQuizSerivce,
-  cancelLiveQuizService,
-  cancelScheduledQuizSerivce,
+  cancelQuizService,
   cleanUpQuizzesService,
   getScheduledQuizzesService,
   getWeeklyQuizLiveQuestionsService,
   getWeeklyQuizStatusService,
   makeQuizLiveService,
+  restoreQuizService,
+  resumeLiveQuizService,
   submitWeeklyQuizAnswersService,
+  suspendLiveQuizService,
 } from '../services/quiz.service.js';
 
 export const getQuizStatusController = async (req, res, next) => {
@@ -48,33 +49,44 @@ export const cleanUpQuizzesController = async (req, res, next) => {
   }
 };
 
-export const allowScheduledQuizController = async (req, res, next) => {
+export const restoreQuizController = async (req, res, next) => {
   try {
     const { orgId } = req.data;
     const { quizId } = req.params;
-    const result = await allowScheduledQuizSerivce(quizId, orgId);
+    const result = await restoreQuizService(quizId, orgId);
     res.status(200).json(result);
   } catch (error) {
     next(error);
   }
 };
 
-export const cancelLiveQuizController = async (req, res, next) => {
+export const suspendLiveQuizController = async (req, res, next) => {
   try {
     const { orgId } = req.data;
     const { quizId } = req.params;
-    const result = await cancelLiveQuizService(quizId, orgId);
+    const result = await suspendLiveQuizService(quizId, orgId);
     res.status(200).json(result);
   } catch (error) {
     next(error);
   }
 };
 
-export const cancelScheduledQuizController = async (req, res, next) => {
+export const resumeLiveQuizController = async (req, res, next) => {
+  try {
+    const { orgId } = req.data;
+    const { quizId } = req.params;
+    const result = await resumeLiveQuizService(quizId, orgId);
+    res.status(200).json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const cancelQuizController = async (req, res, next) => {
   try {
     const { quizId } = req.params;
     const { orgId } = req.data;
-    const result = await cancelScheduledQuizSerivce(quizId, orgId);
+    const result = await cancelQuizService(quizId, orgId);
     res.status(200).json(result);
   } catch (error) {
     next(error);

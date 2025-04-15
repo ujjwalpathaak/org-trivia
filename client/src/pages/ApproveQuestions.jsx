@@ -7,6 +7,7 @@ import {
   fetchEmployeeQuestionsToApproveAPI,
   approveEmployeeQuestionsAPI,
   rejectEmployeeQuestionsAPI,
+  deleteQuestionAPI,
 } from '../api.js';
 
 function numToAlpha(num) {
@@ -76,14 +77,24 @@ function QuestionList({
   onToggleQuestionSelect,
   employeeApproveMode,
   selectedCategory,
+  onSelectQuestionReplace,
+  onSelectQuestionDelete,
+  selectQuestionReplace,
+  selectQuestionDelete,
   onCategoryChange,
 }) {
   const categories = [...new Set(questions.map((q) => q.category))].sort();
+  let width = 'w-[98%]';
+  if (!employeeApproveMode) {
+    if (selectQuestionReplace === null && selectQuestionDelete === null) {
+      width = 'w-[98%]';
+    } else if (selectQuestionReplace === null || selectQuestionDelete === null) {
+      width = 'w-[70%]';
+    }
+  }
 
   return (
-    <div
-      className={`bg-white rounded-xl shadow-lg p-6 ${employeeApproveMode ? 'w-[98%]' : 'w-2/4'}`}
-    >
+    <div className={`bg-white rounded-xl shadow-lg p-6 ${width}`}>
       {!employeeApproveMode && (
         <h2 className="text-2xl font-bold text-gray-800 mb-6">Scheduled Questions</h2>
       )}
@@ -127,17 +138,59 @@ function QuestionList({
                   className="mt-6"
                 />
               )}
-              <button
-                onClick={() =>
-                  employeeApproveMode ? onToggleQuestionSelect(idx) : onSelectQuestion(idx)
-                }
+              <div
+                onClick={() => employeeApproveMode && onToggleQuestionSelect(idx)}
                 className={`flex-1 text-left p-4 rounded-lg shadow-sm hover:shadow-md transition duration-200 border ${
-                  selectedQuestionIndex === idx
+                  selectedQuestionIndex === idx || selectQuestionReplace === idx
                     ? 'bg-blue-50 border-blue-300'
                     : 'bg-white border-gray-200'
                 }`}
               >
-                <div className="font-medium text-gray-800 mb-1">Question {idx + 1}</div>
+                <div className="flex justify-between">
+                  <div className="font-medium text-gray-800 mb-1">Question {idx + 1}</div>
+                  {!employeeApproveMode && (
+                    <div className="flex gap-2">
+                      <div className="flex gap-2 mt-2">
+                        <button
+                          className={`px-3 py-1 rounded-md text-sm transition-all ${
+                            selectedQuestionIndex === idx
+                              ? 'underline text-blue-600 font-semibold'
+                              : 'text-gray-700'
+                          } hover:underline hover:text-blue-600`}
+                          onClick={() => {
+                            onSelectQuestionReplace(null);
+                            onSelectQuestion(idx);
+                          }}
+                        >
+                          Edit
+                        </button>
+
+                        <button
+                          className={`px-3 py-1 rounded-md text-sm transition-all ${
+                            selectQuestionReplace === idx
+                              ? 'underline text-purple-600 font-semibold'
+                              : 'text-gray-700'
+                          } hover:underline hover:text-purple-600`}
+                          onClick={() => {
+                            onSelectQuestion(null);
+                            onSelectQuestionReplace(idx);
+                          }}
+                        >
+                          Replace
+                        </button>
+
+                        <button
+                          className="px-3 py-1 rounded-md text-sm text-red-600 hover:underline transition-all hover:text-red-700"
+                          onClick={() => {
+                            onSelectQuestionDelete(idx);
+                          }}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
                 <div className="text-gray-600 text-sm line-clamp-2">{q.question}</div>
                 <div className="text-xs text-indigo-600 font-medium mb-2">
                   Category: {q.category}
@@ -153,7 +206,7 @@ function QuestionList({
                     {`(${numToAlpha(index)}) ${option}`}
                   </div>
                 ))}
-              </button>
+              </div>
             </div>
           ))}
       </div>
@@ -256,6 +309,8 @@ function App() {
   const [questions, setQuestions] = useState([]);
   const [aiQuestions, setAiQuestions] = useState([]);
   const [empQuestions, setEmpQuestions] = useState([]);
+  const [selectQuestionReplace, setSelectQuestionReplace] = useState(null);
+  const [selectQuestionDelete, setSelectQuestionDelete] = useState(null);
   const [selectedQuestionIndex, setSelectedQuestionIndex] = useState(null);
   const [selectedQuestions, setSelectedQuestions] = useState([]);
   const [selectedQuestionsReject, setSelectedQuestionsReject] = useState([]);
@@ -265,6 +320,16 @@ function App() {
   const { quizId } = useParams();
   const employeeApproveMode = quizId === undefined;
   const navigate = useNavigate();
+
+  const onSelectQuestionDelete = async (idx) => {
+    const questionToDelete = questions[idx];
+    try {
+      await deleteQuestionAPI(questionToDelete._id, quizId, questionToDelete.category);
+      setQuestions((prev) => prev.filter((q) => q._id !== questionToDelete._id));
+    } catch (err) {
+      console.error('Error deleting question', err);
+    }
+  };
 
   const handleApproveSelectedQuestions = async () => {
     if (selectedQuestions.length === 0) {
@@ -417,7 +482,7 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-6">
+    <div className="min-h-screen w-full bg-gradient-to-br from-blue-50 to-indigo-50 p-6">
       <div className="mb-6 flex justify-between items-center">
         {employeeApproveMode ? (
           <>
@@ -473,6 +538,10 @@ function App() {
         <QuestionList
           questions={questions}
           onSelectQuestion={setSelectedQuestionIndex}
+          onSelectQuestionReplace={setSelectQuestionReplace}
+          selectQuestionReplace={selectQuestionReplace}
+          onSelectQuestionDelete={onSelectQuestionDelete}
+          selectQuestionDelete={selectQuestionDelete}
           selectedQuestionIndex={selectedQuestionIndex}
           selectedQuestions={selectedQuestions}
           onToggleQuestionSelect={handleToggleQuestionSelect}
@@ -480,8 +549,7 @@ function App() {
           selectedCategory={selectedCategory}
           onCategoryChange={setSelectedCategory}
         />
-
-        {!employeeApproveMode && (
+        {!employeeApproveMode && !selectQuestionReplace && selectedQuestionIndex !== null && (
           <QuestionEditor
             question={selectedQuestionIndex !== null ? questions[selectedQuestionIndex] : null}
             index={selectedQuestionIndex}
@@ -492,12 +560,12 @@ function App() {
             employeeApproveMode={employeeApproveMode}
           />
         )}
-        {!employeeApproveMode && (
+        {!employeeApproveMode && !selectedQuestionIndex && selectQuestionReplace !== null && (
           <ExtraQuestions
             aiQuestions={aiQuestions}
             empQuestions={empQuestions}
             onReplaceQuestion={handleReplaceQuestion}
-            selectedQuestionIndex={selectedQuestionIndex}
+            selectedQuestionIndex={selectQuestionReplace}
           />
         )}
       </div>

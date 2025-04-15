@@ -12,11 +12,11 @@ export const findQuiz = (quizId) => {
   return Quiz.findOne({ _id: new ObjectId(quizId) });
 };
 
-export const getLiveQuizQuestionsByOrgId = () => {
+export const getLiveQuizQuestionsByOrgId = (orgId) => {
   return Quiz.aggregate([
     {
       $match: {
-        orgId: new ObjectId('67c6904cf8c3ce19ef544cac'),
+        orgId: new ObjectId(orgId),
         status: 'live',
       },
     },
@@ -61,7 +61,7 @@ export const getLiveQuizQuestionsByOrgId = () => {
     },
     {
       $addFields: {
-        'question.quizId': '$quizId',
+        'question.quizId': '$_id',
       },
     },
     {
@@ -82,29 +82,34 @@ export const getQuizStatus = (orgId, date) => {
   );
 };
 
-export const cancelScheduledQuiz = async (quizId) => {
+export const cancelQuiz = async (quizId) => {
   return Quiz.findOneAndUpdate(
-    { _id: new ObjectId(quizId) },
+    { _id: new ObjectId(quizId), status: { $in: ['scheduled', 'upcoming'] } },
     { $set: { status: 'cancelled' } },
     { returnDocument: 'after' },
   );
 };
 
-export const cancelLiveQuiz = async (quizId) => {
+export const suspendLiveQuiz = async (quizId) => {
   return Quiz.findOneAndUpdate(
     { _id: new ObjectId(quizId), status: 'live' },
-    { $set: { status: 'expired' } },
+    { $set: { status: 'suspended' } },
     { returnDocument: 'after' },
   );
 };
 
-export const allowScheduledQuiz = async (quizId) => {
+export const resumeLiveQuiz = async (quizId) => {
+  return Quiz.findOneAndUpdate(
+    { _id: new ObjectId(quizId), status: 'suspended' },
+    { $set: { status: 'live' } },
+    { returnDocument: 'after' },
+  );
+};
+
+export const restoreQuiz = async (quizId) => {
   const quiz = await Quiz.findOne({ _id: new ObjectId(quizId) });
-  console.log(quiz);
   const quizQuestionsCount = quiz.questions.length;
-  console.log(quizQuestionsCount);
   const newStatus = quizQuestionsCount === 0 ? 'upcoming' : 'scheduled';
-  console.log(newStatus);
 
   return Quiz.findOneAndUpdate(
     { _id: new ObjectId(quizId), status: 'cancelled' },
@@ -214,6 +219,22 @@ export const scheduleNewWeeklyQuiz = (
       questionGenerationTimeline: companyCurrentAffairsTimeline,
     }),
   });
+};
+
+export const removeQuestionFromQuiz = async (questionId, quizId) => {
+  const questionIds = await Quiz.findOne(
+    { _id: new ObjectId(quizId) },
+    { questions: 1 },
+  ).lean();
+
+  const newQuestions = questionIds?.questions?.filter(
+    (q) => q.toString() !== questionId,
+  );
+
+  return Quiz.updateOne(
+    { _id: new ObjectId(quizId) },
+    { $set: { questions: newQuestions } },
+  );
 };
 
 export const makeQuizLive = async (date) => {

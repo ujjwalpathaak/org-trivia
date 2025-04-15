@@ -30,11 +30,13 @@ import {
   makeGenreUnavailable,
   pushNewQuestionInOrg,
   pushQuestionsInOrg,
+  removeQuestionFromOrg,
   setNextQuestionGenre,
 } from '../repositories/org.repository.js';
 import {
   addQuestions,
   createNewQuestion,
+  deleteQuestionFromDatabase,
   editQuizQuestions,
   getCAnITQuestionsInTimeline,
 } from '../repositories/question.repository.js';
@@ -45,6 +47,7 @@ import {
   getQuizByQuizId,
   getScheduledQuizQuestions,
   lastQuizByGenre,
+  removeQuestionFromQuiz,
   replaceQuizQuestions,
   saveQuizQuestions,
   scheduleNewWeeklyQuiz,
@@ -72,6 +75,7 @@ const scheduleQuizForOrgService = async (org) => {
   let nextGenreIndex = currentGenre;
 
   for (const friday of fridaysOfMonth) {
+    nextGenreIndex = nextGenreIndex % allGenres.length;
     const genre = allGenres[nextGenreIndex];
     const quiz = await scheduleNewWeeklyQuiz(
       org._id,
@@ -343,15 +347,15 @@ export const changeQuizGenreWorkflow = async (
 
     switch (genre.newGenre) {
       case 'PnA': {
-        const requiredPnACount = PnA_QUESTIONS_PER_QUIZ;
-        const [{ count: availablePnACount = 0 } = {}] =
+        let requiredPnACount = PnA_QUESTIONS_PER_QUIZ;
+        let [{ count: availablePnACount = 0 } = {}] =
           await getPnAQuestionsLeft(orgId);
         if (availablePnACount > requiredPnACount) {
           await startPnAWorkflow(orgId, genre.quizId);
         } else {
-          const { questions: fetchedQuestions } =
+          let { questions: fetchedQuestions } =
             await fetchNewPnAQuestions(orgName);
-          const insertedQuestions = await pushQuestionsToDatabase(
+          let insertedQuestions = await pushQuestionsToDatabase(
             fetchedQuestions,
             'PnA',
           );
@@ -365,12 +369,12 @@ export const changeQuizGenreWorkflow = async (
         break;
 
       case 'CAnIT':
-        const quizDate = new Date(quiz.questionGenerationDate);
-        const today = new Date();
-      
+        let quizDate = new Date(quiz.questionGenerationDate);
+        let today = new Date();
+
         quizDate.setUTCHours(0, 0, 0, 0);
         today.setUTCHours(0, 0, 0, 0);
-      
+
         if (quizDate.getTime() === today.getTime()) {
           await generateCAnITQuestionsService();
         }
@@ -442,8 +446,6 @@ export const allowQuizQuestionGenerationWorkflow = async (quiz, orgId) => {
   const genre = quiz.genre;
   const errors = [];
 
-  console.log('abc', quiz, orgId, genre)
-
   switch (genre) {
     case 'HRP': {
       const isAvailable = await isGenreAvailable(orgId, 'HRP');
@@ -489,8 +491,6 @@ export const allowQuizQuestionGenerationWorkflow = async (quiz, orgId) => {
       break;
   }
 
-  console.log(errors);
-
   if (errors.length > 0) {
     console.error('Validation errors:', errors);
     return {
@@ -502,15 +502,16 @@ export const allowQuizQuestionGenerationWorkflow = async (quiz, orgId) => {
 
   switch (genre) {
     case 'PnA': {
-      const requiredPnACount = PnA_QUESTIONS_PER_QUIZ;
-      const [{ count: availablePnACount = 0 } = {}] =
+      let requiredPnACount = PnA_QUESTIONS_PER_QUIZ;
+      let [{ count: availablePnACount = 0 } = {}] =
         await getPnAQuestionsLeft(orgId);
       if (availablePnACount > requiredPnACount) {
         await startPnAWorkflow(orgId, genre.quizId);
       } else {
-        const { questions: fetchedQuestions } =
-          await fetchNewPnAQuestions(orgName);
-        const insertedQuestions = await pushQuestionsToDatabase(
+        let { questions: fetchedQuestions } = await fetchNewPnAQuestions(
+          quiz.name,
+        );
+        let insertedQuestions = await pushQuestionsToDatabase(
           fetchedQuestions,
           'PnA',
         );
@@ -524,9 +525,9 @@ export const allowQuizQuestionGenerationWorkflow = async (quiz, orgId) => {
       break;
 
     case 'CAnIT':
-      const quizDate = new Date(quiz.questionGenerationDate);
-      const today = new Date();
-    
+      let quizDate = new Date(quiz.questionGenerationDate);
+      let today = new Date();
+
       quizDate.setUTCHours(0, 0, 0, 0);
       today.setUTCHours(0, 0, 0, 0);
       if (quizDate.getTime() === today.getTime()) {
@@ -548,6 +549,19 @@ export async function createNewQuestionService(newQuestionData, employeeId) {
   if (!added) throw new Error('Failed to add question to org');
 
   await addSubmittedQuestion(newQuestion._id, employeeId);
+
+  return true;
+}
+
+export async function deleteQuestionService(
+  questionId,
+  orgId,
+  quizId,
+  questionGenre,
+) {
+  await removeQuestionFromOrg(questionId, orgId, questionGenre);
+  await deleteQuestionFromDatabase(questionId);
+  await removeQuestionFromQuiz(questionId, quizId);
 
   return true;
 }

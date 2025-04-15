@@ -5,10 +5,11 @@ import { CircleAlert, GripHorizontal } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import {
-  allowScheduledQuizAPI,
-  cancelLiveQuizAPI,
-  cancelScheduledQuizAPI,
+  cancelQuizAPI,
+  restoreQuizAPI,
+  resumeLiveQuizAPI,
   saveOrgSettings,
+  suspendLiveQuizAPI,
 } from '../api';
 
 const ItemType = 'GENRE';
@@ -120,9 +121,36 @@ export default function ListManager({
     [setIsSaved]
   );
 
-  const handleCancelLiveQuiz = async (quiz) => {
-    const respones = await cancelLiveQuizAPI(quiz._id);
-    toast.error('Live Quiz cancelled');
+  const handleRestoreQuiz = async (quiz) => {
+    const respones = await restoreQuizAPI(quiz._id);
+    if (respones.status === 400) {
+      for (const error of respones.errors) {
+        toast.error(error.message);
+      }
+      return;
+    }
+    toast.success('Quiz Restored');
+  };
+
+  const handleResumeLiveQuizAPI = async (quiz) => {
+    const respones = await resumeLiveQuizAPI(quiz._id);
+    if (respones.status === 400) {
+      for (const error of respones.errors) {
+        toast.error(error.message);
+      }
+      return;
+    }
+    toast.success('Live Quiz Resumed');
+  };
+
+  const handleCancelQuiz = async (quiz) => {
+    await cancelQuizAPI(quiz._id);
+    toast.error('Quiz cancelled');
+  };
+
+  const handleSuspendLiveQuiz = async (quiz) => {
+    await suspendLiveQuizAPI(quiz._id);
+    toast.error('Quiz suspended');
   };
 
   const catMap = {
@@ -131,24 +159,8 @@ export default function ListManager({
     HRP: 'HR Policies',
   };
 
-  const handleCancelScheduledQuiz = async (quiz) => {
-    const respones = await cancelScheduledQuizAPI(quiz._id);
-    toast.error('Quiz cancelled');
-  };
-
   const handleApproveEmployeeQuestions = async (quiz) => {
     navigate(`approve-questions`);
-  };
-
-  const handleAllowQuiz = async (quiz) => {
-    const respones = await allowScheduledQuizAPI(quiz._id);
-    if (respones.status === 400) {
-      for (const error of respones.errors) {
-        toast.error(error.message);
-      }
-      return;
-    }
-    toast.success('Quiz Allowed');
   };
 
   const handleSaveChanges = useCallback(async () => {
@@ -341,6 +353,8 @@ export default function ListManager({
                       let bgColor = 'bg-green-100';
                       if (quiz.status === 'scheduled' || quiz.status === 'upcoming') {
                         bgColor = 'bg-slate-100';
+                      } else if (quiz.status === 'suspended') {
+                        bgColor = 'bg-yellow-100';
                       } else if (quiz.status === 'expired') {
                         bgColor = 'bg-slate-300';
                       } else if (quiz.status === 'cancelled') {
@@ -399,7 +413,7 @@ export default function ListManager({
                                     <button
                                       onClick={() => handleEditQuestions(quiz)}
                                       className="text-xs m-auto hover:underline hover:text-green-500 text-green-700"
-                                      title="Cancel Quiz"
+                                      title="Edit Questions"
                                     >
                                       Edit Questions
                                     </button>
@@ -415,7 +429,7 @@ export default function ListManager({
                                 {quiz.status !== 'cancelled' && (
                                   <div className="flex items-center">
                                     <button
-                                      onClick={() => handleCancelScheduledQuiz(quiz)}
+                                      onClick={() => handleCancelQuiz(quiz)}
                                       className="text-xs m-auto hover:underline hover:text-red-500 text-red-700"
                                       title="Cancel Quiz"
                                     >
@@ -427,18 +441,18 @@ export default function ListManager({
                             ) : (
                               <>
                                 {quiz.status === 'live' ? (
-                                  <>
-                                    <span className="text-sm text-green-700">
+                                  <div className="flex justify-between w-full">
+                                    <span className="ml-2 text-sm text-green-700">
                                       {quiz.genre} is live!
                                     </span>
                                     <button
-                                      onClick={() => handleCancelLiveQuiz(quiz)}
-                                      className="text-xs m-auto hover:p-2 hover:rounded-full hover:bg-red-700 hover:text-red-500 text-red-700"
-                                      title="Cancel Quiz"
+                                      onClick={() => handleSuspendLiveQuiz(quiz)}
+                                      className="text-xs hover:underline hover:text-red-500 text-red-700"
+                                      title="Suspend Quiz"
                                     >
-                                      Cancel Quiz
+                                      Suspend Quiz
                                     </button>
-                                  </>
+                                  </div>
                                 ) : quiz.status === 'cancelled' ? (
                                   <>
                                     <select
@@ -459,11 +473,22 @@ export default function ListManager({
                                     </select>
                                     <span className="text-xs text-slate-400">Quiz Cancelled</span>
                                     <button
-                                      onClick={() => handleAllowQuiz(quiz)}
+                                      onClick={() => handleRestoreQuiz(quiz)}
                                       className="text-xs hover:underline hover:text-green-500 text-green-700"
-                                      title="Allow Quiz"
+                                      title="Restore Quiz"
                                     >
-                                      Allow Quiz
+                                      Restore Quiz
+                                    </button>
+                                  </>
+                                ) : quiz.status === 'suspended' ? (
+                                  <>
+                                    <span className="text-xs text-slate-700">Quiz Suspended</span>
+                                    <button
+                                      onClick={() => handleResumeLiveQuizAPI(quiz)}
+                                      className="text-xs hover:underline hover:text-green-500 text-green-700"
+                                      title="Resume Quiz"
+                                    >
+                                      Resume Quiz
                                     </button>
                                   </>
                                 ) : quiz.status === 'expired' ? (

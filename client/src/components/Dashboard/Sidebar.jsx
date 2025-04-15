@@ -238,6 +238,42 @@ const Sidebar = ({
             </div>
           </div>
         );
+      case 5:
+        return (
+          <div className="rounded-xl">
+            <div className="flex flex-col">
+              <h2 className="text-sm text-gray-400">{quizStatus.genre} quiz has been suspended</h2>
+              <div className="flex items-center gap-2">
+                <Gamepad2 className="w-6 h-6 text-green-600" />
+                <h2 className="text-lg text-gray-800">Weekly Quiz Trivia</h2>
+                <QuizTooltip />
+              </div>
+            </div>
+
+            <div className="flex justify-between mt-4">
+              <div className="flex flex-col items-center w-1/2">
+                <div className="flex items-center gap-2 text-gray-700">
+                  <CalendarCheck className="h-5 w-5 text-green-500" />
+                  <span className="text-lg font-semibold">{details?.employee?.streak || 0}</span>
+                </div>
+                <span className="text-sm text-gray-500">Streak</span>
+              </div>
+              <div className="flex flex-col items-center w-1/2">
+                <div className="flex items-center gap-2 text-gray-700">
+                  <Coins className="h-5 w-5 text-green-500" />
+                  <span className="text-lg font-semibold">{details?.employee?.score || 0}</span>
+                </div>
+                <span className="text-sm text-gray-500">Score</span>
+              </div>
+            </div>
+
+            <div className="flex gap-2 w-full justify-end mt-8">
+              <span className="text-sm italic text-gray-500">
+                Next Quiz in {daysUntilNextFriday()} Days
+              </span>
+            </div>
+          </div>
+        );
       default:
         return null;
     }

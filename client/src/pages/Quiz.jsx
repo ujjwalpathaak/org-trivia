@@ -5,10 +5,7 @@ import { Loader, Clock, CheckCircle, Coins } from 'lucide-react';
 
 const Quiz = ({ setQuizStatus, setIsQuizOpen }) => {
   const [questions, setQuestions] = useState([]);
-  const [result, setResult] = useState({
-    score: -1,
-    points: -1,
-  });
+  const [result, setResult] = useState(null);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [quizId, setQuizId] = useState(null);
   const [isQuizFinished, setIsQuizFinished] = useState(false);
@@ -91,7 +88,8 @@ const Quiz = ({ setQuizStatus, setIsQuizOpen }) => {
       if (optionsSelected.answers) {
         const response = await submitQuizAnswersAPI(optionsSelected.answers, quizId);
         setResult({
-          ...response.data,
+          score: response.score,
+          points: response.points,
         });
         localStorage.removeItem('state');
       }
@@ -121,7 +119,17 @@ const Quiz = ({ setQuizStatus, setIsQuizOpen }) => {
       <div className="w-full p-4 rounded-lg text-center">
         {isQuizFinished ? (
           <>
-            {result?.score !== -1 ? (
+            {result === null ? (
+              <div className="flex flex-col items-center">
+                <CheckCircle className="w-12 h-12 text-green-500" />
+                <button
+                  onClick={handleSubmitAnswers}
+                  className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all"
+                >
+                  Submit Quiz
+                </button>
+              </div>
+            ) : (
               <div className="flex flex-col items-center">
                 <Coins className="w-12 h-12 text-blue-500" />
                 <span className="text-xl mt-2">Your Points: {result.points || 0}</span>
@@ -134,16 +142,6 @@ const Quiz = ({ setQuizStatus, setIsQuizOpen }) => {
                   className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all"
                 >
                   Close Quiz
-                </button>
-              </div>
-            ) : (
-              <div className="flex flex-col items-center">
-                <CheckCircle className="w-12 h-12 text-green-500" />
-                <button
-                  onClick={handleSubmitAnswers}
-                  className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all"
-                >
-                  Submit Quiz
                 </button>
               </div>
             )}

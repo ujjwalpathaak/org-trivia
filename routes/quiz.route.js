@@ -1,13 +1,14 @@
 import express from 'express';
 
 import {
-  allowScheduledQuizController,
-  cancelLiveQuizController,
-  cancelScheduledQuizController,
+  cancelQuizController,
   getQuizStatusController,
   getScheduledQuizzesController,
   getWeeklyQuizLiveQuestionsController,
+  restoreQuizController,
+  resumeLiveQuizController,
   submitQuizAnswersController,
+  suspendLiveQuizController,
 } from '../controllers/quiz.controller.js';
 import { checkRole, protectRoute } from '../middleware/auth.middleware.js';
 
@@ -21,24 +22,31 @@ quizRouter.get(
 );
 
 quizRouter.patch(
-  '/live/:quizId/cancel',
+  '/live/:quizId/suspend',
   protectRoute,
   checkRole('Admin'),
-  cancelLiveQuizController,
+  suspendLiveQuizController,
 );
 
 quizRouter.patch(
-  '/scheduled/:quizId/cancel',
+  '/:quizId/cancel',
   protectRoute,
   checkRole('Admin'),
-  cancelScheduledQuizController,
+  cancelQuizController,
 );
 
 quizRouter.patch(
-  '/scheduled/:quizId/allow',
+  '/:quizId/restore',
   protectRoute,
   checkRole('Admin'),
-  allowScheduledQuizController,
+  restoreQuizController,
+);
+
+quizRouter.patch(
+  '/live/:quizId/resume',
+  protectRoute,
+  checkRole('Admin'),
+  resumeLiveQuizController,
 );
 
 quizRouter.get(

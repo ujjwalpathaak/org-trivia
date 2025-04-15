@@ -146,6 +146,23 @@ const updateQuestionState = async (mp, newState) => {
   }
 };
 
+export const rollforwardWeeklyQuizScores = async (employeeResults) => {
+  for (const employeeResult of employeeResults) {
+    const employee = await Employee.findById(
+      employeeResult.employeeId,
+      'score',
+    );
+    await Employee.updateOne(
+      { _id: new ObjectId(employeeResult.employeeId) },
+      {
+        $set: {
+          score: employee.score + employeeResult.points,
+        },
+      },
+    );
+  }
+};
+
 export const approveEmployeeQuestion = (mp) =>
   updateQuestionState(mp, 'approved');
 export const rejectEmployeeQuestion = (mp) =>

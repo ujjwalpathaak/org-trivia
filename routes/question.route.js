@@ -3,6 +3,7 @@ import express from 'express';
 import {
   approveEmployeeQuestionsController,
   createNewQuestionController,
+  deleteQuestionController,
   editQuizQuestionsController,
   getEmployeeQuestionsToApproveController,
   getScheduledQuizQuestionsController,
@@ -24,6 +25,13 @@ questionRouter.patch(
   protectRoute,
   checkRole('Admin'),
   editQuizQuestionsController,
+);
+
+questionRouter.delete(
+  '/delete',
+  protectRoute,
+  checkRole('Admin'),
+  deleteQuestionController,
 );
 
 questionRouter.get(
